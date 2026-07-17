@@ -203,6 +203,35 @@ and shorts from different days offset (e.g. Portfolio 1 gross ≈ 1.83, not 2.0)
 totaling 50%). With `n_pos` longs and `n_neg` shorts: each long = `1.5/n_pos`,
 each short = `−0.5/n_neg`. Net = +1.5 − 0.5 = **+1.0**.
 
+### Weights Are Money, Not Shares or Price / 权重是"钱"，不是股数或价格
+
+A frequent confusion: *"SPY, GLD, XLK have different prices — how can they each
+be +50% and still sum to 150%?"* The point is that a weight is a **fraction of
+capital (money)**, not a share count and not tied to price. "Equal weight" means
+**equal dollars**, and the long legs sum to 150% **by construction** — you are
+simply slicing a fixed 150% budget into `n_pos` equal money slices, so the sum
+is an identity (`1.5/n_pos × n_pos = 1.5`), never a coincidence. 等权 = 等金额，
+加总必然是 150%，因为那 150% 本来就是你平均切成 n 份的。
+
+Prices do **not** need to be equal and never enter the weight formula. Price
+only enters **later**, when the dollar allocation is converted to shares
+(`shares = dollar / close`): the same $ buys **fewer** shares of an expensive
+asset and **more** of a cheap one.
+
+| Long asset | Weight (money) | $ on 1000 capital | Price | Shares bought |
+| --- | --- | --- | --- | --- |
+| SPY | +50% | $500 | $600 | 0.833 |
+| GLD | +50% | $500 | $200 | 2.500 |
+| XLK | +50% | $500 | $150 | 3.333 |
+| **Sum** | **150%** | **$1500** | — | (all different) |
+
+Same **dollars** per name, wildly different **share counts** — exactly as
+intended. This is also why the weight formula `1.5 / n_pos` correctly contains
+no price term: allocating money does not require knowing the per-share price;
+price is consumed earlier (in the momentum signal, which picked the members) and
+later (in the share conversion), just not in the money split itself.
+分钱不需要知道单价，价格在"选股"和"换算股数"两步才用到。
+
 **Portfolio 2 — Relative MOM (market-neutral).** Equal-magnitude weights whose
 **sign** comes from momentum *relative to the cross-section*, not from its
 absolute sign. An asset is long if its MOM is **at or above the cross-sectional
