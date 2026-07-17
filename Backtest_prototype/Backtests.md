@@ -117,3 +117,128 @@ The correct economic order should always be:
 ```text
 target decision → trade execution → current position → portfolio valuation
 ```
+
+---
+
+# Multi-Asset Momentum Backtester
+
+The single-asset backtester above is extended to many assets in the simplest
+possible way: **loop the single-asset backtester over every asset**, give each
+one its own time-varying dollar series, and sum the per-asset PnL. See
+[`backtest.py`](backtest.py). 用循环把单资产回测跑 37 遍再加总。
+
+## How Momentum and the Backtest Relate / 动量与回测的关系
+
+They are **upstream / downstream**. Momentum decides *what to hold and how
+much*; the backtester assumes you actually traded that and computes the PnL.
+The two are fully decoupled — swap the signal without touching the backtester,
+or change the trading assumptions without touching the signal.
+
+```text
+close prices
+   │  ① signal          momentum(21-day mean of daily returns)   谁在涨/跌
+   ▼
+momentum signal
+   │  ② target weights  Portfolio 1 / Portfolio 2                做多/做空谁、各多少%
+   ▼
+target weights
+   │  ③ 5-day overlap   overlap_weights = target.rolling(5).mean()
+   ▼
+held weights
+   │  ④ weight × capital → dollar exposure                      权重 → 美元敞口
+   ▼
+multi_asset_backtester (loop over 37 assets)
+   │  ⑤ dollar ÷ close → shares → simulate → PnL
+   ▼
+per-asset PnL → summed → equity curve + Sharpe / drawdown
+```
+
+**The bridge is weight → dollar → shares** (one-directional):
+
+| Quantity | Meaning | Formula | Unit |
+| --- | --- | --- | --- |
+| `weight` | how much of the book to allocate | from the momentum signal | fraction (%) |
+| `dollar` | that allocation in money | `weight × capital` | USD |
+| `shares` | shares that money buys | `dollar / close` | shares |
+
+Weight is the **cause**; dollar and shares are the **effect**. Because
+`shares = dollar / close`, the share count drifts every day even when the
+target dollar exposure is unchanged — that is why the book makes small daily
+rebalancing trades. 用权重而不是股数，是因为 37 只 ETF 价格差别很大，只有百分比敞口才可比。
+
+## Momentum Signal / 动量信号
+
+Signal = trailing **21 trading days (~1 month)** mean of daily returns, per
+asset: `close.pct_change().rolling(21).mean()`. Positive = recent uptrend,
+negative = recent downtrend.
+
+## Holding Period: Why Weights Change / 5 天持仓下权重如何变化
+
+Holding period is **5 trading days (~1 week)**, implemented as **overlapping
+portfolios** (Jegadeesh–Titman style), not a hard rebalance every 5th day.
+Each day commits 1/5 of the book to that day's fresh signal and holds it 5
+days, so the weight actually held is the average of the last 5 daily targets:
+
+```text
+held_weight[t] = mean(target[t], target[t-1], ..., target[t-4])
+```
+
+Code: `overlap_weights = target.rolling(5).mean()`. Weights therefore **evolve
+smoothly** as old signals roll off and new ones roll on (lower turnover). A
+side effect: **gross exposure falls below the single-day target** when longs
+and shorts from different days offset (e.g. Portfolio 1 gross ≈ 1.83, not 2.0).
+这就是作业里"想一想 weights 怎么变化"的答案 —— 不是每 5 天跳一次，而是滚动平滑。
+
+## The Two Portfolios / 两个组合
+
+| | Portfolio 1 | Portfolio 2 |
+| --- | --- | --- |
+| Long/short rule | **absolute** MOM (>0 long / <0 short) | **relative** MOM (vs peers) |
+| Weights | long leg 150% equal-weight, short leg 50% equal-weight | equal magnitude, sign by relative rank |
+| Net exposure | +100% (long-biased) | ≈ 0 (market-neutral) |
+| Gross exposure | 200% (before overlap) | ~200% (before overlap) |
+
+**Portfolio 1 — Long 150% / Short 50%.** Long every positive-MOM asset
+(equal weight, totaling 150%), short every negative-MOM asset (equal weight,
+totaling 50%). With `n_pos` longs and `n_neg` shorts: each long = `1.5/n_pos`,
+each short = `−0.5/n_neg`. Net = +1.5 − 0.5 = **+1.0**.
+
+**Portfolio 2 — Relative MOM (market-neutral).** Equal-magnitude weights whose
+**sign** comes from momentum *relative to the cross-section*, not from its
+absolute sign. An asset is long if its MOM is **at or above the cross-sectional
+median** that day, else short — so an asset can be shorted even with positive
+MOM. This reproduces the brief's example (MOM 10% / 5% / 1% → +66% / +66% /
+−66%): the median is 5%, so the two assets ≥ median go long and the weakest one
+goes short. The **median** is used deliberately — the mean (5.33%) would give
++ / − / −, which does not match the example. Each leg has magnitude `2/N`, so
+gross ≈ 2.0 and net ≈ 0. 关键在"相对"：即使都在涨，最弱的也做空，赚的是强弱差价，与大盘涨跌无关。
+
+## Daily Lifecycle After Each Close / 每次收盘后的流程
+
+```text
+day t close arrives
+   │
+   ├─ signal side:   close → daily return → 21d momentum → target weights → dollar
+   │                 ("the position I want", not yet executed)
+   │
+   ├─ execution side (delay ~1 day): dollar → target_shrs
+   │                 → next bar becomes curr_shrs → traded_shrs (shares to trade today)
+   │
+   └─ accounting side: fill at TWAP=(open+close)/2 → update net_cash, asset_value
+                       → portfolio = net_cash + asset_value = cumulative PnL
+```
+
+A signal computed at the close of day t cannot trade at day t's earlier prices,
+so there are two offsets — `delay` on the signal and `.shift()` on the position
+— pushing execution to a later bar. Multi-asset just runs this loop for all 37
+assets and sums each asset's `portfolio` (PnL) into the strategy equity curve.
+
+## Results & Caveats / 结果与注意事项
+
+Over 2020-01 → 2026-06 both portfolios post near-zero Sharpe (a fast, weekly
+cross-sectional momentum on 37 ETFs is not expected to be profitable — the
+exercise is about the mechanics). Sharp vertical steps in the equity curve are
+a **data artifact, not a code bug**: prices are **unadjusted**, so splits and
+dividends create fake cross-day returns (e.g. USO's April-2020 reverse split).
+For a clean backtest use split/dividend-adjusted closes. 净值里的突跳来自未复权价格，
+不是代码问题。
