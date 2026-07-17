@@ -67,7 +67,67 @@ Neither explanation is fully conclusive, but momentum strategies have demonstrat
 - To deploy capital fully, portfolios may combine long and short positions—for example, using 150/50 or 200/100 structures—instead of leaving capital unallocated.
 - Empirically, long positions often contribute more to P&L than short positions of a similar size, possibly because of a carry or risk-free-rate effect.
 
-## 3. Market Participants by Holding Period
+## 3. How Short Selling Works / 做空的原理
+
+A common confusion: *how can you sell shares you do not own, and why does
+"owing shares" make sense?* The answer is that a short sale is not selling out
+of thin air — **you borrow the shares first**, exactly like borrowing money,
+except the thing borrowed is stock. 你不是凭空卖，而是"先借来再卖"。
+
+### The four steps / 四个步骤
+
+```text
+1. Borrow  借入   — borrow N shares from a lender (broker / long-term holder)
+2. Sell    卖出   — sell those borrowed shares now, receive cash
+3. Buy back 买回  — later buy N shares back from the market
+4. Return  归还   — return the N shares to the lender (close the position)
+```
+
+You never create shares from nothing; you use someone else's temporarily and
+return an **equal quantity of the same stock** later. Shares are fungible (every
+SPY share is identical), so returning "N shares of SPY" — not the exact
+certificates — settles the debt. 股票同质可替代，还等量同种即可。
+
+### Why it makes sense — a cola analogy / 一个类比
+
+You think cola will get cheaper next week:
+
+```text
+Today : borrow 1 case (worth $100), sell it immediately  → receive $100
+Later : cola drops, buy 1 case back for $80
+        return the case to the lender                     → you keep $20
+```
+
+Profit = **sell price − buy-back price**. A short position is a bet that the
+price **falls**. 做空就是"赌它跌"：跌了→还债更便宜→赚；涨了→还债更贵→亏。
+
+### Why lenders lend / 出借方图什么
+
+Long-term holders (Vanguard, BlackRock, pension funds — the buy-and-hold group
+in the next section) earn a **lending fee / interest** on stock they were going
+to sit on anyway. The broker matches borrowers with lenders and holds margin.
+This mature market is called **securities lending 证券借贷**.
+
+### Why shorting is riskier than going long / 为什么做空更危险
+
+- **Long:** the most you can lose is 100% (price goes to 0). Loss is bounded.
+- **Short:** the price can rise without limit, so the shares you owe can become
+  arbitrarily expensive — **loss is theoretically unbounded**. Brokers require
+  **margin** and may force a **buy-in** (forced close) to protect the lender.
+  This is also why the 150/50 = 200% gross book is effectively **2× leverage**,
+  not free money.
+
+### In this backtest / 在本回测中
+
+The code does **not** model borrowing, lending fees, or margin. It simply allows
+a **negative share count** (`curr_shrs < 0`) and values it at
+`asset_value = curr_shrs × close`, so a short shows up as a **negative position
+value (a liability)** that *gains* when price falls and *loses* when price rises.
+The simplification assumes shares are always borrowable and borrow costs are
+zero — fine for a teaching backtest, but real trading must account for both.
+负号代表"这是做空方向、是要还的债"，不是"亏损"。
+
+## 4. Market Participants by Holding Period
 
 The following participants are ordered approximately from the longest to the shortest holding period:
 
