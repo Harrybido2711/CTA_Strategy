@@ -1,79 +1,53 @@
 # 08 · Toolbox: pandas
 
-> **This chapter answers:** how the non-obvious pandas functions used in this project actually behave.
-> **Prerequisites:** none — reference material, read it when you hit one of these.
-> **Related:** [03 · Building Your Own Signal](03-building-signals.md), [05 · Understanding Backtesting](05-understanding-backtesting.md).
+> **Answers:** how the non-obvious pandas functions in this project actually behave.
+> **Prerequisites:** none — reference material.
+> **Related:** [03](03-building-signals.md), [05](05-understanding-backtesting.md).
 
 ---
 
 ## `pandas.merge_asof`
 
-Official documentation: [pandas.merge_asof](https://pandas.pydata.org/docs/reference/api/pandas.merge_asof.html)
-
-`pd.merge_asof()` performs an approximate ordered merge. Unlike a normal `merge`, it does not require the values in the merge key to be exactly equal. For every row in the left DataFrame, it searches the right DataFrame for the closest eligible row.
-
-The DataFrames must be sorted in ascending order by the merge key before calling it:
+[Docs](https://pandas.pydata.org/docs/reference/api/pandas.merge_asof.html) · An approximate ordered
+merge: keys need not be equal, so for each left row it finds the closest eligible right row. **Both
+frames must be sorted by the key first.**
 
 ```python
-data = data.sort_values('ts_event')
+data   = data.sort_values('ts_event')
 dollar = dollar.sort_values('ts_event')
 
-df = pd.merge_asof(
-    left=data,
-    right=dollar,
-    on='ts_event',
-    direction='backward'
-)
+df = pd.merge_asof(left=data, right=dollar, on='ts_event', direction='backward')
 ```
 
-In this example:
-
-- `left=data`: determines which timestamps and rows appear in the result.
-- `right=dollar`: supplies values to matching left-side rows.
-- `on='ts_event'`: uses `ts_event` as the ordered matching key in both tables.
-- `direction='backward'`: selects the closest right-side timestamp that is less than or equal to the left-side timestamp.
-
-For example:
+- `left` determines which rows appear in the result; `right` supplies matched values.
+- `direction='backward'` takes the closest right key ≤ left key.
 
 ```text
-left: data                 right: dollar
-ts_event  close            ts_event  dollar
-1.2       100              1.3       10000
-1.3       102              1.4       15000
-1.5       104
+left: data          right: dollar        result
+ts_event  close     ts_event  dollar     ts_event  close  dollar
+1.2       100       1.3       10000      1.2       100    NaN     no right key ≤ 1.2
+1.3       102       1.4       15000      1.3       102    10000   exact match
+1.5       104                            1.5       104    15000   closest earlier is 1.4
 ```
 
-The result is:
-
-```text
-ts_event  close  dollar
-1.2       100    NaN
-1.3       102    10000
-1.5       104    15000
-```
-
-Explanation:
-
-- At `1.2`, the right table has no timestamp less than or equal to `1.2`, so the match is `NaN`.
-- At `1.3`, there is an exact match with right-side `1.3`.
-- At `1.5`, there is no right-side `1.5`, so the closest earlier timestamp, `1.4`, is selected.
-- Right-side `1.4` does not create a separate result row because the left table has no `1.4` row. Its value can still be matched to a later left-side row.
-
-In short: **the left table determines the result rows; the right table provides the matched values.**
+Right-side `1.4` creates no row of its own — the left table has no `1.4`. In short: **left decides
+the rows, right provides the values.**
 
 ### `direction`
 
-- `backward`: closest right key where `right_key <= left_key`. This is commonly used in backtesting because it only uses information available at or before the current time.
-- `forward`: closest right key where `right_key >= left_key`.
-- `nearest`: closest right key in either direction. This can select a future record and may cause look-ahead bias in a backtest.
+| Value | Match | Note |
+|---|---|---|
+| `backward` | closest `right_key <= left_key` | standard for backtesting — uses only past information |
+| `forward` | closest `right_key >= left_key` | |
+| `nearest` | closest in either direction | **can select a future record → look-ahead bias** |
 
-### Other useful parameters
+### Other parameters
 
-- `left_on` / `right_on`: use these when the matching columns have different names.
-- `by`: first require another column, such as `symbol`, to match, and then perform the time match within that group.
-- `tolerance`: specify the maximum permitted distance between the left and right keys.
-- `allow_exact_matches=True`: allow equal timestamps to match. If set to `False`, `backward` uses strictly earlier records and `forward` uses strictly later records.
-- `suffixes`: distinguish overlapping non-key column names from the left and right tables.
+- `left_on` / `right_on` — differing column names.
+- `by` — require another column (e.g. `symbol`) to match first, then time-match within that group.
+- `tolerance` — maximum permitted key distance.
+- `allow_exact_matches=False` — makes `backward` strictly earlier, `forward` strictly later.
+- `suffixes` — disambiguate overlapping non-key columns.
 
 ### Signal-delay example
 
@@ -81,56 +55,40 @@ In short: **the left table determines the result rows; the right table provides 
 dollar['ts_event'] = dollar['ts_event'] + timedelta(days=1)
 ```
 
-This changes only the timestamps in `dollar`; it does not change or delete rows in `data`. For example:
-
-```text
-Before delay              After one-day delay
-ts_event  dollar          ts_event  dollar
-1.2       10000           1.3       10000
-1.3       15000           1.4       15000
-```
-
-After the delay, the signal originally created on `1.2` becomes eligible for matching from `1.3`. Earlier rows from the left-side market data can still appear in the merged result, but their signal value will be `NaN` if there is no eligible earlier right-side record.
-
-Note that `timedelta(days=1)` adds one calendar day, not one trading day.
+Only `dollar`'s timestamps move; `data`'s rows are untouched. A signal created on `1.2` becomes
+matchable from `1.3` onward; earlier left rows still appear, with `NaN` where no eligible right
+record exists. Note `timedelta(days=1)` is one **calendar** day, not one trading day.
 
 ---
 
 ## `SettingWithCopyWarning`
 
-Raised when you assign through **chained indexing** — filter a subset first, then assign into it:
+Raised on **chained indexing** — filter, then assign into the filtered result:
 
 ```python
 df[df.symbol == "SPY"]["signal"] = 0        # ⚠️ warns, and may silently do nothing
+df.loc[df.symbol == "SPY", "signal"] = 0    # ✅ unambiguous
 ```
 
-pandas cannot tell whether `df[df.symbol == "SPY"]` is a view into the original frame or a fresh
-copy, so it cannot tell whether you meant to modify `df` or a temporary. It warns and, depending
-on the case, the write may not reach `df` at all.
+pandas cannot tell whether `df[...]` is a view or a copy, so it cannot tell whether you meant to
+modify `df` or a temporary — and the write may never reach `df`.
 
-The fix is to address rows and columns in a single `.loc` call, which is unambiguous:
-
-```python
-df.loc[df.symbol == "SPY", "signal"] = 0    # ✅
-```
-
-**Why bother.** For throwaway analysis it rarely matters. But once code is reused by anyone else,
-a flood of meaningless warnings buries the one warning that actually mattered. Keeping the output
-clean is what makes warnings useful.
+**Why bother.** Rarely matters for throwaway analysis, but once code is reused, a flood of
+meaningless warnings buries the one that mattered.
 
 ---
 
 ## `DataFrame.ewm`
 
-Exponentially weighted moving average — weights recent observations more than distant ones,
-unlike `rolling(N).mean()` which weights everything in the window equally.
+Exponentially weighted moving average — weights recent observations more heavily, unlike
+`rolling(N).mean()` which weights the window equally.
 
 ```python
 signal = returns.ewm(halflife=H).mean()
 ```
 
-`halflife` is the number of periods after which an observation's weight has decayed by half.
-It is the parameter worth grid-searching; see [03 § 9](03-building-signals.md).
+`halflife` is the periods after which an observation's weight halves — the parameter worth
+grid-searching ([03 § 9](03-building-signals.md)).
 
-`span`, `com`, and `alpha` are alternative parameterizations of the same decay — pick one, and
-state which, because a "20" means three different things depending on the argument used.
+`span`, `com`, and `alpha` parameterize the same decay differently. Pick one and state which: a
+"20" means three different things depending on the argument.

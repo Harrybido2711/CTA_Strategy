@@ -1,8 +1,6 @@
 # 00 · Index & Learning Path
 
-> **This chapter answers:** what is in this series, in what order to read it, and the rules the writing follows.
-> **Prerequisites:** none.
-> **After reading you can:** pick the right chapter for what you are trying to understand.
+> **Answers:** what is in this series, what order to read it in, and the rules the writing follows.
 
 ---
 
@@ -30,71 +28,57 @@ flowchart LR
     class C06,C07 part;
 ```
 
-Green = written, yellow = partly written. Chapters 01 → 07 are meant to be read in order: each one
-assumes the previous. Chapter 08 is a reference to dip into, not a step in the path.
+Green = written, yellow = partly written. 01 → 07 read in order, each assuming the previous; 08 is
+reference material, not a step.
 
-| # | Chapter | Prerequisite | Status |
+| # | Chapter | Prereq | Status |
 |---|---|---|---|
 | 01 | [What Is a CTA Strategy](01-what-is-cta.md) | — | ✅ |
 | 02 | [Data & Corporate Actions](02-data-and-corporate-actions.md) | 01 | ✅ |
 | 03 | [Building Your Own Signal](03-building-signals.md) | 02 | ✅ |
 | 04 | [From Signal to Position](04-from-signal-to-position.md) | 03 | ✅ |
 | 05 | [Understanding Backtesting](05-understanding-backtesting.md) | 04 | ✅ |
-| 06 | [Evaluating Performance](06-evaluating-performance.md) | 05 | 🟡 §1 written |
-| 07 | [Overfitting & Robustness](07-overfitting-and-robustness.md) | 06 | 🟡 §§1–2, 4 written |
+| 06 | [Evaluating Performance](06-evaluating-performance.md) | 05 | 🟡 §1 |
+| 07 | [Overfitting & Robustness](07-overfitting-and-robustness.md) | 06 | 🟡 §§1–2, 4 |
 | 08 | [Toolbox: pandas](08-toolbox-pandas.md) | — | ✅ |
 | 99 | [Glossary](99-glossary.md) | — | ✅ |
 
-## Class Notes
+Class notes go straight into the chapter that owns each concept — no parallel per-session record. A
+lecture is an ordering of delivery, not of ideas: one session touches several topics and one topic
+recurs across sessions, so filing by concept keeps each idea in one place (convention 1). New
+material joins the relevant chapter; a revision edits the existing passage rather than being
+appended elsewhere.
 
-Per-session summaries live beside the chapters as standalone files. They record **what a session
-covered, in the order it was covered**; the chapters are the synthesis, organized by concept rather
-than by date. Each note opens with a map into the chapters that develop its topics.
-
-| Note | Covers |
-|---|---|
-| [Lecture 01 · Momentum, Validation, and the Bucket Chart](lecture-01-momentum-and-validation.md) | Split-adjusted data, train/validation/test, the bucket chart, risk adjustment, rolling ranks, weekly 1/5 tranches, `SettingWithCopyWarning` |
-| [Lecture 02 · Reversal, Portfolio Weights, and Combining Horizons](lecture-02-reversal-and-signal-combination.md) | Horizon assumptions, reversal and the AQR skip, signal → weights, regime in the equity curve, fast/slow pairing, EWMA, smoothing, the assignment |
-
-Read a chapter to understand a topic; read a note to recall a session.
-
-## If You Are Looking For Something Specific
+## Looking For Something Specific
 
 | Question | Go to |
 |---|---|
 | What does a CTA actually trade? | [01](01-what-is-cta.md) |
-| How can you sell a stock you don't own? | [01 § How Short Selling Works](01-what-is-cta.md) |
-| Why does my equity curve have a vertical jump? | [02 § corporate actions](02-data-and-corporate-actions.md) |
+| How can you sell a stock you don't own? | [01 § short selling](01-what-is-cta.md) |
+| Why does my equity curve have a vertical jump? | [02 § 1.1](02-data-and-corporate-actions.md) |
+| Does my signal carry information? | [03 § 4](03-building-signals.md) |
 | Why does a 150% long leg not depend on price? | [04 § weights are money](04-from-signal-to-position.md) |
-| What does `curr_shrs` mean? | [05 § column definitions](05-understanding-backtesting.md) |
-| Do I have look-ahead bias? | [05 § why are the values offset](05-understanding-backtesting.md) |
+| What does `curr_shrs` mean? | [05 § columns](05-understanding-backtesting.md) |
+| Do I have look-ahead bias? | [05 § offsets](05-understanding-backtesting.md), [07 § 2](07-overfitting-and-robustness.md) |
 | How does `merge_asof` work? | [08](08-toolbox-pandas.md) |
 
 ## Writing Conventions
 
-Four rules keep this series from decaying as it grows.
-
-**1. Define each concept exactly once.** Every concept has one home chapter. Other chapters
-link to it and do not restate it. Without this rule, the same idea gets explained in three
-places, and two of them go stale after the first edit.
-
-**2. Concepts live in `docs/`, implementation notes live next to the code.** Anything that
-stays true regardless of this repo's code belongs here. Anything tied to a specific function
-or parameter stays beside it — see [`Backtest_prototype/Backtests.md`](../Backtest_prototype/Backtests.md).
-Chapters link down to code as `[backtest.py](../Backtest_prototype/backtest.py)`, so a code
-change is traceable back to the docs it affects.
-
-**3. Every chapter uses the same skeleton.** It opens with three lines — *this chapter answers*
-/ *prerequisites* / *after reading you can* — and closes with two sections: **Common pitfalls**
-and **Open questions**. The last one matters most: stating where your understanding stops is
-more credible than pretending it doesn't.
-
-**4. English prose, with the original bilingual passages preserved.** New writing is in English.
-Where the earlier notes carried Chinese explanations of a tricky idea, those lines are kept as
-they were rather than translated away.
+1. **Define each concept exactly once.** One home chapter per concept; others link rather than
+   restate, so an edit can't leave two stale copies behind.
+2. **Concepts in `docs/`, implementation notes beside the code.** What stays true regardless of this
+   repo's code belongs here; what is tied to a function or parameter lives in
+   [`Backtest_prototype/Backtests.md`](../Backtest_prototype/Backtests.md). Chapters link down to
+   code so a change is traceable back to the docs it affects.
+3. **One skeleton per chapter.** Opens with *answers / prerequisites / after reading*; closes with
+   **Common pitfalls** and **Open questions**. The last matters most — stating where understanding
+   stops is more credible than pretending it doesn't.
+4. **English prose, original bilingual passages preserved.** New writing is English; existing Chinese
+   explanations of tricky ideas stay as written.
+5. **Be concise.** Cut a sentence that restates the previous one. Prefer a table to a paragraph and a
+   number to an adjective.
 
 ## Numbering
 
-The number prefix makes filesystem order equal reading order, so there is no separate table of
-contents to keep in sync. `99` is reserved for appendices; insert a new chapter between two
-existing ones as `03a`, `03b`, and so on rather than renumbering everything.
+The prefix makes filesystem order equal reading order, so no separate contents list can drift. `99`
+is for appendices; insert between chapters as `03a`, `03b` rather than renumbering.

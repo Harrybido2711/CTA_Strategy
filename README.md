@@ -1,10 +1,9 @@
 # CTA Strategy
 
-A ground-up series on understanding CTA strategies — from *what a CTA is* through data,
-signals, position sizing, backtesting, and performance evaluation. Every chapter is backed
-by runnable code and real market data.
+A ground-up series on CTA strategies — from *what a CTA is* through data, signals, position sizing,
+backtesting, and evaluation. Every chapter is backed by runnable code and real market data.
 
-📖 **The series lives in [`docs/`](docs/). Start at [00 · Index & Learning Path](docs/00-index.md).**
+📖 **Start at [00 · Index & Learning Path](docs/00-index.md).**
 
 ---
 
@@ -42,9 +41,9 @@ flowchart LR
     class MARKET venue;
 ```
 
-Stage 2 maps to [Chapter 02](docs/02-data-and-corporate-actions.md), stage 3 to [Chapter 03](docs/03-building-signals.md),
-stages 4–6 to [Chapter 04](docs/04-from-signal-to-position.md), and stages 8–9 to
-[Chapter 05](docs/05-understanding-backtesting.md) and [Chapter 06](docs/06-evaluating-performance.md).
+Stage 2 → [02](docs/02-data-and-corporate-actions.md) · stage 3 → [03](docs/03-building-signals.md) ·
+stages 4–6 → [04](docs/04-from-signal-to-position.md) · stages 8–9 →
+[05](docs/05-understanding-backtesting.md) and [06](docs/06-evaluating-performance.md).
 
 ## Contents
 
@@ -61,11 +60,7 @@ stages 4–6 to [Chapter 04](docs/04-from-signal-to-position.md), and stages 8�
 | 08 | [Toolbox: pandas](docs/08-toolbox-pandas.md) | Key functions used in this project | ✅ |
 | 99 | [Glossary](docs/99-glossary.md) | English–Chinese term reference | ✅ |
 
-Per-session class notes sit alongside the chapters as standalone files — chapters are organized by
-concept, notes by date:
-
-- [Lecture 01 · Momentum, Validation, and the Bucket Chart](docs/lecture-01-momentum-and-validation.md)
-- [Lecture 02 · Reversal, Portfolio Weights, and Combining Horizons](docs/lecture-02-reversal-and-signal-combination.md)
+Class notes are absorbed into the chapter that owns each concept — there is no parallel per-session record.
 
 ## Layout
 
