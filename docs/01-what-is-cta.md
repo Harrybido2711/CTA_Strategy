@@ -62,16 +62,24 @@ and $D$ cancels.
 - **The level is arbitrary.** $D$ cancels from returns, so the scale is whatever the base period
   set it to — for the S&P 500, 1941–43 = 10. **Compare returns, never levels.**
 
-Rebasing each series to 100 at its first observation makes them comparable:
+A price level is meaningful only against that same series' own history. Across tickers it carries
+no information at all — what each ETF's share price happens to be was fixed by how the fund was
+structured at inception. Dividing every series by its own first observation removes that
+arbitrariness:
 
-| Ticker | 2020-01-02 | 2026-06-29 | Raw close |
-| --- | --- | --- | --- |
-| SPY | 100.0 | **227.9** | 740.83 |
-| TLT | 100.0 | **63.7** | 87.35 |
-| GLD | 100.0 | **255.9** | 368.49 |
+| Ticker | Raw close, start | Raw close, end | Rebased | Return |
+| --- | --- | --- | --- | --- |
+| SPY | 325.05 | 740.83 | 227.9 | **+127.9%** |
+| TLT | 137.10 | 87.35 | 63.7 | **−36.3%** |
+| GLD | 143.97 | 368.49 | 255.9 | **+155.9%** |
 
-By raw close the order is SPY, GLD, TLT; by performance it is GLD, SPY, TLT. The levels put the
-wrong asset first, because each one is set by share-creation history rather than by returns.
+SPY has the highest closing price on every single day of the sample, yet GLD returned more. The
+end level alone cannot tell you this; you need the start it is measured against.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/levels-vs-rebased-dark.png">
+  <img alt="Two panels of the same three ETFs from 2020 to 2026. On the left, raw closing prices: SPY runs highest for the entire sample, with GLD in the middle and TLT lowest. On the right, the same series each divided by their own first value and multiplied by 100: GLD now finishes highest at about 256, SPY at about 228, and TLT below the starting line at about 64" src="figures/levels-vs-rebased-light.png">
+</picture>
 
 ## 2. Why
 
@@ -175,9 +183,9 @@ assumed always borrowable at zero cost: fine for teaching, not for trading. Acco
 
 **Note (The proof's assumption bites).** Shorting \$1 of SPY across the sample, as it rose ×2.28:
 
-| Position | Final PnL | Why |
-| --- | --- | --- |
-| Static short — share count frozen at entry | **−1.2791** | The full `s(p₁ − p₀)` |
+| Position                                            | Final PnL          | Why                                       |
+| --------------------------------------------------- | ------------------ | ----------------------------------------- |
+| Static short — share count frozen at entry         | **−1.2791** | The full`s(p₁ − p₀)`                 |
 | Constant −\$1 exposure — what `backtester` does | **−0.9385** | Exposure trimmed daily as the price rises |
 
 The proof assumes a *static* position. Constant **dollar** exposure shrinks the short as it moves

@@ -9,11 +9,16 @@ through a <picture> element so GitHub serves the variant matching the reader's t
 
 Figures produced
 ----------------
+levels-vs-rebased     01 § 1  raw closes vs rebased: SPY looks highest, GLD returned more
+payoff-asymmetry      01 § 2  a static long's loss is floored at zero; a short's is not
 bucket-chart          03 § 4  the core signal test: mean forward return per signal bucket
 reversal-buckets      03 § 5  expected monotone buckets vs the reversal-broken version
 signal-distribution   03 § 7  why fixed-interval cuts starve the tails, and what fixes it
 overlap-tranches      04      the five overlapping 1/5 tranches of a 5-day hold
 param-heatmap         07 § 4  a plateau (real edge) vs a spike (artifact)
+
+All are schematics drawn from illustrative values except levels-vs-rebased, which
+reads CTA_data/ because its claim is about this dataset rather than about a shape.
 
 Formulas stay in the markdown as LaTeX rather than being rendered here: text in an
 image is neither selectable nor searchable.
@@ -30,11 +35,13 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import FancyBboxPatch, PathPatch
 from matplotlib.path import Path as MplPath
 
 OUT = Path(__file__).resolve().parent
+DATA = Path(__file__).resolve().parents[2] / "CTA_data"
 
 # ---------------------------------------------------------------- design tokens
 THEMES = {
@@ -336,6 +343,53 @@ def param_heatmap(mode):
     save(fig, t, f"param-heatmap-{mode}.png")
 
 
+# --------------------------------------------- fig: raw levels vs rebased
+def levels_vs_rebased(mode):
+    """01 -- why a price level says nothing across tickers.
+
+    The only figure here plotted from real data, because the claim is about
+    this dataset rather than about a shape in general.
+    """
+    t = THEMES[mode]
+    tickers = ["GLD", "SPY", "TLT"]          # ordered by final performance
+    series = {}
+    for tk in tickers:
+        d = pd.read_csv(DATA / f"{tk}_ohlcv_1d.csv", usecols=["ts_event", "close"])
+        d["ts_event"] = pd.to_datetime(d["ts_event"])
+        series[tk] = d.sort_values("ts_event").set_index("ts_event")["close"]
+    close = pd.DataFrame(series).dropna()
+    rebased = close.div(close.iloc[0]) * 100
+    x = close.index
+
+    # three steps of the single hue, darkest for the best performer
+    colours = [t["ramp"][6], t["ramp"][4], t["ramp"][2]]
+
+    fig, axes = plt.subplots(1, 2, figsize=(9.6, 4.3))
+    fig.patch.set_facecolor(t["surface"])
+
+    panels = [
+        (close, "Raw closing price", "SPY sits highest for the whole sample", "\\$"),
+        (rebased, "Rebased to 100", "but GLD returned the most, and TLT lost", ""),
+    ]
+
+    for ax, (frame, title, subtitle, unit) in zip(axes, panels):
+        style_axes(ax, t, ylabel=f"close ({unit})" if unit else "index (start = 100)")
+        for tk, c in zip(tickers, colours):
+            ax.plot(x, frame[tk], color=c, linewidth=1.6, zorder=3)
+            ax.text(x[-1], frame[tk].iloc[-1], f"  {tk}", color=c, fontsize=8.8,
+                    fontweight="600", va="center", ha="left")
+        ax.set_xlim(x[0], x[-1] + (x[-1] - x[0]) * 0.13)
+        ax.tick_params(axis="x", labelrotation=0)
+        titles(ax, t, title, subtitle)
+
+    # the right panel has a meaningful baseline; the left does not
+    axes[1].axhline(100, color=t["baseline"], linewidth=0.9,
+                    linestyle=(0, (4, 3)), zorder=2)
+
+    fig.tight_layout(rect=(0, 0, 1, 0.92))
+    save(fig, t, f"levels-vs-rebased-{mode}.png")
+
+
 # ------------------------------------------- fig: long/short payoff asymmetry
 def payoff_asymmetry(mode):
     """01 -- why a short is not a mirrored long.
@@ -397,7 +451,8 @@ def payoff_asymmetry(mode):
 
 
 FIGURES = (bucket_chart, reversal_buckets, signal_distribution,
-           overlap_tranches, param_heatmap, payoff_asymmetry)
+           overlap_tranches, param_heatmap, payoff_asymmetry,
+           levels_vs_rebased)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):
