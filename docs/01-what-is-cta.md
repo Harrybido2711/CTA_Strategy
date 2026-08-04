@@ -162,39 +162,23 @@ A short is not selling out of thin air — the shares are borrowed before they a
 - **The broker sits in the middle,** matching the two sides and holding margin. The market for
   this is **securities lending**.
 
-### In the backtester
+### How a short is represented
 
-No borrowing, fees, or margin are modelled. The code simply allows a **negative share count**.
+A short needs no separate machinery. Carry the position as a **signed quantity** and let the sign
+do the work: a negative share count valued at the market price is a **negative position value**,
+which rises exactly when the price falls.
 
-**Claim.** In [`backtester`](../Backtest_prototype/backtest.py), a position with `curr_shrs < 0`
-gains exactly when the close falls — with no branch special-casing shorts.
+**Note (Sign convention).** A negative position value is a **liability** — a debt owed — not a
+loss already taken.
 
-**Proof.** Open $s$ shares at execution price $p_0$, hold to a close $p_1$ with no further trades.
-Following the code in order:
+**Note (Static versus constant-exposure shorts).** The proof above holds the share count fixed at
+entry. A book that instead maintains a constant *dollar* exposure buys the short back down as it
+moves against it, so the unbounded loss is never realised. That daily rebalancing is an **implicit
+risk control**: the proof is right, but a constant-exposure book is not running the position it
+describes.
 
-```text
-cash_spend  = s · p₀
-net_cash    = −cumsum(cash_spend) = −s · p₀
-asset_value = s · p₁
-portfolio   = net_cash + asset_value = s (p₁ − p₀)
-```
-
-the same expression as the payoff above. For $s < 0$, `portfolio > 0` exactly when $p_1 < p_0$.
-
-**Note (Sign convention).** A negative `asset_value` is a **liability**, not a loss. Shares are
-assumed always borrowable at zero cost: fine for teaching, not for trading. Accounting detail:
-[05](05-understanding-backtesting.md).
-
-**Note (The proof's assumption bites).** Shorting \$1 of SPY across the sample, as it rose ×2.28:
-
-| Position                                            | Final PnL          | Why                                       |
-| --------------------------------------------------- | ------------------ | ----------------------------------------- |
-| Static short — share count frozen at entry         | **−1.2791** | The full`s(p₁ − p₀)`                 |
-| Constant −\$1 exposure — what `backtester` does | **−0.9385** | Exposure trimmed daily as the price rises |
-
-The proof assumes a *static* position. Constant **dollar** exposure shrinks the short as it moves
-against you, so the unbounded loss is never realised. The proof is right; the backtester is simply
-not running the position it describes.
+→ How this project implements it, with the accounting derivation and the measured gap between the
+two: [Backtest Prototype — Implementation Notes](../Backtest_prototype/Backtests.md).
 
 ## 4. Who Else Is Trading
 
@@ -237,6 +221,6 @@ You should be able to explain:
 
 - [ ] What a CTA actually trades, and why the name is misleading
 - [ ] Why the divisor cancels out of index *returns* but sets the *level*
-- [ ] Where the short's unbounded loss comes from, and why the backtester never realises it
+- [ ] Where the short's unbounded loss comes from, and why constant-dollar exposure never realises it
 
 [← Index](00-index.md)

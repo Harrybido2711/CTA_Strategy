@@ -39,6 +39,55 @@ backtester over 37 assets and sums the PnL. 用循环把单资产回测跑 37 �
 8. **Make timing explicit.** `delay` + `.shift()` encode "a signal known at today's close can't
    trade at today's earlier prices" — a design choice you can point to, not an accident.
 
+## Shorts as a Negative Share Count
+
+Why insight 7 works, in this code. Concept side — bounded longs, unbounded shorts, borrowing
+mechanics — is [01](../docs/01-what-is-cta.md).
+
+**Claim.** In [`backtester`](backtest.py), a position with `curr_shrs < 0` gains exactly when the
+close falls, with no branch special-casing shorts.
+
+**Proof.** Open `s` shares at execution price `p₀`, hold to a close `p₁` with no further trades.
+Following the code in order:
+
+```text
+cash_spend  = s · p₀                                     # traded_shrs × TWAP
+net_cash    = −cumsum(cash_spend) = −s · p₀
+asset_value = s · p₁                                     # curr_shrs × close
+portfolio   = net_cash + asset_value = s (p₁ − p₀)
+```
+
+which is the ordinary payoff expression. For `s < 0`, `portfolio > 0` exactly when `p₁ < p₀`. The
+sign of the share count carries the direction and the accounting needs no other case.
+
+No borrowing, fees, or margin are modelled — shares are assumed always borrowable at zero cost.
+
+### Constant-dollar exposure caps the short
+
+`multi_asset_backtester` feeds a *weight × capital* dollar series, so the share count is recomputed
+every day rather than frozen at entry. That silently bounds a losing short. Shorting \$1 of SPY
+across the sample, as it rose ×2.28:
+
+| Position | Final PnL | Why |
+| --- | --- | --- |
+| Static short — share count frozen at entry | **−1.2791** | The full `s(p₁ − p₀)` |
+| Constant −\$1 exposure — what this code does | **−0.9385** | Exposure trimmed daily as the price rises |
+
+Reproduce with:
+
+```python
+import pandas as pd
+from datetime import timedelta
+from backtest import load_assets, backtester
+
+spy = load_assets()["SPY"]
+dollar = pd.DataFrame({"ts_event": spy["ts_event"], "dollar": -1.0})
+print(backtester(spy, dollar, delay=timedelta(days=1))["portfolio"].dropna().iloc[-1])
+```
+
+Worth being explicit about: the daily rebalance is an **implicit risk control the backtest gets for
+free**, and a real short book only behaves this way if it is actually rebalanced that often.
+
 ## Results & Caveats
 
 Over 2020-01 → 2026-06 both portfolios post near-zero Sharpe. Expected — a fast weekly
