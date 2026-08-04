@@ -13,16 +13,16 @@ traded that and computes the PnL. Fully decoupled — swap either without touchi
 
 ```text
 close prices
-   │  ① signal          momentum(21-day mean of daily returns)   谁在涨/跌
+   │  ① signal          momentum(21-day mean of daily returns)   who is rising / falling
    ▼
 momentum signal
-   │  ② target weights  Portfolio 1 / Portfolio 2                做多/做空谁、各多少%
+   │  ② target weights  Portfolio 1 / Portfolio 2                long/short whom, and how much
    ▼
 target weights
    │  ③ 5-day overlap   overlap_weights = target.rolling(5).mean()
    ▼
 held weights
-   │  ④ weight × capital → dollar exposure                      权重 → 美元敞口
+   │  ④ weight × capital → dollar exposure                       weight → dollar exposure
    ▼
 multi_asset_backtester (loop over 37 assets)
    │  ⑤ dollar ÷ close → shares → simulate → PnL
@@ -38,32 +38,44 @@ per-asset PnL → summed → equity curve + Sharpe / drawdown
 | `dollar` | that allocation in money | `weight × capital` | USD |
 | `shares` | shares that money buys | `dollar / close` | shares |
 
-Weight is the **cause**, dollar and shares the **effect**. Since `shares = dollar / close`, the share
-count drifts daily even at constant dollar exposure — hence the small daily rebalancing trades.
-用权重而不是股数，是因为 37 只 ETF 价格差别很大，只有百分比敞口才可比。
+Weight is the **cause**, dollar and shares the **effect**.
+
+**Note.** Positions are expressed in weights rather than share counts because the 37 ETFs trade at
+very different price levels; only a percentage exposure is comparable across them.
+
+**Note.** Since `shares = dollar / close`, the share count drifts daily even at constant dollar
+exposure — hence the small daily rebalancing trades.
 
 Everything downstream of ⑤ is [05 · Understanding Backtesting](05-understanding-backtesting.md).
 
-## Momentum Signal / 动量信号
+## Momentum Signal
 
-Trailing **21 trading days** mean of daily returns per asset:
-`close.pct_change().rolling(21).mean()`. Positive = recent uptrend. Designing and validating it is
-[03](03-building-signals.md)'s job; here it is a given input.
+**Definition (Momentum signal).** The trailing **21-trading-day** mean of daily returns per asset:
+`close.pct_change().rolling(21).mean()`. Positive indicates a recent uptrend.
 
-## Holding Period: Why Weights Change / 5 天持仓下权重如何变化
+Designing and validating it is [03](03-building-signals.md)'s job; here it is a given input.
 
-**5 trading days**, implemented as **overlapping portfolios** (Jegadeesh–Titman), not a hard
-rebalance every 5th day. Each day commits 1/5 of the book to that day's signal and holds it 5 days,
-so the held weight is the mean of the last 5 daily targets:
+## Holding Period: Why Weights Change
+
+**Definition (Overlapping portfolios).** Under the Jegadeesh–Titman *overlapping portfolio*
+construction with holding period `k`, each day commits `1/k` of the book to that day's signal and
+holds that tranche for `k` days. The held weight is therefore the mean of the last `k` daily
+targets:
 
 ```text
-held_weight[t] = mean(target[t], target[t-1], ..., target[t-4])
+held_weight[t] = mean(target[t], target[t-1], ..., target[t-k+1])
 ```
 
-Code: `overlap_weights = target.rolling(5).mean()`. Weights **evolve smoothly** as old signals roll
-off (lower turnover). Side effect: **gross exposure falls below the single-day target** when longs
-and shorts from different days offset (Portfolio 1 gross ≈ 1.83, not 2.0).
-这就是作业里"想一想 weights 怎么变化"的答案 —— 不是每 5 天跳一次，而是滚动平滑。
+Here `k = 5`. Code: `overlap_weights = target.rolling(5).mean()`.
+
+**Note.** A 5-day holding period is *not* a hard rebalance every fifth day. Weights evolve
+smoothly as old signals roll off, which lowers turnover.
+
+**Claim.** Overlapping reduces gross exposure below the single-day target.
+
+Gross exposure falls whenever longs and shorts from different tranches offset each other — for
+Portfolio 1, gross ≈ 1.83 rather than 2.0. See the pitfalls section for why net exposure is
+nonetheless unaffected.
 
 ### Why overlap rather than a fixed rebalance day
 
@@ -82,7 +94,7 @@ So the tranche structure is bias control, not just turnover smoothing:
   <img alt="Gantt chart of five tranches, each 20% of the book, each held five trading days and each starting one day after the previous — so entry is spread across every weekday and all five are simultaneously live" src="figures/overlap-tranches-light.png">
 </picture>
 
-## The Two Portfolios / 两个组合
+## The Two Portfolios
 
 | | Portfolio 1 | Portfolio 2 |
 | --- | --- | --- |
@@ -94,12 +106,16 @@ So the tranche structure is bias control, not just turnover smoothing:
 **Portfolio 1 — Long 150% / Short 50%.** With `n_pos` longs and `n_neg` shorts: each long =
 `1.5/n_pos`, each short = `−0.5/n_neg`. Net = +1.5 − 0.5 = **+1.0**.
 
-### Weights Are Money, Not Shares or Price / 权重是"钱"，不是股数或价格
+### Weights Are Money, Not Shares or Price
 
-*"SPY, GLD, XLK have different prices — how can they each be +50% and still sum to 150%?"* A weight
-is a **fraction of capital**, not a share count. "Equal weight" means **equal dollars**, and the legs
-sum to 150% **by construction** — slicing a fixed budget into `n_pos` equal money slices is an
-identity (`1.5/n_pos × n_pos = 1.5`), not a coincidence. 等权 = 等金额，加总必然是 150%。
+**Definition (Weight).** A *weight* is a fraction of capital allocated to an asset — not a share
+count and not a price. "Equal weight" therefore means **equal dollars**.
+
+**Claim.** *"SPY, GLD and XLK have different prices — how can they each be +50% and still sum to
+150%?"* They necessarily do.
+
+Slicing a fixed budget into `n_pos` equal money slices is an identity, not a coincidence:
+`(1.5 / n_pos) × n_pos = 1.5`. Price does not appear in the expression.
 
 Price never enters the weight formula; it enters later at `shares = dollar / close`, where the same
 dollars buy fewer shares of an expensive asset:
@@ -111,16 +127,24 @@ dollars buy fewer shares of an expensive asset:
 | XLK | +50% | $500 | $150 | 3.333 |
 | **Sum** | **150%** | **$1500** | — | (all different) |
 
-Same dollars, wildly different share counts — as intended. Price is consumed earlier (the signal
-picked the members) and later (the share conversion), never in the money split.
-分钱不需要知道单价。
+Same dollars, wildly different share counts — as intended.
+
+**Note.** Price is consumed earlier (the signal picked the members) and later (the share
+conversion), never in the money split. Dividing capital does not require knowing unit prices.
 
 **Portfolio 2 — Relative MOM (market-neutral).** Equal-magnitude weights whose **sign** comes from
 momentum relative to the cross-section. Long if MOM is **at or above the cross-sectional median**
-that day, else short — so an asset can be shorted with positive MOM. This reproduces the brief's
-example (10% / 5% / 1% → +66 / +66 / −66): median 5%, so the two at or above go long. The **median**
-is deliberate — the mean (5.33%) would give + / − / −, which doesn't match. Each leg is `2/N`, so
-gross ≈ 2.0, net ≈ 0. 关键在"相对"：即使都在涨，最弱的也做空。
+that day, else short — so an asset can be shorted while its own momentum is positive. Each leg is
+`2/N`, so gross ≈ 2.0 and net ≈ 0.
+
+**Note.** The defining property is *relative* ranking: even in a market where every asset is
+rising, the weakest half is shorted.
+
+**Claim.** The split must use the median, not the mean.
+
+The brief's example is 10% / 5% / 1% → +66 / +66 / −66. The median is 5%, so the two assets at or
+above it go long, reproducing the example. The mean is 5.33%, which would give + / − / − and
+contradict it.
 
 ## From a Continuous Signal to Weights
 

@@ -22,12 +22,24 @@ Databento's `ohlcv-1d` is aggregated by UTC date, and its electronic-session def
 from official exchange settlement or volume statistics. Prices are **not dividend-adjusted**, so
 distributions still affect cross-day comparisons.
 
-### 1.1 Corporate actions in this sample / 本样本中的公司行为
+### 1.1 Corporate actions in this sample
+
+**Definition (Corporate action).** A *corporate action* is a change to the share structure of an
+instrument — split, reverse split, dividend, spin-off — that alters the quoted price without
+altering the value of a position held through it.
+
+**Definition (Phantom return).** A *phantom return* is the return computed across a corporate
+action when the pre-action price basis has not been restated. It is an accounting artifact, not a
+market move.
+
+**Claim.** An unadjusted split is the single most damaging defect in a price series for a trend
+follower.
 
 A split changes the price basis, not the value of the position. Leave pre-split rows at the old
-basis and the split date carries a **phantom return** — several hundred percent, or a clean −50% —
-that is an accounting artifact. Momentum, volatility, and correlation estimates spanning that date
-are corrupted, and a trend follower reads the artifact as the strongest signal in the sample.
+basis and the split date carries a phantom return — several hundred percent, or a clean −50%.
+Momentum, volatility, and correlation estimates spanning that date are corrupted, and because the
+artifact is by construction the largest move in the sample, a trend follower reads it as the
+strongest signal it has ever seen.
 
 **Detection.** Scan every ticker for `|close.pct_change()| > 0.4`. A genuine move that size shows up
 in correlated names at once; a split hits one ticker (or one fund family) while peers stay flat, and
@@ -99,54 +111,64 @@ The other 30 tickers show no split-sized jumps in this window.
 
 ## 2. Meaning of the 37 Datasets
 
-| Category / 类别                    | Ticker | Exposure / 主要敞口                                                                |
-| ---------------------------------- | ------ | ---------------------------------------------------------------------------------- |
-| U.S. broad equity / 美国宽基股票   | SPY    | S&P 500 Index / 标普 500 指数                                                      |
-|                                    | QQQ    | Nasdaq-100 Index / 纳斯达克 100 指数                                               |
-|                                    | IWM    | Russell 2000 small-cap stocks / Russell 2000 美国小盘股                            |
-|                                    | DIA    | Dow Jones Industrial Average / 道琼斯工业平均指数                                  |
-|                                    | MDY    | S&P MidCap 400 stocks / 标普 400 中盘股                                            |
-| U.S. equity sectors / 美国行业股票 | XLK    | Technology / 科技                                                                  |
-|                                    | XLF    | Financials / 金融                                                                  |
-|                                    | XLE    | Energy / 能源                                                                      |
-|                                    | XLV    | Health care / 医疗保健                                                             |
-|                                    | XLI    | Industrials / 工业                                                                 |
-|                                    | XLY    | Consumer discretionary / 非必需消费品                                              |
-|                                    | XLP    | Consumer staples / 必需消费品                                                      |
-|                                    | XLU    | Utilities / 公用事业                                                               |
-|                                    | XLB    | Materials / 原材料                                                                 |
-|                                    | XLRE   | Real estate / 房地产                                                               |
-|                                    | XLC    | Communication services / 通信服务                                                  |
-| International equity / 国际股票    | EFA    | Developed markets excluding the U.S. and Canada / 美国、加拿大以外的发达市场       |
-|                                    | EEM    | Emerging markets / 新兴市场                                                        |
-|                                    | VGK    | European equities / 欧洲股票                                                       |
-|                                    | EWJ    | Japanese equities / 日本股票                                                       |
-|                                    | FXI    | Large-cap Chinese equities / 中国大型股                                            |
-| Fixed income / 固定收益            | TLT    | U.S. Treasury bonds with maturities above 20 years / 20 年以上美国国债             |
-|                                    | IEF    | 7–10 year U.S. Treasury bonds / 7–10 年美国国债                                  |
-|                                    | SHY    | 1–3 year U.S. Treasury bonds / 1–3 年美国国债                                    |
-|                                    | AGG    | Broad U.S. investment-grade bond market / 美国投资级综合债券市场                   |
-|                                    | LQD    | U.S. dollar investment-grade corporate bonds / 美元投资级公司债                    |
-|                                    | HYG    | U.S. dollar high-yield corporate bonds / 美元高收益公司债                          |
-|                                    | TIP    | U.S. Treasury Inflation-Protected Securities / 美国通胀保值国债（TIPS）            |
-| Commodities / 商品                 | GLD    | Gold / 黄金                                                                        |
-|                                    | SLV    | Silver / 白银                                                                      |
-|                                    | DBC    | Diversified commodity futures / 多元商品期货组合                                   |
-|                                    | USO    | Crude-oil futures exposure, not spot oil / 原油期货敞口，并非原油现货价格          |
-|                                    | UNG    | Natural-gas futures exposure, not spot gas / 天然气期货敞口，并非天然气现货价格    |
-|                                    | DBA    | Agricultural commodity futures / 农产品期货组合                                    |
-| Alternatives / 其他或另类资产      | VNQ    | U.S. real estate investment trusts (REITs) / 美国房地产投资信托（REITs）           |
-|                                    | GDX    | Global gold-mining company equities / 全球金矿公司股票                             |
-|                                    | UUP    | Long U.S. dollar exposure against a currency basket / 美元相对一篮子货币走强的敞口 |
+| Category              | Ticker | Exposure                                            |
+| --------------------- | ------ | --------------------------------------------------- |
+| U.S. broad equity     | SPY    | S&P 500 Index                                       |
+|                       | QQQ    | Nasdaq-100 Index                                    |
+|                       | IWM    | Russell 2000 small-cap stocks                       |
+|                       | DIA    | Dow Jones Industrial Average                        |
+|                       | MDY    | S&P MidCap 400 stocks                               |
+| U.S. equity sectors   | XLK    | Technology                                          |
+|                       | XLF    | Financials                                          |
+|                       | XLE    | Energy                                              |
+|                       | XLV    | Health care                                         |
+|                       | XLI    | Industrials                                         |
+|                       | XLY    | Consumer discretionary                              |
+|                       | XLP    | Consumer staples                                    |
+|                       | XLU    | Utilities                                           |
+|                       | XLB    | Materials                                           |
+|                       | XLRE   | Real estate                                         |
+|                       | XLC    | Communication services                              |
+| International equity  | EFA    | Developed markets excluding the U.S. and Canada     |
+|                       | EEM    | Emerging markets                                    |
+|                       | VGK    | European equities                                   |
+|                       | EWJ    | Japanese equities                                   |
+|                       | FXI    | Large-cap Chinese equities                          |
+| Fixed income          | TLT    | U.S. Treasury bonds with maturities above 20 years  |
+|                       | IEF    | 7–10 year U.S. Treasury bonds                       |
+|                       | SHY    | 1–3 year U.S. Treasury bonds                        |
+|                       | AGG    | Broad U.S. investment-grade bond market             |
+|                       | LQD    | U.S. dollar investment-grade corporate bonds        |
+|                       | HYG    | U.S. dollar high-yield corporate bonds              |
+|                       | TIP    | U.S. Treasury Inflation-Protected Securities (TIPS) |
+| Commodities           | GLD    | Gold                                                |
+|                       | SLV    | Silver                                              |
+|                       | DBC    | Diversified commodity futures                       |
+|                       | USO    | Crude-oil futures exposure, not spot oil            |
+|                       | UNG    | Natural-gas futures exposure, not spot gas          |
+|                       | DBA    | Agricultural commodity futures                      |
+| Alternatives          | VNQ    | U.S. real estate investment trusts (REITs)          |
+|                       | GDX    | Global gold-mining company equities                 |
+|                       | UUP    | Long U.S. dollar exposure against a currency basket |
+
+**Note.** All 37 instruments here are **ETFs**, not futures. Real CTAs trade the futures
+(Definition, [01](01-what-is-cta.md)); this dataset substitutes ETFs so that the mechanics can be
+studied without contract-roll handling. The consequence is that shorting is assumed frictionless
+and no collateral yield accrues — see [01 § Instruments](01-what-is-cta.md).
 
 ## 3. Overnight Versus Intraday Movement
 
-- Absolute overnight movement: `abs(Open[t] - Close[t-1])`
-- Absolute intraday movement: `abs(Close[t] - Open[t])`
+**Definition (Overnight movement).** `abs(Open[t] − Close[t−1])` — the gap between one session's
+close and the next session's open.
+
+**Definition (Intraday movement).** `abs(Close[t] − Open[t])` — the net move within one session.
 
 Both are reported in dollars and percent; percent is the right comparison across ETFs at different
-price levels. Note that average absolute movement is **not** cumulative return contribution — testing
-whether returns are realized overnight needs *signed* returns, with dividends and splits handled.
+price levels.
+
+**Note.** Average absolute movement is **not** cumulative return contribution. Testing whether
+returns are *realized* overnight requires *signed* returns, with dividends and splits handled.
+Absolute movement measures where volatility lives, not where profit accrues.
 
 ### Results for This Dataset
 
