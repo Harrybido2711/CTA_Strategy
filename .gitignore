@@ -5,3 +5,6 @@
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
+
+# Local tooling — keep out of the repo
+.claude/
