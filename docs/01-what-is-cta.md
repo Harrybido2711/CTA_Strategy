@@ -17,6 +17,32 @@ metals, agriculture.
 
 The objective is **absolute return**, regardless of market direction.
 
+### Index vs ETF vs Futures / 指数、ETF 与期货
+
+"S&P 500" names three different things. Only two of them are tradeable.
+
+| Layer | Example | What it is |
+|---|---|---|
+| **Index 指数** | SPX, NDX | A published *number*, computed from its constituents. Not tradeable. |
+| **ETF** | SPY, VOO, QQQ | A fund that actually holds the constituents; trades like a stock. |
+| **Futures 期货** | ES, NQ | A contract to settle at a future date. No shares held. |
+
+The index itself is float-adjusted **market-cap weighted**, not a simple average of 500 prices — the
+largest handful of names dominate. （「500」是成分股数量，不是分母。）Contrast: the Dow is
+*price*-weighted, and an equal-weight fund like RSP is the actual "average".
+
+**CTAs trade the futures, not the ETFs**, for three reasons:
+
+- **Symmetry.** Shorting a future costs nothing extra; shorting an ETF needs borrowed shares, a
+  borrow fee, and availability. A strategy that must go short as freely as long needs this.
+- **Coverage.** Commodities and FX have deep futures markets and poor ETFs. One instrument type
+  covers all four asset classes.
+- **Capital efficiency.** Margin is roughly 5–10% of notional, so the unused cash sits in T-bills.
+  That interest is a real return component called **collateral yield 抵押品收益**.
+
+The cost: futures expire. There is no natural continuous ES price series, so you must stitch
+contracts together yourself — see [02](02-data-and-corporate-actions.md).
+
 ## 1. Why CTA/Momentum Strategies Work
 
 - **Information diffusion.** Unglamorous news with real long-term macro effects spreads gradually,
@@ -108,6 +134,7 @@ Longest to shortest:
 ## Common pitfalls
 
 - **"CTA means commodities only."** A historical artifact of the name; main exposures are equity-index, rate, and FX futures.
+- **"You can buy the S&P 500."** You buy an ETF or a future *tracking* it. The index is a number.
 - **"A negative position means I lost money."** The sign encodes *direction* — a debt — not P&L.
 - **"150/50 is free extra return."** 200% gross is 2× leverage; risk scales with it.
 - **"Momentum works because information diffuses slowly."** One candidate explanation, possibly weakened after 2008. Nothing is settled.
@@ -128,6 +155,7 @@ data before building anything on it.
 You should be able to explain:
 
 - [ ] What a CTA actually trades, and why the name is misleading
+- [ ] The difference between an index, an ETF, and a future — and why CTAs use futures
 - [ ] Why a negative share count is a direction, not a loss
 - [ ] Why a 150/50 book is 2× leverage rather than free return
 
