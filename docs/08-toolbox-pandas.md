@@ -1,4 +1,10 @@
-# Python Functions
+# 08 · Toolbox: pandas
+
+> **This chapter answers:** how the non-obvious pandas functions used in this project actually behave.
+> **Prerequisites:** none — reference material, read it when you hit one of these.
+> **Related:** [03 · Building Your Own Signal](03-building-signals.md), [05 · Understanding Backtesting](05-understanding-backtesting.md).
+
+---
 
 ## `pandas.merge_asof`
 
@@ -87,3 +93,44 @@ ts_event  dollar          ts_event  dollar
 After the delay, the signal originally created on `1.2` becomes eligible for matching from `1.3`. Earlier rows from the left-side market data can still appear in the merged result, but their signal value will be `NaN` if there is no eligible earlier right-side record.
 
 Note that `timedelta(days=1)` adds one calendar day, not one trading day.
+
+---
+
+## `SettingWithCopyWarning`
+
+Raised when you assign through **chained indexing** — filter a subset first, then assign into it:
+
+```python
+df[df.symbol == "SPY"]["signal"] = 0        # ⚠️ warns, and may silently do nothing
+```
+
+pandas cannot tell whether `df[df.symbol == "SPY"]` is a view into the original frame or a fresh
+copy, so it cannot tell whether you meant to modify `df` or a temporary. It warns and, depending
+on the case, the write may not reach `df` at all.
+
+The fix is to address rows and columns in a single `.loc` call, which is unambiguous:
+
+```python
+df.loc[df.symbol == "SPY", "signal"] = 0    # ✅
+```
+
+**Why bother.** For throwaway analysis it rarely matters. But once code is reused by anyone else,
+a flood of meaningless warnings buries the one warning that actually mattered. Keeping the output
+clean is what makes warnings useful.
+
+---
+
+## `DataFrame.ewm`
+
+Exponentially weighted moving average — weights recent observations more than distant ones,
+unlike `rolling(N).mean()` which weights everything in the window equally.
+
+```python
+signal = returns.ewm(halflife=H).mean()
+```
+
+`halflife` is the number of periods after which an observation's weight has decayed by half.
+It is the parameter worth grid-searching; see [03 § 9](03-building-signals.md).
+
+`span`, `com`, and `alpha` are alternative parameterizations of the same decay — pick one, and
+state which, because a "20" means three different things depending on the argument used.
