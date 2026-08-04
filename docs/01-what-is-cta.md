@@ -25,21 +25,41 @@ are equity-index futures, Treasuries, FX, energy, metals, and agriculture.
 | **ETF**    | SPY, VOO, QQQ | A fund holding the constituents; its own shares trade | Yes       |
 | **Future** | ES, NQ        | A contract to settle at a future date; holds nothing  | Yes       |
 
-**Definition (Index).** `I_t = M_t / D_t`, where `M_t = Σ_i N_i · P_it` is total float
-capitalisation across constituents `i`, and `D_t > 0` is the *divisor*.
+**Definition (Index).**
+
+$$
+I_t \;=\; \frac{M_t}{D_t}, \qquad\qquad M_t \;=\; \sum_i N_i \, P_{it}
+$$
+
+where $P_{it}$ is the price of constituent $i$, $N_i$ its float-adjusted share count, $M_t$ the
+total float capitalisation, and $D_t > 0$ the *divisor*.
 
 **Claim.** Index returns are the capitalisation-weighted average of constituent returns; the
 divisor sets only the level.
 
-**Proof.** With `D` constant, `I_{t+1}/I_t = M_{t+1}/M_t`. Since `M_{t+1} − M_t = Σ_i N_i P_it·r_i`,
-dividing through by `M_t` gives `r_I = Σ_i w_it · r_i`, where `w_it = N_i P_it / M_t` and
-`Σ_i w_it = 1`. `D` cancels.
+**Proof.** Over a window with no constituent change, $D$ is constant, so $I_{t+1}/I_t = M_{t+1}/M_t$.
+The numerator moves by
+
+$$
+M_{t+1} - M_t \;=\; \sum_i N_i \big( P_{i,t+1} - P_{it} \big) \;=\; \sum_i N_i P_{it} \, r_i
+$$
+
+and dividing through by $M_t$ gives
+
+$$
+r_I \;=\; \sum_i \frac{N_i P_{it}}{M_t} \, r_i \;=\; \sum_i w_{it} \, r_i ,
+\qquad w_{it} = \frac{N_i P_{it}}{M_t}, \quad \sum_i w_{it} = 1 .
+$$
+
+So $r_I$ is a weighted average of constituent returns with weights equal to capitalisation shares,
+and $D$ cancels.
 
 **Note (Two consequences).**
 
-- **The top names dominate.** At `w ≈ 7%` against `w ≈ 0.02%`, the largest constituent carries
-  roughly **350×** the index impact of the smallest. This is not an average of 500 *prices*.
-- **The level is arbitrary.** `D` cancels from returns, so the scale is whatever the base period
+- **The top names dominate.** At $w \approx 7\%$ against $w \approx 0.02\%$, the largest
+  constituent carries roughly **350×** the index impact of the smallest. This is not an average of
+  500 *prices*.
+- **The level is arbitrary.** $D$ cancels from returns, so the scale is whatever the base period
   set it to — for the S&P 500, 1941–43 = 10. **Compare returns, never levels.**
 
 Rebasing each series to 100 at its first observation makes them comparable:
@@ -83,13 +103,20 @@ Two contested explanations, no proof. Momentum has been durably profitable regar
 
 **Claim.** For a static position, a long's loss is bounded by its outlay; a short's is not.
 
-**Proof.** With signed share count `s`, entry `P₀ > 0` and exit `P_T`, the payoff is
-`PnL(P_T) = s · (P_T − P₀)` on the half-open domain `P_T ∈ [0, ∞)`, since a price cannot go
-negative. For `s > 0` the payoff increases in `P_T`, so `PnL ≥ s(0 − P₀) = −s·P₀`, exactly the
-amount paid. For `s < 0` it decreases in `P_T`, and the domain has no right endpoint, so
-`PnL → −∞`.
+**Proof.** With signed share count $s$, entry price $P_0 > 0$ and exit price $P_T$, the payoff is
 
-The asymmetry is in the **domain**, not the payoff — both are lines of slope `|s|`. The floor
+$$
+\operatorname{PnL}(P_T) \;=\; s \, (P_T - P_0), \qquad P_T \in [0, \infty)
+$$
+
+the domain being half-open because a price cannot go negative.
+
+- **Long, $s > 0$.** $\operatorname{PnL}$ is increasing in $P_T$, so its infimum is at the left
+  endpoint: $\operatorname{PnL} \geq s(0 - P_0) = -s P_0$, exactly the amount paid.
+- **Short, $s < 0$.** $\operatorname{PnL}$ is decreasing in $P_T$, and the domain has no right
+  endpoint, so $\operatorname{PnL} \to -\infty$ as $P_T \to \infty$.
+
+The asymmetry is in the **domain**, not the payoff — both are lines of slope $|s|$. The floor
 exists only because prices are floored at zero.
 
 <picture>
@@ -130,17 +157,19 @@ No borrowing, fees, or margin are modelled. The code simply allows a **negative 
 **Claim.** In [`backtester`](../Backtest_prototype/backtest.py), a position with `curr_shrs < 0`
 gains exactly when the close falls — with no branch special-casing shorts.
 
-**Proof.** Open `s` shares at execution price `p₀`, hold to a close `p₁` with no further trades.
+**Proof.** Open $s$ shares at execution price $p_0$, hold to a close $p_1$ with no further trades.
 Following the code in order:
 
-```text
-cash_spend  = s · p₀
-net_cash    = −cumsum(cash_spend) = −s · p₀
-asset_value = s · p₁
-portfolio   = net_cash + asset_value = s (p₁ − p₀)
-```
+$$
+\begin{aligned}
+\texttt{cash\_spend}  &= s \, p_0 \\
+\texttt{net\_cash}    &= -\operatorname{cumsum}(\texttt{cash\_spend}) \;=\; -s \, p_0 \\
+\texttt{asset\_value} &= s \, p_1 \\
+\texttt{portfolio}    &= \texttt{net\_cash} + \texttt{asset\_value} \;=\; s \, (p_1 - p_0)
+\end{aligned}
+$$
 
-the same expression as the payoff above. For `s < 0`, `portfolio > 0 ⟺ p₁ < p₀`.
+the same expression as the payoff above. For $s < 0$, $\texttt{portfolio} > 0 \iff p_1 < p_0$.
 
 **Note (Sign convention).** A negative `asset_value` is a **liability**, not a loss. Shares are
 assumed always borrowable at zero cost: fine for teaching, not for trading. Accounting detail:

@@ -120,12 +120,12 @@ Slicing a fixed budget into `n_pos` equal money slices is an identity, not a coi
 Price never enters the weight formula; it enters later at `shares = dollar / close`, where the same
 dollars buy fewer shares of an expensive asset:
 
-| Long asset | Weight (money) | $ on 1000 capital | Price | Shares bought |
+| Long asset | Weight (money) | \$ on 1000 capital | Price | Shares bought |
 | --- | --- | --- | --- | --- |
-| SPY | +50% | $500 | $600 | 0.833 |
-| GLD | +50% | $500 | $200 | 2.500 |
-| XLK | +50% | $500 | $150 | 3.333 |
-| **Sum** | **150%** | **$1500** | — | (all different) |
+| SPY | +50% | \$500 | \$600 | 0.833 |
+| GLD | +50% | \$500 | \$200 | 2.500 |
+| XLK | +50% | \$500 | \$150 | 3.333 |
+| **Sum** | **150%** | **\$1500** | — | (all different) |
 
 Same dollars, wildly different share counts — as intended.
 
