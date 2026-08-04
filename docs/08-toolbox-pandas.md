@@ -1,8 +1,8 @@
 # 08 · Toolbox: pandas
 
-> **Answers:** how the non-obvious pandas functions in this project actually behave.
-> **Prerequisites:** none — reference material.
-> **Related:** [03](03-building-signals.md), [05](05-understanding-backtesting.md).
+> - **Answers:** how the non-obvious pandas functions in this project actually behave.
+> - **Prerequisites:** none — reference material.
+> - **Related:** [03](03-building-signals.md), [05](05-understanding-backtesting.md).
 
 ---
 

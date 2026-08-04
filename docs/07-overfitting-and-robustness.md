@@ -1,8 +1,8 @@
 # 07 · Overfitting & Robustness
 
-> **Answers:** why a good backtest is weak evidence, and what makes it stronger.
-> **Prerequisites:** [06 · Evaluating Performance](06-evaluating-performance.md).
-> **After reading:** split a time series correctly, and state honestly how much of a result is signal and how much is search.
+> - **Answers:** why a good backtest is weak evidence, and what makes it stronger.
+> - **Prerequisites:** [06 · Evaluating Performance](06-evaluating-performance.md).
+> - **After reading:** split a time series correctly, and state honestly how much of a result is signal and how much is search.
 
 > 🟡 **Partly written.** §§ 1–2, 4 complete; §§ 3, 5–6 outline.
 

@@ -1,8 +1,8 @@
 # 01 · What Is a CTA Strategy
 
-> **Answers:** what a CTA is, why it might make money, how long/short works, and who else is trading.
-> **Prerequisites:** none — first chapter.
-> **After reading:** explain what a CTA does, and why a short sale is not selling out of thin air.
+> - **Answers:** what a CTA is, why it might make money, how long/short works, and who else is trading.
+> - **Prerequisites:** none — first chapter.
+> - **After reading:** explain what a CTA does, and why a short sale is not selling out of thin air.
 
 ---
 

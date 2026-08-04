@@ -1,8 +1,8 @@
 # 03 · Building Your Own Signal
 
-> **Answers:** how to turn an intuition into a computable signal, and how to tell whether it carries information before backtesting it.
-> **Prerequisites:** [02 · Data & Corporate Actions](02-data-and-corporate-actions.md).
-> **After reading:** state a signal as a hypothesis, test it with a bucket chart, normalize it, and combine horizons without drowning in noise.
+> - **Answers:** how to turn an intuition into a computable signal, and how to tell whether it carries information before backtesting it.
+> - **Prerequisites:** [02 · Data & Corporate Actions](02-data-and-corporate-actions.md).
+> - **After reading:** state a signal as a hypothesis, test it with a bucket chart, normalize it, and combine horizons without drowning in noise.
 
 ---
 

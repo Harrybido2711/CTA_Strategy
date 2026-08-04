@@ -1,8 +1,8 @@
 # 06 · Evaluating Performance
 
-> **Answers:** given an equity curve, how do you judge whether it is any good?
-> **Prerequisites:** [05 · Understanding Backtesting](05-understanding-backtesting.md).
-> **After reading:** report performance in the terms a practitioner expects, and know what each number hides.
+> - **Answers:** given an equity curve, how do you judge whether it is any good?
+> - **Prerequisites:** [05 · Understanding Backtesting](05-understanding-backtesting.md).
+> - **After reading:** report performance in the terms a practitioner expects, and know what each number hides.
 
 > 🟡 **Partly written.** § 1 complete; §§ 2–5 outline.
 

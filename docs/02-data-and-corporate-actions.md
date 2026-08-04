@@ -1,8 +1,8 @@
 # 02 · Data & Corporate Actions
 
-> **Answers:** what is in these CSV files, what the 37 tickers represent, and how a corporate action silently destroys a backtest.
-> **Prerequisites:** [01 · What Is a CTA Strategy](01-what-is-cta.md).
-> **After reading:** validate a price dataset before trusting it, and detect an unadjusted split from the data alone.
+> - **Answers:** what is in these CSV files, what the 37 tickers represent, and how a corporate action silently destroys a backtest.
+> - **Prerequisites:** [01 · What Is a CTA Strategy](01-what-is-cta.md).
+> - **After reading:** validate a price dataset before trusting it, and detect an unadjusted split from the data alone.
 
 ---
 

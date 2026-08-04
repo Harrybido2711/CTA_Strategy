@@ -1,8 +1,8 @@
 # 05 · Understanding Backtesting
 
-> **Answers:** what a backtester computes, why decision and fill must be offset in time, and how large that offset should be.
-> **Prerequisites:** [04 · From Signal to Position](04-from-signal-to-position.md).
-> **After reading:** read every column of the output, and say whether your backtest has look-ahead bias.
+> - **Answers:** what a backtester computes, why decision and fill must be offset in time, and how large that offset should be.
+> - **Prerequisites:** [04 · From Signal to Position](04-from-signal-to-position.md).
+> - **After reading:** read every column of the output, and say whether your backtest has look-ahead bias.
 
 A backtester does one thing: **convert a target dollar exposure into shares, simulate the trade,
 compute the portfolio value.** Implementation: [`backtest.py`](../Backtest_prototype/backtest.py).
