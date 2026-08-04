@@ -9,13 +9,13 @@
 ## 1. A signal is a hypothesis, not a formula
 
 $$
-\textbf{signal:}\quad MOM_t \;=\; \operatorname{Avg}\big(r_{s,\,t-i}\big),\qquad i = 1 \ldots N
+\textbf{signal:}\quad MOM_t  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
 $$
 
 $$
-\textbf{hypothesis:}\quad MOM \uparrow \;\Longrightarrow\; \text{return} \uparrow
+\textbf{hypothesis:}\quad MOM \uparrow  \Longrightarrow  \text{return} \uparrow
 \qquad\qquad
-\textbf{consequence:}\quad MOM_t \;\propto\; w \;\propto\; \text{return}
+\textbf{consequence:}\quad MOM_t  \propto  w  \propto  \text{return}
 $$
 
 The third line makes it tradeable: the signal doesn't just correlate with return, it says **how much**
@@ -106,7 +106,7 @@ meaning — and 2% for SHY is not 2% for UNG.
 Divide by volatility:
 
 $$
-MOM^{\text{risk-adj}}_t \;=\; \operatorname{Avg}\!\left(\frac{r_{s,\,t-i}}{\sigma}\right),\qquad i = 1 \ldots N
+MOM^{\text{risk-adj}}_t  =  \text{Avg}\left(\frac{r_{s,t-i}}{\sigma}\right),\qquad i = 1 \ldots N
 $$
 
 Every asset and period lands on one scale — approximately standard normal — so values compare. Two

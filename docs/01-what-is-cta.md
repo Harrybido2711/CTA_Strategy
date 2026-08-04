@@ -28,7 +28,7 @@ are equity-index futures, Treasuries, FX, energy, metals, and agriculture.
 **Definition (Index).**
 
 $$
-I_t \;=\; \frac{M_t}{D_t}, \qquad\qquad M_t \;=\; \sum_i N_i \, P_{it}
+I_t  =  \frac{M_t}{D_t}, \qquad\qquad M_t  =  \sum_i N_i  P_{it}
 $$
 
 where $P_{it}$ is the price of constituent $i$, $N_i$ its float-adjusted share count, $M_t$ the
@@ -41,13 +41,13 @@ divisor sets only the level.
 The numerator moves by
 
 $$
-M_{t+1} - M_t \;=\; \sum_i N_i \big( P_{i,t+1} - P_{it} \big) \;=\; \sum_i N_i P_{it} \, r_i
+M_{t+1} - M_t  =  \sum_i N_i \left( P_{i,t+1} - P_{it} \right)  =  \sum_i N_i P_{it}  r_i
 $$
 
 and dividing through by $M_t$ gives
 
 $$
-r_I \;=\; \sum_i \frac{N_i P_{it}}{M_t} \, r_i \;=\; \sum_i w_{it} \, r_i ,
+r_I  =  \sum_i \frac{N_i P_{it}}{M_t}  r_i  =  \sum_i w_{it}  r_i ,
 \qquad w_{it} = \frac{N_i P_{it}}{M_t}, \quad \sum_i w_{it} = 1 .
 $$
 
@@ -56,7 +56,7 @@ and $D$ cancels.
 
 **Note (Two consequences).**
 
-- **The top names dominate.** At $w \approx 7\%$ against $w \approx 0.02\%$, the largest
+- **The top names dominate.** At $w \approx 0.07$ against $w \approx 0.0002$, the largest
   constituent carries roughly **350×** the index impact of the smallest. This is not an average of
   500 *prices*.
 - **The level is arbitrary.** $D$ cancels from returns, so the scale is whatever the base period
@@ -106,15 +106,15 @@ Two contested explanations, no proof. Momentum has been durably profitable regar
 **Proof.** With signed share count $s$, entry price $P_0 > 0$ and exit price $P_T$, the payoff is
 
 $$
-\operatorname{PnL}(P_T) \;=\; s \, (P_T - P_0), \qquad P_T \in [0, \infty)
+\text{PnL}(P_T)  =  s  (P_T - P_0), \qquad P_T \in [0, \infty)
 $$
 
 the domain being half-open because a price cannot go negative.
 
-- **Long, $s > 0$.** $\operatorname{PnL}$ is increasing in $P_T$, so its infimum is at the left
-  endpoint: $\operatorname{PnL} \geq s(0 - P_0) = -s P_0$, exactly the amount paid.
-- **Short, $s < 0$.** $\operatorname{PnL}$ is decreasing in $P_T$, and the domain has no right
-  endpoint, so $\operatorname{PnL} \to -\infty$ as $P_T \to \infty$.
+- **Long, $s > 0$.** $\text{PnL}$ is increasing in $P_T$, so its infimum is at the left
+  endpoint: $\text{PnL} \geq s(0 - P_0) = -s P_0$, exactly the amount paid.
+- **Short, $s < 0$.** $\text{PnL}$ is decreasing in $P_T$, and the domain has no right
+  endpoint, so $\text{PnL} \to -\infty$ as $P_T \to \infty$.
 
 The asymmetry is in the **domain**, not the payoff — both are lines of slope $|s|$. The floor
 exists only because prices are floored at zero.
@@ -160,16 +160,14 @@ gains exactly when the close falls — with no branch special-casing shorts.
 **Proof.** Open $s$ shares at execution price $p_0$, hold to a close $p_1$ with no further trades.
 Following the code in order:
 
-$$
-\begin{aligned}
-\texttt{cash\_spend}  &= s \, p_0 \\
-\texttt{net\_cash}    &= -\operatorname{cumsum}(\texttt{cash\_spend}) \;=\; -s \, p_0 \\
-\texttt{asset\_value} &= s \, p_1 \\
-\texttt{portfolio}    &= \texttt{net\_cash} + \texttt{asset\_value} \;=\; s \, (p_1 - p_0)
-\end{aligned}
-$$
+```text
+cash_spend  = s · p₀
+net_cash    = −cumsum(cash_spend) = −s · p₀
+asset_value = s · p₁
+portfolio   = net_cash + asset_value = s (p₁ − p₀)
+```
 
-the same expression as the payoff above. For $s < 0$, $\texttt{portfolio} > 0 \iff p_1 < p_0$.
+the same expression as the payoff above. For $s < 0$, `portfolio > 0` exactly when $p_1 < p_0$.
 
 **Note (Sign convention).** A negative `asset_value` is a **liability**, not a loss. Shares are
 assumed always borrowable at zero cost: fine for teaching, not for trading. Accounting detail:
