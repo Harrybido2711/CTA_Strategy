@@ -6,166 +6,141 @@
 
 ---
 
-## What Is a CTA Strategy?
-
 **Definition (CTA strategy).** A *CTA (Commodity Trading Advisor) strategy* is a rule-based
 strategy that trades **futures** systematically across asset classes — equities, fixed income,
-commodities, currencies — with the objective of **absolute return**, independent of market
-direction.
+commodities, currencies — targeting **absolute return**, independent of market direction.
 
-**Note.** The name is a historical artifact. Modern CTAs are not limited to commodities; typical
-markets are equity-index futures (S&P 500, Nasdaq), Treasury futures, currency futures, energy,
-precious metals, and agriculture.
+**Note.** The name is a historical artifact. Modern CTAs are not commodity-only; typical markets
+are equity-index futures (S&P 500, Nasdaq), Treasury futures, FX futures, energy, metals, and
+agriculture.
 
-### Instruments: Index, ETF, Future
+## 1. Instruments: Index, ETF, Future
 
-The phrase "S&P 500" names three different objects. Only two of them can be traded.
+"S&P 500" names three different objects. Only two of them can be traded.
 
-**Definition (Index).** An *index* is a published real-valued process
+| Layer | Example | What it is | Tradeable |
+| --- | --- | --- | --- |
+| **Index** | SPX, NDX | A published number computed from its constituents | No |
+| **ETF** | SPY, VOO, QQQ | A fund holding the constituents; its own shares trade | Yes |
+| **Future** | ES, NQ | A contract to settle at a future date; holds nothing | Yes |
+
+**Definition (Index).** A published real-valued process
 
 ```text
 I_t  =  ( Σ_i  P_it · N_it )  /  D_t
 ```
 
-where `P_it` is the price of constituent `i` at time `t`, `N_it` its float-adjusted share count,
-and `D_t > 0` the *divisor*. An index is a number, not a claim on anything, and therefore cannot
-be bought.
+where `P_it` is the price of constituent `i`, `N_it` its float-adjusted share count, and `D_t > 0`
+the *divisor*.
 
-**Definition (ETF).** An *exchange-traded fund* is a fund that holds the constituents of some
-index and whose own shares trade on an exchange. Examples: SPY, IVV, VOO track the S&P 500; QQQ
-tracks the Nasdaq-100.
+- **Cap-weighted, not averaged.** The largest few names dominate `I_t`. Contrast the Dow
+  (price-weighted) and RSP (equal-weighted — the actual arithmetic average). The "500" is a
+  constituent count, not a denominator.
+- **The level carries no information; only returns do.** `D_t` exists solely to keep `I_t`
+  continuous when constituents change. The S&P 500 base period is 1941–43 = 10, so the level is a
+  growth factor off an arbitrary scale, with no tendency to revert to it.
 
-**Definition (Futures contract).** A *futures contract* is an agreement to settle a specified
-quantity of an underlying at a specified price on a specified future date. No constituent shares
-are held. Examples: ES (S&P 500), NQ (Nasdaq-100).
+**Claim.** A CTA trades futures, not ETFs.
 
-**Note (Weighting).** `I_t` above is **float-adjusted market-capitalisation weighted**, not a
-simple average of constituent prices — the largest few names dominate the level. Contrast the Dow
-Jones Industrial Average, which is *price*-weighted, and an equal-weight fund such as RSP, which
-is the actual arithmetic average. The "500" is the constituent count, not a denominator.
+| Reason | Futures | ETFs |
+| --- | --- | --- |
+| **Symmetry** | Shorting costs nothing extra | Shorting needs borrowed shares, a fee, availability |
+| **Coverage** | Deep markets in all four asset classes | Poor in commodities and FX |
+| **Capital efficiency** | Margin ≈ 5–10% of notional; spare cash earns **collateral yield** | Full notional tied up |
 
-**Note (Level versus return).** `D_t` carries no economic meaning; it exists only to keep `I_t`
-continuous when constituents change. The base period of the S&P 500 is 1941–43 = 10, so the level
-is a cumulative growth factor from an arbitrary starting scale. Only *changes* in `I_t` are
-interpretable — the level itself admits no "high" or "low" reading, and `I_t` has no tendency to
-revert to its base.
+Symmetry is the decisive one: a strategy that must go short as freely as long cannot tolerate that
+asymmetry.
 
-**Claim.** A CTA trades futures rather than ETFs.
+**Note (The cost).** Futures expire, so no natural continuous ES series exists — contracts must be
+stitched together. See [02](02-data-and-corporate-actions.md).
 
-Three reasons, in descending order of importance.
+## 2. Why CTA/Momentum Strategies Work
 
-1. **Symmetry.** Shorting a future carries no instrument-specific cost. Shorting an ETF requires
-   borrowed shares, a borrow fee, and availability. A strategy that must take short positions as
-   freely as long ones cannot tolerate that asymmetry.
-2. **Coverage.** Commodities and currencies have deep futures markets and poor ETFs. One
-   instrument type spans all four asset classes under one framework.
-3. **Capital efficiency.** Margin is roughly 5–10% of notional, so unused cash sits in Treasury
-   bills. That interest is a genuine return component, termed **collateral yield**.
+Two candidate explanations. Neither is settled; momentum has nonetheless been durably profitable.
 
-**Note (The cost).** Futures expire. There is no natural continuous ES price series, so contracts
-must be stitched together — see [02](02-data-and-corporate-actions.md).
+- **Information diffusion.** Unglamorous news with real macro effects spreads gradually, creating
+  sustained pressure. Possibly weakened since 2008 — faster computing prices news more quickly.
+- **Selective momentum capture.** Recent winners keep winning, recent losers keep losing. Three
+  mechanisms are usually offered:
+  - Large positions take time to build and unwind, so institutional flow persists.
+  - Investors chase winners and abandon losers, self-reinforcing while it lasts.
+  - Major economic events do not resolve in one day; their impact is spread out.
 
-## 1. Why CTA/Momentum Strategies Work
+## 3. Long/Short Mechanics
 
-Two candidate explanations. Neither is conclusive; momentum has nonetheless been durably
-profitable historically.
+**Definition (Long).** Buy first, sell later. Profit = sell price − buy price.
 
-**Information diffusion.** Unglamorous news with real long-term macro effects spreads gradually,
-creating sustained pressure. This explanation may have weakened since 2008 — faster computing and
-data distribution let markets price news much more quickly.
+**Definition (Short).** Borrow and sell first, buy back and return later. Profit = sell price −
+buy-back price.
 
-**Selective momentum capture.** Assets that performed well over recent months tend to keep doing
-so, and weak performers tend to keep declining. Three mechanisms are usually offered:
-
-- Large positions take time to build and unwind, so institutional flow persists.
-- Investors chase winners and abandon losers, which is self-reinforcing while it lasts.
-- Major economic events do not resolve within a single day; their price impact is spread out.
-
-## 2. Long/Short Mechanics
-
-**Definition (Long).** Buy first, sell later. Profit is the sell price minus the buy price.
-
-**Definition (Short).** Borrow and sell first, buy back and return later. Profit is the sell price
-minus the buy-back price.
-
-**Note.** Combining both deploys capital fully — 150/50 or 200/100 structures rather than leaving
-cash idle.
-
-**Note.** Empirically, longs contribute more P&L than same-size shorts, possibly a carry or
-risk-free-rate effect.
+- Running both deploys capital fully — 150/50 or 200/100 rather than leaving cash idle.
+- Empirically longs contribute more P&L than same-size shorts, possibly a carry or
+  risk-free-rate effect.
 
 Turning a long/short stance into per-asset weights is [04](04-from-signal-to-position.md).
 
-## 3. How Short Selling Works
+### How short selling works
 
-*How can you sell shares you don't own?* A short sale is not selling out of thin air — **you
-borrow the shares first**, exactly like borrowing money, except the thing borrowed is stock.
-
-### The four steps
+A short sale is not selling out of thin air — **you borrow the shares first**, exactly like
+borrowing money, except the thing borrowed is stock.
 
 ```text
 1. Borrow    — borrow N shares from a lender (broker / long-term holder)
-2. Sell      — sell those borrowed shares now, receive cash
+2. Sell      — sell them now, receive cash
 3. Buy back  — later buy N shares back from the market
-4. Return    — return the N shares to the lender (close the position)
+4. Return    — return the N shares, closing the position
 ```
 
-**Note (Fungibility).** You never create shares; you use someone else's temporarily and return an
-**equal quantity of the same stock**. Shares are fungible, so returning "N shares of SPY" — not
-specific certificates — settles the debt.
+**Note (Fungibility).** You never create shares. Returning "N shares of SPY" — not specific
+certificates — settles the debt.
 
-**Example.** Today: borrow one case of cola worth \$100 and sell it immediately, receiving \$100.
-Later: the price falls, so buy one case back for \$80 and return it to the lender. You keep \$20.
-Profit is sell price minus buy-back price, so a short is a bet the price **falls**.
+**Note (Why lenders lend).** Long-term holders (Vanguard, BlackRock, pension funds) earn a
+**lending fee** on stock they were going to sit on anyway. The broker matches the two sides and
+holds margin. The market for this is **securities lending**.
 
-### Why lenders lend
+**Claim.** A long has bounded loss; a short does not.
 
-Long-term holders (Vanguard, BlackRock, pension funds) earn a **lending fee** on stock they were
-going to sit on anyway. The broker matches borrowers with lenders and holds margin. This mature
-market is called **securities lending**.
-
-### Why shorting is riskier
-
-**Claim.** A long position has bounded loss; a short position does not.
-
-A long can lose at most 100% of the amount invested, since the price is floored at zero. A short
-owes the market price of the borrowed shares, and that price can rise without limit, so the
-liability is **theoretically unbounded**. Brokers therefore require **margin** and may force a
-**buy-in** to protect the lender.
-
-**Note.** This is also why a 150/50 book — 200% gross — is **2× leverage**, not free money.
+A long can lose at most 100%, since price is floored at zero. A short owes the market price of the
+borrowed shares, which can rise without limit, so the liability is **theoretically unbounded**.
+Hence margin requirements and forced buy-ins. This is also why a 150/50 book — 200% gross — is
+**2× leverage**, not free money.
 
 ### In this backtest
 
-The code models no borrowing, fees, or margin. It allows a **negative share count**
-(`curr_shrs < 0`) valued at `asset_value = curr_shrs × close`, so a short is a **negative position
-value**, i.e. a liability, that gains when price falls.
+No borrowing, fees, or margin are modelled. A **negative share count** (`curr_shrs < 0`) is valued
+at `asset_value = curr_shrs × close`, so a short is a negative position value — a liability — that
+gains when price falls.
 
-**Note (Sign convention).** A negative number encodes *direction* — a debt owed — not a loss. The
-model assumes shares are always borrowable at zero cost: fine for teaching, not for real trading.
-
-Accounting detail: [05](05-understanding-backtesting.md).
+**Note (Sign convention).** The negative sign encodes *direction*, a debt owed, not a loss. Shares
+are assumed always borrowable at zero cost: fine for teaching, not for trading. Accounting detail:
+[05](05-understanding-backtesting.md).
 
 ## 4. Market Participants by Holding Period
 
-Longest to shortest:
+| Participant | Examples | Typical hold |
+| --- | --- | --- |
+| Index / passive funds | Vanguard, BlackRock | Years to decades |
+| Active managers | Fidelity, PIMCO | Monthly to quarterly |
+| Hedge funds | — | Intraday to several days |
+| Market makers | Optiver, Citadel Securities, IMC, SIG | Seconds to minutes |
+| Noise traders | Retail, uninformed flow | No consistent horizon |
 
-1. **Index and passive funds** — Vanguard, BlackRock; years to decades. Pension funds favour bonds for predictable cash flows.
-2. **Active managers** — Fidelity, PIMCO; monthly to quarterly, more discretionary/fundamental.
-3. **Hedge funds** — high minimums, lockups, management + performance fees; intraday to several days.
-4. **Market makers** — Optiver, Citadel Securities, IMC, Susquehanna; liquidity provision, extremely short holds, minimal overnight exposure.
-5. **Noise traders** — retail or uninformed flow, no consistent horizon or informational content.
+Pension funds favour bonds for predictable cash flows. Hedge funds charge management plus
+performance fees behind lockups. Market makers provide liquidity and carry minimal overnight
+exposure. Noise-trader flow has no informational content.
 
 ---
 
 ## Common pitfalls
 
-- **"CTA means commodities only."** A historical artifact of the name; main exposures are equity-index, rate, and FX futures.
-- **"You can buy the S&P 500."** You buy an ETF or a future *tracking* it. The index is a number.
-- **"The index level tells you whether the market is expensive."** The base scale is arbitrary (1941–43 = 10). Only returns are interpretable.
-- **"A negative position means I lost money."** The sign encodes *direction* — a debt — not P&L.
-- **"150/50 is free extra return."** 200% gross is 2× leverage; risk scales with it.
-- **"Momentum works because information diffuses slowly."** One candidate explanation, possibly weakened after 2008. Nothing is settled.
+| Belief | Correction |
+| --- | --- |
+| "CTA means commodities only." | Historical artifact; main exposures are equity-index, rate, and FX futures. |
+| "You can buy the S&P 500." | You buy an ETF or a future *tracking* it. The index is a number. |
+| "The index is at 5000, so the market is expensive." | The base scale is arbitrary (1941–43 = 10). Only returns are interpretable. |
+| "A negative position means I lost money." | The sign encodes direction — a debt — not P&L. |
+| "150/50 is free extra return." | 200% gross is 2× leverage; risk scales with it. |
+| "Momentum works because information diffuses slowly." | One candidate explanation, possibly weakened after 2008. Nothing is settled. |
 
 ## Open questions
 
@@ -174,7 +149,7 @@ Longest to shortest:
 
 ---
 
-## Next → [02 · Data &amp; Corporate Actions](02-data-and-corporate-actions.md)
+## Next → [02 · Data & Corporate Actions](02-data-and-corporate-actions.md)
 
 Before moving on, **open `CTA_data/_manifest.csv`** and look at the 37 tickers you will be working
 with — note which are equity, rate, commodity, and FX exposures. Chapter 02 is about trusting that
