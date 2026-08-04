@@ -116,3 +116,19 @@ Longest to shortest:
 
 - Longs out-contribute same-size shorts — carry / risk-free-rate effect, or just equities' long-run positive drift?
 - If information diffusion weakened after 2008, what keeps momentum alive since?
+
+---
+
+## Next → [02 · Data & Corporate Actions](02-data-and-corporate-actions.md)
+
+Before moving on, **open `CTA_data/_manifest.csv`** and look at the 37 tickers you will be working
+with — note which are equity, rate, commodity, and FX exposures. Chapter 02 is about trusting that
+data before building anything on it.
+
+You should be able to explain:
+
+- [ ] What a CTA actually trades, and why the name is misleading
+- [ ] Why a negative share count is a direction, not a loss
+- [ ] Why a 150/50 book is 2× leverage rather than free return
+
+[← Index](00-index.md)

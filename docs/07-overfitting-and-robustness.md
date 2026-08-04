@@ -103,3 +103,18 @@ these 37 ETFs all exist today.
 - ~1 year each for validation and test against ~4.5 years training — enough to separate edge from noise at these Sharpe levels?
 - Walk-forward (rolling the three windows) instead of one fixed cut?
 - The *test* set's own observations also overlap. Does that inflate significance within the test period?
+
+---
+
+## Next → the assignment: [Backtest_prototype/Backtests.md](../Backtest_prototype/Backtests.md)
+
+Before moving on, **cut the data into train / validation / test and re-run**, then grid-search the
+lookback × holding-period pair and look at the *shape* of the heat map rather than its maximum.
+
+You should be able to explain:
+
+- [ ] Why shuffling rows is fatal for momentum specifically
+- [ ] Why a plateau is trustworthy and a single hot cell is not
+- [ ] How many degrees of freedom this strategy has already spent
+
+[← 06](06-evaluating-performance.md) · [Index](00-index.md)

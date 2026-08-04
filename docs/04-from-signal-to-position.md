@@ -158,3 +158,19 @@ magnitude is informative and is punished harder when it isn't. Test both against
 - Where does 150/50 come from — risk budgeting, or convention?
 - Would inverse-volatility weighting (risk parity) beat equal weight here? Volatility varies enormously (UNG vs SHY).
 - How sensitive are results to sweeping the 5-day hold and 21-day lookback together? See [07](07-overfitting-and-robustness.md).
+
+---
+
+## Next → [05 · Understanding Backtesting](05-understanding-backtesting.md)
+
+Before moving on, **produce the weight matrix for both portfolios** and verify two things numerically:
+net exposure is exactly +100%, and gross falls below 200% after the 5-day overlap. If gross comes out
+at exactly 2.0, the overlap is not being applied.
+
+You should be able to explain:
+
+- [ ] The weight → dollar → shares chain, and why price enters only at the last step
+- [ ] Why net is invariant under overlap but gross shrinks
+- [ ] Why the median, not the mean, defines Portfolio 2's long/short split
+
+[← 03](03-building-signals.md) · [Index](00-index.md)

@@ -167,3 +167,24 @@ Source: [`analyze_cta_data.py`](../analyze_cta_data.py). Outputs:
 
 - `output/validation_and_gap_summary.csv` — load status, quality checks, and the overnight-vs-intraday comparison per ticker.
 - `output/selected_price_trends.png` — closing-price charts for SPY, TLT, GLD, EEM, DBC.
+
+---
+
+## Next → [03 · Building Your Own Signal](03-building-signals.md)
+
+Before moving on, **run the validation and find the defects yourself**:
+
+```bash
+python ../analyze_cta_data.py
+```
+
+Then scan every ticker for `|close.pct_change()| > 0.4` and confirm you land on the five SPDRs that
+are still unadjusted. Chapter 03 builds a signal on this data — anything you miss here propagates.
+
+You should be able to explain:
+
+- [ ] Which two tickers were fixed, which five are not, and what a phantom return is
+- [ ] Why volume is not a reliable split tell (XLK 0.88×, XLY 0.51×)
+- [ ] Why the 2025-12-05 bar stays corrupt even after a split adjustment
+
+[← 01](01-what-is-cta.md) · [Index](00-index.md)

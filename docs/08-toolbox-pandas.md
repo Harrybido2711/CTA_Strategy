@@ -92,3 +92,10 @@ grid-searching ([03 § 9](03-building-signals.md)).
 
 `span`, `com`, and `alpha` parameterize the same decay differently. Pick one and state which: a
 "20" means three different things depending on the argument.
+
+---
+
+Reference chapter — no next step. Used by [03 · Signals](03-building-signals.md) and
+[05 · Backtesting](05-understanding-backtesting.md).
+
+[Index](00-index.md)

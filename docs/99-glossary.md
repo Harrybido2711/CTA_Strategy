@@ -61,3 +61,7 @@ where the concept has its home, per [convention 1](00-index.md#writing-conventio
 | Out-of-sample | 样本外 | Data not used when the strategy was chosen | [07](07-overfitting-and-robustness.md) |
 | Multiple testing | 多重检验 | Trying many variants inflates the best one's apparent quality | [07](07-overfitting-and-robustness.md) |
 | Survivorship bias | 幸存者偏差 | Studying only the assets that still exist today | [07](07-overfitting-and-robustness.md) |
+
+---
+
+[Index](00-index.md)

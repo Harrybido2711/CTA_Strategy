@@ -119,3 +119,22 @@ Multi-asset runs this loop for all 37 assets and sums each `portfolio` into the 
 - Keep `delay` or `.shift()` — which? Write down when the signal is knowable and when a fill is possible, then decide.
 - How much does `(open+close)/2` change the conclusions? Test against close-fill and open-fill.
 - With commissions and slippage, does daily rebalancing turnover consume the entire return?
+
+---
+
+## Next → [06 · Evaluating Performance](06-evaluating-performance.md)
+
+Before moving on, **run the backtest and trace one asset by hand** — pick a single ticker and follow
+one row from `dollar` through `target_shrs`, `curr_shrs`, `traded_shrs`, `TWAP`, to `portfolio`:
+
+```bash
+python ../Backtest_prototype/backtest.py
+```
+
+You should be able to explain:
+
+- [ ] What each column means and which are inputs vs computed
+- [ ] Exactly where the two time offsets are, and whether your code delays twice
+- [ ] Why turnover is never zero even at constant `dollar`
+
+[← 04](04-from-signal-to-position.md) · [Index](00-index.md)

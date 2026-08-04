@@ -58,3 +58,17 @@ random-sign portfolio? Net vs gross exposure makes this non-obvious for a 150/50
 ## Open questions
 
 *(to be written)*
+
+---
+
+## Next → [07 · Overfitting & Robustness](07-overfitting-and-robustness.md)
+
+Before moving on, **plot the equity curve and annotate its three worst drawdowns** with what the
+market was doing at the time. Chapter 07 asks how much of the remaining result is real.
+
+You should be able to explain:
+
+- [ ] Why a Sharpe number alone cannot distinguish steady earnings from one lucky quarter
+- [ ] Why dropping the worst asset is fitting rather than analysis
+
+[← 05](05-understanding-backtesting.md) · [Index](00-index.md)

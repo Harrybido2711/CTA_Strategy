@@ -3,7 +3,7 @@
 A ground-up series on CTA strategies — from *what a CTA is* through data, signals, position sizing,
 backtesting, and evaluation. Every chapter is backed by runnable code and real market data.
 
-📖 **Start at [00 · Index & Learning Path](docs/00-index.md).**
+📖 **Start at [00 · Index &amp; Learning Path](docs/00-index.md).**
 
 ---
 
@@ -47,35 +47,55 @@ stages 4–6 → [04](docs/04-from-signal-to-position.md) · stages 8–9 →
 
 ## Contents
 
-| # | Chapter | Covers | Status |
-|---|---|---|---|
-| 00 | [Index & Learning Path](docs/00-index.md) | How to read this series, prerequisites per chapter | ✅ |
-| 01 | [What Is a CTA Strategy](docs/01-what-is-cta.md) | Definition, why momentum works, long/short mechanics, short selling, market participants | ✅ |
-| 02 | [Data & Corporate Actions](docs/02-data-and-corporate-actions.md) | Fields, the 37 tickers, split adjustment, data-quality checks | ✅ |
-| 03 | [Building Your Own Signal](docs/03-building-signals.md) | Hypothesis framing, bucketed bar charts, reversal, risk-adjusted momentum, rolling quantiles, fast/slow combination, EWMA, smoothing | ✅ |
-| 04 | [From Signal to Position](docs/04-from-signal-to-position.md) | weight → dollar → shares, holding period, the two portfolios | ✅ |
-| 05 | [Understanding Backtesting](docs/05-understanding-backtesting.md) | Every column, timing offsets, look-ahead bias | ✅ |
-| 06 | [Evaluating Performance](docs/06-evaluating-performance.md) | Why a single number hides the time dimension; Sharpe, drawdown, turnover, attribution | 🟡 partial |
-| 07 | [Overfitting & Robustness](docs/07-overfitting-and-robustness.md) | Train/validation/test, why time series can't be split randomly, heat-map parameter sensitivity | 🟡 partial |
-| 08 | [Toolbox: pandas](docs/08-toolbox-pandas.md) | Key functions used in this project | ✅ |
-| 99 | [Glossary](docs/99-glossary.md) | English–Chinese term reference | ✅ |
+| #  | Chapter                                                              | Covers                                                                                                                               | Status     |
+| -- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| 00 | [Index &amp; Learning Path](docs/00-index.md)                         | How to read this series, prerequisites per chapter                                                                                   | ✅         |
+| 01 | [What Is a CTA Strategy](docs/01-what-is-cta.md)                      | Definition, why momentum works, long/short mechanics, short selling, market participants                                             | ✅         |
+| 02 | [Data &amp; Corporate Actions](docs/02-data-and-corporate-actions.md) | Fields, the 37 tickers, split adjustment, data-quality checks                                                                        | ✅         |
+| 03 | [Building Your Own Signal](docs/03-building-signals.md)               | Hypothesis framing, bucketed bar charts, reversal, risk-adjusted momentum, rolling quantiles, fast/slow combination, EWMA, smoothing | ✅         |
+| 04 | [From Signal to Position](docs/04-from-signal-to-position.md)         | weight → dollar → shares, holding period, the two portfolios                                                                       | ✅         |
+| 05 | [Understanding Backtesting](docs/05-understanding-backtesting.md)     | Every column, timing offsets, look-ahead bias                                                                                        | ✅         |
+| 06 | [Evaluating Performance](docs/06-evaluating-performance.md)           | Why a single number hides the time dimension; Sharpe, drawdown, turnover, attribution                                                | 🟡 partial |
+| 07 | [Overfitting &amp; Robustness](docs/07-overfitting-and-robustness.md) | Train/validation/test, why time series can't be split randomly, heat-map parameter sensitivity                                       | 🟡 partial |
+| 08 | [Toolbox: pandas](docs/08-toolbox-pandas.md)                          | Key functions used in this project                                                                                                   | ✅         |
+| 99 | [Glossary](docs/99-glossary.md)                                       | English–Chinese term reference                                                                                                      | ✅         |
 
-Class notes are absorbed into the chapter that owns each concept — there is no parallel per-session record.
+Chapters read in order — each ends with a **Next** block: one concrete thing to do before moving on,
+plus a checklist of what you should be able to explain. Class notes are absorbed into the chapter
+that owns each concept; there is no parallel per-session record.
+
+### Jump straight to a topic
+
+| I want to…                                          | Go to                                                                                                   |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Understand what a CTA trades, and how shorting works | [01](docs/01-what-is-cta.md)                                                                             |
+| Check my price data before trusting it               | [02 § 1.1](docs/02-data-and-corporate-actions.md)                                                       |
+| See what the 37 tickers actually are                 | [02 § 2](docs/02-data-and-corporate-actions.md)                                                         |
+| Test whether my signal carries information           | [03 § 4](docs/03-building-signals.md)                                                                   |
+| Understand why my lowest bucket misbehaves           | [03 § 5](docs/03-building-signals.md)                                                                   |
+| Make signals comparable across assets and regimes    | [03 §§ 6–7](docs/03-building-signals.md)                                                              |
+| Combine a fast and slow horizon                      | [03 §§ 8–10](docs/03-building-signals.md)                                                             |
+| Turn a signal into position weights                  | [04](docs/04-from-signal-to-position.md)                                                                 |
+| Look up what`curr_shrs` means                      | [05 § columns](docs/05-understanding-backtesting.md)                                                    |
+| Work out whether I have look-ahead bias              | [05 § offsets](docs/05-understanding-backtesting.md) · [07 § 2](docs/07-overfitting-and-robustness.md) |
+| Judge an equity curve honestly                       | [06 § 1](docs/06-evaluating-performance.md)                                                             |
+| Tune parameters without fooling myself               | [07 § 4](docs/07-overfitting-and-robustness.md)                                                         |
+| Look up a pandas function                            | [08](docs/08-toolbox-pandas.md)                                                                          |
+| Look up a term                                       | [99 · Glossary](docs/99-glossary.md)                                                                    |
+| See what to build next                               | [Backtests.md § Next Steps](Backtest_prototype/Backtests.md)                                            |
 
 ## Layout
 
-```
-CTA_Strategy/
-├── README.md                   Entry point + contents (this file)
-├── docs/                       The series: concepts that stay true over time
-│   └── figures/                Chart source (make_figures.py) + generated light/dark PNGs
-├── CTA_data/                   Daily OHLCV for 37 ETFs
-│   └── _unadjusted_raw/        Pre-adjustment originals (not picked up by the loaders)
-├── Backtest_prototype/         Backtest prototype code + implementation notes
-├── analyze_cta_data.py         Data validation and exploration
-├── backtester.ipynb            Interactive backtest
-└── output/                     Generated charts and summary tables
-```
+| Path                                          | What's in it                                                                                              |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| [`docs/`](docs/)                             | The series — concepts that stay true over time                                                           |
+| [`docs/figures/`](docs/figures/)             | [`make_figures.py`](docs/figures/make_figures.py) + generated light/dark PNGs                            |
+| [`CTA_data/`](CTA_data/)                     | Daily OHLCV for 37 ETFs                                                                                   |
+| `CTA_data/_unadjusted_raw/`                 | Pre-adjustment originals — deliberately outside the loaders' glob                                        |
+| [`Backtest_prototype/`](Backtest_prototype/) | [`backtest.py`](Backtest_prototype/backtest.py) + [implementation notes](Backtest_prototype/Backtests.md) |
+| [`analyze_cta_data.py`](analyze_cta_data.py) | Data validation and exploration                                                                           |
+| [`backtester.ipynb`](backtester.ipynb)       | Interactive backtest                                                                                      |
+| `output/`                                   | Generated charts and summary tables                                                                       |
 
 ## How to Run
 

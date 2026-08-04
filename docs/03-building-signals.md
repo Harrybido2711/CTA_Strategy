@@ -211,3 +211,19 @@ train/validation/test split ([07](07-overfitting-and-robustness.md)) are the sam
 - Rolling-quantile window length — too short is noisy, too long spans the regimes standardization was meant to separate.
 - Does the bucket spread survive transaction costs? The chart prices the gross edge only.
 - Would a volatility *forecast* filter noise better than trailing realized vol?
+
+---
+
+## Next → [04 · From Signal to Position](04-from-signal-to-position.md)
+
+Before moving on, **build the 21-day momentum signal and plot its bucket chart three ways** — raw
+values, standardized, and rolling quantile — then compare them. Chapter 04 assumes you have a signal
+you already believe in.
+
+You should be able to explain:
+
+- [ ] Why a scatter plot proves nothing at a realistic 10–15% correlation
+- [ ] Why the bottom bucket lifts, and how you would measure the right skip
+- [ ] Why fixed-interval buckets starve the tails and full-history ranking leaks the future
+
+[← 02](02-data-and-corporate-actions.md) · [Index](00-index.md) · reference: [08 · Toolbox](08-toolbox-pandas.md)
