@@ -139,8 +139,12 @@ exists only because prices are floored at zero.
 
 ### Borrowing the shares
 
-**Definition (Long).** Buy first, sell later. **Definition (Short).** Borrow and sell first, buy
-back and return later. A short is not selling out of thin air:
+**Definition (Long).** Buy first, sell later. Profit is the sell price minus the buy price.
+
+**Definition (Short).** Borrow and sell first, buy back and return later. Profit is the sell price
+minus the buy-back price.
+
+A short is not selling out of thin air — the shares are borrowed before they are sold:
 
 ```text
 1. Borrow    — borrow N shares from a lender (broker / long-term holder)
