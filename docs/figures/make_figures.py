@@ -390,68 +390,91 @@ def signal_kernels(mode):
 
 # ------------------------------------------------- fig: the strategy pipeline
 def strategy_pipeline(mode):
-    """00-pipeline -- what the strategy is, and what merely measures it.
+    """00-pipeline -- the two ways a signal gets made, and what validates it.
 
-    Schematic. The point is the boundary: the first two transforms are the
-    thing you design, the rest is the ruler you judge it with.
+    Schematic. The point is that a rule and an ML model are alternative ways
+    of producing the same object -- a signal -- and that the backtest sits
+    downstream of both, validating the whole strategy rather than the model.
     """
     t = THEMES[mode]
-    stages = ["prices", "signal", "weights", "positions", "PnL", "verdict"]
-    edges = ["hypothesis, computed per asset per day",
-             "sizing rule — fraction of capital, signed",
-             "× capital ÷ price, with an execution lag",
-             "simulate against history",
-             "metrics, then robustness"]
-    # prices are the input; the strategy is signal + sizing, the rest measures it
-    STRAT = (1, 2)
+    W, H = 4.6, 0.56                    # shared-spine box size
+    BW = 3.5                            # branch box width
+    CX, LX, RX = 4.7, 2.15, 7.25        # centre, left-branch, right-branch
 
-    fig, ax = plt.subplots(figsize=(7.6, 5.6))
+    #  (x, y, w, label, sublabel, kind)
+    nodes = [
+        (CX, 6.0, W,  "market data / features", "prices, volume, volatility", "input"),
+        (LX, 4.9, BW, "rule", "momentum, MACD", "strat"),
+        (RX, 4.9, BW, "ML model", "OLS, ridge, lasso, trees", "strat"),
+        (RX, 3.8, BW, "prediction", "return, P(up), volatility", "strat"),
+        (CX, 2.7, W,  "signal", "long / short / flat", "strat"),
+        (CX, 1.6, W,  "position", "how much to bet, and risk limits", "strat"),
+        (CX, 0.5, W,  "backtest", "costs, delay, turnover, execution", "instr"),
+        (CX, -0.6, W, "return · Sharpe · drawdown · turnover", "", "instr"),
+    ]
+    edges = [(0, 1, None), (0, 2, None), (1, 4, "sign / threshold"),
+             (2, 3, None), (3, 4, "trading rule"), (4, 5, None),
+             (5, 6, None), (6, 7, None)]
+
+    fig, ax = plt.subplots(figsize=(9.0, 6.6))
     fig.patch.set_facecolor(t["surface"])
     ax.set_facecolor(t["surface"])
-    ax.set_xlim(0, 7.6)
-    ax.set_ylim(-0.7, len(stages) - 0.3)
+    ax.set_xlim(0, 9.6)
+    ax.set_ylim(-1.25, 6.6)
     ax.axis("off")
 
-    box_x, box_w, box_h = 1.35, 2.45, 0.52
-    for i, name in enumerate(stages):
-        y = len(stages) - 1 - i
-        owned = STRAT[0] <= i <= STRAT[1]
-        face = t["ramp"][5] if owned else t["ramp"][1]
-        label = t["surface"] if owned else t["ink"]
-        patch = dict(facecolor=face, edgecolor="none")
-        if i == 0:                                    # input, not a stage you own
-            patch = dict(facecolor=t["surface"], edgecolor=t["baseline"], linewidth=1.1)
-            label = t["ink_secondary"]
+    face = {"input": None, "strat": t["ramp"][5], "instr": t["ramp"][1]}
+    for x, y, w, label, sub, kind in nodes:
+        if kind == "input":
+            style = dict(facecolor=t["surface"], edgecolor=t["baseline"], linewidth=1.1)
+            ink, subink = t["ink_secondary"], t["muted"]
+        else:
+            style = dict(facecolor=face[kind], edgecolor="none")
+            ink = t["surface"] if kind == "strat" else t["ink"]
+            subink = ink
         ax.add_patch(FancyBboxPatch(
-            (box_x, y - box_h / 2), box_w, box_h,
-            boxstyle="round,pad=0.02,rounding_size=0.14", zorder=3, **patch))
-        ax.text(box_x + box_w / 2, y, name, ha="center", va="center",
-                color=label, fontsize=10, fontweight="600", zorder=4)
+            (x - w / 2, y - H / 2), w, H,
+            boxstyle="round,pad=0.02,rounding_size=0.15", zorder=3, **style))
+        dy = 0.10 if sub else 0.0
+        ax.text(x, y + dy, label, ha="center", va="center",
+                color=ink, fontsize=9.8, fontweight="600", zorder=4)
+        if sub:
+            ax.text(x, y - 0.145, sub, ha="center", va="center",
+                    color=subink, fontsize=7.8, alpha=0.85, zorder=4)
 
-        if i < len(edges):
-            ax.annotate("", xy=(box_x + box_w / 2, y - 1 + box_h / 2 + 0.02),
-                        xytext=(box_x + box_w / 2, y - box_h / 2 - 0.02),
-                        arrowprops=dict(arrowstyle="-|>", color=t["baseline"],
-                                        linewidth=1.1, shrinkA=0, shrinkB=0))
-            ax.text(box_x + box_w + 0.28, y - 0.5, edges[i], ha="left", va="center",
-                    color=t["ink_secondary"], fontsize=8.5)
+    for a, b, note in edges:
+        xa, ya, _, _, _, _ = nodes[a]
+        xb, yb, _, _, _, _ = nodes[b]
+        ax.annotate("", xy=(xb, yb + H / 2 + 0.02), xytext=(xa, ya - H / 2 - 0.02),
+                    arrowprops=dict(arrowstyle="-|>", color=t["baseline"], linewidth=1.1,
+                                    shrinkA=0, shrinkB=0,
+                                    connectionstyle="arc3,rad=0"))
+        if note:
+            ax.text((xa + xb) / 2 + (0.30 if xb < xa else -0.30),
+                    (ya + yb) / 2, note, ha="center", va="center",
+                    color=t["ink_secondary"], fontsize=7.6, rotation=0,
+                    bbox=dict(boxstyle="round,pad=0.18", facecolor=t["surface"],
+                              edgecolor="none"), zorder=5)
 
-    # brackets: what you design, versus what measures it
-    def bracket(top_i, bot_i, text, colour):
-        y0 = len(stages) - 1 - bot_i - box_h / 2
-        y1 = len(stages) - 1 - top_i + box_h / 2
-        x = box_x - 0.34
-        ax.plot([x + 0.13, x, x, x + 0.13], [y1, y1, y0, y0],
-                color=colour, linewidth=1.1, solid_joinstyle="miter", zorder=3)
-        ax.text(x - 0.16, (y0 + y1) / 2, text, ha="center", va="center",
-                rotation=90, color=colour, fontsize=8.8, fontweight="600")
+    # the correction this figure exists to make
+    ax.text(9.5, 2.7, "both paths end here —\nML replaces the rule,\nnot the backtest",
+            ha="right", va="center", color=t["ramp"][5], fontsize=8.4,
+            fontweight="600", linespacing=1.5)
+    ax.annotate("", xy=(CX + W / 2 + 0.05, 2.7), xytext=(7.5, 2.7),
+                arrowprops=dict(arrowstyle="-", color=t["baseline"], linewidth=0.9))
 
-    bracket(STRAT[0], STRAT[1], "the strategy", t["ramp"][5])
-    bracket(STRAT[1] + 1, len(stages) - 1, "the instrument", t["muted"])
+    ax.plot([0.42, 0.30, 0.30, 0.42], [5.2, 5.2, 1.32, 1.32],
+            color=t["ramp"][5], linewidth=1.1, solid_joinstyle="miter", zorder=3)
+    ax.text(0.14, 3.26, "the strategy", ha="center", va="center", rotation=90,
+            color=t["ramp"][5], fontsize=8.8, fontweight="600")
+    ax.plot([0.42, 0.30, 0.30, 0.42], [0.78, 0.78, -0.88, -0.88],
+            color=t["muted"], linewidth=1.1, solid_joinstyle="miter", zorder=3)
+    ax.text(0.14, -0.05, "validation", ha="center", va="center", rotation=90,
+            color=t["muted"], fontsize=8.8, fontweight="600")
 
-    titles(ax, t, "What you design, and what merely measures it",
-           "prices go in; only the two shaded stages are the strategy itself")
-    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    titles(ax, t, "Two ways to make a signal, one way to validate it",
+           "a rule and a model are alternatives; the backtest is downstream of both")
+    fig.tight_layout(rect=(0, 0, 1, 0.94))
     save(fig, t, f"strategy-pipeline-{mode}.png")
 
 
