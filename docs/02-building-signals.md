@@ -169,7 +169,72 @@ MACD's 9-day signal line is an **empirical solution** — a value that fit histo
 more. Every parameter here has that status, which is why they belong in
 [06](06-overfitting-and-robustness.md) rather than being accepted on authority.
 
-## 10. Volatility clustering, and smoothing the fast leg
+## 10. MACD, stated precisely
+
+§ 8 and § 9 both gestured at MACD. Written out, it is three series built from two exponential
+moving averages of the **price**:
+
+**Definition (MACD).** For spans $f < s$ with smoothing constants $\alpha = 2/(\text{span}+1)$:
+
+$$
+\text{MACD}_t = \text{EMA}_f(P)_t - \text{EMA}_s(P)_t , \qquad
+\text{signal}_t = \text{EMA}_9(\text{MACD})_t , \qquad
+\text{hist}_t = \text{MACD}_t - \text{signal}_t
+$$
+
+Conventionally $f = 12$, $s = 26$, and 9 for the signal line.
+
+| Series | Reads as | Sign means |
+| --- | --- | --- |
+| **MACD line** | recent average price versus a longer one | trend direction |
+| **Signal line** | a smoothed MACD | the level MACD is crossing |
+| **Histogram** | MACD minus its own smoothing | trend *acceleration* |
+
+**Claim.** MACD is a momentum signal. It is a weighted sum of past returns, differing from a
+lookback mean only in the shape of the weights.
+
+**Proof.** Each EMA is a weighted average of past prices whose weights sum to one, so their
+difference has weights summing to **zero**:
+
+$$
+\text{MACD}_t = \sum_i c_i P_{t-i} , \qquad
+c_i = \alpha_f (1-\alpha_f)^i - \alpha_s (1-\alpha_s)^i , \qquad \sum_i c_i = 0 .
+$$
+
+A zero-sum weighting is unchanged when every price is shifted by a constant, so subtract $P_t$
+from each term. Writing $P_t - P_{t-i}$ as the sum of the last $i$ price changes and collecting the
+coefficient of the change at lag $j$:
+
+$$
+\text{MACD}_t = \sum_j w_j \Delta_{t-j} , \qquad
+w_j = \sum_{i \leq j} c_i = (1-\alpha_s)^{j+1} - (1-\alpha_f)^{j+1} .
+$$
+
+Since $\alpha_f > \alpha_s$, every $w_j \geq 0$: MACD is a **non-negative** weighted sum of past
+price changes, exactly like a lookback mean.
+
+**Note (What actually differs).** The kernel. A 21-day momentum weights the last 21 returns
+equally and everything older at zero; MACD's weights rise from a small value at lag 0, peak around
+lag 8, and decay without ever reaching zero. It therefore discounts *yesterday* relative to last
+week — deliberately, since the newest return is the noisiest — and never fully forgets.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/signal-kernels-dark.png">
+  <img alt="Weight given to each past daily return, against lag in trading days, for two signals normalised to the same total. A 21-day momentum is a flat box: equal weight for the last 21 days and zero beyond. MACD with spans 12 and 26 is a hump that starts low at lag zero, peaks around lag 8, then decays slowly and never reaches zero within sixty days" src="figures/signal-kernels-light.png">
+</picture>
+
+**Note (From value to rule).** Three common rules, in increasing order of information kept:
+
+- **Zero-line.** Long when $\text{MACD}_t > 0$. This is a slow trend filter.
+- **Crossover.** Long when $\text{hist}_t > 0$, i.e. MACD is above its own signal line. Earlier,
+  and noisier — the churn this creates is § 11's subject.
+- **Proportional.** Use the standardized MACD value as the position size directly, keeping the
+  magnitude that the two rules above throw away. See [03](03-from-signal-to-position.md).
+
+**Note.** All three still have to pass § 4's bucket test before they earn a backtest, and 12/26/9
+are fitted constants, not theory — § 9.
+
+## 11. Volatility clustering, and smoothing the fast leg
 
 Volatility arrives in clusters. A fast signal is exposed: short-lived noise flips it long/short, and
 the churn eats the return in transaction costs before any edge is realized.
@@ -180,7 +245,7 @@ Fix: **smooth the fast signal** to filter the shortest cycles.
 long window and you have not denoised it — you have built another slow signal and lost the
 timeliness the fast leg existed for.
 
-## 11. Information availability
+## 12. Information availability
 
 Everything above assumes the signal at `t` uses only data knowable at `t`. Look-ahead bias is born
 here; the execution offsets in [04](04-understanding-backtesting.md) are the second line of defense
@@ -201,6 +266,7 @@ train/validation/test split ([06](06-overfitting-and-robustness.md)) are the sam
 - **Ranking against the full history.** Pure look-ahead.
 - **Comparing raw momentum across regimes or assets.** 2% in 2021 ≠ 2% in 2023; SHY ≠ UNG.
 - **Smoothing a fast signal with a long window.** That converts it into a slow one.
+- **Treating MACD as a different species from momentum.** Same weighted sum of past returns, different kernel.
 - **Reading MACD's 26/12/9 as theory.** They are fitted values. So are yours.
 
 ## Open questions
@@ -225,5 +291,6 @@ You should be able to explain:
 - [ ] Why a scatter plot proves nothing at a realistic 10–15% correlation
 - [ ] Why the bottom bucket lifts, and how you would measure the right skip
 - [ ] Why fixed-interval buckets starve the tails and full-history ranking leaks the future
+- [ ] Why MACD is momentum with a hump-shaped kernel rather than a separate indicator
 
 [← 01](01-what-is-cta.md) · [Index](00-index.md) · reference: [07 · Toolbox](07-toolbox-pandas.md)

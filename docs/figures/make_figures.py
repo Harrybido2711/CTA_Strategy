@@ -12,6 +12,7 @@ Figures produced
 strategy-pipeline     00-pipeline  which stages are the strategy and which only measure it
 levels-vs-rebased     01 § 1  raw closes vs rebased: SPY looks highest, GLD returned more
 payoff-asymmetry      01 § 2  a static long's loss is floored at zero; a short's is not
+signal-kernels        02 § 10 MACD is momentum with a hump-shaped kernel, not a box
 bucket-chart          02 § 4  the core signal test: mean forward return per signal bucket
 reversal-buckets      02 § 5  expected monotone buckets vs the reversal-broken version
 signal-distribution   02 § 7  why fixed-interval cuts starve the tails, and what fixes it
@@ -344,6 +345,49 @@ def param_heatmap(mode):
     save(fig, t, f"param-heatmap-{mode}.png")
 
 
+# --------------------------------------------------- fig: momentum vs MACD kernel
+def signal_kernels(mode):
+    """02 -- MACD is momentum with a different weighting of past returns.
+
+    Both curves are the weight each past daily return carries in the signal,
+    normalised to sum to one so only the shape is being compared.
+    """
+    t = THEMES[mode]
+    lags = np.arange(0, 61)
+
+    box = np.where(lags < 21, 1.0 / 21, 0.0)          # 21-day mean of returns
+
+    a_fast, a_slow = 2 / 13, 2 / 27                    # MACD spans 12 and 26
+    w = (1 - a_slow) ** (lags + 1) - (1 - a_fast) ** (lags + 1)
+    w = w / (1 / a_slow - 1 / a_fast)                  # the exact total, = 7
+
+    fig, ax = plt.subplots(figsize=(7.0, 4.3))
+    fig.patch.set_facecolor(t["surface"])
+    style_axes(ax, t, ylabel="weight on that day's return",
+               xlabel="lag (trading days ago)")
+
+    ax.step(lags, box, where="post", color=t["muted"], linewidth=1.7, zorder=3)
+    ax.fill_between(lags, 0, box, step="post", color=t["muted"], alpha=0.13, zorder=2)
+    ax.plot(lags, w, color=t["series"], linewidth=2.1, zorder=4)
+    ax.fill_between(lags, 0, w, color=t["series"], alpha=0.13, zorder=2)
+
+    ax.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
+    ax.set_xlim(0, 60)
+    ax.set_ylim(0, 0.058)
+
+    ax.text(21.6, 0.0455, "21-day momentum — a box:\nevery day inside counts equally,\nnothing outside counts at all",
+            color=t["muted"], fontsize=8.6, ha="left", va="top", linespacing=1.5)
+    ax.text(33, 0.0148, "MACD (12/26) — a hump:\npeaks at lag 8, never reaches zero",
+            color=t["series"], fontsize=8.6, ha="left", va="center", linespacing=1.5)
+    ax.plot([8], [w[8]], marker="o", markersize=4.5, color=t["series"],
+            markeredgecolor=t["surface"], markeredgewidth=1.2, zorder=6)
+
+    titles(ax, t, "MACD is momentum with a different kernel",
+           "both weight past returns; only the shape of the weighting differs")
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    save(fig, t, f"signal-kernels-{mode}.png")
+
+
 # ------------------------------------------------- fig: the strategy pipeline
 def strategy_pipeline(mode):
     """00-pipeline -- what the strategy is, and what merely measures it.
@@ -520,7 +564,7 @@ def payoff_asymmetry(mode):
 
 FIGURES = (bucket_chart, reversal_buckets, signal_distribution,
            overlap_tranches, param_heatmap, payoff_asymmetry,
-           levels_vs_rebased, strategy_pipeline)
+           levels_vs_rebased, strategy_pipeline, signal_kernels)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

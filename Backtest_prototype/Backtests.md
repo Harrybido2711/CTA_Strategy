@@ -114,7 +114,7 @@ Assigned work. The pipeline stays as-is — only the signal changes.
 2. **Add a MACD-style fast leg** to the grid search; read the heat map, don't pick the maximum —
    [02 § 8](../docs/02-building-signals.md), [06 § 4](../docs/06-overfitting-and-robustness.md).
 3. **Smooth the fast leg** with a window shorter than its own period, or it becomes another slow
-   signal — [02 § 10](../docs/02-building-signals.md).
+   signal — [02 § 11](../docs/02-building-signals.md).
 4. **Run it through the pipeline** and produce the charts.
 
 Further ahead: a volatility *forecast* rather than trailing realized vol as the noise filter.
