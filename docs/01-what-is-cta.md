@@ -6,7 +6,7 @@
 
 ---
 
-## 1. What
+## 1. What a CTA Trades
 
 **Definition (CTA strategy).** A *CTA (Commodity Trading Advisor) strategy* is a rule-based
 strategy that trades **futures** systematically across asset classes — equities, fixed income,
@@ -15,15 +15,15 @@ commodities, currencies — targeting **absolute return**, independent of market
 **Note.** The name is a historical artifact. Modern CTAs are not commodity-only; typical markets
 are equity-index futures, Treasuries, FX, energy, metals, and agriculture.
 
-### What it trades
+### Index, ETF, or future
 
 "S&P 500" names three different objects. Only two of them can be traded.
 
-| Layer            | Example       | What it is                                            | Tradeable |
-| ---------------- | ------------- | ----------------------------------------------------- | --------- |
-| **Index**  | SPX, NDX      | A published number computed from its constituents     | No        |
-| **ETF**    | SPY, VOO, QQQ | A fund holding the constituents; its own shares trade | Yes       |
-| **Future** | ES, NQ        | A contract to settle at a future date; holds nothing  | Yes       |
+| Layer | Example | What it is | Tradeable |
+| --- | --- | --- | --- |
+| **Index** | SPX, NDX | A published number computed from its constituents | No |
+| **ETF** | SPY, VOO, QQQ | A fund holding the constituents; its own shares trade | Yes |
+| **Future** | ES, NQ | A contract to settle at a future date; holds nothing | Yes |
 
 **Definition (Index).**
 
@@ -60,11 +60,11 @@ no information at all — what each ETF's share price happens to be was fixed by
 structured at inception. Dividing every series by its own first observation removes that
 arbitrariness:
 
-| Ticker | Raw close, start | Raw close, end | Rebased | Return            |
-| ------ | ---------------- | -------------- | ------- | ----------------- |
-| SPY    | 325.05           | 740.83         | 227.9   | **+127.9%** |
-| TLT    | 137.10           | 87.35          | 63.7    | **−36.3%** |
-| GLD    | 143.97           | 368.49         | 255.9   | **+155.9%** |
+| Ticker | Raw close, start | Raw close, end | Rebased | Return |
+| --- | --- | --- | --- | --- |
+| SPY | 325.05 | 740.83 | 227.9 | **+127.9%** |
+| TLT | 137.10 | 87.35 | 63.7 | **−36.3%** |
+| GLD | 143.97 | 368.49 | 255.9 | **+155.9%** |
 
 SPY has the highest closing price on every single day of the sample, yet GLD returned more. The
 end level alone cannot tell you this; you need the start it is measured against.
@@ -74,19 +74,33 @@ end level alone cannot tell you this; you need the start it is measured against.
   <img alt="Two panels of the same three ETFs from 2020 to 2026. On the left, raw closing prices: SPY runs highest for the entire sample, with GLD in the middle and TLT lowest. On the right, the same series each divided by their own first value and multiplied by 100: GLD now finishes highest at about 256, SPY at about 228, and TLT below the starting line at about 64" src="figures/levels-vs-rebased-light.png">
 </picture>
 
-## 2. Why
-
 ### Why futures rather than ETFs
 
-| Reason                       | Futures                                                                  | ETFs                                                |
-| ---------------------------- | ------------------------------------------------------------------------ | --------------------------------------------------- |
-| **Symmetry**           | Shorting costs nothing extra                                             | Shorting needs borrowed shares, a fee, availability |
-| **Coverage**           | Deep markets in all four asset classes                                   | Poor in commodities and FX                          |
-| **Capital efficiency** | Margin ≈ 5–10% of notional; spare cash earns**collateral yield** | Full notional tied up                               |
+| Reason | Futures | ETFs |
+| --- | --- | --- |
+| **Symmetry** | Shorting costs nothing extra | Shorting needs borrowed shares, a fee, availability |
+| **Coverage** | Deep markets in all four asset classes | Poor in commodities and FX |
+| **Capital efficiency** | Margin ≈ 5–10% of notional; spare cash earns **collateral yield** | Full notional tied up |
 
 Symmetry is decisive: a strategy that must go short as freely as long cannot tolerate the
-asymmetry. The cost is that futures expire, so a continuous series has to be stitched together
-from contracts — see [02](02-data-and-corporate-actions.md).
+asymmetry, and § 3 shows why the short leg is the fragile one. The cost is that futures expire, so
+a continuous series has to be stitched together from contracts — see
+[02](02-data-and-corporate-actions.md).
+
+## 2. Momentum, the Source of the Return
+
+### What momentum is
+
+**Definition (Momentum).** *Momentum* is the empirical tendency for recent relative performance to
+persist: assets that outperformed over the past one to twelve months tend to keep outperforming,
+and recent laggards tend to keep lagging.
+
+**Note.** The claim is about *returns*, not price levels — it concerns the ordering of performance
+across assets and across time. That is why one momentum rule can be applied to markets with
+nothing else in common, from Treasury futures to natural gas.
+
+**Note.** Turning this into a number — a lookback window, a normalization, a test that it carries
+information — is [03](03-building-signals.md)'s subject. Here it is only the premise.
 
 ### Why momentum might work
 
@@ -99,6 +113,38 @@ Two contested explanations, no proof. Momentum has been durably profitable regar
   resolve in a single day.
 
 [03](03-building-signals.md) turns this from a story into something testable.
+
+## 3. Long and Short, the Two Sides of a Position
+
+### What the two sides mean
+
+**Definition (Long).** Buy first, sell later. Profit is the sell price minus the buy price.
+
+**Definition (Short).** Borrow and sell first, buy back and return later. Profit is the sell price
+minus the buy-back price.
+
+**Note.** Running both deploys capital fully — a 150/50 or 200/100 book rather than idle cash —
+and lets the strategy express a negative view, which a long-only book cannot.
+
+### How a short is borrowed
+
+A short is not selling out of thin air — the shares are borrowed before they are sold:
+
+```text
+1. Borrow    — borrow N shares from a lender (broker / long-term holder)
+2. Sell      — sell them now, receive cash
+3. Buy back  — later buy N shares back from the market
+4. Return    — return the N shares, closing the position
+```
+
+**Note.**
+
+- **You never create shares.** They are fungible, so returning "N shares of SPY" — not specific
+  certificates — settles the debt.
+- **Lenders are paid.** Long-term holders earn a **lending fee** on stock they were going to sit
+  on anyway.
+- **The broker sits in the middle,** matching the two sides and holding margin. The market for
+  this is **securities lending**.
 
 ### Why the short leg is the fragile one
 
@@ -128,33 +174,6 @@ exists only because prices are floored at zero.
 **Note.** Hence margin requirements and forced buy-ins — and why a 150/50 book, 200% gross, is
 **2× leverage** rather than free money.
 
-## 3. How
-
-### Borrowing the shares
-
-**Definition (Long).** Buy first, sell later. Profit is the sell price minus the buy price.
-
-**Definition (Short).** Borrow and sell first, buy back and return later. Profit is the sell price
-minus the buy-back price.
-
-A short is not selling out of thin air — the shares are borrowed before they are sold:
-
-```text
-1. Borrow    — borrow N shares from a lender (broker / long-term holder)
-2. Sell      — sell them now, receive cash
-3. Buy back  — later buy N shares back from the market
-4. Return    — return the N shares, closing the position
-```
-
-**Note.**
-
-- **You never create shares.** They are fungible, so returning "N shares of SPY" — not specific
-  certificates — settles the debt.
-- **Lenders are paid.** Long-term holders earn a **lending fee** on stock they were going to sit
-  on anyway.
-- **The broker sits in the middle,** matching the two sides and holding margin. The market for
-  this is **securities lending**.
-
 ### How a short is represented
 
 A short needs no separate machinery. Carry the position as a **signed quantity** and let the sign
@@ -175,13 +194,13 @@ two: [Backtest Prototype — Implementation Notes](../Backtest_prototype/Backtes
 
 ## 4. Who Else Is Trading
 
-| Participant           | Examples                              | Typical hold             |
-| --------------------- | ------------------------------------- | ------------------------ |
-| Index / passive funds | Vanguard, BlackRock                   | Years to decades         |
-| Active managers       | Fidelity, PIMCO                       | Monthly to quarterly     |
-| Hedge funds           | —                                    | Intraday to several days |
-| Market makers         | Optiver, Citadel Securities, IMC, SIG | Seconds to minutes       |
-| Noise traders         | Retail, uninformed flow               | No consistent horizon    |
+| Participant | Examples | Typical hold |
+| --- | --- | --- |
+| Index / passive funds | Vanguard, BlackRock | Years to decades |
+| Active managers | Fidelity, PIMCO | Monthly to quarterly |
+| Hedge funds | — | Intraday to several days |
+| Market makers | Optiver, Citadel Securities, IMC, SIG | Seconds to minutes |
+| Noise traders | Retail, uninformed flow | No consistent horizon |
 
 ---
 
@@ -199,12 +218,12 @@ They answer different questions, so they are not alternatives to one another.
 Futures are not an asset class, and options are not a rival one. Every asset class trades in every
 instrument:
 
-| Asset class               | Typical underlying    | Futures                    | Options       |
-| ------------------------- | --------------------- | -------------------------- | ------------- |
-| **Equities**        | S&P 500, Nasdaq 100   | ES, NQ                     | options on ES |
-| **Fixed income**    | US Treasuries, Bunds  | ZN (10-year), ZB (30-year) | options on ZN |
-| **Commodities**     | Crude oil, gold, corn | CL, GC, ZC                 | options on CL |
-| **Currencies (FX)** | EUR/USD, USD/JPY      | 6E, 6J                     | options on 6E |
+| Asset class | Typical underlying | Futures | Options |
+| --- | --- | --- | --- |
+| **Equities** | S&P 500, Nasdaq 100 | ES, NQ | options on ES |
+| **Fixed income** | US Treasuries, Bunds | ZN (10-year), ZB (30-year) | options on ZN |
+| **Commodities** | Crude oil, gold, corn | CL, GC, ZC | options on CL |
+| **Currencies (FX)** | EUR/USD, USD/JPY | 6E, 6J | options on 6E |
 
 The same exposure, three wrappers:
 
@@ -232,11 +251,11 @@ discretion.
 
 ### Why do CTAs use futures rather than options?
 
-|                         | Futures                                                       | Options                                     |
-| ----------------------- | ------------------------------------------------------------- | ------------------------------------------- |
-| Exposure                | **Linear** — PnL moves one-for-one with the underlying | Non-linear; depends on strike and moneyness |
-| Extra drivers           | None                                                          | Implied volatility, time decay, strike      |
-| What you are betting on | Direction                                                     | Direction**and** volatility           |
+| | Futures | Options |
+| --- | --- | --- |
+| Exposure | **Linear** — PnL moves one-for-one with the underlying | Non-linear; depends on strike and moneyness |
+| Extra drivers | None | Implied volatility, time decay, strike |
+| What you are betting on | Direction | Direction **and** volatility |
 
 An option position is partly a volatility trade whether you intended it or not. Linear exposure is
 what lets one risk framework size 37 positions on the same scale.
@@ -248,15 +267,16 @@ four are futures, and all four are different asset classes.
 
 ## Common pitfalls
 
-| Belief                                              | Correction                                                                   |
-| --------------------------------------------------- | ---------------------------------------------------------------------------- |
-| "CTA means commodities only."                       | Historical artifact; main exposures are equity-index, rate, and FX futures.  |
-| "Futures and options are asset classes."            | They are instruments. Every asset class trades in both — see Background.    |
-| "You can buy the S&P 500."                          | You buy an ETF or a future*tracking* it. The index is a number.            |
+| Belief | Correction |
+| --- | --- |
+| "CTA means commodities only." | Historical artifact; main exposures are equity-index, rate, and FX futures. |
+| "Futures and options are asset classes." | They are instruments. Every asset class trades in both — see Background. |
+| "You can buy the S&P 500." | You buy an ETF or a future *tracking* it. The index is a number. |
 | "The index is at 5000, so the market is expensive." | The base scale is arbitrary (1941–43 = 10). Only returns are interpretable. |
-| "The index is the average of 500 stocks."           | It is a cap-weighted average of 500*returns*; the top names dominate.      |
-| "A negative position means I lost money."           | The sign encodes direction — a debt — not P&L.                             |
-| "150/50 is free extra return."                      | 200% gross is 2× leverage; risk scales with it.                             |
+| "The index is the average of 500 stocks." | It is a cap-weighted average of 500 *returns*; the top names dominate. |
+| "Momentum is about price levels." | It is about the ordering of *returns*, which is why it transfers across asset classes. |
+| "A negative position means I lost money." | The sign encodes direction — a debt — not P&L. |
+| "150/50 is free extra return." | 200% gross is 2× leverage; risk scales with it. |
 
 ## Open questions
 
@@ -266,7 +286,7 @@ four are futures, and all four are different asset classes.
 
 ---
 
-## Next → [02 · Data &amp; Corporate Actions](02-data-and-corporate-actions.md)
+## Next → [02 · Data & Corporate Actions](02-data-and-corporate-actions.md)
 
 Before moving on, **rebase all 37 tickers to 100** and find the best and worst performer over the
 sample. Then open `CTA_data/_manifest.csv` and note which are equity, rate, commodity, and FX
@@ -276,6 +296,7 @@ You should be able to explain:
 
 - [ ] What a CTA actually trades, and why the name is misleading
 - [ ] Why the divisor cancels out of index *returns* but sets the *level*
+- [ ] What momentum claims, and the two competing explanations for it
 - [ ] Where the short's unbounded loss comes from, and why constant-dollar exposure never realises it
 
 [← Index](00-index.md)
