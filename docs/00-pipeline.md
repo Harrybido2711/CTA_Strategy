@@ -19,15 +19,15 @@ maps them onto one another so you can see what is being built and why in that or
 In one line: **a model finds the pattern, a prediction states the judgement, a signal picks the
 direction, a position sizes the bet, and the backtest asks whether any of it survives.**
 
-| Layer | What it does | Output | Example |
-| --- | --- | --- | --- |
-| **Features** | describe the market | prices, volume, volatility | 21-day realised vol |
-| **Rule** *or* **model** | encode or learn a regularity | a number | MACD; ridge regression |
-| **Prediction** | state a judgement about the future | expected return, P(up), expected vol | `+0.8%` next week |
-| **Signal** | turn that judgement into a direction | `+1` / `−1` / `0` | long if prediction > 1% |
-| **Position** | decide how much to bet | a weight, after risk limits | 30% of capital, long |
-| **Backtest** | apply it all to history under real constraints | a PnL series | after costs and delay |
-| **Metrics** | judge the PnL | Sharpe, drawdown, turnover, hit rate | Sharpe 0.4, −18% |
+| Layer                                 | What it does                                   | Output                               | Example                 |
+| ------------------------------------- | ---------------------------------------------- | ------------------------------------ | ----------------------- |
+| **Features**                    | describe the market                            | prices, volume, volatility           | 21-day realised vol     |
+| **Rule** *or* **model** | encode or learn a regularity                   | a number                             | MACD; ridge regression  |
+| **Prediction**                  | state a judgement about the future             | expected return, P(up), expected vol | `+0.8%` next week     |
+| **Signal**                      | turn that judgement into a direction           | `+1` / `−1` / `0`             | long if prediction > 1% |
+| **Position**                    | decide how much to bet                         | a weight, after risk limits          | 30% of capital, long    |
+| **Backtest**                    | apply it all to history under real constraints | a PnL series                         | after costs and delay   |
+| **Metrics**                     | judge the PnL                                  | Sharpe, drawdown, turnover, hit rate | Sharpe 0.4, −18%       |
 
 ## 2. Where a Model Enters, and Where It Does Not
 
@@ -77,12 +77,12 @@ the single-asset one and contains no strategy logic. See
 
 Each layer is tested on its own terms, and passing one says nothing about the next.
 
-| Level | Question | Typical measure | Where |
-| --- | --- | --- | --- |
-| **Model** | does the prediction track the outcome? | test IC, MSE, accuracy | out-of-sample only |
-| **Signal** | is the direction right, and tradeable? | bucket monotonicity, turnover | [02 § 4](02-building-signals.md) |
-| **Strategy** | does it survive real constraints? | Sharpe, drawdown, return after costs | [04](04-understanding-backtesting.md), [05](05-evaluating-performance.md) |
-| **Robustness** | does it persist? | across years, markets, parameters | [06](06-overfitting-and-robustness.md) |
+| Level                | Question                               | Typical measure                      | Where                                                                   |
+| -------------------- | -------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------- |
+| **Model**      | does the prediction track the outcome? | test IC, MSE, accuracy               | out-of-sample only                                                      |
+| **Signal**     | is the direction right, and tradeable? | bucket monotonicity, turnover        | [02 § 4](02-building-signals.md)                                        |
+| **Strategy**   | does it survive real constraints?      | Sharpe, drawdown, return after costs | [04](04-understanding-backtesting.md), [05](05-evaluating-performance.md) |
+| **Robustness** | does it persist?                       | across years, markets, parameters    | [06](06-overfitting-and-robustness.md)                                   |
 
 **Note (Each arrow loses candidates).** High test accuracy is not economic value; economic value is
 not profit after costs; profit after costs is not stability out of sample. A model can predict
@@ -91,15 +91,15 @@ or because acting on it every day costs more than the edge.
 
 ## 4. The Build Order
 
-| # | Stage | What happens | Chapter |
-| --- | --- | --- | --- |
-| 0 | **Validate the data** | Confirm prices are continuous and corporate actions are adjusted | [100](100-dataset.md) |
-| 1 | **State a hypothesis, compute a signal** | Turn an intuition into a number, then test that it carries information | [02](02-building-signals.md) |
-| 2 | **Size the positions** | Signal → weights → dollars → shares | [03](03-from-signal-to-position.md) |
-| 3 | **Simulate** | Apply the positions to history with realistic timing | [04](04-understanding-backtesting.md) |
-| 4 | **Evaluate** | Reduce the PnL series to numbers you can judge | [05](05-evaluating-performance.md) |
-| 5 | **Attack the result** | Ask how much of it is signal and how much is search | [06](06-overfitting-and-robustness.md) |
-| 6 | **Try a model** | Ask whether a learned prediction beats the rule — same sizing, same backtest | — |
+| # | Stage                                          | What happens                                                                  | Chapter                               |
+| - | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------- |
+| 0 | **Validate the data**                    | Confirm prices are continuous and corporate actions are adjusted              | [100](100-dataset.md)                  |
+| 1 | **State a hypothesis, compute a signal** | Turn an intuition into a number, then test that it carries information        | [02](02-building-signals.md)           |
+| 2 | **Size the positions**                   | Signal → weights → dollars → shares                                        | [03](03-from-signal-to-position.md)    |
+| 3 | **Simulate**                             | Apply the positions to history with realistic timing                          | [04](04-understanding-backtesting.md)  |
+| 4 | **Evaluate**                             | Reduce the PnL series to numbers you can judge                                | [05](05-evaluating-performance.md)     |
+| 5 | **Attack the result**                    | Ask how much of it is signal and how much is search                           | [06](06-overfitting-and-robustness.md) |
+| 6 | **Try a model**                          | Ask whether a learned prediction beats the rule — same sizing, same backtest | —                                    |
 
 **Note (Stage 0 is not optional).** Every later stage inherits whatever is wrong with the data. An
 unadjusted split is the largest move in the sample by construction, so a trend follower reads it as
@@ -119,15 +119,15 @@ and no way to tell whether the model added value or merely added parameters.
 The stages fail in different ways, and the symptoms are easy to misattribute — the most common
 mistake is reading a data defect as a code bug.
 
-| Stage | Failure | What you see | Where it is treated |
-| --- | --- | --- | --- |
-| Data | Unadjusted corporate action | A vertical step in the equity curve | [100 § 1.1](100-dataset.md) |
-| Signal | No information | Flat or non-monotone buckets | [02 § 4](02-building-signals.md) |
-| Sizing | Exposure not what you think | Gross or net drifts from target | [03](03-from-signal-to-position.md) |
-| Simulation | Look-ahead bias | Implausibly smooth, high Sharpe | [04](04-understanding-backtesting.md) |
-| Evaluation | One number hides the path | Good Sharpe, unlivable drawdown | [05](05-evaluating-performance.md) |
-| Robustness | Parameters were searched | Result vanishes out of sample | [06](06-overfitting-and-robustness.md) |
-| Model | Fitted to the sample | Good IC in train, none in test | out-of-sample split |
+| Stage      | Failure                     | What you see                        | Where it is treated                   |
+| ---------- | --------------------------- | ----------------------------------- | ------------------------------------- |
+| Data       | Unadjusted corporate action | A vertical step in the equity curve | [100 § 1.1](100-dataset.md)           |
+| Signal     | No information              | Flat or non-monotone buckets        | [02 § 4](02-building-signals.md)      |
+| Sizing     | Exposure not what you think | Gross or net drifts from target     | [03](03-from-signal-to-position.md)    |
+| Simulation | Look-ahead bias             | Implausibly smooth, high Sharpe     | [04](04-understanding-backtesting.md)  |
+| Evaluation | One number hides the path   | Good Sharpe, unlivable drawdown     | [05](05-evaluating-performance.md)     |
+| Robustness | Parameters were searched    | Result vanishes out of sample       | [06](06-overfitting-and-robustness.md) |
+| Model      | Fitted to the sample        | Good IC in train, none in test      | out-of-sample split                   |
 
 **Note.** The order is forced in one direction — you cannot evaluate before simulating, or simulate
 before sizing. The one shortcut is that stage 1 can be validated *without* stages 2–4, and it
@@ -135,17 +135,111 @@ should be.
 
 ---
 
+## Background
+
+General background needed to read this chapter, not part of its argument.
+
+### What are the features and the target?
+
+**Features** are everything knowable at time `t`. The project names three groups, and a regime
+indicator built from them:
+
+| Group | Examples |
+| --- | --- |
+| Price | momentum at several lookbacks, MACD line, MACD histogram |
+| Volume | rolling mean volume, volume z-score |
+| Volatility | rolling realised volatility |
+| Regime | high/low volatility, high/low volume, as quantile dummies |
+
+**The target** is the forward return over a chosen horizon `h`:
+
+```python
+y = close.pct_change(h).shift(-h)      # the return from t to t+h, labelled at t
+```
+
+- Prefer a **volatility-scaled** target, `y / vol`. Raw returns are heteroscedastic, so a model
+  fitted to them spends most of its capacity on high-volatility periods, where the numbers are
+  large but not more informative.
+- That `shift(-h)` is the single place look-ahead bias enters. Verify the alignment on a handful
+  of rows by hand before trusting anything downstream.
+
+**One model or 37?** Pool the assets — stack `(date, ticker)` into rows and fit once. Per-asset
+models get ~1,600 rows each and overfit. Pooling requires the features to be comparable across
+assets, which is what the standardization in [02 § 6](02-building-signals.md) is for.
+
+**Note the effective sample size.** 37 tickers × ~1,600 days looks like 60,000 observations, but
+the assets move together, so the number of genuinely independent observations is closer to the
+number of **days**. That is the main reason flexible models overfit on a panel like this.
+
+### Why can a time series not be split randomly?
+
+Because a random fold puts **future rows in the training set and past rows in the test set**. The
+model then "predicts" a past it has already seen, and the score is meaningless.
+
+Split by time instead:
+
+```text
+|------------ train ------------|-- valid --|-- test --|
+2020                          2024        2025      2026
+```
+
+There is a second, subtler leak even after splitting by time. If the target is a 5-day forward
+return, the last five training rows describe returns that fall inside the validation window. Leave
+a gap of `h` observations between the segments — **purging**, sometimes with an extra **embargo**.
+
+- The same discipline as the rolling-quantile rule in [02 § 7](02-building-signals.md): rank and
+  fit using only what was knowable at the time.
+- Formal treatment of splits and why a backtest overstates: [06](06-overfitting-and-robustness.md).
+
+### How does a model's output become a signal?
+
+`predict` returns one number per row. Reshaped, it is a `date × ticker` matrix — **the same shape
+as a momentum signal**, which is what lets the two be swapped:
+
+```python
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+pred = pd.Series(pred, index=X_test.index).unstack()     # date × ticker
+```
+
+From there, nothing downstream changes:
+
+```python
+signal  = momentum(close)     # rule path
+signal  = pred                # model path — same shape, same everything after
+
+weights = overlap_weights(target_weights_p1(signal))
+pnl, _  = multi_asset_backtester(asset_data, weights)
+```
+
+**Judging the model itself** uses rank correlation per date, not accuracy:
+
+```python
+ic = pred.corrwith(fwd_return, axis=1, method="spearman")
+ic.mean(), ic.mean() / ic.std()          # average IC, and its stability
+```
+
+| Measure | Plausible on daily data | Almost certainly a bug |
+| --- | --- | --- |
+| Mean daily IC | 0.02 – 0.05 is already good | above 0.15 |
+| R² | 0.001 – 0.01 | above 0.1 |
+
+An R² of 0.3 on daily returns is not a discovery; it is a look-ahead bug. Check the `shift(-h)`
+alignment first — it is the cheapest sanity check in the whole pipeline.
+
+---
+
 ## Common pitfalls
 
-| Belief | Correction |
-| --- | --- |
-| "Momentum is a strategy." | It is a hypothesis, so a family of signals. A strategy also needs a sizing rule. |
-| "ML validates the signal." | ML *produces* signals. The backtest validates the whole strategy. |
-| "A prediction is a signal." | A prediction is a number about the future; a signal is a decision. A trading rule sits between them. |
-| "High accuracy means it makes money." | Not after costs, not if the errors are the big moves, not necessarily next year. |
-| "The backtest is part of the strategy." | It is the instrument that measures one. Changing it changes your ruler, not your idea. |
-| "A signal is good if the backtest looks good." | Test the signal on its own first; an equity curve is far easier to rationalize. |
-| "Bad data makes results look bad." | An unadjusted split usually makes them look *better*. |
+| Belief                                         | Correction                                                                                           |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| "Momentum is a strategy."                      | It is a hypothesis, so a family of signals. A strategy also needs a sizing rule.                     |
+| "ML validates the signal."                     | ML*produces* signals. The backtest validates the whole strategy.                                   |
+| "A prediction is a signal."                    | A prediction is a number about the future; a signal is a decision. A trading rule sits between them. |
+| "High accuracy means it makes money."          | Not after costs, not if the errors are the big moves, not necessarily next year.                     |
+| "The backtest is part of the strategy."        | It is the instrument that measures one. Changing it changes your ruler, not your idea.               |
+| "A signal is good if the backtest looks good." | Test the signal on its own first; an equity curve is far easier to rationalize.                      |
+| "Bad data makes results look bad."             | An unadjusted split usually makes them look*better*.                                               |
 
 ## Next → [02 · Building Your Own Signal](02-building-signals.md)
 
@@ -159,5 +253,6 @@ You should be able to explain:
 - [ ] Why a model replaces the rule but not the backtest
 - [ ] Why a high test accuracy is not yet a reason to trade
 - [ ] Which stage a vertical jump in the equity curve belongs to
+- [ ] Why a time series cannot be split randomly, and what purging fixes
 
 [← Index](00-index.md)
