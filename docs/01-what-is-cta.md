@@ -85,7 +85,7 @@ end level alone cannot tell you this; you need the start it is measured against.
 Symmetry is decisive: a strategy that must go short as freely as long cannot tolerate the
 asymmetry, and § 3 shows why the short leg is the fragile one. The cost is that futures expire, so
 a continuous series has to be stitched together from contracts — see
-[02](02-data-and-corporate-actions.md).
+[100](100-dataset.md).
 
 ## 2. Momentum, the Source of the Return
 
@@ -100,7 +100,7 @@ across assets and across time. That is why one momentum rule can be applied to m
 nothing else in common, from Treasury futures to natural gas.
 
 **Note.** Turning this into a number — a lookback window, a normalization, a test that it carries
-information — is [03](03-building-signals.md)'s subject. Here it is only the premise.
+information — is [02](02-building-signals.md)'s subject. Here it is only the premise.
 
 ### Why momentum might work
 
@@ -112,7 +112,7 @@ Two contested explanations, no proof. Momentum has been durably profitable regar
   positions take time to build and unwind, investors chase winners, and major events do not
   resolve in a single day.
 
-[03](03-building-signals.md) turns this from a story into something testable.
+[02](02-building-signals.md) turns this from a story into something testable.
 
 ## 3. Long and Short, the Two Sides of a Position
 
@@ -286,11 +286,13 @@ four are futures, and all four are different asset classes.
 
 ---
 
-## Next → [02 · Data & Corporate Actions](02-data-and-corporate-actions.md)
+## Next → [02 · Building Your Own Signal](02-building-signals.md)
 
 Before moving on, **rebase all 37 tickers to 100** and find the best and worst performer over the
-sample. Then open `CTA_data/_manifest.csv` and note which are equity, rate, commodity, and FX
-exposures. Chapter 02 is about trusting that data before building anything on it.
+sample. Chapter 02 turns the momentum premise above into a number you can test.
+
+The data itself — what the 37 tickers are, and which still carry unadjusted splits — is
+[100 · The Dataset](100-dataset.md). Read it before trusting any result.
 
 You should be able to explain:
 

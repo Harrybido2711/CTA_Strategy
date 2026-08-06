@@ -28,20 +28,25 @@ flowchart LR
     class C06,C07 part;
 ```
 
-Green = written, yellow = partly written. 01 → 07 read in order, each assuming the previous; 08 is
-reference material, not a step.
+Green = written, yellow = partly written. **01 → 06 read in order**, each assuming the previous.
+Everything from 07 up is reference, consulted rather than stepped through.
 
 | # | Chapter | Prereq | Status |
 |---|---|---|---|
 | 01 | [What Is a CTA Strategy](01-what-is-cta.md) | — | ✅ |
-| 02 | [Data & Corporate Actions](02-data-and-corporate-actions.md) | 01 | ✅ |
-| 03 | [Building Your Own Signal](03-building-signals.md) | 02 | ✅ |
-| 04 | [From Signal to Position](04-from-signal-to-position.md) | 03 | ✅ |
-| 05 | [Understanding Backtesting](05-understanding-backtesting.md) | 04 | ✅ |
-| 06 | [Evaluating Performance](06-evaluating-performance.md) | 05 | 🟡 §1 |
-| 07 | [Overfitting & Robustness](07-overfitting-and-robustness.md) | 06 | 🟡 §§1–2, 4 |
-| 08 | [Toolbox: pandas](08-toolbox-pandas.md) | — | ✅ |
-| 99 | [Glossary](99-glossary.md) | — | ✅ |
+| 02 | [Building Your Own Signal](02-building-signals.md) | 01 | ✅ |
+| 03 | [From Signal to Position](03-from-signal-to-position.md) | 02 | ✅ |
+| 04 | [Understanding Backtesting](04-understanding-backtesting.md) | 03 | ✅ |
+| 05 | [Evaluating Performance](05-evaluating-performance.md) | 04 | 🟡 §1 |
+| 06 | [Overfitting & Robustness](06-overfitting-and-robustness.md) | 05 | 🟡 §§1–2, 4 |
+
+Reference:
+
+| # | Document | What it is | Status |
+|---|---|---|---|
+| 07 | [Toolbox: pandas](07-toolbox-pandas.md) | How the non-obvious pandas calls behave | ✅ |
+| 99 | [Glossary](99-glossary.md) | EN ↔ ZH terms | ✅ |
+| 100 | [The Dataset](100-dataset.md) | The 37-ticker sample and the defects it carries | ✅ |
 
 Class notes go straight into the chapter that owns each concept — no parallel per-session record. A
 lecture is an ordering of delivery, not of ideas: one session touches several topics and one topic
@@ -55,12 +60,12 @@ appended elsewhere.
 |---|---|
 | What does a CTA actually trade? | [01](01-what-is-cta.md) |
 | How can you sell a stock you don't own? | [01 § short selling](01-what-is-cta.md) |
-| Why does my equity curve have a vertical jump? | [02 § 1.1](02-data-and-corporate-actions.md) |
-| Does my signal carry information? | [03 § 4](03-building-signals.md) |
-| Why does a 150% long leg not depend on price? | [04 § weights are money](04-from-signal-to-position.md) |
-| What does `curr_shrs` mean? | [05 § columns](05-understanding-backtesting.md) |
-| Do I have look-ahead bias? | [05 § offsets](05-understanding-backtesting.md), [07 § 2](07-overfitting-and-robustness.md) |
-| How does `merge_asof` work? | [08](08-toolbox-pandas.md) |
+| Why does my equity curve have a vertical jump? | [100 § 1.1](100-dataset.md) |
+| Does my signal carry information? | [02 § 4](02-building-signals.md) |
+| Why does a 150% long leg not depend on price? | [03 § weights are money](03-from-signal-to-position.md) |
+| What does `curr_shrs` mean? | [04 § columns](04-understanding-backtesting.md) |
+| Do I have look-ahead bias? | [04 § offsets](04-understanding-backtesting.md), [06 § 2](06-overfitting-and-robustness.md) |
+| How does `merge_asof` work? | [07](07-toolbox-pandas.md) |
 
 ## Writing Conventions
 

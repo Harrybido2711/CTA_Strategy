@@ -1,7 +1,7 @@
-# 07 · Overfitting & Robustness
+# 06 · Overfitting & Robustness
 
 > - **Answers:** why a good backtest is weak evidence, and what makes it stronger.
-> - **Prerequisites:** [06 · Evaluating Performance](06-evaluating-performance.md).
+> - **Prerequisites:** [05 · Evaluating Performance](05-evaluating-performance.md).
 > - **After reading:** split a time series correctly, and state honestly how much of a result is signal and how much is search.
 
 > 🟡 **Partly written.** §§ 1–2, 4 complete; §§ 3, 5–6 outline.
@@ -45,7 +45,7 @@ the model looks like it generalizes when it has memorized.
 
 That is forward-looking bias in subtle form: no row contains future data, but the **split** does.
 Cut on time, never on shuffled rows. Same logic as the rolling-quantile rule in
-[03 § 7](03-building-signals.md) — when you ask "is this value high?", the comparison set must
+[02 § 7](02-building-signals.md) — when you ask "is this value high?", the comparison set must
 contain only the past.
 
 ## 3. Why a backtest overstates
@@ -87,7 +87,7 @@ these 37 ETFs all exist today.
 - Drop the best-contributing asset and re-run.
 - Shift the execution assumption (close-fill vs TWAP vs open-fill).
 - Add realistic costs; find the breakeven cost level.
-- Re-run the split-corrupted tickers before and after adjustment — a concrete measure of how much a data defect moves a result. See [02](02-data-and-corporate-actions.md).
+- Re-run the split-corrupted tickers before and after adjustment — a concrete measure of how much a data defect moves a result. See [100](100-dataset.md).
 
 ---
 
@@ -96,7 +96,7 @@ these 37 ETFs all exist today.
 - **Shuffling rows before splitting.** Standard for tabular ML, invalid for time series, fatal for momentum.
 - **Skipping validation.** Then the test set becomes the selection set and nothing is held out.
 - **Treating 2020–2026 as one regime.** It contains COVID, a rate-hike cycle, and a commodity shock.
-- **Forgetting the data is a choice.** Five tickers still carry a phantom −50% ([02](02-data-and-corporate-actions.md)); robustness testing on corrupted data measures the corruption.
+- **Forgetting the data is a choice.** Five tickers still carry a phantom −50% ([100](100-dataset.md)); robustness testing on corrupted data measures the corruption.
 
 ## Open questions
 
@@ -117,4 +117,4 @@ You should be able to explain:
 - [ ] Why a plateau is trustworthy and a single hot cell is not
 - [ ] How many degrees of freedom this strategy has already spent
 
-[← 06](06-evaluating-performance.md) · [Index](00-index.md)
+[← 05](05-evaluating-performance.md) · [Index](00-index.md)

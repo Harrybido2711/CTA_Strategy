@@ -11,11 +11,11 @@ Figures produced
 ----------------
 levels-vs-rebased     01 § 1  raw closes vs rebased: SPY looks highest, GLD returned more
 payoff-asymmetry      01 § 2  a static long's loss is floored at zero; a short's is not
-bucket-chart          03 § 4  the core signal test: mean forward return per signal bucket
-reversal-buckets      03 § 5  expected monotone buckets vs the reversal-broken version
-signal-distribution   03 § 7  why fixed-interval cuts starve the tails, and what fixes it
-overlap-tranches      04      the five overlapping 1/5 tranches of a 5-day hold
-param-heatmap         07 § 4  a plateau (real edge) vs a spike (artifact)
+bucket-chart          02 § 4  the core signal test: mean forward return per signal bucket
+reversal-buckets      02 § 5  expected monotone buckets vs the reversal-broken version
+signal-distribution   02 § 7  why fixed-interval cuts starve the tails, and what fixes it
+overlap-tranches      03      the five overlapping 1/5 tranches of a 5-day hold
+param-heatmap         06 § 4  a plateau (real edge) vs a spike (artifact)
 
 All are schematics drawn from illustrative values except levels-vs-rebased, which
 reads CTA_data/ because its claim is about this dataset rather than about a shape.

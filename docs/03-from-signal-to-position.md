@@ -1,7 +1,7 @@
-# 04 · From Signal to Position
+# 03 · From Signal to Position
 
 > - **Answers:** how a signal becomes "how many dollars, then how many shares, of each asset."
-> - **Prerequisites:** [03 · Building Your Own Signal](03-building-signals.md).
+> - **Prerequisites:** [02 · Building Your Own Signal](02-building-signals.md).
 > - **After reading:** trace the weight → dollar → shares chain, and explain how a holding period is implemented through weights.
 
 ---
@@ -46,14 +46,14 @@ very different price levels; only a percentage exposure is comparable across the
 **Note.** Since `shares = dollar / close`, the share count drifts daily even at constant dollar
 exposure — hence the small daily rebalancing trades.
 
-Everything downstream of ⑤ is [05 · Understanding Backtesting](05-understanding-backtesting.md).
+Everything downstream of ⑤ is [04 · Understanding Backtesting](04-understanding-backtesting.md).
 
 ## Momentum Signal
 
 **Definition (Momentum signal).** The trailing **21-trading-day** mean of daily returns per asset:
 `close.pct_change().rolling(21).mean()`. Positive indicates a recent uptrend.
 
-Designing and validating it is [03](03-building-signals.md)'s job; here it is a given input.
+Designing and validating it is [02](02-building-signals.md)'s job; here it is a given input.
 
 ## Holding Period: Why Weights Change
 
@@ -165,7 +165,7 @@ w = w + (1.0 - w.sum(axis=1).values[:, None]) / w.shape[1]   # shift net to +100
 These weights feed the backtester unchanged. Which version wins is empirical: sign-based weighting is
 robust to a noisy signal since it only needs the ranking; proportional weighting extracts more when
 magnitude is informative and is punished harder when it isn't. Test both against the bucket chart in
-[03 § 4](03-building-signals.md).
+[02 § 4](02-building-signals.md).
 
 ---
 
@@ -181,11 +181,11 @@ magnitude is informative and is punished harder when it isn't. Test both against
 
 - Where does 150/50 come from — risk budgeting, or convention?
 - Would inverse-volatility weighting (risk parity) beat equal weight here? Volatility varies enormously (UNG vs SHY).
-- How sensitive are results to sweeping the 5-day hold and 21-day lookback together? See [07](07-overfitting-and-robustness.md).
+- How sensitive are results to sweeping the 5-day hold and 21-day lookback together? See [06](06-overfitting-and-robustness.md).
 
 ---
 
-## Next → [05 · Understanding Backtesting](05-understanding-backtesting.md)
+## Next → [04 · Understanding Backtesting](04-understanding-backtesting.md)
 
 Before moving on, **produce the weight matrix for both portfolios** and verify two things numerically:
 net exposure is exactly +100%, and gross falls below 200% after the 5-day overlap. If gross comes out
@@ -197,4 +197,4 @@ You should be able to explain:
 - [ ] Why net is invariant under overlap but gross shrinks
 - [ ] Why the median, not the mean, defines Portfolio 2's long/short split
 
-[← 03](03-building-signals.md) · [Index](00-index.md)
+[← 02](02-building-signals.md) · [Index](00-index.md)

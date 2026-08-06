@@ -1,8 +1,13 @@
-# 02 · Data & Corporate Actions
+# 100 · The Dataset
 
 > - **Answers:** what is in these CSV files, what the 37 tickers represent, and how a corporate action silently destroys a backtest.
 > - **Prerequisites:** [01 · What Is a CTA Strategy](01-what-is-cta.md).
 > - **After reading:** validate a price dataset before trusting it, and detect an unadjusted split from the data alone.
+> - **Read it when:** you first touch the data, and again whenever a result looks impossible.
+
+**Reference, not part of the main sequence.** Chapters 01–07 are the theory in reading order; this
+one describes the particular 37-ticker sample they are exercised on, and the defects it still
+carries.
 
 ---
 
@@ -192,16 +197,17 @@ Source: [`analyze_cta_data.py`](../analyze_cta_data.py). Outputs:
 
 ---
 
-## Next → [03 · Building Your Own Signal](03-building-signals.md)
+## Try it
 
-Before moving on, **run the validation and find the defects yourself**:
+**Run the validation and find the defects yourself**:
 
 ```bash
 python ../analyze_cta_data.py
 ```
 
 Then scan every ticker for `|close.pct_change()| > 0.4` and confirm you land on the five SPDRs that
-are still unadjusted. Chapter 03 builds a signal on this data — anything you miss here propagates.
+are still unadjusted. Every chapter from [02](02-building-signals.md) onward is exercised on this
+data — anything you miss here propagates into all of it.
 
 You should be able to explain:
 

@@ -1,7 +1,7 @@
-# 03 · Building Your Own Signal
+# 02 · Building Your Own Signal
 
 > - **Answers:** how to turn an intuition into a computable signal, and how to tell whether it carries information before backtesting it.
-> - **Prerequisites:** [02 · Data & Corporate Actions](02-data-and-corporate-actions.md).
+> - **Prerequisites:** [01 · What Is a CTA Strategy](01-what-is-cta.md); the data it runs on is [100 · The Dataset](100-dataset.md).
 > - **After reading:** state a signal as a hypothesis, test it with a bucket chart, normalize it, and combine horizons without drowning in noise.
 
 ---
@@ -19,7 +19,7 @@ $$
 $$
 
 The third line makes it tradeable: the signal doesn't just correlate with return, it says **how much**
-to allocate — the bridge into [04](04-from-signal-to-position.md).
+to allocate — the bridge into [03](03-from-signal-to-position.md).
 
 Write the hypothesis first because it tells you what would falsify it. A signal you cannot falsify
 is a plot you will rationalize either way.
@@ -140,7 +140,7 @@ No single view suffices; produce all three:
 | Rolling-quantile buckets | No look-ahead, balanced groups | Magnitude information |
 
 A fourth angle: cross-sectional ranking — each asset against its peers that day rather than its own
-past. That is the Portfolio 1 vs Portfolio 2 distinction in [04](04-from-signal-to-position.md).
+past. That is the Portfolio 1 vs Portfolio 2 distinction in [03](03-from-signal-to-position.md).
 
 ## 8. Combining a slow and a fast horizon
 
@@ -167,7 +167,7 @@ Tune the **half-life** — candidates are fractions of the lookback (1/2, 1/3, 1
 
 MACD's 9-day signal line is an **empirical solution** — a value that fit historical data, nothing
 more. Every parameter here has that status, which is why they belong in
-[07](07-overfitting-and-robustness.md) rather than being accepted on authority.
+[06](06-overfitting-and-robustness.md) rather than being accepted on authority.
 
 ## 10. Volatility clustering, and smoothing the fast leg
 
@@ -183,9 +183,9 @@ timeliness the fast leg existed for.
 ## 11. Information availability
 
 Everything above assumes the signal at `t` uses only data knowable at `t`. Look-ahead bias is born
-here; the execution offsets in [05](05-understanding-backtesting.md) are the second line of defense
+here; the execution offsets in [04](04-understanding-backtesting.md) are the second line of defense
 and cannot rescue a signal contaminated at construction. The rolling-quantile rule (§7) and the
-train/validation/test split ([07](07-overfitting-and-robustness.md)) are the same discipline.
+train/validation/test split ([06](06-overfitting-and-robustness.md)) are the same discipline.
 
 ---
 
@@ -214,10 +214,10 @@ train/validation/test split ([07](07-overfitting-and-robustness.md)) are the sam
 
 ---
 
-## Next → [04 · From Signal to Position](04-from-signal-to-position.md)
+## Next → [03 · From Signal to Position](03-from-signal-to-position.md)
 
 Before moving on, **build the 21-day momentum signal and plot its bucket chart three ways** — raw
-values, standardized, and rolling quantile — then compare them. Chapter 04 assumes you have a signal
+values, standardized, and rolling quantile — then compare them. Chapter 03 assumes you have a signal
 you already believe in.
 
 You should be able to explain:
@@ -226,4 +226,4 @@ You should be able to explain:
 - [ ] Why the bottom bucket lifts, and how you would measure the right skip
 - [ ] Why fixed-interval buckets starve the tails and full-history ranking leaks the future
 
-[← 02](02-data-and-corporate-actions.md) · [Index](00-index.md) · reference: [08 · Toolbox](08-toolbox-pandas.md)
+[← 01](01-what-is-cta.md) · [Index](00-index.md) · reference: [07 · Toolbox](07-toolbox-pandas.md)

@@ -1,8 +1,8 @@
-# 08 · Toolbox: pandas
+# 07 · Toolbox: pandas
 
 > - **Answers:** how the non-obvious pandas functions in this project actually behave.
 > - **Prerequisites:** none — reference material.
-> - **Related:** [03](03-building-signals.md), [05](05-understanding-backtesting.md).
+> - **Related:** [02](02-building-signals.md), [04](04-understanding-backtesting.md).
 
 ---
 
@@ -88,14 +88,14 @@ signal = returns.ewm(halflife=H).mean()
 ```
 
 `halflife` is the periods after which an observation's weight halves — the parameter worth
-grid-searching ([03 § 9](03-building-signals.md)).
+grid-searching ([02 § 9](02-building-signals.md)).
 
 `span`, `com`, and `alpha` parameterize the same decay differently. Pick one and state which: a
 "20" means three different things depending on the argument.
 
 ---
 
-Reference chapter — no next step. Used by [03 · Signals](03-building-signals.md) and
-[05 · Backtesting](05-understanding-backtesting.md).
+Reference chapter — no next step. Used by [02 · Signals](02-building-signals.md) and
+[04 · Backtesting](04-understanding-backtesting.md).
 
 [Index](00-index.md)

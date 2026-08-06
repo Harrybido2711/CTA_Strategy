@@ -5,9 +5,9 @@ live in the series:
 
 | Looking for | Chapter |
 | --- | --- |
-| Column meanings, timing offsets, look-ahead bias | [05 · Understanding Backtesting](../docs/05-understanding-backtesting.md) |
-| Momentum signal, overlapping holds, portfolio weights | [04 · From Signal to Position](../docs/04-from-signal-to-position.md) |
-| Unadjusted prices, splits, data-quality checks | [02 · Data & Corporate Actions](../docs/02-data-and-corporate-actions.md) |
+| Column meanings, timing offsets, look-ahead bias | [04 · Understanding Backtesting](../docs/04-understanding-backtesting.md) |
+| Momentum signal, overlapping holds, portfolio weights | [03 · From Signal to Position](../docs/03-from-signal-to-position.md) |
+| Unadjusted prices, splits, data-quality checks | [100 · The Dataset](../docs/100-dataset.md) |
 
 Code: [`backtest.py`](backtest.py). Multi-asset adds no trading logic — it loops the single-asset
 backtester over 37 assets and sums the PnL. 用循环把单资产回测跑 37 遍再加总。
@@ -102,7 +102,7 @@ cross-sectional momentum on 37 ETFs is not supposed to be profitable; the exerci
   split adjustment alone will not repair.
 - Dividends are unadjusted throughout.
 
-Detail: [02](../docs/02-data-and-corporate-actions.md). Until those five are fixed, no conclusion
+Detail: [100](../docs/100-dataset.md). Until those five are fixed, no conclusion
 spanning December 2025 is trustworthy.
 
 ## Next Steps
@@ -110,11 +110,11 @@ spanning December 2025 is trustworthy.
 Assigned work. The pipeline stays as-is — only the signal changes.
 
 1. **Re-plot performance** with the risk-adjusted signal bucketed by rolling quantile instead of raw
-   value — [03 §§ 6–7](../docs/03-building-signals.md).
+   value — [02 §§ 6–7](../docs/02-building-signals.md).
 2. **Add a MACD-style fast leg** to the grid search; read the heat map, don't pick the maximum —
-   [03 § 8](../docs/03-building-signals.md), [07 § 4](../docs/07-overfitting-and-robustness.md).
+   [02 § 8](../docs/02-building-signals.md), [06 § 4](../docs/06-overfitting-and-robustness.md).
 3. **Smooth the fast leg** with a window shorter than its own period, or it becomes another slow
-   signal — [03 § 10](../docs/03-building-signals.md).
+   signal — [02 § 10](../docs/02-building-signals.md).
 4. **Run it through the pipeline** and produce the charts.
 
 Further ahead: a volatility *forecast* rather than trailing realized vol as the noise filter.
