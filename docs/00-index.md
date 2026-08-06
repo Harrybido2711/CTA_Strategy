@@ -34,6 +34,7 @@ Everything from 07 up is reference, consulted rather than stepped through.
 | # | Chapter | Prereq | Status |
 |---|---|---|---|
 | 01 | [What Is a CTA Strategy](01-what-is-cta.md) | — | ✅ |
+| — | [How a Strategy Is Built](00-pipeline.md) — orientation | 01 | ✅ |
 | 02 | [Building Your Own Signal](02-building-signals.md) | 01 | ✅ |
 | 03 | [From Signal to Position](03-from-signal-to-position.md) | 02 | ✅ |
 | 04 | [Understanding Backtesting](04-understanding-backtesting.md) | 03 | ✅ |
@@ -59,6 +60,7 @@ appended elsewhere.
 | Question | Go to |
 |---|---|
 | What does a CTA actually trade? | [01](01-what-is-cta.md) |
+| How do signal, strategy and backtest relate? | [00 · pipeline](00-pipeline.md) |
 | How can you sell a stock you don't own? | [01 § short selling](01-what-is-cta.md) |
 | Why does my equity curve have a vertical jump? | [100 § 1.1](100-dataset.md) |
 | Does my signal carry information? | [02 § 4](02-building-signals.md) |

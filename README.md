@@ -51,6 +51,7 @@ stages 4–6 → [03](docs/03-from-signal-to-position.md) · stages 8–9 →
 | -- | ------- | ------ | ------ |
 | 00 | [Index &amp; Learning Path](docs/00-index.md) | How to read this series, prerequisites per chapter | ✅ |
 | 01 | [What Is a CTA Strategy](docs/01-what-is-cta.md) | What a CTA trades, momentum, long/short mechanics, market participants | ✅ |
+| — | [How a Strategy Is Built](docs/00-pipeline.md) | Orientation: how signal, strategy, backtest and momentum relate, and the order they get built in | ✅ |
 | 02 | [Building Your Own Signal](docs/02-building-signals.md) | Hypothesis framing, bucketed bar charts, reversal, risk-adjusted momentum, rolling quantiles, fast/slow combination, EWMA, smoothing | ✅ |
 | 03 | [From Signal to Position](docs/03-from-signal-to-position.md) | weight → dollar → shares, holding period, the two portfolios | ✅ |
 | 04 | [Understanding Backtesting](docs/04-understanding-backtesting.md) | Every column, timing offsets, look-ahead bias | ✅ |
@@ -73,6 +74,7 @@ that owns each concept; there is no parallel per-session record.
 
 | I want to…                                          | Go to                                                                                                   |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| See how signal, strategy and backtest fit together | [00 · pipeline](docs/00-pipeline.md) |
 | Understand what a CTA trades, and how shorting works | [01](docs/01-what-is-cta.md)                                                                             |
 | Check my price data before trusting it               | [100 § 1.1](docs/100-dataset.md)                                                       |
 | See what the 37 tickers actually are                 | [100 § 2](docs/100-dataset.md)                                                         |

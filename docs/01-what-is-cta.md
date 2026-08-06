@@ -291,6 +291,10 @@ four are futures, and all four are different asset classes.
 Before moving on, **rebase all 37 tickers to 100** and find the best and worst performer over the
 sample. Chapter 02 turns the momentum premise above into a number you can test.
 
+If the words *signal*, *strategy*, *momentum* and *backtest* still blur together, read
+[How a Strategy Is Built](00-pipeline.md) first — it is short, and it maps the remaining chapters
+onto one another.
+
 The data itself — what the 37 tickers are, and which still carry unadjusted splits — is
 [100 · The Dataset](100-dataset.md). Read it before trusting any result.
 

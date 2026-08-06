@@ -9,6 +9,7 @@ through a <picture> element so GitHub serves the variant matching the reader's t
 
 Figures produced
 ----------------
+strategy-pipeline     00-pipeline  which stages are the strategy and which only measure it
 levels-vs-rebased     01 § 1  raw closes vs rebased: SPY looks highest, GLD returned more
 payoff-asymmetry      01 § 2  a static long's loss is floored at zero; a short's is not
 bucket-chart          02 § 4  the core signal test: mean forward return per signal bucket
@@ -343,6 +344,73 @@ def param_heatmap(mode):
     save(fig, t, f"param-heatmap-{mode}.png")
 
 
+# ------------------------------------------------- fig: the strategy pipeline
+def strategy_pipeline(mode):
+    """00-pipeline -- what the strategy is, and what merely measures it.
+
+    Schematic. The point is the boundary: the first two transforms are the
+    thing you design, the rest is the ruler you judge it with.
+    """
+    t = THEMES[mode]
+    stages = ["prices", "signal", "weights", "positions", "PnL", "verdict"]
+    edges = ["hypothesis, computed per asset per day",
+             "sizing rule — fraction of capital, signed",
+             "× capital ÷ price, with an execution lag",
+             "simulate against history",
+             "metrics, then robustness"]
+    # prices are the input; the strategy is signal + sizing, the rest measures it
+    STRAT = (1, 2)
+
+    fig, ax = plt.subplots(figsize=(7.6, 5.6))
+    fig.patch.set_facecolor(t["surface"])
+    ax.set_facecolor(t["surface"])
+    ax.set_xlim(0, 7.6)
+    ax.set_ylim(-0.7, len(stages) - 0.3)
+    ax.axis("off")
+
+    box_x, box_w, box_h = 1.35, 2.45, 0.52
+    for i, name in enumerate(stages):
+        y = len(stages) - 1 - i
+        owned = STRAT[0] <= i <= STRAT[1]
+        face = t["ramp"][5] if owned else t["ramp"][1]
+        label = t["surface"] if owned else t["ink"]
+        patch = dict(facecolor=face, edgecolor="none")
+        if i == 0:                                    # input, not a stage you own
+            patch = dict(facecolor=t["surface"], edgecolor=t["baseline"], linewidth=1.1)
+            label = t["ink_secondary"]
+        ax.add_patch(FancyBboxPatch(
+            (box_x, y - box_h / 2), box_w, box_h,
+            boxstyle="round,pad=0.02,rounding_size=0.14", zorder=3, **patch))
+        ax.text(box_x + box_w / 2, y, name, ha="center", va="center",
+                color=label, fontsize=10, fontweight="600", zorder=4)
+
+        if i < len(edges):
+            ax.annotate("", xy=(box_x + box_w / 2, y - 1 + box_h / 2 + 0.02),
+                        xytext=(box_x + box_w / 2, y - box_h / 2 - 0.02),
+                        arrowprops=dict(arrowstyle="-|>", color=t["baseline"],
+                                        linewidth=1.1, shrinkA=0, shrinkB=0))
+            ax.text(box_x + box_w + 0.28, y - 0.5, edges[i], ha="left", va="center",
+                    color=t["ink_secondary"], fontsize=8.5)
+
+    # brackets: what you design, versus what measures it
+    def bracket(top_i, bot_i, text, colour):
+        y0 = len(stages) - 1 - bot_i - box_h / 2
+        y1 = len(stages) - 1 - top_i + box_h / 2
+        x = box_x - 0.34
+        ax.plot([x + 0.13, x, x, x + 0.13], [y1, y1, y0, y0],
+                color=colour, linewidth=1.1, solid_joinstyle="miter", zorder=3)
+        ax.text(x - 0.16, (y0 + y1) / 2, text, ha="center", va="center",
+                rotation=90, color=colour, fontsize=8.8, fontweight="600")
+
+    bracket(STRAT[0], STRAT[1], "the strategy", t["ramp"][5])
+    bracket(STRAT[1] + 1, len(stages) - 1, "the instrument", t["muted"])
+
+    titles(ax, t, "What you design, and what merely measures it",
+           "prices go in; only the two shaded stages are the strategy itself")
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    save(fig, t, f"strategy-pipeline-{mode}.png")
+
+
 # --------------------------------------------- fig: raw levels vs rebased
 def levels_vs_rebased(mode):
     """01 -- why a price level says nothing across tickers.
@@ -452,7 +520,7 @@ def payoff_asymmetry(mode):
 
 FIGURES = (bucket_chart, reversal_buckets, signal_distribution,
            overlap_tranches, param_heatmap, payoff_asymmetry,
-           levels_vs_rebased)
+           levels_vs_rebased, strategy_pipeline)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

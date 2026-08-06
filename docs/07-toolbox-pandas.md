@@ -35,11 +35,11 @@ the rows, right provides the values.**
 
 ### `direction`
 
-| Value | Match | Note |
-|---|---|---|
-| `backward` | closest `right_key <= left_key` | standard for backtesting — uses only past information |
-| `forward` | closest `right_key >= left_key` | |
-| `nearest` | closest in either direction | **can select a future record → look-ahead bias** |
+| Value        | Match                            | Note                                                    |
+| ------------ | -------------------------------- | ------------------------------------------------------- |
+| `backward` | closest`right_key <= left_key` | standard for backtesting — uses only past information  |
+| `forward`  | closest`right_key >= left_key` |                                                         |
+| `nearest`  | closest in either direction      | **can select a future record → look-ahead bias** |
 
 ### Other parameters
 
