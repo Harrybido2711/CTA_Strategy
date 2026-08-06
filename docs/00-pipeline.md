@@ -218,4 +218,54 @@ ic.mean(), ic.mean() / ic.std()          # average IC, and its stability
 An R² of 0.3 on daily returns is not a discovery; it is a look-ahead bug. Check the `shift(-h)`
 alignment first — it is the cheapest sanity check in the whole pipeline.
 
+### Why rank IC rather than R²?
+
+**R² is decided by a handful of observations.** Returns are fat-tailed, so the sum of squares is
+dominated by the few largest moves. Take 100 observations where 99 have |y| ≈ 1% and one has
+y = 20%:
+
+```text
+SST = 99 × (0.01)²  +  (0.20)²
+    =    0.0099     +   0.04      →  that single point is 80% of the variance
+```
+
+R² is then essentially asking "did you get that one day right?" A model that ranks correctly every
+ordinary day but misses the crash scores badly; a model that catches only the crash scores well.
+Rank correlation is immune — the 20% day is simply *first*, carrying no more weight than a 3% day.
+That matters here in particular: the unadjusted splits in [100](100-dataset.md) leave phantom
+returns near −50%, which would dominate an R² and barely register in a rank IC.
+
+**Getting the scale wrong is free; getting the direction wrong is fatal.** Suppose the prediction
+is exactly half the true return:
+
+| | True `y` | Prediction |
+| --- | --- | --- |
+| SPY | +3.0% | +1.5% |
+| GLD | +1.0% | +0.5% |
+| TLT | −2.0% | −1.0% |
+
+The ordering is perfect, so IC = 1, but R² is penalised to about 0.72. Yet the model is entirely
+tradeable — double the position size. Sizing is a **separate layer** of the chain, so a scale error
+is corrected for free downstream, while a ranking error cannot be corrected at all. R² penalises
+both; IC measures only the part that matters.
+
+**IC is computed per date, so it is a series rather than a number.** That is what makes the
+conditional questions answerable:
+
+| Question | What to look at |
+| --- | --- |
+| Is the signal stable? | `ic.mean() / ic.std()` |
+| Which year did it stop working? | IC grouped by year |
+| Is it better in high volatility? | IC grouped by regime |
+| What holding period is best? | IC against horizon `h` |
+
+One R² over the whole panel answers none of these.
+
+**And IC converts to an expected Sharpe.** As a rule of thumb `IR ≈ IC × √BR`, where BR is the
+number of *independent* bets per year — which is far below `37 × rebalances`, since the ETFs move
+together. There is no comparable formula for R².
+
+In one line: R² asks how accurately you estimated the number; IC asks how well you ordered the
+field. You trade the order.
+
 [← Index](00-index.md)
