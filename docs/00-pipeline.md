@@ -227,32 +227,4 @@ ic.mean(), ic.mean() / ic.std()          # average IC, and its stability
 An R² of 0.3 on daily returns is not a discovery; it is a look-ahead bug. Check the `shift(-h)`
 alignment first — it is the cheapest sanity check in the whole pipeline.
 
----
-
-## Common pitfalls
-
-| Belief                                         | Correction                                                                                           |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| "Momentum is a strategy."                      | It is a hypothesis, so a family of signals. A strategy also needs a sizing rule.                     |
-| "ML validates the signal."                     | ML*produces* signals. The backtest validates the whole strategy.                                   |
-| "A prediction is a signal."                    | A prediction is a number about the future; a signal is a decision. A trading rule sits between them. |
-| "High accuracy means it makes money."          | Not after costs, not if the errors are the big moves, not necessarily next year.                     |
-| "The backtest is part of the strategy."        | It is the instrument that measures one. Changing it changes your ruler, not your idea.               |
-| "A signal is good if the backtest looks good." | Test the signal on its own first; an equity curve is far easier to rationalize.                      |
-| "Bad data makes results look bad."             | An unadjusted split usually makes them look*better*.                                               |
-
-## Next → [02 · Building Your Own Signal](02-building-signals.md)
-
-Before moving on, write down — in one sentence each — the hypothesis you want to test, the number
-that would express it, and the observation that would prove it wrong. Chapter 02 starts from
-exactly that.
-
-You should be able to explain:
-
-- [ ] Why prediction, signal and position are three different objects
-- [ ] Why a model replaces the rule but not the backtest
-- [ ] Why a high test accuracy is not yet a reason to trade
-- [ ] Which stage a vertical jump in the equity curve belongs to
-- [ ] Why a time series cannot be split randomly, and what purging fixes
-
 [← Index](00-index.md)
