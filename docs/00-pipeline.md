@@ -1,14 +1,5 @@
 # 00 · How a Strategy Is Built
 
-> - **Answers:** what *prediction*, *signal*, *position*, *strategy* and *backtest* each mean, how they chain, and where a model enters.
-> - **Prerequisites:** [01 · What Is a CTA Strategy](01-what-is-cta.md).
-> - **Read it when:** before [02](02-building-signals.md), and again whenever you lose track of which stage a problem belongs to.
-
-**Orientation, not a step in the sequence.** The numbered chapters each go deep on one stage; this
-maps them onto one another so you can see what is being built and why in that order.
-
----
-
 ## 1. The Chain, End to End
 
 <picture>
