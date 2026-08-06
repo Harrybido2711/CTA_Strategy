@@ -60,11 +60,11 @@ no information at all — what each ETF's share price happens to be was fixed by
 structured at inception. Dividing every series by its own first observation removes that
 arbitrariness:
 
-| Ticker | Raw close, start | Raw close, end | Rebased | Return |
-| --- | --- | --- | --- | --- |
-| SPY | 325.05 | 740.83 | 227.9 | **+127.9%** |
-| TLT | 137.10 | 87.35 | 63.7 | **−36.3%** |
-| GLD | 143.97 | 368.49 | 255.9 | **+155.9%** |
+| Ticker | Raw close, start | Raw close, end | Rebased | Return            |
+| ------ | ---------------- | -------------- | ------- | ----------------- |
+| SPY    | 325.05           | 740.83         | 227.9   | **+127.9%** |
+| TLT    | 137.10           | 87.35          | 63.7    | **−36.3%** |
+| GLD    | 143.97           | 368.49         | 255.9   | **+155.9%** |
 
 SPY has the highest closing price on every single day of the sample, yet GLD returned more. The
 end level alone cannot tell you this; you need the start it is measured against.
@@ -185,25 +185,26 @@ two: [Backtest Prototype — Implementation Notes](../Backtest_prototype/Backtes
 
 ---
 
-## Background · Asset Class versus Instrument
+## Background
 
-Reading the opening definition — *"trades **futures** systematically **across asset classes** —
-equities, fixed income, commodities, currencies"* — the two bolded phrases answer different
-questions:
+General finance knowledge needed to read this chapter, not part of its argument.
+
+### What is the relationship between futures/options and asset classes?
+
+They answer different questions, so they are not alternatives to one another.
 
 - **Asset class** — *what* underlying market you are exposed to.
-- **Instrument** — *how* you take that exposure: cash, futures, or options.
-- **Systematically** — by rule or model, not discretion.
+- **Instrument** — *how* you hold that exposure: cash, futures, or options.
 
-So futures are not an asset class, and options are not a rival one. Every asset class can be
-traded through any instrument:
+Futures are not an asset class, and options are not a rival one. Every asset class trades in every
+instrument:
 
-| Asset class | Typical underlying | Futures | Options |
-| --- | --- | --- | --- |
-| **Equities** | S&P 500, Nasdaq 100 | ES, NQ | options on ES |
-| **Fixed income** | US Treasuries, Bunds | ZN (10-year), ZB (30-year) | options on ZN |
-| **Commodities** | Crude oil, gold, corn | CL, GC, ZC | options on CL |
-| **Currencies (FX)** | EUR/USD, USD/JPY | 6E, 6J | options on 6E |
+| Asset class               | Typical underlying    | Futures                    | Options       |
+| ------------------------- | --------------------- | -------------------------- | ------------- |
+| **Equities**        | S&P 500, Nasdaq 100   | ES, NQ                     | options on ES |
+| **Fixed income**    | US Treasuries, Bunds  | ZN (10-year), ZB (30-year) | options on ZN |
+| **Commodities**     | Crude oil, gold, corn | CL, GC, ZC                 | options on CL |
+| **Currencies (FX)** | EUR/USD, USD/JPY      | 6E, 6J                     | options on 6E |
 
 The same exposure, three wrappers:
 
@@ -213,19 +214,29 @@ Equities ──┬── cash     buy SPY
            └── options  buy an ES call
 ```
 
-**Where bonds sit.** A bond is **fixed income**. "Fixed" refers to the contract — a scheduled
-coupon and the return of principal — **not** to a fixed price. Bond prices move with interest
-rates, credit risk, and maturity, which is exactly why they are tradeable as a trend market.
-Treasury futures exist at 2-, 5-, 10- and 30-year maturities, so a CTA trades the *maturity* it
-wants exposure to.
+So in the opening definition — *"trades **futures** systematically **across asset classes**"* —
+the three parts are independent: **futures** is the wrapper, **across asset classes** is the
+breadth of underlying markets, and **systematically** means by rule or model rather than
+discretion.
 
-**Why CTAs stay on the futures row.**
+### Which asset class does a bond belong to?
 
-| | Futures | Options |
-| --- | --- | --- |
-| Exposure | **Linear** — PnL moves one-for-one with the underlying | Non-linear; depends on strike and moneyness |
-| Extra drivers | None | Implied volatility, time decay, strike |
-| What you are betting on | Direction | Direction **and** volatility |
+**Fixed income.** Treasuries, corporate, municipal and high-yield bonds all sit there.
+
+- "Fixed" describes the **contract** — a scheduled coupon and the return of principal — not a
+  fixed price.
+- Bond prices still move, with interest rates, credit risk and time to maturity. That variation is
+  what makes them a trend market at all.
+- Treasury futures trade at 2-, 5-, 10- and 30-year maturities, so a CTA picks the *maturity* it
+  wants exposure to.
+
+### Why do CTAs use futures rather than options?
+
+|                         | Futures                                                       | Options                                     |
+| ----------------------- | ------------------------------------------------------------- | ------------------------------------------- |
+| Exposure                | **Linear** — PnL moves one-for-one with the underlying | Non-linear; depends on strike and moneyness |
+| Extra drivers           | None                                                          | Implied volatility, time decay, strike      |
+| What you are betting on | Direction                                                     | Direction**and** volatility           |
 
 An option position is partly a volatility trade whether you intended it or not. Linear exposure is
 what lets one risk framework size 37 positions on the same scale.
@@ -240,7 +251,7 @@ four are futures, and all four are different asset classes.
 | Belief                                              | Correction                                                                   |
 | --------------------------------------------------- | ---------------------------------------------------------------------------- |
 | "CTA means commodities only."                       | Historical artifact; main exposures are equity-index, rate, and FX futures.  |
-| "Futures and options are asset classes."            | They are instruments. Every asset class trades in both — see Background.     |
+| "Futures and options are asset classes."            | They are instruments. Every asset class trades in both — see Background.    |
 | "You can buy the S&P 500."                          | You buy an ETF or a future*tracking* it. The index is a number.            |
 | "The index is at 5000, so the market is expensive." | The base scale is arbitrary (1941–43 = 10). Only returns are interpretable. |
 | "The index is the average of 500 stocks."           | It is a cap-weighted average of 500*returns*; the top names dominate.      |
