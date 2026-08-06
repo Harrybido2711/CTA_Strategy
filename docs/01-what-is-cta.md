@@ -37,22 +37,15 @@ total float capitalisation, and $D_t > 0$ the *divisor*.
 **Claim.** Index returns are the capitalisation-weighted average of constituent returns; the
 divisor sets only the level.
 
-**Proof.** Over a window with no constituent change, $D$ is constant, so $I_{t+1}/I_t = M_{t+1}/M_t$.
-The numerator moves by
+Both halves follow from `I` being a *sum divided by a constant*. A constituent's dollar move is
+`N_i × (price change)`, so its share of the index move is its share of total capitalisation:
 
 $$
-M_{t+1} - M_t  =  \sum_i N_i \left( P_{i,t+1} - P_{it} \right)  =  \sum_i N_i P_{it}  r_i
+r_I  =  \sum_i w_{it}  r_i , \qquad w_{it} = \frac{N_i P_{it}}{M_t} , \qquad \sum_i w_{it} = 1 .
 $$
 
-and dividing through by $M_t$ gives
-
-$$
-r_I  =  \sum_i \frac{N_i P_{it}}{M_t}  r_i  =  \sum_i w_{it}  r_i ,
-\qquad w_{it} = \frac{N_i P_{it}}{M_t}, \quad \sum_i w_{it} = 1 .
-$$
-
-So $r_I$ is a weighted average of constituent returns with weights equal to capitalisation shares,
-and $D$ cancels.
+And `D` divides `I` at both dates, so it cancels from the ratio — it can shift the level anywhere
+without touching a single return.
 
 **Note (Two consequences).**
 
@@ -192,11 +185,62 @@ two: [Backtest Prototype — Implementation Notes](../Backtest_prototype/Backtes
 
 ---
 
+## Background · Asset Class versus Instrument
+
+Reading the opening definition — *"trades **futures** systematically **across asset classes** —
+equities, fixed income, commodities, currencies"* — the two bolded phrases answer different
+questions:
+
+- **Asset class** — *what* underlying market you are exposed to.
+- **Instrument** — *how* you take that exposure: cash, futures, or options.
+- **Systematically** — by rule or model, not discretion.
+
+So futures are not an asset class, and options are not a rival one. Every asset class can be
+traded through any instrument:
+
+| Asset class | Typical underlying | Futures | Options |
+| --- | --- | --- | --- |
+| **Equities** | S&P 500, Nasdaq 100 | ES, NQ | options on ES |
+| **Fixed income** | US Treasuries, Bunds | ZN (10-year), ZB (30-year) | options on ZN |
+| **Commodities** | Crude oil, gold, corn | CL, GC, ZC | options on CL |
+| **Currencies (FX)** | EUR/USD, USD/JPY | 6E, 6J | options on 6E |
+
+The same exposure, three wrappers:
+
+```text
+Equities ──┬── cash     buy SPY
+           ├── futures  buy ES
+           └── options  buy an ES call
+```
+
+**Where bonds sit.** A bond is **fixed income**. "Fixed" refers to the contract — a scheduled
+coupon and the return of principal — **not** to a fixed price. Bond prices move with interest
+rates, credit risk, and maturity, which is exactly why they are tradeable as a trend market.
+Treasury futures exist at 2-, 5-, 10- and 30-year maturities, so a CTA trades the *maturity* it
+wants exposure to.
+
+**Why CTAs stay on the futures row.**
+
+| | Futures | Options |
+| --- | --- | --- |
+| Exposure | **Linear** — PnL moves one-for-one with the underlying | Non-linear; depends on strike and moneyness |
+| Extra drivers | None | Implied volatility, time decay, strike |
+| What you are betting on | Direction | Direction **and** volatility |
+
+An option position is partly a volatility trade whether you intended it or not. Linear exposure is
+what lets one risk framework size 37 positions on the same scale.
+
+**Example.** A trend follower might simultaneously hold long ES, short ZN, long GC, short 6J — all
+four are futures, and all four are different asset classes.
+
+---
+
 ## Common pitfalls
 
 | Belief                                              | Correction                                                                   |
 | --------------------------------------------------- | ---------------------------------------------------------------------------- |
 | "CTA means commodities only."                       | Historical artifact; main exposures are equity-index, rate, and FX futures.  |
+| "Futures and options are asset classes."            | They are instruments. Every asset class trades in both — see Background.     |
 | "You can buy the S&P 500."                          | You buy an ETF or a future*tracking* it. The index is a number.            |
 | "The index is at 5000, so the market is expensive." | The base scale is arbitrary (1941–43 = 10). Only returns are interpretable. |
 | "The index is the average of 500 stocks."           | It is a cap-weighted average of 500*returns*; the top names dominate.      |
