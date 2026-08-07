@@ -12,7 +12,8 @@ Figures produced
 strategy-pipeline     00-pipeline  which stages are the strategy and which only measure it
 levels-vs-rebased     01 § 1  raw closes vs rebased: SPY looks highest, GLD returned more
 payoff-asymmetry      01 § 2  a static long's loss is floored at zero; a short's is not
-prediction-shrinkage  00-pipeline  a low-R2 model predicts a far narrower range than reality
+prediction-shrinkage  08 § 2  a low-R2 model predicts a far narrower range than reality
+ic-series-vs-r2       08 § 2  squaring a noisy IC series manufactures explained variance
 signal-kernels        02 § 10 MACD is momentum with a hump-shaped kernel, not a box
 bucket-chart          02 § 4  the core signal test: mean forward return per signal bucket
 reversal-buckets      02 § 5  expected monotone buckets vs the reversal-broken version
@@ -399,6 +400,60 @@ def prediction_shrinkage(mode):
 
 
 # --------------------------------------------------- fig: momentum vs MACD kernel
+def ic_series_vs_r2(mode):
+    """08 -- IC keeps the time axis; squaring it folds noise into apparent skill.
+
+    Schematic. Illustrative daily rank IC at mean 0.03 against a day-to-day
+    standard deviation of 0.33 -- roughly what a ~30-name cross-section of
+    correlated ETFs produces. The point is that the lower panel is almost
+    entirely the variance term, not the mean.
+    """
+    t = THEMES[mode]
+    rng = np.random.RandomState(8)
+    n = 520
+    ic = 0.03 + 0.33 * rng.standard_normal(n)
+    x = np.arange(n)
+
+    fig, axes = plt.subplots(2, 1, figsize=(7.4, 5.4), sharex=True,
+                             gridspec_kw=dict(hspace=0.54))
+    fig.patch.set_facecolor(t["surface"])
+
+    # ---- top: the series itself, with its barely-visible mean
+    ax = axes[0]
+    style_axes(ax, t, ylabel="daily IC")
+    ax.plot(x, ic, color=t["series"], linewidth=0.6, alpha=0.5, zorder=3)
+    ax.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
+    ax.axhline(ic.mean(), color=t["ink"], linewidth=1.4, zorder=5)
+    ax.set_ylim(-1.15, 1.15)
+    ax.set_yticks([-1, -0.5, 0, 0.5, 1])
+    ax.annotate("", xy=(n * 0.995, ic.mean()), xytext=(n * 0.995, 0.62),
+                arrowprops=dict(arrowstyle="-|>", color=t["muted"], linewidth=1.0))
+    ax.text(n * 0.975, 0.70, "mean IC $= 0.03$ — the entire edge",
+            color=t["ink_secondary"], fontsize=8.4, ha="right", va="bottom")
+    titles(ax, t, "IC keeps the time axis", "one value per day: a series, not a number")
+
+    # ---- bottom: the same series squared -- noise folded upward
+    ax = axes[1]
+    style_axes(ax, t, ylabel="daily $R^2 = $ IC$^2$",
+               xlabel="trading day")
+    ax.fill_between(x, ic ** 2, color=t["series"], alpha=0.30, linewidth=0, zorder=3)
+    ax.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
+    ax.axhline((ic ** 2).mean(), color=t["ink"], linewidth=1.4, zorder=5)
+    ax.set_ylim(0, 1.15)
+    ax.set_yticks([0, 0.5, 1])
+    ax.text(n * 0.985, (ic ** 2).mean() + 0.07,
+            "mean $R^2 \\approx 0.11$", color=t["ink"],
+            fontsize=8.6, fontweight="600", ha="right", va="bottom")
+    ax.text(n * 0.985, 0.80,
+            "$0.109$ of it is Var(IC); only $0.0009$ is the edge",
+            color=t["ink_secondary"], fontsize=8.4, ha="right", va="bottom")
+    titles(ax, t, "Squaring folds the noise upward",
+           "$R^2$ cannot be negative, so day-to-day scatter reappears as explained variance")
+
+    save(fig, t, f"ic-series-vs-r2-{mode}.png")   # save() already crops tight
+
+
+# --------------------------------------------------------- fig: signal kernels
 def signal_kernels(mode):
     """02 -- MACD is momentum with a different weighting of past returns.
 
@@ -641,7 +696,7 @@ def payoff_asymmetry(mode):
 FIGURES = (bucket_chart, reversal_buckets, signal_distribution,
            overlap_tranches, param_heatmap, payoff_asymmetry,
            levels_vs_rebased, strategy_pipeline, signal_kernels,
-           prediction_shrinkage)
+           prediction_shrinkage, ic_series_vs_r2)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

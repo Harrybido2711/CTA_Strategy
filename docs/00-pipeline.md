@@ -204,22 +204,11 @@ pnl, _  = multi_asset_backtester(asset_data, weights)
 ```
 
 **Expect the predictions to be far narrower than reality.** A least-squares fit shrinks toward the
-mean in proportion to how little it can explain: the spread of the predictions is roughly
-`√R² × std(y)`. At R² = 0.005 that is `0.07 × 2.5% ≈ 0.2%`.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/prediction-shrinkage-dark.png">
-  <img alt="Two stacked density curves on the same return axis from minus eight to plus eight percent. The top panel shows realised five-day returns, a broad fat-tailed hump with a standard deviation near 2.5 percent. The bottom panel shows the model's predictions, a narrow spike with a standard deviation near 0.2 percent. A shaded sliver on the top panel marks how little of the realised range the predictions ever occupy" src="figures/prediction-shrinkage-light.png">
-</picture>
-
-This is correct behaviour, not a defect — a model that explains half a percent of the variance
-should not claim to know more. Two consequences:
-
-- **An absolute threshold will never fire.** `prediction > 1%` selects nothing when predictions
-  live inside ±0.5%. Threshold on the prediction's *own* quantiles, or rank cross-sectionally and
-  take the top and bottom names each day.
-- **Predictions as wide as reality mean overfitting**, not skill. Check the split before
-  celebrating.
+mean in proportion to how little it can explain, so at R² = 0.005 a 2.5% spread of returns yields
+predictions spread over roughly 0.2%. This is forced rather than a defect, and it has one immediate
+consequence for the rule: **an absolute threshold will never fire.** `prediction > 1%` selects
+nothing when predictions live inside ±0.5%. Threshold on the prediction's *own* quantiles, or rank
+cross-sectionally and take the top and bottom names each day.
 
 **Judging the model itself** uses rank correlation per date, not accuracy:
 
@@ -228,62 +217,7 @@ ic = pred.corrwith(fwd_return, axis=1, method="spearman")
 ic.mean(), ic.mean() / ic.std()          # average IC, and its stability
 ```
 
-| Measure | Plausible on daily data | Almost certainly a bug |
-| --- | --- | --- |
-| Mean daily IC | 0.02 – 0.05 is already good | above 0.15 |
-| R² | 0.001 – 0.01 | above 0.1 |
-
-An R² of 0.3 on daily returns is not a discovery; it is a look-ahead bug. Check the `shift(-h)`
-alignment first — it is the cheapest sanity check in the whole pipeline.
-
-### Why rank IC rather than R²?
-
-**R² is decided by a handful of observations.** Returns are fat-tailed, so the sum of squares is
-dominated by the few largest moves. Take 100 observations where 99 have |y| ≈ 1% and one has
-y = 20%:
-
-```text
-SST = 99 × (0.01)²  +  (0.20)²
-    =    0.0099     +   0.04      →  that single point is 80% of the variance
-```
-
-R² is then essentially asking "did you get that one day right?" A model that ranks correctly every
-ordinary day but misses the crash scores badly; a model that catches only the crash scores well.
-Rank correlation is immune — the 20% day is simply *first*, carrying no more weight than a 3% day.
-That matters here in particular: the unadjusted splits in [100](100-dataset.md) leave phantom
-returns near −50%, which would dominate an R² and barely register in a rank IC.
-
-**Getting the scale wrong is free; getting the direction wrong is fatal.** Suppose the prediction
-is exactly half the true return:
-
-| | True `y` | Prediction |
-| --- | --- | --- |
-| SPY | +3.0% | +1.5% |
-| GLD | +1.0% | +0.5% |
-| TLT | −2.0% | −1.0% |
-
-The ordering is perfect, so IC = 1, but R² is penalised to about 0.72. Yet the model is entirely
-tradeable — double the position size. Sizing is a **separate layer** of the chain, so a scale error
-is corrected for free downstream, while a ranking error cannot be corrected at all. R² penalises
-both; IC measures only the part that matters.
-
-**IC is computed per date, so it is a series rather than a number.** That is what makes the
-conditional questions answerable:
-
-| Question | What to look at |
-| --- | --- |
-| Is the signal stable? | `ic.mean() / ic.std()` |
-| Which year did it stop working? | IC grouped by year |
-| Is it better in high volatility? | IC grouped by regime |
-| What holding period is best? | IC against horizon `h` |
-
-One R² over the whole panel answers none of these.
-
-**And IC converts to an expected Sharpe.** As a rule of thumb `IR ≈ IC × √BR`, where BR is the
-number of *independent* bets per year — which is far below `37 × rebalances`, since the ETFs move
-together. There is no comparable formula for R².
-
-In one line: R² asks how accurately you estimated the number; IC asks how well you ordered the
-field. You trade the order.
+→ Why that is the right statistic rather than R², what each one measures, why they can disagree
+completely, and how to read the magnitudes: [08 · IC and R²](08-ic-and-r-squared.md).
 
 [← Index](00-index.md)
