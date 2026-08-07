@@ -131,37 +131,33 @@ the second one works.
 
 ### 3.1 Turn down `alpha`
 
-**What it is.** `alpha` is the opacity of a plotted marker. At `alpha=0.01` a single point is
-practically invisible and only *overlap* renders, so the chart stops being a mass of ink and becomes
-a density map. Below, the left panel is the before; the other two are both the after.
+`alpha` is a marker's opacity. At `alpha=0.01` a single point is invisible and only *overlap*
+renders, so the chart becomes a density map instead of a mass of ink — below, the left panel is the
+before and the other two are both the after.
 
-**Note (Not the other alphas).** This `alpha` is matplotlib's opacity keyword, written as code
-wherever it appears. It is neither the intercept of a regression nor the excess return a manager is
-paid for, and it is not § 10's EMA smoothing constant $\alpha$ — which is written as maths and
-always carries a subscript.
+**Note (Not the other alphas).** matplotlib's opacity keyword: not a regression intercept, not the
+excess return a manager is paid for, not § 10's smoothing constant $\alpha$. Code font is the tell.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/alpha-opacity-dark.png">
   <img alt="Three scatter panels of forward return against a signal. Left, at full opacity, 55,000 points render as one solid disc with no internal structure. Middle, the same rendering at alpha 0.01 on a book where a high signal rules out deep losses: a soft density cloud with the bottom-right corner visibly bitten out, annotated high signal, no deep loss. Right, alpha 0.01 on the original points: a smooth round density with no thin region anywhere" src="figures/alpha-opacity-light.png">
 </picture>
 
-Sometimes that is enough — the middle panel, where one region (high signal against a badly negative
-return) has thinned enough to read. A signal that only rules something *out* is still tradeable, so
-seeing even that much would be a good day.
+Sometimes it is enough — the middle panel, where high signal against a badly negative return has
+thinned enough to read. A signal that only rules something *out* is still tradeable.
 
-**Why it usually fails.** Three reasons, and they compound:
+**Why it usually fails.** Three reasons that compound:
 
-- **The density comes back smooth.** 55,000 asset-dates — 37 ETFs over six years — average into a
-  clean bivariate blob. Opacity renders density faithfully, and a smooth density has no feature.
-- **The tilt is finer than the ink.** § 2's arithmetic: the band is eight times taller than the
-  whole rise of the trend line, so the lean is smaller than the markers drawn on top of it.
-- **It treats the symptom.** The scatter spends all its resolution on individual noisy points when
-  the claim is about their **average**. No rendering choice changes what is being rendered.
+- **The density comes back smooth.** 55,000 asset-dates average into a clean bivariate blob, and
+  opacity renders that faithfully. A smooth density has no feature.
+- **The tilt is finer than the ink.** § 2's band is eight times taller than the trend line's whole
+  rise, so the lean is smaller than the markers drawn over it.
+- **It treats the symptom.** The scatter spends its resolution on individual noisy points when the
+  claim is about their **average**; no rendering choice changes what is being rendered.
 
-**Note (Look first anyway).** Always draw the scatter. On the rare occasion something *is* readable
-— a curve, a threshold, one corner plainly empty — it beats every summary statistic, because it
-gives the *shape* and not just the strength. Thirty seconds. The mistake is concluding anything
-**from** a cloud.
+**Note (Look first anyway).** Always draw it. On the rare occasion something *is* readable — a
+curve, an empty corner — it beats every statistic, because it gives the *shape*. The mistake is
+concluding anything **from** a cloud.
 
 ### 3.2 Sort, then average
 
