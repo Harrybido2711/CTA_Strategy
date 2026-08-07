@@ -203,6 +203,24 @@ weights = overlap_weights(target_weights_p1(signal))
 pnl, _  = multi_asset_backtester(asset_data, weights)
 ```
 
+**Expect the predictions to be far narrower than reality.** A least-squares fit shrinks toward the
+mean in proportion to how little it can explain: the spread of the predictions is roughly
+`√R² × std(y)`. At R² = 0.005 that is `0.07 × 2.5% ≈ 0.2%`.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/prediction-shrinkage-dark.png">
+  <img alt="Two stacked density curves on the same return axis from minus eight to plus eight percent. The top panel shows realised five-day returns, a broad fat-tailed hump with a standard deviation near 2.5 percent. The bottom panel shows the model's predictions, a narrow spike with a standard deviation near 0.2 percent. A shaded sliver on the top panel marks how little of the realised range the predictions ever occupy" src="figures/prediction-shrinkage-light.png">
+</picture>
+
+This is correct behaviour, not a defect — a model that explains half a percent of the variance
+should not claim to know more. Two consequences:
+
+- **An absolute threshold will never fire.** `prediction > 1%` selects nothing when predictions
+  live inside ±0.5%. Threshold on the prediction's *own* quantiles, or rank cross-sectionally and
+  take the top and bottom names each day.
+- **Predictions as wide as reality mean overfitting**, not skill. Check the split before
+  celebrating.
+
 **Judging the model itself** uses rank correlation per date, not accuracy:
 
 ```python

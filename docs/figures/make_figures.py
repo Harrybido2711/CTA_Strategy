@@ -12,6 +12,7 @@ Figures produced
 strategy-pipeline     00-pipeline  which stages are the strategy and which only measure it
 levels-vs-rebased     01 § 1  raw closes vs rebased: SPY looks highest, GLD returned more
 payoff-asymmetry      01 § 2  a static long's loss is floored at zero; a short's is not
+prediction-shrinkage  00-pipeline  a low-R2 model predicts a far narrower range than reality
 signal-kernels        02 § 10 MACD is momentum with a hump-shaped kernel, not a box
 bucket-chart          02 § 4  the core signal test: mean forward return per signal bucket
 reversal-buckets      02 § 5  expected monotone buckets vs the reversal-broken version
@@ -345,6 +346,58 @@ def param_heatmap(mode):
     save(fig, t, f"param-heatmap-{mode}.png")
 
 
+# ------------------------------------------- fig: predictions shrink to the mean
+def prediction_shrinkage(mode):
+    """00-pipeline -- a low-R2 model must predict a far narrower range than reality.
+
+    Schematic. Illustrative widths: realised 5-day returns at 2.5% standard
+    deviation against predictions at 0.2%, the ratio implied by R2 = 0.005.
+    """
+    t = THEMES[mode]
+    x = np.linspace(-0.08, 0.08, 900)
+
+    def normal(x, s):
+        return np.exp(-0.5 * (x / s) ** 2) / (s * np.sqrt(2 * np.pi))
+
+    s = 0.025 / np.sqrt(1.8)                       # mixture gives fat tails
+    realised = 0.9 * normal(x, s) + 0.1 * normal(x, 3 * s)
+    predicted = normal(x, 0.002)
+
+    fig, axes = plt.subplots(2, 1, figsize=(7.4, 5.0), sharex=True,
+                             gridspec_kw=dict(hspace=0.42))
+    fig.patch.set_facecolor(t["surface"])
+
+    panels = [
+        (axes[0], realised, t["muted"], "Realised 5-day returns",
+         "standard deviation $\\approx$ 2.5%"),
+        (axes[1], predicted, t["series"], "Model predictions",
+         "standard deviation $\\approx$ 0.2% — about 12$\\times$ narrower"),
+    ]
+    for ax, y, colour, title, subtitle in panels:
+        style_axes(ax, t, grid=False)
+        ax.plot(x, y, color=colour, linewidth=1.9, zorder=3)
+        ax.fill_between(x, y, color=colour, alpha=0.13, zorder=2)
+        ax.set_yticks([])
+        ax.set_ylim(0, y.max() * 1.28)
+        titles(ax, t, title, subtitle)
+
+    # project the prediction's range onto the realised panel
+    axes[0].axvspan(-0.004, 0.004, color=t["series"], alpha=0.16, zorder=1)
+    axes[0].annotate("", xy=(0.004, realised.max() * 0.62),
+                     xytext=(0.030, realised.max() * 0.62),
+                     arrowprops=dict(arrowstyle="-|>", color=t["series"], linewidth=1.1))
+    axes[0].text(0.032, realised.max() * 0.62,
+                 "everything the model ever says\nfits inside this sliver",
+                 color=t["series"], fontsize=8.4, ha="left", va="center", linespacing=1.5)
+
+    axes[1].set_xlabel("5-day return", color=t["muted"], fontsize=8.5, labelpad=7)
+    axes[1].set_xticks([-0.08, -0.04, 0, 0.04, 0.08])
+    axes[1].set_xticklabels(["−8%", "−4%", "0", "+4%", "+8%"])
+    axes[1].set_xlim(-0.08, 0.08)
+
+    save(fig, t, f"prediction-shrinkage-{mode}.png")   # save() already crops tight
+
+
 # --------------------------------------------------- fig: momentum vs MACD kernel
 def signal_kernels(mode):
     """02 -- MACD is momentum with a different weighting of past returns.
@@ -587,7 +640,8 @@ def payoff_asymmetry(mode):
 
 FIGURES = (bucket_chart, reversal_buckets, signal_distribution,
            overlap_tranches, param_heatmap, payoff_asymmetry,
-           levels_vs_rebased, strategy_pipeline, signal_kernels)
+           levels_vs_rebased, strategy_pipeline, signal_kernels,
+           prediction_shrinkage)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):
