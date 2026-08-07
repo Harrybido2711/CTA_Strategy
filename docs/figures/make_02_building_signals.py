@@ -11,6 +11,7 @@ reader's theme.
 Figures produced
 ----------------
     binary-momentum      sign() maps two very different trends onto the same position
+    scatter-ladder       what each correlation level looks like, and where real signals sit
     bucket-chart         the core signal test: mean forward return per signal bucket
     reversal-buckets     expected monotone buckets vs the reversal-broken version
     signal-distribution  why fixed-interval cuts starve the tails, and what fixes it
@@ -236,7 +237,61 @@ def signal_kernels(mode):
     fig.tight_layout(rect=(0, 0, 1, 0.93))
     save(fig, t, f"signal-kernels-{mode}.png")
 
-FIGURES = (binary_momentum, bucket_chart, reversal_buckets, signal_distribution, signal_kernels)
+# ------------------------------- fig: what each correlation actually looks like
+def scatter_ladder(mode):
+    """02 s3 -- the eye needs ~30% correlation; real signals carry 10-15%.
+
+    Schematic. The same 1,500 illustrative points redrawn at four correlations,
+    so the panels differ only in the quantity being demonstrated. The rightmost
+    panel is the one you actually get.
+    """
+    t = THEMES[mode]
+    rng = np.random.RandomState(11)
+    n = 1500
+    x = rng.standard_normal(n)
+    e = rng.standard_normal(n)
+
+    panels = [
+        (0.80, "obvious"),
+        (0.45, "convincing"),
+        (0.30, "the eye's floor"),
+        (0.12, "a real signal"),
+    ]
+
+    fig, axes = plt.subplots(1, 4, figsize=(9.6, 3.0), sharex=True, sharey=True,
+                             gridspec_kw=dict(wspace=0.16))
+    fig.patch.set_facecolor(t["surface"])
+
+    for ax, (r, verdict) in zip(axes, panels):
+        style_axes(ax, t, grid=False)
+        y = r * x + (1 - r ** 2) ** 0.5 * e
+        live = r == 0.12
+        ax.scatter(x, y, s=3.2, color=t["series"], alpha=0.16,
+                   linewidths=0, zorder=3)
+        ax.set_xlim(-3.6, 3.6)
+        ax.set_ylim(-3.6, 3.6)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        for side in ("bottom",):
+            ax.spines[side].set_visible(False)
+        ax.text(0, 1.13, f"corr = {int(r * 100)}%", transform=ax.transAxes,
+                color=t["ink"], fontsize=10.2, fontweight="600", va="bottom")
+        ax.text(0, 1.02, verdict, transform=ax.transAxes,
+                color=t["ink"] if live else t["muted"],
+                fontsize=8.6, fontweight="600" if live else "normal", va="bottom")
+
+    axes[0].set_ylabel("forward return", color=t["ink_secondary"], fontsize=9, labelpad=8)
+    fig.text(0.5, 0.01, "signal value", ha="center",
+             color=t["muted"], fontsize=8.5)
+    fig.text(0.5, -0.08,
+             "Only the leftmost panel reads as a trend by eye. The rightmost is what a "
+             "working signal looks like.",
+             ha="center", color=t["ink_secondary"], fontsize=8.6)
+    save(fig, t, f"scatter-ladder-{mode}.png")   # save() already crops tight
+
+
+FIGURES = (binary_momentum, scatter_ladder, bucket_chart, reversal_buckets,
+           signal_distribution, signal_kernels)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

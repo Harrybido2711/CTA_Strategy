@@ -8,6 +8,38 @@
 
 ## 1. A signal is a hypothesis, not a formula
 
+**Definition (Binary momentum).** The simplest member of the family — carry the sign of the last
+period's return, and nothing else:
+
+$$
+MOM_{s,t}  =  \text{sign}\left( R_{s,t-1} \right)
+$$
+
+taking the value +1 (long) or −1 (short) for asset $s$ on date $t$.
+
+**Note (What the sign discards).** Two assets that rose 20% and 10% over the same window produce
+the *same* signal, so a book built on it holds them in the same size. Trend **strength** is thrown
+away; only trend **direction** survives.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/binary-momentum-dark.png">
+  <img alt="Left panel: two price paths rebased to 100 over one lookback window, the darker one climbing to 120 and the lighter one to 110. Right panel: the momentum signal each path produces, two bars of identical height at plus one, joined by an arrow labelled identical" src="figures/binary-momentum-light.png">
+</picture>
+
+**Note (Two repairs).** Neither is obviously right, and both are tested the same way — § 4's bucket
+chart.
+
+- **Keep the value, not the sign** — the definition below, which stays proportional to how strongly
+  the asset trended.
+- **Make the value comparable first** — divide by volatility, so a 20% move in a quiet market
+  outranks a 20% move in a violent one (§ 6).
+
+Whether the surviving magnitude should reach the position at all is [03](03-from-signal-to-position.md)'s
+decision, not this chapter's.
+
+**Definition (Momentum).** Averaging over $N$ periods rather than one, and keeping the value rather
+than its sign:
+
 $$
 \textbf{signal:}\quad MOM_t  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
 $$
@@ -35,12 +67,56 @@ a different signal than the one tested."
 
 ## 3. Why the scatter plot disappoints
 
-A scatter needs ~30% correlation before the eye picks out a trend, 40–50% to convince, 80% to be
-obvious. **Real signals run 10–15%** — an undifferentiated cloud whether they work or not, so the
-absence of a visible trend proves nothing.
+§ 1 asserted $MOM_t \propto w \propto \text{return}$. The obvious way to check a proportionality is
+to plot one against the other, so the scatter of signal against forward return is where everyone
+starts — and it is the right place to start. It just almost never answers the question.
 
-The scatter spends all its resolution on individual noisy points instead of the average behaviour
-that matters.
+**Claim.** The scatter cannot confirm or refute a real signal, because the correlation a real
+signal carries sits below the threshold at which the eye resolves a trend.
+
+**Proof.** The two quantities are measurable and they do not overlap.
+
+| | Correlation | Reads as |
+| --- | --- | --- |
+| Obvious at a glance | ~80% | a line with scatter around it |
+| Convincing | 40–50% | a visibly tilted cloud |
+| The eye's floor | ~30% | a trend you can just about argue for |
+| **What a working signal carries** | **10–15%** | an undifferentiated cloud |
+
+Since 15% < 30%, a signal that works and a signal that does not produce the same picture.
+**The absence of a visible trend is therefore not evidence of anything.**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/scatter-ladder-dark.png">
+  <img alt="Four scatter panels of the same 1,500 points redrawn at correlations of 80, 45, 30 and 12 percent. The 80 percent panel shows a clear diagonal band; by 30 percent the tilt is barely arguable, and the 12 percent panel — labelled a real signal — is an undifferentiated round cloud indistinguishable from noise" src="figures/scatter-ladder-light.png">
+</picture>
+
+**Note (Why transparency does not rescue it).** The usual first fix is to drop the marker opacity —
+`alpha=0.01` — so that overlapping points reveal density rather than a solid mass. It is worth
+doing and it occasionally exposes a faint tilt or a thinned corner. But it treats the symptom: the
+scatter spends all its resolution on individual noisy points, when the thing being claimed is about
+their **average** behaviour. Density plotting shows the same information more legibly; it does not
+add any.
+
+**Note (Look at it anyway, first).** None of this argues for skipping the scatter. On the rare
+occasion something *is* readable — a curve, a cluster, one corner plainly empty — it beats any
+summary statistic, because it gives the *shape* and not just the strength. Plot it, spend thirty
+seconds, move on when it comes back a cloud. The mistake is concluding anything **from** the cloud.
+
+### What sorting recovers
+
+**Claim.** Sorting by the signal and averaging within groups detects a relationship the scatter
+cannot, because averaging shrinks the noise while leaving the signal intact.
+
+**Proof.** Suppose the relationship is exactly linear, $y_i = \beta x_i + \epsilon_i$ with noise of
+standard deviation $\sigma$. Take a group of $m$ observations sharing a similar signal value. Their
+mean forward return still has expectation $\beta$ times their mean signal — the relationship is
+untouched — while the noise around that mean has standard deviation $\sigma / m^{1/2}$. At
+$m = 300$ the noise is 17 times smaller, so the group means separate cleanly even though no
+individual point ever did.
+
+**Note.** This is why the next section sorts into buckets rather than fitting a line. The scatter
+asks each point to carry the argument alone; the bucket chart lets 300 of them share it.
 
 ## 4. The bucketed bar chart — the core method
 
@@ -133,11 +209,11 @@ equal and it discards some magnitude information.
 
 No single view suffices; produce all three:
 
-| View | Shows | Hides |
-|---|---|---|
-| Raw-value buckets | The signal at its natural scale | Not comparable across regimes or assets |
-| Standardized buckets | Regime-neutral comparison | Sparse, unreliable tails |
-| Rolling-quantile buckets | No look-ahead, balanced groups | Magnitude information |
+| View                     | Shows                           | Hides                                   |
+| ------------------------ | ------------------------------- | --------------------------------------- |
+| Raw-value buckets        | The signal at its natural scale | Not comparable across regimes or assets |
+| Standardized buckets     | Regime-neutral comparison       | Sparse, unreliable tails                |
+| Rolling-quantile buckets | No look-ahead, balanced groups  | Magnitude information                   |
 
 A fourth angle: cross-sectional ranking — each asset against its peers that day rather than its own
 past. That is the Portfolio 1 vs Portfolio 2 distinction in [03](03-from-signal-to-position.md).
@@ -184,11 +260,11 @@ $$
 
 Conventionally $f = 12$, $s = 26$, and 9 for the signal line.
 
-| Series | Reads as | Sign means |
-| --- | --- | --- |
-| **MACD line** | recent average price versus a longer one | trend direction |
-| **Signal line** | a smoothed MACD | the level MACD is crossing |
-| **Histogram** | MACD minus its own smoothing | trend *acceleration* |
+| Series                | Reads as                                 | Sign means                 |
+| --------------------- | ---------------------------------------- | -------------------------- |
+| **MACD line**   | recent average price versus a longer one | trend direction            |
+| **Signal line** | a smoothed MACD                          | the level MACD is crossing |
+| **Histogram**   | MACD minus its own smoothing             | trend *acceleration*       |
 
 **Claim.** MACD is a momentum signal. It is a weighted sum of past returns, differing from a
 lookback mean only in the shape of the weights.
