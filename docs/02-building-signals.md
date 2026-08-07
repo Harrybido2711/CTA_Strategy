@@ -161,26 +161,30 @@ concluding anything **from** a cloud.
 
 ### 3.2 Sort, then average
 
-**The construction.** Start where the answer is already known — suppose every observation sat
-exactly on a regression line, so a higher signal always meant a higher return. Then:
-
-1. **Draw five observations at random.** The dark set in the left panel below.
-2. **Rank them by signal**, and drop the highest into G5, the next into G4, down to G1.
-3. **Their returns land in that same order**, because the line says they must — the middle panel.
-4. **Draw five more** — the lighter set — and repeat. It rises across the same five slots, from a
-   different starting height.
-5. **Do that a few thousand times and average each slot.** The right panel: a monotone staircase.
+**The construction.** Draw five observations at random, rank them by signal, drop the highest into
+G5 and the lowest into G1, and record the return each one went on to deliver. Repeat a few thousand
+times, then average whatever landed in each slot.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
-  <img alt="Three panels. Left, a straight line through the origin with ten points on it, two draws of five in different shades. Middle, the same ten points replotted against rank slots G1 to G5, each draw forming a line that rises from left to right, the two crossing once. Right, the average over 4,000 such draws as five bars rising monotonically from G1 to G5" src="figures/bucket-construction-light.png">
+  <img alt="Six panels in two rows, each row running the same three steps. Top row, a perfect linear relationship: five points drawn off the line, those five ranked into slots G1 to G5 rising monotonically, and the average over 4,000 draws as a clean staircase. Bottom row, the real 12 percent correlation cloud: five points drawn from it, those five ranked into a scrambled zigzag with G3 highest and G4 lowest, and the average over 4,000 draws as a monotone staircase running from a negative G1 to a positive G5" src="figures/bucket-construction-light.png">
 </picture>
 
-**Note (Why that is a test and not a demonstration).** Nothing in steps 1–5 used the line. They used
-only the **ranking**, so the identical procedure runs on the real cloud, where no line is known —
-and the closer the truth is to a line, the more completely the staircase comes back. So the
-staircase reads **backwards**, as a measurement of how close the relationship is to the one § 1
-hypothesized. Bars that come back flat or scrambled are the same procedure answering "not close".
+**Note (First, where the answer is known).** The top row runs that on a perfect relationship — every
+observation sitting on a line. One draw of five is already ordered, and averaging returns a clean
+staircase. That is calibration rather than evidence: it fixes what success looks like.
+
+**Note (Then, on the real cloud).** The bottom row runs the identical procedure on § 2's scatter,
+and it settles the obvious objection to the top row. **One draw of five comes back scrambled** —
+here the third-ranked signal delivered the best return and the fourth-ranked the worst. Nothing
+about a single draw is monotone, and nothing should be: at 12% correlation the noise is eight times
+the signal. The staircase is a property of the **average over 4,000 draws**, never of any draw in
+it.
+
+Because the procedure only ever used the *ranking* and never the line, the closer the truth is to a
+line the more completely the staircase returns — so it reads backwards, as a measurement of how
+close the relationship is to the one § 1 hypothesized. Bars that come back flat or scrambled are
+the same procedure answering "not close".
 
 **Claim.** Sorting by the signal and averaging within groups detects what the scatter cannot,
 because averaging shrinks the noise and leaves the signal intact.

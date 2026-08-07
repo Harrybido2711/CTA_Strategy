@@ -146,65 +146,85 @@ def alpha_opacity(mode):
     save(fig, t, f"alpha-opacity-{mode}.png")
 
 
-# --------------------- fig: how the bar chart is built, from a perfect line
+# --------------------- fig: how the bar chart is built, and why averaging is
 def bucket_construction(mode):
-    """02 s3.2 -- draw five, rank them, repeat, average: the staircase appears.
+    """02 s3.2 -- draw five, rank them, repeat, average — on a line and on a cloud.
 
-    Schematic. Left: a perfect linear relationship with two draws of five
-    observations marked. Middle: those same ten replotted at the rank slot each
-    landed in, both rising. Right: the average over 4,000 such draws, which is
-    the bucket chart. Illustrative values throughout.
+    Schematic. Top row: a perfect relationship, where one draw of five is
+    already ordered. Bottom row: the real 12%-correlation cloud, where the same
+    draw comes back scrambled and the order only survives the average. Right
+    column keeps the shape and loses most of the height. Illustrative values.
     """
     t = THEMES[mode]
-    rng = np.random.RandomState(5)
+    rng = np.random.RandomState(4)
     dark, light = t["ramp"][5], t["ramp"][2]
+    n, draws = 4000, 4000
 
-    draw_a = np.array([9, 7, 6, 4, 2], dtype=float)
-    draw_b = np.array([10, 8, 5, 3, 1], dtype=float)
+    # ---- the two worlds, each a population to sample from
+    lx = rng.uniform(0, 10, n)
+    ly = lx.copy()                                   # perfect: return is the signal
+    cx = rng.standard_normal(n)
+    cy = 0.12 * cx + (1 - 0.12 ** 2) ** 0.5 * rng.standard_normal(n)
 
-    fig, axes = plt.subplots(1, 3, figsize=(11.0, 3.8),
-                             gridspec_kw=dict(wspace=0.30))
+    pick_l = rng.choice(n, 5, replace=False)
+    pick_c = np.array([i for i in rng.choice(n, 40, replace=False)][:5])
+
+    def ladder(px, py):
+        """mean return per rank slot, over many draws of five"""
+        idx = rng.randint(0, len(px), size=(draws, 5))
+        xs, ys = px[idx], py[idx]
+        order = np.argsort(xs, axis=1)
+        return np.take_along_axis(ys, order, axis=1).mean(axis=0)
+
+    rows = (
+        (lx, ly, pick_l, dark, "If the relationship were perfect",
+         "one draw of five is already ordered"),
+        (cx, cy, pick_c, light, "On the real cloud",
+         "the same draw comes back scrambled"),
+    )
+
+    fig, axes = plt.subplots(2, 3, figsize=(10.6, 6.6),
+                             gridspec_kw=dict(wspace=0.30, hspace=0.55))
     fig.patch.set_facecolor(t["surface"])
 
-    # ---- left: the perfect line, and the two draws taken off it
-    ax = axes[0]
-    style_axes(ax, t, ylabel="return", xlabel="$MOM$")
-    line = np.linspace(0.4, 10.6, 50)
-    ax.plot(line, line, color=t["grid"], linewidth=1.4, zorder=2)
-    for vals, colour in ((draw_a, dark), (draw_b, light)):
-        ax.scatter(vals, vals, s=46, color=colour, zorder=4)
-    ax.set_xlim(0, 11)
-    ax.set_ylim(0, 11)
-    ax.set_xticks(range(1, 11))
-    ax.set_yticks([])
-    titles(ax, t, "A perfect relationship", "two draws of five, taken at random")
+    for (px, py, pick, colour, head, sub), (ax, bx, cxx) in zip(rows, axes):
+        # source population, with the five drawn points called out
+        style_axes(ax, t, ylabel="return", xlabel="$MOM$", grid=False)
+        ax.scatter(px, py, s=3.0, color=t["series"], alpha=0.10, linewidths=0, zorder=2)
+        ax.scatter(px[pick], py[pick], s=44, color=colour, zorder=4)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        titles(ax, t, head, sub)
 
-    # ---- middle: the same ten points, at the rank slot each fell into
-    bx = axes[1]
-    style_axes(bx, t, ylabel="return", xlabel="rank slot")
-    for vals, colour in ((draw_a, dark), (draw_b, light)):
-        bx.plot(range(5), np.sort(vals), color=colour, linewidth=1.2,
+        # that one draw, at the rank slot each point fell into
+        sel = np.argsort(px[pick])
+        style_axes(bx, t, ylabel="return", xlabel="rank slot", grid=False)
+        bx.plot(range(5), py[pick][sel], color=colour, linewidth=1.3,
                 marker="o", markersize=6.5, zorder=4)
-    bx.set_xlim(-0.5, 4.5)
-    bx.set_ylim(0, 11)
-    bx.set_xticks(range(5))
-    bx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
-    bx.set_yticks([])
-    titles(bx, t, "Ranked, lowest to highest", "each draw rises across the same five slots")
+        bx.set_xticks(range(5))
+        bx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
+        bx.set_yticks([])
+        titles(bx, t, "That draw, ranked", "highest signal into G5")
 
-    # ---- right: average many draws and the staircase is what is left
-    cx = axes[2]
-    style_axes(cx, t, ylabel="mean return", xlabel="signal bucket")
-    means = np.sort(rng.uniform(0.5, 10.5, size=(4000, 5)), axis=1).mean(axis=0)
-    for i, v in enumerate(means):
-        rounded_bar(cx, i, v, color=t["series"], width=0.34)
-    cx.set_xlim(-0.6, 4.6)
-    cx.set_ylim(0, 11)
-    cx.set_xticks(range(5))
-    cx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
-    cx.set_yticks([])
-    titles(cx, t, "Averaged over 4,000 draws", "the staircase is all that survives")
+        # and the average over 4,000 of them
+        means = ladder(px, py)
+        base = min(0.0, means.min())
+        style_axes(cxx, t, ylabel="mean return", xlabel="signal bucket")
+        for i, v in enumerate(means):
+            rounded_bar(cxx, i, v, base=base, color=t["series"], width=0.34)
+        cxx.axhline(base, color=t["baseline"], linewidth=0.9, zorder=2)
+        span = means.max() - base
+        cxx.set_ylim(base - 0.10 * span, means.max() + 0.15 * span)
+        cxx.set_xlim(-0.6, 4.6)
+        cxx.set_xticks(range(5))
+        cxx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
+        cxx.set_yticks([])
+        titles(cxx, t, "4,000 draws, averaged", "the staircase is what survives")
 
+    fig.text(0.5, -0.03,
+             "Illustrative. Each row is scaled to its own height — the real staircase has the same "
+             "shape as the perfect one and a small fraction of the rise.",
+             ha="center", color=t["ink_secondary"], fontsize=8.8)
     save(fig, t, f"bucket-construction-{mode}.png")
 
 
