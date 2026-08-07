@@ -173,12 +173,11 @@ The top row runs that procedure on a perfect relationship — every
 observation sitting on a line. One draw of five is already ordered, and averaging returns a clean
 staircase. That is calibration rather than evidence: it fixes what success looks like.
 
-The bottom row runs the identical procedure on § 2's scatter,
-and it settles the obvious objection to the top row. **One draw of five comes back scrambled** —
-here the third-ranked signal delivered the best return and the fourth-ranked the worst. Nothing
-about a single draw is monotone, and nothing should be: at 12% correlation the noise is eight times
-the signal. The staircase is a property of the **average over 4,000 draws**, never of any draw in
-it.
+The bottom row runs the identical procedure on § 2's scatter, and it settles the obvious objection
+to the top row. **One draw of five comes back scrambled** — here the third-ranked signal delivered
+the best return and the fourth-ranked the worst. Nothing about a single draw is monotone, and
+nothing should be: at 12% correlation the noise is eight times the signal. The staircase is a
+property of the **average over 4,000 draws**, never of any draw in it.
 
 Because the procedure only ever used the *ranking* and never the line, the closer the truth is to a
 line the more completely the staircase returns — so it reads backwards, as a measurement of how
