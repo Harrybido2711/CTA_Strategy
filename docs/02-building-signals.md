@@ -66,20 +66,21 @@ much** to allocate. How far the magnitude reaches the position is
 Write the hypothesis first: it names what would falsify the signal, and one you cannot falsify is a
 plot you will rationalize either way.
 
-## 2. Horizons travel — but verify
+## 2. What you hoped for, and what you get
 
-A signal that works yearly is assumed to work monthly and quarterly, since a long trend is short
-fluctuations accumulating in one direction. That is a prior, not a fact.
+§ 1's hypothesis says forward return rises with the signal, so the first move is to plot one against
+the other and look. The left panel is the picture you had in mind. The right panel is what comes
+back — and it comes back that way for well over 99% of the scatters you will ever draw.
 
-When a horizon test comes back non-monotone, don't discard the signal — re-read the source paper's
-assumptions (universe, period, skip, weighting). Most "it doesn't work" results are "I implemented
-a different signal than the one tested."
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/hope-vs-reality-dark.png">
+  <img alt="Two scatter panels of forward return against a momentum signal, drawn from the same number of points at the same opacity. The left, labelled hoped for, is a tight band climbing from bottom left to top right. The right, labelled observed, is a round formless cloud with no tilt the eye can read" src="figures/hope-vs-reality-light.png">
+</picture>
+
+Both panels hold a real relationship. The right one holds it at the strength a working signal
+actually carries — which is why the cloud is not the verdict it looks like.
 
 ## 3. Why the scatter plot disappoints
-
-§ 1 asserted $MOM_{s,t} \propto w_{s,t} \propto \text{return}$. The obvious way to check a proportionality is
-to plot one against the other, so the scatter of signal against forward return is where everyone
-starts — and it is the right place to start. It just almost never answers the question.
 
 **Claim.** The scatter cannot confirm or refute a real signal, because the correlation a real
 signal carries sits below the threshold at which the eye resolves a trend.
@@ -360,11 +361,11 @@ last month's average daily move.
 
 Take a five-day lookback:
 
-| Asset | Last five returns | Avg → the signal | After `sign()` |
-| --- | --- | --- | --- |
-| A | +3%, +2%, +4%, +1%, +2% | **+0.024** | +1 |
-| B | +1%, −0.5%, +1%, 0%, +0.5% | **+0.004** | +1 |
-| C | −2%, −3%, −1%, −2%, −2% | **−0.020** | −1 |
+| Asset | Last five returns            | Avg → the signal | After`sign()` |
+| ----- | ---------------------------- | ----------------- | --------------- |
+| A     | +3%, +2%, +4%, +1%, +2%      | **+0.024**  | +1              |
+| B     | +1%, −0.5%, +1%, 0%, +0.5%  | **+0.004**  | +1              |
+| C     | −2%, −3%, −1%, −2%, −2% | **−0.020** | −1             |
 
 The right column is binary momentum, and it cannot tell A from B. In the left column A is **six
 times** B — that ratio *is* the magnitude.
@@ -382,30 +383,30 @@ what standardization (§ 6) and rolling-quantile bucketing (§ 7) exist to make 
 Every symbol used above, collected. Throughout, $s$ indexes the asset and $t$ the date; both are
 dropped where a formula concerns one asset on one day.
 
-| Symbol | Means | First used |
-| --- | --- | --- |
-| $s$ | asset — one of the 37 ETFs | § 1 |
-| $t$ | date, counted in periods (days here) | § 1 |
-| $r_{s,t}$ | that asset's return over that period | § 1 |
-| $MOM_{s,t}$ | the momentum signal it produces | § 1 |
-| $N$ | lookback length, in periods | § 1 |
-| $i$ | lag inside the lookback, from 1 to N | § 1 |
-| $w_{s,t}$ | weight — the position size given to that asset that day | § 1 |
-| $x$, $y$ | one observation's signal value and its forward return | § 3 |
-| $\beta$ | slope of forward return on signal | § 3 |
-| $\epsilon$ | noise around that line | § 3 |
-| $\sigma_\epsilon$ | standard deviation of that noise | § 3 |
-| $m$ | observations sharing a bucket | § 3 |
-| G1 … G5 | buckets, lowest to highest signal value | § 4 |
-| $\sigma_{s,t}$ | volatility of the asset, estimated on data before that date | § 6 |
-| $H$ | EWMA half-life, in periods | § 9 |
-| $P_t$ | price on that date | § 10 |
-| $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 10 |
-| $\alpha$ | EMA smoothing constant, two over span plus one | § 10 |
-| $\alpha_f$, $\alpha_s$ | the fast and slow EMA's own smoothing constants | § 10 |
-| $c_i$ | MACD's net weight on the price at that lag | § 10 |
-| $\Delta_{t-j}$ | one-period price change at that lag | § 10 |
-| $k_j$ | kernel — MACD's weight on the price change at that lag | § 10 |
+| Symbol                     | Means                                                       | First used |
+| -------------------------- | ----------------------------------------------------------- | ---------- |
+| $s$                      | asset — one of the 37 ETFs                                 | § 1       |
+| $t$                      | date, counted in periods (days here)                        | § 1       |
+| $r_{s,t}$                | that asset's return over that period                        | § 1       |
+| $MOM_{s,t}$              | the momentum signal it produces                             | § 1       |
+| $N$                      | lookback length, in periods                                 | § 1       |
+| $i$                      | lag inside the lookback, from 1 to N                        | § 1       |
+| $w_{s,t}$                | weight — the position size given to that asset that day    | § 1       |
+| $x$, $y$               | one observation's signal value and its forward return       | § 3       |
+| $\beta$                  | slope of forward return on signal                           | § 3       |
+| $\epsilon$               | noise around that line                                      | § 3       |
+| $\sigma_\epsilon$        | standard deviation of that noise                            | § 3       |
+| $m$                      | observations sharing a bucket                               | § 3       |
+| G1 … G5                   | buckets, lowest to highest signal value                     | § 4       |
+| $\sigma_{s,t}$           | volatility of the asset, estimated on data before that date | § 6       |
+| $H$                      | EWMA half-life, in periods                                  | § 9       |
+| $P_t$                    | price on that date                                          | § 10      |
+| $n_f$, $n_s$           | fast and slow EMA spans, conventionally 12 and 26           | § 10      |
+| $\alpha$                 | EMA smoothing constant, two over span plus one              | § 10      |
+| $\alpha_f$, $\alpha_s$ | the fast and slow EMA's own smoothing constants             | § 10      |
+| $c_i$                    | MACD's net weight on the price at that lag                  | § 10      |
+| $\Delta_{t-j}$           | one-period price change at that lag                         | § 10      |
+| $k_j$                    | kernel — MACD's weight on the price change at that lag     | § 10      |
 
 **Note (Collisions to watch).** $\sigma_\epsilon$ (§ 3, noise around a fitted line) and
 $\sigma_{s,t}$ (§ 6, an asset's volatility) are different quantities; so are $w_{s,t}$ (a position)
