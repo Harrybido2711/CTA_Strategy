@@ -140,30 +140,23 @@ a density map. Below, the left panel is the before; the other two are both the a
   <img alt="Three scatter panels of forward return against a signal. Left, at full opacity, 55,000 points render as one solid disc with no internal structure. Middle, the same rendering at alpha 0.01 on a book where a high signal rules out deep losses: a soft density cloud with the bottom-right corner visibly bitten out, annotated high signal, no deep loss. Right, alpha 0.01 on the original points: a smooth round density with no thin region anywhere" src="figures/alpha-opacity-light.png">
 </picture>
 
-**What you hope for.** Either outcome would be a result:
+Sometimes that is enough — the middle panel, where one region (high signal against a badly negative
+return) has thinned enough to read. A signal that only rules something *out* is still tradeable, so
+seeing even that much would be a good day.
 
-- **A tilted ridge.** The core goes thick where observations pile up and the edges stay thin, and if
-  forward return really does rise with the signal, that core leans.
-- **An empty corner** — the middle panel. One region, high signal against a badly negative return,
-  visibly thinner than the rest. A signal that only rules something *out* is still tradeable, so
-  seeing even this much on a scatter would be a good day.
+**Why it usually fails.** Three reasons, and they compound:
 
-**What actually happens.** The right panel, for two reasons that compound:
-
-- **Too many points, too evenly spread.** 55,000 asset-dates — 37 ETFs over six years — average
-  into a smooth bivariate blob, and a smooth blob has no feature to read.
-- **Too dispersed.** § 2's arithmetic: the scatter band is eight times taller than the entire rise
-  of the trend line, so the lean in the density is finer than the markers drawn on top of it.
-
-**Note (It treats the symptom).** Opacity is worth setting, and it does make the plot more legible.
-But the scatter spends all its resolution on individual noisy points when the claim is about their
-**average**, and no rendering choice fixes that. If any of § 2's first three panels ever showed up
-on real data, the equity curve behind it would be spectacular — which is precisely why they do not.
+- **The density comes back smooth.** 55,000 asset-dates — 37 ETFs over six years — average into a
+  clean bivariate blob. Opacity renders density faithfully, and a smooth density has no feature.
+- **The tilt is finer than the ink.** § 2's arithmetic: the band is eight times taller than the
+  whole rise of the trend line, so the lean is smaller than the markers drawn on top of it.
+- **It treats the symptom.** The scatter spends all its resolution on individual noisy points when
+  the claim is about their **average**. No rendering choice changes what is being rendered.
 
 **Note (Look first anyway).** Always draw the scatter. On the rare occasion something *is* readable
 — a curve, a threshold, one corner plainly empty — it beats every summary statistic, because it
-gives the *shape* and not just the strength. Spend thirty seconds. The mistake is concluding
-anything **from** a cloud.
+gives the *shape* and not just the strength. Thirty seconds. The mistake is concluding anything
+**from** a cloud.
 
 ### 3.2 Sort, then average
 
