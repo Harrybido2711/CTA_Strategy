@@ -169,9 +169,9 @@ times, then average whatever landed in each slot.
   <img alt="Six panels in two rows, each row running the same three steps. Top row, a perfect linear relationship: five points drawn off the line, those five ranked into slots G1 to G5 rising monotonically, and the average over 4,000 draws as a clean staircase. Bottom row, the real 12 percent correlation cloud: five points drawn from it, those five ranked into a scrambled zigzag with G3 highest and G4 lowest, and the average over 4,000 draws as a monotone staircase running from a negative G1 to a positive G5" src="figures/bucket-construction-light.png">
 </picture>
 
-The top row runs that procedure on a perfect relationship — every
-observation sitting on a line. One draw of five is already ordered, and averaging returns a clean
-staircase. That is calibration rather than evidence: it fixes what success looks like.
+The top row runs that procedure on a perfect relationship — every observation sitting on a line.
+One draw of five is already ordered, and averaging returns a clean staircase. That is calibration
+rather than evidence: it fixes what success looks like.
 
 The bottom row runs the identical procedure on § 2's scatter, and it settles the obvious objection
 to the top row. **One draw of five comes back scrambled** — here the third-ranked signal delivered
