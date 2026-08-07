@@ -161,14 +161,26 @@ concluding anything **from** a cloud.
 
 ### 3.2 Sort, then average
 
-**The idea.** Suppose for a moment the relationship were perfectly linear. Draw five observations at
-random, rank them by signal, and drop the highest into G5, the next into G4, down to G1. Their
-forward returns come out in the same order. Draw five more and repeat. Do it enough times and
-average each group's return: the result is a monotone staircase, G1 lowest and G5 highest.
+**The construction.** Start where the answer is already known — suppose every observation sat
+exactly on a regression line, so a higher signal always meant a higher return. Then:
 
-Now run exactly that procedure on the real cloud. **The closer the underlying relationship is to
-linear, the more completely the staircase appears** — so the staircase can be read backwards, as a
-test of how close the truth is to the line you hypothesized. That is the next section's chart.
+1. **Draw five observations at random.** The dark set in the left panel below.
+2. **Rank them by signal**, and drop the highest into G5, the next into G4, down to G1.
+3. **Their returns land in that same order**, because the line says they must — the middle panel.
+4. **Draw five more** — the lighter set — and repeat. It rises across the same five slots, from a
+   different starting height.
+5. **Do that a few thousand times and average each slot.** The right panel: a monotone staircase.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
+  <img alt="Three panels. Left, a straight line through the origin with ten points on it, two draws of five in different shades. Middle, the same ten points replotted against rank slots G1 to G5, each draw forming a line that rises from left to right, the two crossing once. Right, the average over 4,000 such draws as five bars rising monotonically from G1 to G5" src="figures/bucket-construction-light.png">
+</picture>
+
+**Note (Why that is a test and not a demonstration).** Nothing in steps 1–5 used the line. They used
+only the **ranking**, so the identical procedure runs on the real cloud, where no line is known —
+and the closer the truth is to a line, the more completely the staircase comes back. So the
+staircase reads **backwards**, as a measurement of how close the relationship is to the one § 1
+hypothesized. Bars that come back flat or scrambled are the same procedure answering "not close".
 
 **Claim.** Sorting by the signal and averaging within groups detects what the scatter cannot,
 because averaging shrinks the noise and leaves the signal intact.
@@ -177,11 +189,11 @@ because averaging shrinks the noise and leaves the signal intact.
 one date. Their mean forward return still has expectation $\beta$ times their mean signal, while
 the noise around that mean shrinks to $\sigma_\epsilon / m^{1/2}$:
 
-| | One observation | Mean of 300 |
-| --- | --- | --- |
-| Signal | 14.4 bp | 14.4 bp |
-| Noise | 119 bp | $119 / 300^{1/2} \approx 6.9$ bp |
-| Ratio | 1 : 8 | **2 : 1** |
+|        | One observation | Mean of 300                        |
+| ------ | --------------- | ---------------------------------- |
+| Signal | 14.4 bp         | 14.4 bp                            |
+| Noise  | 119 bp          | $119 / 300^{1/2} \approx 6.9$ bp |
+| Ratio  | 1 : 8           | **2 : 1**                    |
 
 **Note (Where that overstates it).** The $m^{1/2}$ assumes independence. Overlapping lookback
 windows and assets that move together push the effective count well below $m$, so the noise does not
@@ -440,10 +452,10 @@ asset on one day.
 | G1 … G5                                        | the buckets, lowest to highest signal value                                                                                   | § 4       |
 | $\sigma_{s,t}$                                | one asset's volatility, estimated on data before that date                                                                    | § 6       |
 | $H$                                           | EWMA half-life, in periods                                                                                                    | § 9       |
-| $P_t$, $\Delta_{t-j}$                       | price on that date, and the one-period change at that lag                                                                     | § 10       |
-| $n_f$, $n_s$                                | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 10       |
-| $\alpha_f$, $\alpha_s$                      | their smoothing constants, two over span plus one                                                                             | § 10       |
-| $c_i$, $k_j$                                | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 10       |
+| $P_t$, $\Delta_{t-j}$                       | price on that date, and the one-period change at that lag                                                                     | § 10      |
+| $n_f$, $n_s$                                | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 10      |
+| $\alpha_f$, $\alpha_s$                      | their smoothing constants, two over span plus one                                                                             | § 10      |
+| $c_i$, $k_j$                                | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 10      |
 
 **Note (Collisions to watch).** Three quantities wear a $\sigma$ and they are not interchangeable:
 $\sigma_y$ is the spread of forward return across the pooled cloud (§ 2), $\sigma_\epsilon$ the

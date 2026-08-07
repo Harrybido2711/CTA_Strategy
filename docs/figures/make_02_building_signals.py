@@ -13,6 +13,7 @@ Figures produced
     binary-momentum      sign() maps two very different trends onto the same position
     scatter-ladder       what each correlation looks like, and which one you get
     alpha-opacity        what turning the marker opacity down does and does not buy
+    bucket-construction  draw five, rank them, repeat, average — where the bars come from
     bucket-chart         the core signal test: mean forward return per signal bucket
     reversal-buckets     expected monotone buckets vs the reversal-broken version
     signal-distribution  why fixed-interval cuts starve the tails, and what fixes it
@@ -143,6 +144,68 @@ def alpha_opacity(mode):
              "would look like, and it would be a result.",
              ha="center", color=t["ink_secondary"], fontsize=8.6)
     save(fig, t, f"alpha-opacity-{mode}.png")
+
+
+# --------------------- fig: how the bar chart is built, from a perfect line
+def bucket_construction(mode):
+    """02 s3.2 -- draw five, rank them, repeat, average: the staircase appears.
+
+    Schematic. Left: a perfect linear relationship with two draws of five
+    observations marked. Middle: those same ten replotted at the rank slot each
+    landed in, both rising. Right: the average over 4,000 such draws, which is
+    the bucket chart. Illustrative values throughout.
+    """
+    t = THEMES[mode]
+    rng = np.random.RandomState(5)
+    dark, light = t["ramp"][5], t["ramp"][2]
+
+    draw_a = np.array([9, 7, 6, 4, 2], dtype=float)
+    draw_b = np.array([10, 8, 5, 3, 1], dtype=float)
+
+    fig, axes = plt.subplots(1, 3, figsize=(11.0, 3.8),
+                             gridspec_kw=dict(wspace=0.30))
+    fig.patch.set_facecolor(t["surface"])
+
+    # ---- left: the perfect line, and the two draws taken off it
+    ax = axes[0]
+    style_axes(ax, t, ylabel="return", xlabel="$MOM$")
+    line = np.linspace(0.4, 10.6, 50)
+    ax.plot(line, line, color=t["grid"], linewidth=1.4, zorder=2)
+    for vals, colour in ((draw_a, dark), (draw_b, light)):
+        ax.scatter(vals, vals, s=46, color=colour, zorder=4)
+    ax.set_xlim(0, 11)
+    ax.set_ylim(0, 11)
+    ax.set_xticks(range(1, 11))
+    ax.set_yticks([])
+    titles(ax, t, "A perfect relationship", "two draws of five, taken at random")
+
+    # ---- middle: the same ten points, at the rank slot each fell into
+    bx = axes[1]
+    style_axes(bx, t, ylabel="return", xlabel="rank slot")
+    for vals, colour in ((draw_a, dark), (draw_b, light)):
+        bx.plot(range(5), np.sort(vals), color=colour, linewidth=1.2,
+                marker="o", markersize=6.5, zorder=4)
+    bx.set_xlim(-0.5, 4.5)
+    bx.set_ylim(0, 11)
+    bx.set_xticks(range(5))
+    bx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
+    bx.set_yticks([])
+    titles(bx, t, "Ranked, lowest to highest", "each draw rises across the same five slots")
+
+    # ---- right: average many draws and the staircase is what is left
+    cx = axes[2]
+    style_axes(cx, t, ylabel="mean return", xlabel="signal bucket")
+    means = np.sort(rng.uniform(0.5, 10.5, size=(4000, 5)), axis=1).mean(axis=0)
+    for i, v in enumerate(means):
+        rounded_bar(cx, i, v, color=t["series"], width=0.34)
+    cx.set_xlim(-0.6, 4.6)
+    cx.set_ylim(0, 11)
+    cx.set_xticks(range(5))
+    cx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
+    cx.set_yticks([])
+    titles(cx, t, "Averaged over 4,000 draws", "the staircase is all that survives")
+
+    save(fig, t, f"bucket-construction-{mode}.png")
 
 
 # ----------------------------------------------------- fig: the bucket bar chart
@@ -355,7 +418,7 @@ def scatter_ladder(mode):
     save(fig, t, f"scatter-ladder-{mode}.png")   # save() already crops tight
 
 
-FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_chart, reversal_buckets,
+FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_construction, bucket_chart, reversal_buckets,
            signal_distribution, signal_kernels)
 
 if __name__ == "__main__":
