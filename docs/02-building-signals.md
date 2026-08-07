@@ -23,9 +23,9 @@ nothing in between.
 
 ### Why the sign alone is not enough
 
-Two assets that rose 20% and 10% over the same window produce
-the *same* signal, so a book built on it holds them in the same size. Trend **strength** is thrown
-away; only trend **direction** survives.
+Two assets that rose 20% and 10% over the same window produce the *same* signal, so a book built on
+it holds them in the same size. Trend **strength** is thrown away; only trend **direction**
+survives.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/binary-momentum-dark.png">
@@ -107,15 +107,15 @@ return from one observation to the next, 1.44% is linear in the signal and 98.56
 **Example.** With a daily return standard deviation of $\sigma_y = 0.012$ — 120 bp, typical for an
 equity ETF, a **basis point** being 0.01%:
 
-| Component             | Size                            | At$\rho = 0.12$ |
+| Component             | Size                            | At 12% correlation |
 | --------------------- | ------------------------------- | ----------------- |
 | Total return          | $\sigma_y$                    | 120 bp            |
 | What the signal moves | $\rho \sigma_y$               | **14.4 bp** |
 | What it does not      | $\sigma_y (1 - \rho^2)^{1/2}$ | **119 bp**  |
 
-Across an x-axis running $-2\sigma_x$ to $+2\sigma_x$ the trend line climbs $4 \times 14.4
-$\approx 58$ bp, while at every $x$ the points scatter over $4 \times 119 \approx 476$ bp. **A
-0.6% slope inside a 4.8% cloud** — that ratio *is* the picture.
+Across an x-axis running from $-2\sigma_x$ to $+2\sigma_x$ the trend line climbs about 58 bp end
+to end, while at every $x$ the points scatter over roughly 476 bp. **A 0.6% slope inside a 4.8%
+cloud** — that ratio *is* the picture.
 
 **Note (And it is worse than that).** Part of those 119 bp is not the market's doing: pooling UNG
 with SHY, and 2021 with 2023, adds spread that standardization (§ 6) removes. Nor is a larger
@@ -160,52 +160,63 @@ concluding anything **from** a cloud.
 
 ### 3.2 Sort, then average
 
-**The construction.** Draw five observations at random, rank them by signal, drop the highest into
-G5 and the lowest into G1, and record the return each one went on to deliver. Repeat a few thousand
-times, then average whatever landed in each slot.
+**The construction.** Six steps. Only the last one produces anything worth looking at.
+
+1. **Draw** five observations at random — one observation being one asset on one date.
+2. **Rank** those five by signal value, highest to lowest.
+3. **Assign** them to slots: highest signal into G5, next into G4, down to G1.
+4. **Record** the forward return each one went on to deliver, filed under its slot.
+5. **Repeat** steps 1–4 a few thousand times.
+6. **Average** everything filed under G1, then G2, and so on — five numbers, drawn as five bars.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
-  <img alt="Six panels in two rows, each row running the same three steps. Top row, a perfect linear relationship: five points drawn off the line, those five ranked into slots G1 to G5 rising monotonically, and the average over 4,000 draws as a clean staircase. Bottom row, the real 12 percent correlation cloud: five points drawn from it, those five ranked into a scrambled zigzag with G3 highest and G4 lowest, and the average over 4,000 draws as a monotone staircase running from a negative G1 to a positive G5" src="figures/bucket-construction-light.png">
+  <img alt="Six panels in two rows, each row running the same steps. Top row, a perfect linear relationship: five points drawn off the line, those five ranked into slots G1 to G5 rising monotonically, and the average over 4,000 draws as a clean staircase. Bottom row, the real 12 percent correlation cloud: five points drawn from it, those five ranked into a scrambled zigzag with G3 highest and G4 lowest, and the average over 4,000 draws as a monotone staircase running from a negative G1 to a positive G5" src="figures/bucket-construction-light.png">
 </picture>
 
-The top row runs that procedure on a perfect relationship — every observation sitting on a line.
-One draw of five is already ordered, and averaging returns a clean staircase. That is calibration
-rather than evidence: it fixes what success looks like.
+**Why that carries information.** Three things are true of those six steps, and together they turn
+five bars into a test.
 
-The bottom row runs the identical procedure on § 2's scatter, and it settles the obvious objection
-to the top row. **One draw of five comes back scrambled** — here the third-ranked signal delivered
-the best return and the fourth-ranked the worst. Nothing about a single draw is monotone, and
-nothing should be: at 12% correlation the noise is eight times the signal. The staircase is a
-property of the **average over 4,000 draws**, never of any draw in it.
+**Nothing about the hypothesis goes in.** Steps 1–6 use the *ranking* of the signal and nothing
+else — no fitted line, no assumption that return rises with it. So they run unchanged on data where
+the answer is unknown, and any staircase that survives step 6 was not put in at step 1.
 
-Because the procedure only ever used the *ranking* and never the line, the closer the truth is to a
-line the more completely the staircase returns — so it reads backwards, as a measurement of how
-close the relationship is to the one § 1 hypothesized. Bars that come back flat or scrambled are
-the same procedure answering "not close".
+**A single draw is worthless, and the average is not.** The figure's top row runs the steps on a
+perfect relationship, where one draw of five comes out already ordered — calibration rather than
+evidence, fixing what success looks like. The bottom row runs the identical steps on § 2's real
+scatter, and the same draw comes back **scrambled**: the third-ranked signal delivered the best
+return, the fourth-ranked the worst. At 12% correlation nothing about one draw should be monotone.
+The staircase belongs to step 6, never to any draw inside it.
+
+**The arithmetic says step 5 is what buys that.** Which is the one part of the construction that
+can be proved rather than shown.
 
 **Claim.** Sorting by the signal and averaging within groups detects what the scatter cannot,
 because averaging shrinks the noise and leaves the signal intact.
 
-**Proof.** Take $m$ observations sharing a similar signal value, one observation being one asset on
-one date. Their mean forward return still has expectation $\beta$ times their mean signal, while
-the noise around that mean shrinks to $\sigma_\epsilon / m^{1/2}$:
+**Proof.** Take $m$ observations sharing a similar signal value. Their mean forward return still has
+expectation $\beta$ times their mean signal, while the noise around that mean shrinks to
+$\sigma_\epsilon / m^{1/2}$:
 
-|        | One observation | Mean of 300                        |
-| ------ | --------------- | ---------------------------------- |
-| Signal | 14.4 bp         | 14.4 bp                            |
-| Noise  | 119 bp          | $119 / 300^{1/2} \approx 6.9$ bp |
-| Ratio  | 1 : 8           | **2 : 1**                    |
+| | One observation | Mean of 300 |
+| --- | --- | --- |
+| Signal | 14.4 bp | 14.4 bp |
+| Noise | 119 bp | $119 / 300^{1/2} \approx 6.9$ bp |
+| Ratio | 1 : 8 | **2 : 1** |
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/noise-shrinks-dark.png">
   <img alt="Four bucket charts of the same population at 12 percent correlation, computed from 5, 30, 300 and 3,000 observations per bucket. At m equals 5 the bars swing between minus 80 and plus 93 basis points and are not monotone; by m equals 300 they have settled into a monotone staircase from about minus 20 to plus 20 basis points, and at m equals 3,000 the error bars are barely visible" src="figures/noise-shrinks-light.png">
 </picture>
 
-The true bucket means are identical in all four panels above — near −20 bp at G1 and +20 bp at G5.
-Only the error on the estimate moves, and at $m = 5$ that error is larger than the whole staircase,
-so the bars come back scrambled. **Sample size is not a detail of the recipe; it is the entire
-reason the recipe works.**
+The true bucket means are identical in all four panels — near −20 bp at G1 and +20 bp at G5. Only
+the error on the estimate moves, and at $m = 5$ that error is larger than the whole staircase, so
+the bars come back scrambled. **Sample size is not a detail of the recipe; it is the entire reason
+the recipe works.**
+
+Put together: the closer the truth is to the line § 1 hypothesized, the more completely the
+staircase returns, so the bars read **backwards** — as a measurement of that closeness. Bars that
+come back flat or scrambled are the same procedure answering "not close".
 
 **Note (Where that overstates it).** The $m^{1/2}$ assumes independence. Overlapping lookback
 windows and assets that move together push the effective count well below $m$, so the noise does not
