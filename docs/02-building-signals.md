@@ -23,7 +23,7 @@ nothing in between.
 
 ### Why the sign alone is not enough
 
-**Note (What the sign discards).** Two assets that rose 20% and 10% over the same window produce
+Two assets that rose 20% and 10% over the same window produce
 the *same* signal, so a book built on it holds them in the same size. Trend **strength** is thrown
 away; only trend **direction** survives.
 
@@ -34,8 +34,7 @@ away; only trend **direction** survives.
 
 ### What to keep instead
 
-**Note (Two repairs).** Neither is obviously right, and both are tested the same way — § 4's bucket
-chart.
+Neither repair below is obviously right, and both are tested the same way — § 4's bucket chart.
 
 - **Keep the value, not the sign** — the definition below, which stays proportional to how strongly
   the asset trended.
@@ -170,11 +169,11 @@ times, then average whatever landed in each slot.
   <img alt="Six panels in two rows, each row running the same three steps. Top row, a perfect linear relationship: five points drawn off the line, those five ranked into slots G1 to G5 rising monotonically, and the average over 4,000 draws as a clean staircase. Bottom row, the real 12 percent correlation cloud: five points drawn from it, those five ranked into a scrambled zigzag with G3 highest and G4 lowest, and the average over 4,000 draws as a monotone staircase running from a negative G1 to a positive G5" src="figures/bucket-construction-light.png">
 </picture>
 
-**Note (First, where the answer is known).** The top row runs that on a perfect relationship — every
+The top row runs that procedure on a perfect relationship — every
 observation sitting on a line. One draw of five is already ordered, and averaging returns a clean
 staircase. That is calibration rather than evidence: it fixes what success looks like.
 
-**Note (Then, on the real cloud).** The bottom row runs the identical procedure on § 2's scatter,
+The bottom row runs the identical procedure on § 2's scatter,
 and it settles the obvious objection to the top row. **One draw of five comes back scrambled** —
 here the third-ranked signal delivered the best return and the fourth-ranked the worst. Nothing
 about a single draw is monotone, and nothing should be: at 12% correlation the noise is eight times
@@ -204,10 +203,10 @@ the noise around that mean shrinks to $\sigma_\epsilon / m^{1/2}$:
   <img alt="Four bucket charts of the same population at 12 percent correlation, computed from 5, 30, 300 and 3,000 observations per bucket. At m equals 5 the bars swing between minus 80 and plus 93 basis points and are not monotone; by m equals 300 they have settled into a monotone staircase from about minus 20 to plus 20 basis points, and at m equals 3,000 the error bars are barely visible" src="figures/noise-shrinks-light.png">
 </picture>
 
-**Note (Which makes $m$ the method).** The true bucket means are identical in all four panels above —
-near −20 bp at G1 and +20 bp at G5. Only the error on the estimate moves, and at $m = 5$ that error
-is larger than the whole staircase, so the bars come back scrambled. Sample size is not a detail of
-the recipe; it is the entire reason the recipe works.
+The true bucket means are identical in all four panels above — near −20 bp at G1 and +20 bp at G5.
+Only the error on the estimate moves, and at $m = 5$ that error is larger than the whole staircase,
+so the bars come back scrambled. **Sample size is not a detail of the recipe; it is the entire
+reason the recipe works.**
 
 **Note (Where that overstates it).** The $m^{1/2}$ assumes independence. Overlapping lookback
 windows and assets that move together push the effective count well below $m$, so the noise does not
@@ -395,7 +394,7 @@ week — deliberately, since the newest return is the noisiest — and never ful
   <img alt="Weight given to each past daily return, against lag in trading days, for two signals normalised to the same total. A 21-day momentum is a flat box: equal weight for the last 21 days and zero beyond. MACD with spans 12 and 26 is a hump that starts low at lag zero, peaks around lag 8, then decays slowly and never reaches zero within sixty days" src="figures/signal-kernels-light.png">
 </picture>
 
-**Note (From value to rule).** Three common rules, in increasing order of information kept. All
+Three common rules, in increasing order of information kept. All
 three still have to pass § 4's bucket test before they earn a backtest.
 
 | Rule         | Go long when                            | Costs                                                            |
