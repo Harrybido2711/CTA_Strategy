@@ -14,6 +14,7 @@ Figures produced
     scatter-ladder       what each correlation looks like, and which one you get
     alpha-opacity        what turning the marker opacity down does and does not buy
     bucket-construction  draw five, rank them, repeat, average — where the bars come from
+    noise-shrinks        why the bucket count m is the method, not a detail
     bucket-chart         the core signal test: mean forward return per signal bucket
     reversal-buckets     expected monotone buckets vs the reversal-broken version
     signal-distribution  why fixed-interval cuts starve the tails, and what fixes it
@@ -228,6 +229,54 @@ def bucket_construction(mode):
     save(fig, t, f"bucket-construction-{mode}.png")
 
 
+# ------------------ fig: the staircase is an estimate, and m is what sharpens it
+def noise_shrinks(mode):
+    """02 s3.2 -- the same buckets at m = 5, 30, 300 and 3,000 observations each.
+
+    Schematic, but the numbers are the chapter's. Population is 12%-correlated
+    with a 120 bp return standard deviation, so the true bucket means sit at
+    roughly -20, -8, 0, +8 and +20 bp in every panel and only the error on them
+    changes: 119 bp over root m, which is 53, 22, 6.9 and 2.2 bp.
+    """
+    t = THEMES[mode]
+    rng = np.random.RandomState(17)
+    rho, sig = 0.12, 120.0
+
+    fig, axes = plt.subplots(1, 4, figsize=(11.4, 3.5), sharey=True,
+                             gridspec_kw=dict(wspace=0.14))
+    fig.patch.set_facecolor(t["surface"])
+
+    for ax, m in zip(axes, (5, 30, 300, 3000)):
+        x = rng.standard_normal(5 * m)
+        y = sig * (rho * x + (1 - rho ** 2) ** 0.5 * rng.standard_normal(5 * m))
+        order = np.argsort(x)
+        groups = y[order].reshape(5, m)
+        means, errs = groups.mean(axis=1), groups.std(axis=1) / m ** 0.5
+
+        style_axes(ax, t, ylabel="mean forward return (bp)" if ax is axes[0] else None)
+        for i, v in enumerate(means):
+            rounded_bar(ax, i, v, color=t["series"], width=0.34)
+        ax.errorbar(range(5), means, yerr=errs, fmt="none", ecolor=t["muted"],
+                    elinewidth=1.1, capsize=3, capthick=1.1, zorder=5)
+        ax.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
+        ax.set_xlim(-0.62, 4.62)
+        ax.set_ylim(-95, 95)
+        ax.set_xticks(range(5))
+        ax.set_xticklabels(["G1", "G2", "G3", "G4", "G5"], fontsize=7.6)
+        ax.text(0, 1.14, f"m = {m:,}", transform=ax.transAxes, color=t["ink"],
+                fontsize=10.2, fontweight="600", va="bottom")
+        sem = 119 / m ** 0.5
+        ax.text(0, 1.03, f"noise ± {sem:.1f} bp" if sem < 10 else f"noise ± {sem:.0f} bp",
+                transform=ax.transAxes, color=t["ink_secondary"], fontsize=8.5, va="bottom")
+
+    fig.text(0.5, -0.10,
+             "Illustrative. The true bucket means are the same in all four panels — near −20 bp at "
+             "G1 and +20 bp at G5. Only the error on the estimate changes, and it changes as the "
+             "square root of m.",
+             ha="center", color=t["ink_secondary"], fontsize=8.6)
+    save(fig, t, f"noise-shrinks-{mode}.png")
+
+
 # ----------------------------------------------------- fig: the bucket bar chart
 def bucket_chart(mode):
     t = THEMES[mode]
@@ -438,7 +487,7 @@ def scatter_ladder(mode):
     save(fig, t, f"scatter-ladder-{mode}.png")   # save() already crops tight
 
 
-FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_construction, bucket_chart, reversal_buckets,
+FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_construction, noise_shrinks, bucket_chart, reversal_buckets,
            signal_distribution, signal_kernels)
 
 if __name__ == "__main__":

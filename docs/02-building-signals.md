@@ -199,6 +199,16 @@ the noise around that mean shrinks to $\sigma_\epsilon / m^{1/2}$:
 | Noise  | 119 bp          | $119 / 300^{1/2} \approx 6.9$ bp |
 | Ratio  | 1 : 8           | **2 : 1**                    |
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/noise-shrinks-dark.png">
+  <img alt="Four bucket charts of the same population at 12 percent correlation, computed from 5, 30, 300 and 3,000 observations per bucket. At m equals 5 the bars swing between minus 80 and plus 93 basis points and are not monotone; by m equals 300 they have settled into a monotone staircase from about minus 20 to plus 20 basis points, and at m equals 3,000 the error bars are barely visible" src="figures/noise-shrinks-light.png">
+</picture>
+
+**Note (Which makes $m$ the method).** The true bucket means are identical in all four panels above —
+near −20 bp at G1 and +20 bp at G5. Only the error on the estimate moves, and at $m = 5$ that error
+is larger than the whole staircase, so the bars come back scrambled. Sample size is not a detail of
+the recipe; it is the entire reason the recipe works.
+
 **Note (Where that overstates it).** The $m^{1/2}$ assumes independence. Overlapping lookback
 windows and assets that move together push the effective count well below $m$, so the noise does not
 really reach 7 bp. The logic survives the correction: averaging cancels noise and leaves systematic
