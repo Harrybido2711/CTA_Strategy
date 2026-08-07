@@ -11,7 +11,7 @@ reader's theme.
 Figures produced
 ----------------
     binary-momentum      sign() maps two very different trends onto the same position
-    hope-vs-reality      the scatter you pictured, beside the one the data returns
+    scatter-ladder       what each correlation looks like, and which one you get
     bucket-chart         the core signal test: mean forward return per signal bucket
     reversal-buckets     expected monotone buckets vs the reversal-broken version
     signal-distribution  why fixed-interval cuts starve the tails, and what fixes it
@@ -237,54 +237,61 @@ def signal_kernels(mode):
     fig.tight_layout(rect=(0, 0, 1, 0.93))
     save(fig, t, f"signal-kernels-{mode}.png")
 
-# --------------------------------- fig: the plot you pictured vs the one you get
-def hope_vs_reality(mode):
-    """02 s2 -- the scatter you imagine, beside the one the data returns.
+# ----------------------- fig: the calibration ladder, and where reality sits
+def scatter_ladder(mode):
+    """02 s2 -- what each correlation looks like; the eye's floor is ~30%.
 
-    Schematic. Both panels plot the same axes from illustrative points; the left
-    is drawn at a correlation the eye reads as a trend, the right at the 10-15%
-    a working signal actually carries, which reads as a formless cloud.
+    Schematic. The same 1,500 illustrative points redrawn at four correlations,
+    so the panels differ only in the quantity being demonstrated. The leftmost
+    is the picture you had in mind; the rightmost is what the data returns.
     """
     t = THEMES[mode]
-    rng = np.random.RandomState(7)
-    n = 1200
+    rng = np.random.RandomState(11)
+    n = 1500
     x = rng.standard_normal(n)
     e = rng.standard_normal(n)
 
-    panels = (
-        (0.86, "Hoped for", "return climbs with the signal"),
-        (0.12, "Observed", "the same claim, plotted honestly"),
-    )
+    panels = [
+        (0.80, "what you pictured", False),
+        (0.45, "convincing", False),
+        (0.30, "the eye's floor", False),
+        (0.12, "what you observe", True),
+    ]
 
-    fig, axes = plt.subplots(1, 2, figsize=(8.2, 3.9), sharex=True, sharey=True,
-                             gridspec_kw=dict(wspace=0.14))
+    fig, axes = plt.subplots(1, 4, figsize=(9.6, 3.1), sharex=True, sharey=True,
+                             gridspec_kw=dict(wspace=0.16))
     fig.patch.set_facecolor(t["surface"])
 
-    for ax, (r, head, sub) in zip(axes, panels):
+    for ax, (r, verdict, live) in zip(axes, panels):
         style_axes(ax, t, grid=False)
         y = r * x + (1 - r ** 2) ** 0.5 * e
-        # same n, same alpha in both panels — only the shape may differ
-        ax.scatter(x, y, s=3.4, color=t["series"], alpha=0.18, linewidths=0, zorder=3)
-        ax.set_xlim(-3.5, 3.5)
-        ax.set_ylim(-3.5, 3.5)
+        ax.scatter(x, y, s=3.2, color=t["series"], alpha=0.16, linewidths=0, zorder=3)
+        ax.set_xlim(-3.6, 3.6)
+        ax.set_ylim(-3.6, 3.6)
         ax.set_xticks([])
         ax.set_yticks([])
         ax.spines["bottom"].set_visible(False)
-        ax.text(0, 1.12, head, transform=ax.transAxes, color=t["ink"],
-                fontsize=11, fontweight="600", va="bottom")
-        ax.text(0, 1.02, sub, transform=ax.transAxes, color=t["ink_secondary"],
-                fontsize=8.6, va="bottom")
+        ax.text(0, 1.15, f"corr = {int(r * 100)}%", transform=ax.transAxes,
+                color=t["ink"], fontsize=10.4, fontweight="600", va="bottom")
+        ax.text(0, 1.04, verdict, transform=ax.transAxes,
+                color=t["ink"] if live else t["muted"],
+                fontsize=8.8, fontweight="600" if live else "normal", va="bottom")
+        # underscore the panel the reader will actually meet
+        if live:
+            ax.plot([0, 0.62], [1.005, 1.005], transform=ax.transAxes,
+                    color=t["series"], linewidth=1.6, solid_capstyle="butt",
+                    clip_on=False, zorder=5)
 
     axes[0].set_ylabel("forward return", color=t["ink_secondary"], fontsize=9, labelpad=8)
-    fig.text(0.5, 0.01, "momentum signal", ha="center", color=t["muted"], fontsize=8.5)
+    fig.text(0.5, 0.01, "signal value", ha="center", color=t["muted"], fontsize=8.5)
     fig.text(0.5, -0.09,
-             "Illustrative. Both panels hold a real relationship — the right one holds it at the "
-             "strength a working signal actually carries.",
+             "Illustrative. Every panel holds a real relationship — only the first two are "
+             "strong enough for the eye to find it.",
              ha="center", color=t["ink_secondary"], fontsize=8.6)
-    save(fig, t, f"hope-vs-reality-{mode}.png")
+    save(fig, t, f"scatter-ladder-{mode}.png")   # save() already crops tight
 
 
-FIGURES = (binary_momentum, hope_vs_reality, bucket_chart, reversal_buckets,
+FIGURES = (binary_momentum, scatter_ladder, bucket_chart, reversal_buckets,
            signal_distribution, signal_kernels)
 
 if __name__ == "__main__":

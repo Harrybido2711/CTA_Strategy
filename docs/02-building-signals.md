@@ -86,11 +86,11 @@ signal carries sits below the threshold at which the eye resolves a trend.
 
 **Proof.** The two quantities are measurable and they do not overlap.
 
-| Correlation | Reads as |
-| --- | --- |
-| ~80% | a line with scatter around it — obvious at a glance |
-| 40–50% | a visibly tilted cloud — convincing |
-| ~30% | the eye's floor: a trend you can just about argue for |
+| Correlation       | Reads as                                                             |
+| ----------------- | -------------------------------------------------------------------- |
+| ~80%              | a line with scatter around it — obvious at a glance                 |
+| 40–50%           | a visibly tilted cloud — convincing                                 |
+| ~30%              | the eye's floor: a trend you can just about argue for                |
 | **10–15%** | **what a working signal carries** — an undifferentiated cloud |
 
 Since 15% < 30%, a signal that works and a signal that does not produce the same picture. **The
@@ -115,14 +115,14 @@ return from one observation to the next, 1.44% is linear in the signal and 98.56
 **Example.** With a daily return standard deviation of $\sigma_y = 0.012$ — 120 bp, typical for an
 equity ETF, a **basis point** being 0.01%:
 
-| Component | Size | At $\rho = 0.12$ |
-| --- | --- | --- |
-| Total return | $\sigma_y$ | 120 bp |
-| What the signal moves | $\rho \sigma_y$ | **14.4 bp** |
-| What it does not | $\sigma_y (1 - \rho^2)^{1/2}$ | **119 bp** |
+| Component             | Size                            | At$\rho = 0.12$ |
+| --------------------- | ------------------------------- | ----------------- |
+| Total return          | $\sigma_y$                    | 120 bp            |
+| What the signal moves | $\rho \sigma_y$               | **14.4 bp** |
+| What it does not      | $\sigma_y (1 - \rho^2)^{1/2}$ | **119 bp**  |
 
 Across an x-axis running $-2\sigma_x$ to $+2\sigma_x$ the trend line climbs $4 \times 14.4
-\approx 58$ bp, while at every $x$ the points scatter over $4 \times 119 \approx 476$ bp. **A
+$\approx 58$ bp, while at every $x$ the points scatter over $4 \times 119 \approx 476$ bp. **A
 0.6% slope inside a 4.8% cloud** — that ratio *is* the picture.
 
 **Note (And it is worse than that).** Part of those 119 bp is not the market's doing: pooling UNG
@@ -151,11 +151,11 @@ because averaging shrinks the noise and leaves the signal intact.
 one date. Their mean forward return still has expectation $\beta$ times their mean signal, while
 the noise around that mean shrinks to $\sigma_\epsilon / m^{1/2}$:
 
-| | One observation | Mean of 300 |
-| --- | --- | --- |
-| Signal | 14.4 bp | 14.4 bp |
-| Noise | 119 bp | $119 / 300^{1/2} \approx 6.9$ bp |
-| Ratio | 1 : 8 | **2 : 1** |
+|        | One observation | Mean of 300                        |
+| ------ | --------------- | ---------------------------------- |
+| Signal | 14.4 bp         | 14.4 bp                            |
+| Noise  | 119 bp          | $119 / 300^{1/2} \approx 6.9$ bp |
+| Ratio  | 1 : 8           | **2 : 1**                    |
 
 **Note (Where that overstates it).** The $m^{1/2}$ assumes independence. Overlapping lookback
 windows and assets that move together push the effective count well below $m$, so the noise does not
@@ -346,11 +346,11 @@ week — deliberately, since the newest return is the noisiest — and never ful
 **Note (From value to rule).** Three common rules, in increasing order of information kept. All
 three still have to pass § 3's bucket test before they earn a backtest.
 
-| Rule | Go long when | Costs |
-| --- | --- | --- |
-| Zero-line | MACD is above zero | a slow trend filter, late |
-| Crossover | the histogram is above zero | earlier, noisier — the churn is § 10's subject |
-| Proportional | always, sized by the standardized value | none of the magnitude, but see [03](03-from-signal-to-position.md) |
+| Rule         | Go long when                            | Costs                                                            |
+| ------------ | --------------------------------------- | ---------------------------------------------------------------- |
+| Zero-line    | MACD is above zero                      | a slow trend filter, late                                        |
+| Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 10's subject                 |
+| Proportional | always, sized by the standardized value | none of the magnitude, but see[03](03-from-signal-to-position.md) |
 
 ## 10. Volatility clustering, and smoothing the fast leg
 
@@ -402,22 +402,22 @@ are not the same trend, and neither are 2021's and 2023's. Only *relative* sizes
 Throughout, $s$ indexes the asset and $t$ the date; both are dropped where a formula concerns one
 asset on one day.
 
-| Symbol | Means | First used |
-| --- | --- | --- |
-| $s$, $t$ | the asset, and the date in periods (days here) | § 1 |
-| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$ | that asset's return in that period, the momentum signal it produces, and the position size that signal earns | § 1 |
-| $N$, $i$ | lookback length, and the lag inside it running 1 to N | § 1 |
-| $x$, $y$, $\beta$, $\epsilon$ | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2 |
-| $\rho$, $R^2$ | their correlation, and its square — the share of the return's variance the signal explains | § 2 |
-| $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$ | standard deviation of the signal, of the return, and of the unreachable part | § 2 |
-| $m$ | observations sharing a bucket | § 2 |
-| G1 … G5 | the buckets, lowest to highest signal value | § 3 |
-| $\sigma_{s,t}$ | one asset's volatility, estimated on data before that date | § 5 |
-| $H$ | EWMA half-life, in periods | § 8 |
-| $P_t$, $\Delta_{t-j}$ | price on that date, and the one-period change at that lag | § 9 |
-| $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 9 |
-| $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one | § 9 |
-| $c_i$, $k_j$ | MACD's net weight on the price at that lag, and its kernel weight on the price change | § 9 |
+| Symbol                                          | Means                                                                                                                         | First used |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| $s$, $t$                                    | the asset, and the date in periods (days here)                                                                                | § 1       |
+| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$         | that asset's return in that period, the momentum signal it produces, and the position size that signal earns                  | § 1       |
+| $N$, $i$                                    | lookback length, and the lag inside it running 1 to N                                                                         | § 1       |
+| $x$, $y$, $\beta$, $\epsilon$           | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
+| $\rho$, $R^2$                               | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
+| $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$ | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
+| $m$                                           | observations sharing a bucket                                                                                                 | § 2       |
+| G1 … G5                                        | the buckets, lowest to highest signal value                                                                                   | § 3       |
+| $\sigma_{s,t}$                                | one asset's volatility, estimated on data before that date                                                                    | § 5       |
+| $H$                                           | EWMA half-life, in periods                                                                                                    | § 8       |
+| $P_t$, $\Delta_{t-j}$                       | price on that date, and the one-period change at that lag                                                                     | § 9       |
+| $n_f$, $n_s$                                | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 9       |
+| $\alpha_f$, $\alpha_s$                      | their smoothing constants, two over span plus one                                                                             | § 9       |
+| $c_i$, $k_j$                                | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 9       |
 
 **Note (Collisions to watch).** Three quantities wear a $\sigma$ and they are not interchangeable:
 $\sigma_y$ is the spread of forward return across the pooled cloud (§ 2), $\sigma_\epsilon$ the
