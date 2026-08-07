@@ -135,6 +135,11 @@ the second one works.
 practically invisible and only *overlap* renders, so the chart stops being a mass of ink and becomes
 a density map. Below, the left panel is the before; the other two are both the after.
 
+**Note (Not the other alphas).** This `alpha` is matplotlib's opacity keyword, written as code
+wherever it appears. It is neither the intercept of a regression nor the excess return a manager is
+paid for, and it is not § 10's EMA smoothing constant $\alpha$ — which is written as maths and
+always carries a subscript.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/alpha-opacity-dark.png">
   <img alt="Three scatter panels of forward return against a signal. Left, at full opacity, 55,000 points render as one solid disc with no internal structure. Middle, the same rendering at alpha 0.01 on a book where a high signal rules out deep losses: a soft density cloud with the bottom-right corner visibly bitten out, annotated high signal, no deep loss. Right, alpha 0.01 on the original points: a smooth round density with no thin region anywhere" src="figures/alpha-opacity-light.png">
@@ -448,8 +453,9 @@ asset on one day.
 $\sigma_y$ is the spread of forward return across the pooled cloud (§ 2), $\sigma_\epsilon$ the
 part of it the signal cannot reach (§ 2), and $\sigma_{s,t}$ one asset's trailing volatility on one
 date (§ 6). Likewise $w_{s,t}$ is a position and $k_j$ a kernel weight, which is why the latter is
-not written $w$. Chapter [01](01-what-is-cta.md) uses $s$ for a signed share count — here it is
-always the asset.
+not written $w$. And § 3.1's `alpha` is a plotting keyword, not $\alpha$ the smoothing constant
+and not a regression intercept — code font against maths is the tell. Chapter
+[01](01-what-is-cta.md) uses $s$ for a signed share count; here it is always the asset.
 
 ---
 
