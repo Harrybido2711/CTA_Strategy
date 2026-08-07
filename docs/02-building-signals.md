@@ -101,20 +101,59 @@ Since 15% < 30%, a signal that works and a signal that does not produce the same
   <img alt="Four scatter panels of the same 1,500 points redrawn at correlations of 80, 45, 30 and 12 percent. The 80 percent panel shows a clear diagonal band; by 30 percent the tilt is barely arguable, and the 12 percent panel — labelled a real signal — is an undifferentiated round cloud indistinguishable from noise" src="figures/scatter-ladder-light.png">
 </picture>
 
-That pushes the question back one step: why is the correlation only 10–15%? Two reasons, and
-neither is that the signal is broken.
+That pushes the question back one step: why is the correlation only 10–15%? Because the quantity
+being plotted is mostly not the signal.
 
-- **Forward return is mostly idiosyncratic.** Earnings, flow, and news specific to that asset and
-  that week dominate whatever a lookback average of past returns knows. The signal is a small tilt
-  on a large random quantity, and a scatter shows the quantity, not the tilt.
-- **A stronger one would not survive.** A predictor correlating 50% with next month's return would
-  be arbitraged away well before you found it in 37 liquid ETFs. 10–15% is the ceiling of a
-  competitive market, not a shortfall in craft.
+**Definition (Signal and noise).** Split one observation's forward return into the part the signal
+reaches and the part it does not:
 
-**Note (The number itself is treacherous).** Correlation on the pooled cloud is also the wrong
-statistic — it mixes the cross-section with the time axis, and it rewards fitting the level of the
-return rather than its ranking. [08](08-ic-and-r-squared.md) separates the two and explains why a
-respectable R² can belong to a signal with no edge at all.
+$$
+y = \beta x + \epsilon
+$$
+
+where $x$ is the signal value, $\beta x$ the component the signal predicts, and $\epsilon$
+everything it cannot — earnings, flow, and the rest of the period's randomness.
+
+**Claim.** If $\epsilon$ is uncorrelated with $x$, the signal owns exactly $\rho^2$ of the forward
+return's variance, where $\rho$ is their correlation.
+
+**Proof.** Uncorrelated components add their variances:
+
+$$
+\text{Var}(y) = \text{Var}(\beta x) + \text{Var}(\epsilon)
+= \beta^2 \text{Var}(x) + \text{Var}(\epsilon)
+$$
+
+For a linear fit on one regressor with an intercept, the explained share is
+$R^2 = \text{Corr}(x, y)^2 = \rho^2$. At $\rho = 0.12$ that is $R^2 = 0.0144$.
+
+**Note (What 1.44% does not say).** It is not "the prediction is right 1.4% of the time". It is: of
+the variation in forward return from one observation to the next, 1.44% is explained by linear
+variation in the signal and 98.56% is not.
+
+**Example.** Take a daily return standard deviation of $\sigma_y = 0.012$ — 120 bp, typical for an
+equity ETF, where a **basis point** is 0.01%.
+
+| Component | Size | At $\rho = 0.12$ |
+| --- | --- | --- |
+| Total return | $\sigma_y$ | 120 bp |
+| The part the signal moves | $\rho \sigma_y$ | **14.4 bp** |
+| The part it does not | $\sigma_y (1 - \rho^2)^{1/2}$ | **119 bp** |
+
+Noise is $119 / 14.4 \approx 8.3$ times the signal. Plot the x-axis from $-2\sigma_x$ to
+$+2\sigma_x$ and the trend line climbs $4 \times 14.4 \approx 58$ bp end to end, while at every
+single $x$ the points scatter across roughly $4 \times 119 \approx 476$ bp. **A 0.6% slope inside a
+4.8% cloud** — that ratio *is* the picture.
+
+**Note (Two things inflate it further).** Some of those 119 bp are not the market's doing. Pooling
+UNG with SHY, and 2021 with 2023, adds spread that has nothing to do with the signal — what
+standardization (§ 5) removes. And correlation on the pooled cloud is the wrong statistic anyway:
+it mixes the cross-section with the time axis and rewards fitting the *level* of the return rather
+than its ranking, which is [08](08-ic-and-r-squared.md)'s subject.
+
+**Note (Why no stronger signal exists).** A predictor correlating 50% with next month's return
+would be arbitraged away long before you found it in 37 liquid ETFs. 10–15% is the ceiling of a
+competitive market, not a shortfall in craft.
 
 ### What to do about it
 
@@ -130,16 +169,27 @@ Spend thirty seconds on it. The mistake is concluding anything **from** a cloud.
 Neither recovers the signal. The fix is to stop asking individual points to carry the argument.
 
 **Claim.** Sorting by the signal and averaging within groups detects a relationship the scatter
-cannot, because averaging shrinks the noise while leaving the signal intact.
+cannot, because averaging shrinks the noise while leaving the signal intact. One **observation**
+here is one asset on one date.
 
-**Proof.** One **observation** is one asset on one date. Write $x$ for its signal value and $y$ for
-its forward return, and suppose the relationship is exactly linear, $y = \beta x + \epsilon$, with
-$\beta$ the slope being claimed and $\epsilon$ the noise, of standard deviation
-$\sigma_\epsilon$. Take a group of $m$ observations sharing a similar signal value. Their mean
-forward return still has expectation $\beta$ times their mean signal — the relationship is
-untouched — while the noise around it shrinks to $\sigma_\epsilon / m^{1/2}$. At $m = 300$ that
-noise is 17 times smaller, so the group means separate cleanly even though no individual point
-ever did.
+**Proof.** Take a group of $m$ observations sharing a similar signal value. Their mean forward
+return still has expectation $\beta$ times their mean signal — the relationship is untouched —
+while the noise around that mean shrinks to $\sigma_\epsilon / m^{1/2}$. Carrying the numbers
+above through at $m = 300$:
+
+| | Single observation | Mean of 300 |
+| --- | --- | --- |
+| Signal | 14.4 bp | 14.4 bp |
+| Noise | 119 bp | $119 / 300^{1/2} \approx 6.9$ bp |
+| Ratio | 1 : 8 | **2 : 1** |
+
+The signal is untouched and the noise is 17 times smaller, so the group means separate cleanly even
+though no individual point ever did.
+
+**Note (Where the ratio overstates it).** The $m^{1/2}$ assumes the observations are independent.
+Overlapping lookback windows and assets that move together push the effective count well below
+$m$, so the noise does not really fall to 7 bp. The logic survives the correction: averaging cancels
+noise and leaves systematic signal.
 
 **Note.** That is the next section. The scatter asks each point to carry the argument alone; the
 bucket chart lets 300 of them share it.
@@ -409,9 +459,12 @@ dropped where a formula concerns one asset on one day.
 | $i$                      | lag inside the lookback, from 1 to N                        | § 1       |
 | $w_{s,t}$                | weight — the position size given to that asset that day    | § 1       |
 | $x$, $y$               | one observation's signal value and its forward return       | § 2       |
-| $\beta$                  | slope of forward return on signal                           | § 2       |
-| $\epsilon$               | noise around that line                                      | § 2       |
-| $\sigma_\epsilon$        | standard deviation of that noise                            | § 2       |
+| $\beta$ | slope of forward return on signal | § 2 |
+| $\epsilon$ | the part of the return the signal cannot reach | § 2 |
+| $\rho$ | correlation between signal and forward return | § 2 |
+| $R^2$ | share of the return's variance the signal explains | § 2 |
+| $\sigma_x$, $\sigma_y$ | standard deviation of the signal and of the return | § 2 |
+| $\sigma_\epsilon$ | standard deviation of the unreachable part | § 2 |
 | $m$                      | observations sharing a bucket                               | § 2       |
 | G1 … G5                   | buckets, lowest to highest signal value                     | § 3       |
 | $\sigma_{s,t}$           | volatility of the asset, estimated on data before that date | § 5       |
@@ -424,10 +477,12 @@ dropped where a formula concerns one asset on one day.
 | $\Delta_{t-j}$           | one-period price change at that lag                         | § 9      |
 | $k_j$                    | kernel — MACD's weight on the price change at that lag     | § 9      |
 
-**Note (Collisions to watch).** $\sigma_\epsilon$ (§ 2, noise around a fitted line) and
-$\sigma_{s,t}$ (§ 5, an asset's volatility) are different quantities; so are $w_{s,t}$ (a position)
-and $k_j$ (a kernel weight), which is why the latter is not written $w$. Chapter [01](01-what-is-cta.md)
-uses $s$ for a signed share count — here it is always the asset.
+**Note (Collisions to watch).** Three quantities wear a $\sigma$ and they are not interchangeable:
+$\sigma_y$ is the spread of forward return across the pooled cloud (§ 2), $\sigma_\epsilon$ the
+part of it the signal cannot reach (§ 2), and $\sigma_{s,t}$ one asset's trailing volatility on one
+date (§ 5). Likewise $w_{s,t}$ is a position and $k_j$ a kernel weight, which is why the latter is
+not written $w$. Chapter [01](01-what-is-cta.md) uses $s$ for a signed share count — here it is
+always the asset.
 
 ---
 
