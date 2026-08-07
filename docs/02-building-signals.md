@@ -49,8 +49,8 @@ $$
 \textbf{signal:}\quad MOM_{s,t}  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
 $$
 
-with $N$ the lookback length in periods and $i$ the lag inside it, so the average runs over the $N$
-returns ending yesterday.
+with $N$ the lookback length and $i$ the lag inside it — the average runs over the $N$ returns
+ending yesterday.
 
 $$
 \textbf{hypothesis:}\quad MOM \uparrow  \Longrightarrow  \text{return} \uparrow
@@ -58,13 +58,13 @@ $$
 \textbf{consequence:}\quad MOM_{s,t}  \propto  w_{s,t}  \propto  \text{return}
 $$
 
-Here $w_{s,t}$ is the **weight** — the size of the position the book takes in asset $s$ on date $t$.
-The third line is what makes the signal tradeable: it doesn't just correlate with return, it says
-**how much** to allocate. Whether the surviving magnitude should reach the position at all is
-[03](03-from-signal-to-position.md)'s decision, not this chapter's.
+Here $w_{s,t}$ is the **weight** — the position size given to asset $s$ on date $t$. That third
+line is what makes the signal tradeable: it doesn't merely correlate with return, it says **how
+much** to allocate. How far the magnitude reaches the position is
+[03](03-from-signal-to-position.md)'s decision.
 
-Write the hypothesis first because it tells you what would falsify it. A signal you cannot falsify
-is a plot you will rationalize either way.
+Write the hypothesis first: it names what would falsify the signal, and one you cannot falsify is a
+plot you will rationalize either way.
 
 ## 2. Horizons travel — but verify
 
@@ -86,12 +86,12 @@ signal carries sits below the threshold at which the eye resolves a trend.
 
 **Proof.** The two quantities are measurable and they do not overlap.
 
-| | Correlation | Reads as |
-| --- | --- | --- |
-| Obvious at a glance | ~80% | a line with scatter around it |
-| Convincing | 40–50% | a visibly tilted cloud |
-| The eye's floor | ~30% | a trend you can just about argue for |
-| **What a working signal carries** | **10–15%** | an undifferentiated cloud |
+|                                         | Correlation       | Reads as                             |
+| --------------------------------------- | ----------------- | ------------------------------------ |
+| Obvious at a glance                     | ~80%              | a line with scatter around it        |
+| Convincing                              | 40–50%           | a visibly tilted cloud               |
+| The eye's floor                         | ~30%              | a trend you can just about argue for |
+| **What a working signal carries** | **10–15%** | an undifferentiated cloud            |
 
 Since 15% < 30%, a signal that works and a signal that does not produce the same picture.
 **The absence of a visible trend is therefore not evidence of anything.**
@@ -101,17 +101,14 @@ Since 15% < 30%, a signal that works and a signal that does not produce the same
   <img alt="Four scatter panels of the same 1,500 points redrawn at correlations of 80, 45, 30 and 12 percent. The 80 percent panel shows a clear diagonal band; by 30 percent the tilt is barely arguable, and the 12 percent panel — labelled a real signal — is an undifferentiated round cloud indistinguishable from noise" src="figures/scatter-ladder-light.png">
 </picture>
 
-**Note (Why transparency does not rescue it).** The usual first fix is to drop the marker opacity —
-`alpha=0.01` — so that overlapping points reveal density rather than a solid mass. It is worth
-doing and it occasionally exposes a faint tilt or a thinned corner. But it treats the symptom: the
-scatter spends all its resolution on individual noisy points, when the thing being claimed is about
-their **average** behaviour. Density plotting shows the same information more legibly; it does not
-add any.
+**Note (Transparency does not rescue it).** Dropping the marker opacity — `alpha=0.01` — reveals
+density rather than a solid mass, and occasionally a faint tilt. It treats the symptom: the scatter
+spends its resolution on individual noisy points when the claim is about their **average**. More
+legible, no more informative.
 
-**Note (Look at it anyway, first).** None of this argues for skipping the scatter. On the rare
-occasion something *is* readable — a curve, a cluster, one corner plainly empty — it beats any
-summary statistic, because it gives the *shape* and not just the strength. Plot it, spend thirty
-seconds, move on when it comes back a cloud. The mistake is concluding anything **from** the cloud.
+**Note (Plot it anyway).** On the rare occasion something *is* readable — a curve, one corner
+plainly empty — it beats any statistic, because it gives the *shape* and not just the strength.
+Spend thirty seconds on it. The mistake is concluding anything **from** a cloud.
 
 ### What sorting recovers
 
@@ -121,11 +118,11 @@ cannot, because averaging shrinks the noise while leaving the signal intact.
 **Proof.** One **observation** is one asset on one date. Write $x$ for its signal value and $y$ for
 its forward return, and suppose the relationship is exactly linear, $y = \beta x + \epsilon$, with
 $\beta$ the slope being claimed and $\epsilon$ the noise, of standard deviation
-$\sigma_\epsilon$. Take a group of $m$ observations sharing a similar signal value. Their
-mean forward return still has expectation $\beta$ times their mean signal — the relationship is
-untouched — while the noise around that mean has standard deviation $\sigma_\epsilon / m^{1/2}$. At
-$m = 300$ the noise is 17 times smaller, so the group means separate cleanly even though no
-individual point ever did.
+$\sigma_\epsilon$. Take a group of $m$ observations sharing a similar signal value. Their mean
+forward return still has expectation $\beta$ times their mean signal — the relationship is
+untouched — while the noise around it shrinks to $\sigma_\epsilon / m^{1/2}$. At $m = 300$ that
+noise is 17 times smaller, so the group means separate cleanly even though no individual point
+ever did.
 
 **Note.** This is why the next section sorts into buckets rather than fitting a line. The scatter
 asks each point to carry the argument alone; the bucket chart lets 300 of them share it.
@@ -149,17 +146,16 @@ means.plot.bar(yerr=errs)
   <img alt="Bucketed bar chart: mean forward return rises monotonically from bucket G1 to G5, with error bars, and the G5−G1 spread annotated as the long/short edge" src="figures/bucket-chart-light.png">
 </picture>
 
-**Reading it.** Monotone G1 → G5 means the signal carries information. Monotonicity is the test, not
-the height of any one bar — a tall G5 with G1–G4 scrambled is usually small-sample noise.
+**Reading it.** Monotone G1 → G5 means the signal carries information. Monotonicity is the test,
+not the height of any one bar — a tall G5 with G1–G4 scrambled is usually small-sample noise, which
+is what the error bars exist to expose.
 
 **It prices the trade.** Long the top bucket, short the bottom: the expected spread is the gap
 between those bars. G5 at +2% and G1 at −1% is worth about 3%.
 
 **Why it beats the scatter.** Each bar is a cross-sectional portfolio held at every date, averaged
-down the time axis — so it answers "how often does this rank correctly?", which is what determines
+down the time axis — so it answers "how often does this rank correctly?", which is what decides
 whether the strategy earns.
-
-Error bars are not decoration: they stop you reading a 2-observation bucket as a result.
 
 ## 5. Reversal — why the lowest bucket misbehaves
 
@@ -182,9 +178,6 @@ money are both money** — try to earn both.
 **Make the skip empirical.** The fix is a `shift`, but its size is measured, not inherited — 1 day,
 1 week, 1 month? Run the bucket chart at each and watch G1.
 
-The whiteboard's other note, `risk-adjusted MOM → rolling quantile`, is the recipe for a broken
-bucket chart: standardize (§6), then bucket by rolling quantile (§7).
-
 ## 6. Risk-adjusted momentum
 
 Raw momentum is not comparable across time or assets. 2% monthly momentum in the 2021 inflation
@@ -197,13 +190,12 @@ $$
 MOM^{\text{risk-adj}}_{s,t}  =  \text{Avg}\left(\frac{r_{s,t-i}}{\sigma_{s,t}}\right),\qquad i = 1 \ldots N
 $$
 
-where $\sigma_{s,t}$ is asset $s$'s volatility — the standard deviation of its returns — estimated
-from data strictly before $t$, since a denominator that peeks at the future contaminates the signal
-as surely as a numerator would (§ 12). Which estimate belongs there is still open.
+where $\sigma_{s,t}$ is that asset's volatility, estimated on data strictly before $t$ — a
+denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 12).
 
-Every asset and period lands on one scale — approximately standard normal — so values compare. Two
-students both score 80, but on different exams against different cohorts; without a common baseline
-the two 80s are not the same achievement.
+Every asset and period now lands on one scale, so values compare. Two students both score 80, but on
+different exams against different cohorts; without a common baseline the two 80s are not the same
+achievement.
 
 ## 7. The bucketing trap, and the rolling-quantile fix
 
@@ -284,7 +276,7 @@ Conventionally $n_f = 12$, $n_s = 26$, and 9 for the signal line.
 | --------------------- | ---------------------------------------- | -------------------------- |
 | **MACD line**   | recent average price versus a longer one | trend direction            |
 | **Signal line** | a smoothed MACD                          | the level MACD is crossing |
-| **Histogram**   | MACD minus its own smoothing             | trend *acceleration*       |
+| **Histogram**   | MACD minus its own smoothing             | trend acceleration         |
 
 **Claim.** MACD is a momentum signal. It is a weighted sum of past returns, differing from a
 lookback mean only in the shape of the weights.
@@ -297,22 +289,21 @@ $$
 c_i = \alpha_f (1-\alpha_f)^i - \alpha_s (1-\alpha_s)^i , \qquad \sum_i c_i = 0 .
 $$
 
-Here $\alpha_f$ and $\alpha_s$ are the smoothing constants of the fast and slow EMA, and $c_i$ is
-the net weight MACD places on the price $i$ days ago.
+with $\alpha_f$ and $\alpha_s$ the fast and slow smoothing constants, and $c_i$ the net weight MACD
+places on the price $i$ days ago.
 
-A zero-sum weighting is unchanged when every price is shifted by a constant, so subtract $P_t$
-from each term. Writing $P_t - P_{t-i}$ as the sum of the last $i$ price changes — write
-$\Delta_{t-j} = P_{t-j} - P_{t-j-1}$ for the change at lag $j$ — and collecting the coefficient of
-that change:
+A zero-sum weighting is unchanged when every price shifts by a constant, so subtract $P_t$ from each
+term, write $P_t - P_{t-i}$ as a sum of one-period changes $\Delta_{t-j} = P_{t-j} - P_{t-j-1}$, and
+collect the coefficient of the change at lag $j$:
 
 $$
 \text{MACD}_t = \sum_j k_j \Delta_{t-j} , \qquad
 k_j = \sum_{i \leq j} c_i = (1-\alpha_s)^{j+1} - (1-\alpha_f)^{j+1} .
 $$
 
-The $k_j$ are the **kernel** — the weight each past price change carries into today's value.
-Since $\alpha_f > \alpha_s$, every $k_j \geq 0$: MACD is a **non-negative** weighted sum of past
-price changes, exactly like a lookback mean.
+The $k_j$ are the **kernel** — the weight each past price change carries into today's value. Since
+$\alpha_f > \alpha_s$, every $k_j \geq 0$: MACD is a non-negative weighted sum of past price changes,
+exactly like a lookback mean.
 
 **Note (What actually differs).** The kernel. A 21-day momentum weights the last 21 returns
 equally and everything older at zero; MACD's weights rise from a small value at lag 0, peak around
@@ -332,18 +323,16 @@ week — deliberately, since the newest return is the noisiest — and never ful
 - **Proportional.** Use the standardized MACD value as the position size directly, keeping the
   magnitude that the two rules above throw away. See [03](03-from-signal-to-position.md).
 
-**Note.** All three still have to pass § 4's bucket test before they earn a backtest, and 12/26/9
-are fitted constants, not theory — § 9.
+**Note.** All three still have to pass § 4's bucket test before they earn a backtest.
 
 ## 11. Volatility clustering, and smoothing the fast leg
 
-Volatility arrives in clusters. A fast signal is exposed: short-lived noise flips it long/short, and
-the churn eats the return in transaction costs before any edge is realized.
-
-Fix: **smooth the fast signal** to filter the shortest cycles.
+Volatility arrives in clusters, and a fast signal is exposed: short-lived noise flips it
+long/short, and the churn eats the return in transaction costs before any edge is realized. Fix:
+**smooth the fast signal** to filter the shortest cycles.
 
 **Constraint:** the smoothing window must be **shorter than the signal's own period**. Smooth with a
-long window and you have not denoised it — you have built another slow signal and lost the
+long one and you have not denoised the signal — you have built another slow one and lost the
 timeliness the fast leg existed for.
 
 ## 12. Information availability
@@ -352,6 +341,41 @@ Everything above assumes the signal at `t` uses only data knowable at `t`. Look-
 here; the execution offsets in [04](04-understanding-backtesting.md) are the second line of defense
 and cannot rescue a signal contaminated at construction. The rolling-quantile rule (§7) and the
 train/validation/test split ([06](06-overfitting-and-robustness.md)) are the same discipline.
+
+## Background
+
+### If momentum averages returns, where is the magnitude — isn't the signal still ±1?
+
+No. The two definitions in § 1 differ by exactly one operation: binary momentum wraps the return in
+`sign()`, plain momentum does not. An average of returns is an ordinary decimal — `Avg` spelled out
+is just a sum over the window:
+
+$$
+MOM_{s,t} = \frac{1}{N}\sum_{i=1}^{N} r_{s,t-i}
+$$
+
+The lag $i$ counts backwards — $i = 1$ is yesterday, $i = N$ the oldest return in the window — so
+the signal reads "mean return per period over the $N$ periods ending yesterday". At $N = 21$ it is
+last month's average daily move.
+
+Take a five-day lookback:
+
+| Asset | Last five returns | Avg → the signal | After `sign()` |
+| --- | --- | --- | --- |
+| A | +3%, +2%, +4%, +1%, +2% | **+0.024** | +1 |
+| B | +1%, −0.5%, +1%, 0%, +0.5% | **+0.004** | +1 |
+| C | −2%, −3%, −1%, −2%, −2% | **−0.020** | −1 |
+
+The right column is binary momentum, and it cannot tell A from B. In the left column A is **six
+times** B — that ratio *is* the magnitude.
+
+It matters because the signal is proportional to the weight: A is held six times larger than B, and
+C is held short. Nothing is lost in the trade — the sign still carries direction, and the absolute
+value adds strength on top.
+
+One caveat, which is § 6's subject: 0.024 means nothing on its own. 2.4% for SHY and 2.4% for UNG
+are not the same trend, and neither are 2021's and 2023's. Only the *relative* sizes are ever used —
+what standardization (§ 6) and rolling-quantile bucketing (§ 7) exist to make honest.
 
 ## Appendix · Notation
 
@@ -362,57 +386,31 @@ dropped where a formula concerns one asset on one day.
 | --- | --- | --- |
 | $s$ | asset — one of the 37 ETFs | § 1 |
 | $t$ | date, counted in periods (days here) | § 1 |
-| $r_{s,t}$ | return of asset $s$ over period $t$ | § 1 |
-| $MOM_{s,t}$ | the momentum signal for asset $s$ on date $t$ | § 1 |
+| $r_{s,t}$ | that asset's return over that period | § 1 |
+| $MOM_{s,t}$ | the momentum signal it produces | § 1 |
 | $N$ | lookback length, in periods | § 1 |
-| $i$ | lag inside the lookback, $1 \ldots N$ | § 1 |
-| $w_{s,t}$ | weight — the position size given to asset $s$ on date $t$ | § 1 |
+| $i$ | lag inside the lookback, from 1 to N | § 1 |
+| $w_{s,t}$ | weight — the position size given to that asset that day | § 1 |
 | $x$, $y$ | one observation's signal value and its forward return | § 3 |
 | $\beta$ | slope of forward return on signal | § 3 |
 | $\epsilon$ | noise around that line | § 3 |
 | $\sigma_\epsilon$ | standard deviation of that noise | § 3 |
 | $m$ | observations sharing a bucket | § 3 |
 | G1 … G5 | buckets, lowest to highest signal value | § 4 |
-| $\sigma_{s,t}$ | volatility of asset $s$, estimated on data before $t$ | § 6 |
+| $\sigma_{s,t}$ | volatility of the asset, estimated on data before that date | § 6 |
 | $H$ | EWMA half-life, in periods | § 9 |
-| $P_t$ | price on date $t$ | § 10 |
+| $P_t$ | price on that date | § 10 |
 | $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 10 |
-| $\alpha$ | EMA smoothing constant, $2/(\text{span}+1)$ | § 10 |
+| $\alpha$ | EMA smoothing constant, two over span plus one | § 10 |
 | $\alpha_f$, $\alpha_s$ | the fast and slow EMA's own smoothing constants | § 10 |
-| $c_i$ | MACD's net weight on the price at lag $i$ | § 10 |
-| $\Delta_{t-j}$ | one-period price change at lag $j$ | § 10 |
-| $k_j$ | kernel — MACD's weight on the price change at lag $j$ | § 10 |
+| $c_i$ | MACD's net weight on the price at that lag | § 10 |
+| $\Delta_{t-j}$ | one-period price change at that lag | § 10 |
+| $k_j$ | kernel — MACD's weight on the price change at that lag | § 10 |
 
 **Note (Collisions to watch).** $\sigma_\epsilon$ (§ 3, noise around a fitted line) and
 $\sigma_{s,t}$ (§ 6, an asset's volatility) are different quantities; so are $w_{s,t}$ (a position)
 and $k_j$ (a kernel weight), which is why the latter is not written $w$. Chapter [01](01-what-is-cta.md)
 uses $s$ for a signed share count — here it is always the asset.
-
----
-
-## Common pitfalls
-
-- **Reading a scatter as evidence.** At 10–15% correlation it looks identical either way.
-- **Judging a bucket chart by its best bar.** Monotonicity is the test.
-- **Dropping the error bars.** The extreme buckets are where samples are thinnest.
-- **Discarding a signal when buckets aren't monotone.** Check the source's assumptions first — a lifted G1 usually means reversal, not a dead signal.
-- **Inheriting AQR's one-month skip untested.** Measure the right lag for your data.
-- **Treating reversal as noise.** It is a second source of return.
-- **Fixed-interval buckets on a standardized signal.** The tails you trade end up empty.
-- **Ranking against the full history.** Pure look-ahead.
-- **Comparing raw momentum across regimes or assets.** 2% in 2021 ≠ 2% in 2023; SHY ≠ UNG.
-- **Smoothing a fast signal with a long window.** That converts it into a slow one.
-- **Treating MACD as a different species from momentum.** Same weighted sum of past returns, different kernel.
-- **Reading MACD's 26/12/9 as theory.** They are fitted values. So are yours.
-
-## Open questions
-
-- Which volatility estimate goes in the risk-adjustment denominator — trailing realized over the same lookback, longer, or slower? The lecture didn't pin it down.
-- The right reversal skip for this 37-ETF universe, which may differ by asset class.
-- How many buckets? With 37 assets, five leaves ~7 names per bucket per day.
-- Rolling-quantile window length — too short is noisy, too long spans the regimes standardization was meant to separate.
-- Does the bucket spread survive transaction costs? The chart prices the gross edge only.
-- Would a volatility *forecast* filter noise better than trailing realized vol?
 
 ---
 
