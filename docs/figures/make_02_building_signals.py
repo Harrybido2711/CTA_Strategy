@@ -12,6 +12,7 @@ Figures produced
 ----------------
     binary-momentum      sign() maps two very different trends onto the same position
     scatter-ladder       what each correlation looks like, and which one you get
+    alpha-opacity        what turning the marker opacity down does and does not buy
     bucket-chart         the core signal test: mean forward return per signal bucket
     reversal-buckets     expected monotone buckets vs the reversal-broken version
     signal-distribution  why fixed-interval cuts starve the tails, and what fixes it
@@ -80,6 +81,69 @@ def binary_momentum(mode):
     titles(bx, t, "One signal", "$\\mathrm{sign}(\\cdot)=+1$")
 
     save(fig, t, f"binary-momentum-{mode}.png")   # save() already crops tight
+
+# ------------------------------ fig: what turning the opacity down buys you
+def alpha_opacity(mode):
+    """02 s3.1 -- alpha turns ink into density; whether density reads is another matter.
+
+    Schematic. Left and right are the same 55,000 illustrative points at 12%
+    correlation -- about what 37 ETFs over six years give you -- drawn opaque
+    and at alpha=0.01. The middle panel is a different, invented dataset: what
+    the fix looks like when it works, a corner thin enough to read.
+    """
+    t = THEMES[mode]
+    rng = np.random.RandomState(23)
+    n = 55000
+    r = 0.12
+    x = rng.standard_normal(n)
+    y = r * x + (1 - r ** 2) ** 0.5 * rng.standard_normal(n)
+
+    # a hypothetical book where a high signal rules out the worst losses: thin
+    # the bottom-right corner smoothly, so it reads as data and not as a mask
+    xs = rng.standard_normal(n)
+    ys = r * xs + (1 - r ** 2) ** 0.5 * rng.standard_normal(n)
+    carve = np.clip((xs + 0.3) / 1.8, 0, 1) * np.clip((-ys + 0.3) / 1.8, 0, 1)
+    keep = rng.random_sample(n) > 0.97 * carve
+
+    panels = (
+        (x, y, 1.00, "alpha = 1", "the default — one solid mass", False),
+        (xs[keep], ys[keep], 0.01, "alpha = 0.01, and it worked",
+         "one corner thin enough to read", True),
+        (x, y, 0.01, "alpha = 0.01, and it did not",
+         "the same points — round, and untilted", False),
+    )
+
+    fig, axes = plt.subplots(1, 3, figsize=(11.0, 3.9), sharex=True, sharey=True,
+                             gridspec_kw=dict(wspace=0.12))
+    fig.patch.set_facecolor(t["surface"])
+
+    for ax, (px, py, alpha, head, sub, mark) in zip(axes, panels):
+        style_axes(ax, t, grid=False)
+        ax.scatter(px, py, s=8.0, color=t["series"], alpha=alpha, linewidths=0, zorder=3)
+        ax.set_xlim(-3.6, 3.6)
+        ax.set_ylim(-3.6, 3.6)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.spines["bottom"].set_visible(False)
+        ax.text(0, 1.13, head, transform=ax.transAxes, color=t["ink"],
+                fontsize=10.2, fontweight="600", va="bottom")
+        ax.text(0, 1.03, sub, transform=ax.transAxes, color=t["ink_secondary"],
+                fontsize=8.5, va="bottom")
+        if mark:
+            ax.annotate("high signal, no\ndeep loss", xy=(2.0, -2.0), xytext=(-0.4, -3.3),
+                        color=t["ink_secondary"], fontsize=8.4, ha="center",
+                        arrowprops=dict(arrowstyle="-", color=t["muted"], linewidth=1.0,
+                                        connectionstyle="arc3,rad=-0.25"))
+
+    axes[0].set_ylabel("forward return", color=t["ink_secondary"], fontsize=9, labelpad=8)
+    fig.text(0.5, 0.01, "signal value", ha="center", color=t["muted"], fontsize=8.5)
+    fig.text(0.5, -0.09,
+             "Illustrative. Outer panels are one dataset of 55,000 asset-dates at 12% correlation, "
+             "differing only in opacity. The middle is a different, invented book — what success "
+             "would look like, and it would be a result.",
+             ha="center", color=t["ink_secondary"], fontsize=8.6)
+    save(fig, t, f"alpha-opacity-{mode}.png")
+
 
 # ----------------------------------------------------- fig: the bucket bar chart
 def bucket_chart(mode):
@@ -291,7 +355,7 @@ def scatter_ladder(mode):
     save(fig, t, f"scatter-ladder-{mode}.png")   # save() already crops tight
 
 
-FIGURES = (binary_momentum, scatter_ladder, bucket_chart, reversal_buckets,
+FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_chart, reversal_buckets,
            signal_distribution, signal_kernels)
 
 if __name__ == "__main__":

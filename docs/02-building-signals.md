@@ -133,22 +133,27 @@ the second one works.
 
 **What it is.** `alpha` is the opacity of a plotted marker. At `alpha=0.01` a single point is
 practically invisible and only *overlap* renders, so the chart stops being a mass of ink and becomes
-a density map.
+a density map. Below, the left panel is the before; the other two are both the after.
 
-**What you hope for.** Two outcomes would each be a result:
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/alpha-opacity-dark.png">
+  <img alt="Three scatter panels of forward return against a signal. Left, at full opacity, 55,000 points render as one solid disc with no internal structure. Middle, the same rendering at alpha 0.01 on a book where a high signal rules out deep losses: a soft density cloud with the bottom-right corner visibly bitten out, annotated high signal, no deep loss. Right, alpha 0.01 on the original points: a smooth round density with no thin region anywhere" src="figures/alpha-opacity-light.png">
+</picture>
 
-- **A tilted ridge.** The middle goes thick and dark where observations pile up, the edges stay
-  thin, and if forward return really does rise with the signal that dense core leans.
-- **An empty corner.** Weaker, and still enough — one region (high signal, badly negative return)
-  visibly thinner than the rest. A signal that only rules something *out* is still tradeable, and
-  seeing even that much on a scatter would be a good day.
+**What you hope for.** Either outcome would be a result:
 
-**What actually happens.** Neither, for two reasons that compound:
+- **A tilted ridge.** The core goes thick where observations pile up and the edges stay thin, and if
+  forward return really does rise with the signal, that core leans.
+- **An empty corner** — the middle panel. One region, high signal against a badly negative return,
+  visibly thinner than the rest. A signal that only rules something *out* is still tradeable, so
+  seeing even this much on a scatter would be a good day.
 
-- **Too many points.** Tens of thousands of asset-dates saturate the canvas even at `alpha=0.01`,
-  so the density map comes back uniformly dark.
+**What actually happens.** The right panel, for two reasons that compound:
+
+- **Too many points, too evenly spread.** 55,000 asset-dates — 37 ETFs over six years — average
+  into a smooth bivariate blob, and a smooth blob has no feature to read.
 - **Too dispersed.** § 2's arithmetic: the scatter band is eight times taller than the entire rise
-  of the trend line. The tilt in the density is smaller than the markers drawn on top of it.
+  of the trend line, so the lean in the density is finer than the markers drawn on top of it.
 
 **Note (It treats the symptom).** Opacity is worth setting, and it does make the plot more legible.
 But the scatter spends all its resolution on individual noisy points when the claim is about their
