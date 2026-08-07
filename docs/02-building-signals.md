@@ -71,12 +71,12 @@ plot you will rationalize either way.
 ### The plot everyone draws first
 
 § 1's hypothesis says forward return rises with the signal, so the first move is to plot one against
-the other. The left panel is the picture you had in mind; the right is what comes back, for well
-over 99% of the scatters you will ever draw.
+the other. The picture you had in mind is the leftmost panel below. What comes back — for well over
+99% of the scatters you will ever draw — is the rightmost.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/hope-vs-reality-dark.png">
-  <img alt="Two scatter panels of forward return against a momentum signal, drawn from the same number of points at the same opacity. The left, labelled hoped for, is a tight band climbing from bottom left to top right. The right, labelled observed, is a round formless cloud with no tilt the eye can read" src="figures/hope-vs-reality-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="figures/scatter-ladder-dark.png">
+  <img alt="Four scatter panels of forward return against a signal, the same 1,500 points redrawn at correlations of 80, 45, 30 and 12 percent. The 80 percent panel, labelled what you pictured, is a clear diagonal band; by 30 percent, labelled the eye's floor, the tilt is barely arguable; the 12 percent panel, underlined and labelled what you observe, is a formless round cloud" src="figures/scatter-ladder-light.png">
 </picture>
 
 ### Why the real one is a cloud
@@ -84,17 +84,10 @@ over 99% of the scatters you will ever draw.
 **Claim.** The scatter can neither confirm nor refute a signal, because the correlation a working
 signal carries sits below the threshold at which the eye resolves a trend.
 
-**Proof.** The two quantities are measurable and they do not overlap.
-
-| Correlation       | Reads as                                                             |
-| ----------------- | -------------------------------------------------------------------- |
-| ~80%              | a line with scatter around it — obvious at a glance                 |
-| 40–50%           | a visibly tilted cloud — convincing                                 |
-| ~30%              | the eye's floor: a trend you can just about argue for                |
-| **10–15%** | **what a working signal carries** — an undifferentiated cloud |
-
-Since 15% < 30%, a signal that works and a signal that does not produce the same picture. **The
-absence of a visible trend is not evidence of anything.**
+**Proof.** Both numbers are readable off the panels above: the eye stops resolving a tilt somewhere
+around 30%, and a working signal carries 10–15%. Since 15% < 30%, a signal that works and a signal
+that does not produce the same picture — **the absence of a visible trend is not evidence of
+anything.**
 
 So why is the correlation only 10–15%? Because the quantity being plotted is mostly not the signal.
 
