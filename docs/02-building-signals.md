@@ -8,14 +8,20 @@
 
 ## 1. A signal is a hypothesis, not a formula
 
+### The simplest signal — the sign of the last return
+
 **Definition (Binary momentum).** The simplest member of the family — carry the sign of the last
 period's return, and nothing else:
 
 $$
-MOM_{s,t}  =  \text{sign}\left( R_{s,t-1} \right)
+MOM_{s,t}  =  \text{sign}\left( r_{s,t-1} \right)
 $$
 
-taking the value +1 (long) or −1 (short) for asset $s$ on date $t$.
+where $s$ indexes the asset and $t$ the date, $r_{s,t-1}$ is that asset's return over the period
+just ended, and $MOM_{s,t}$ is the signal it produces for today. The signal takes the value +1
+(long) or −1 (short), with nothing in between.
+
+### Why the sign alone is not enough
 
 **Note (What the sign discards).** Two assets that rose 20% and 10% over the same window produce
 the *same* signal, so a book built on it holds them in the same size. Trend **strength** is thrown
@@ -26,6 +32,8 @@ away; only trend **direction** survives.
   <img alt="Left panel: two price paths rebased to 100 over one lookback window, the darker one climbing to 120 and the lighter one to 110. Right panel: the momentum signal each path produces, two bars of identical height at plus one, joined by an arrow labelled identical" src="figures/binary-momentum-light.png">
 </picture>
 
+### What to keep instead
+
 **Note (Two repairs).** Neither is obviously right, and both are tested the same way — § 4's bucket
 chart.
 
@@ -34,24 +42,26 @@ chart.
 - **Make the value comparable first** — divide by volatility, so a 20% move in a quiet market
   outranks a 20% move in a violent one (§ 6).
 
-Whether the surviving magnitude should reach the position at all is [03](03-from-signal-to-position.md)'s
-decision, not this chapter's.
-
 **Definition (Momentum).** Averaging over $N$ periods rather than one, and keeping the value rather
 than its sign:
 
 $$
-\textbf{signal:}\quad MOM_t  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
+\textbf{signal:}\quad MOM_{s,t}  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
 $$
+
+with $N$ the lookback length in periods and $i$ the lag inside it, so the average runs over the $N$
+returns ending yesterday.
 
 $$
 \textbf{hypothesis:}\quad MOM \uparrow  \Longrightarrow  \text{return} \uparrow
 \qquad\qquad
-\textbf{consequence:}\quad MOM_t  \propto  w  \propto  \text{return}
+\textbf{consequence:}\quad MOM_{s,t}  \propto  w_{s,t}  \propto  \text{return}
 $$
 
-The third line makes it tradeable: the signal doesn't just correlate with return, it says **how much**
-to allocate — the bridge into [03](03-from-signal-to-position.md).
+Here $w_{s,t}$ is the **weight** — the size of the position the book takes in asset $s$ on date $t$.
+The third line is what makes the signal tradeable: it doesn't just correlate with return, it says
+**how much** to allocate. Whether the surviving magnitude should reach the position at all is
+[03](03-from-signal-to-position.md)'s decision, not this chapter's.
 
 Write the hypothesis first because it tells you what would falsify it. A signal you cannot falsify
 is a plot you will rationalize either way.
@@ -67,7 +77,7 @@ a different signal than the one tested."
 
 ## 3. Why the scatter plot disappoints
 
-§ 1 asserted $MOM_t \propto w \propto \text{return}$. The obvious way to check a proportionality is
+§ 1 asserted $MOM_{s,t} \propto w_{s,t} \propto \text{return}$. The obvious way to check a proportionality is
 to plot one against the other, so the scatter of signal against forward return is where everyone
 starts — and it is the right place to start. It just almost never answers the question.
 
@@ -108,10 +118,12 @@ seconds, move on when it comes back a cloud. The mistake is concluding anything 
 **Claim.** Sorting by the signal and averaging within groups detects a relationship the scatter
 cannot, because averaging shrinks the noise while leaving the signal intact.
 
-**Proof.** Suppose the relationship is exactly linear, $y_i = \beta x_i + \epsilon_i$ with noise of
-standard deviation $\sigma$. Take a group of $m$ observations sharing a similar signal value. Their
+**Proof.** One **observation** is one asset on one date. Write $x$ for its signal value and $y$ for
+its forward return, and suppose the relationship is exactly linear, $y = \beta x + \epsilon$, with
+$\beta$ the slope being claimed and $\epsilon$ the noise, of standard deviation
+$\sigma_\epsilon$. Take a group of $m$ observations sharing a similar signal value. Their
 mean forward return still has expectation $\beta$ times their mean signal — the relationship is
-untouched — while the noise around that mean has standard deviation $\sigma / m^{1/2}$. At
+untouched — while the noise around that mean has standard deviation $\sigma_\epsilon / m^{1/2}$. At
 $m = 300$ the noise is 17 times smaller, so the group means separate cleanly even though no
 individual point ever did.
 
@@ -182,8 +194,12 @@ meaning — and 2% for SHY is not 2% for UNG.
 Divide by volatility:
 
 $$
-MOM^{\text{risk-adj}}_t  =  \text{Avg}\left(\frac{r_{s,t-i}}{\sigma}\right),\qquad i = 1 \ldots N
+MOM^{\text{risk-adj}}_{s,t}  =  \text{Avg}\left(\frac{r_{s,t-i}}{\sigma_{s,t}}\right),\qquad i = 1 \ldots N
 $$
+
+where $\sigma_{s,t}$ is asset $s$'s volatility — the standard deviation of its returns — estimated
+from data strictly before $t$, since a denominator that peeks at the future contaminates the signal
+as surely as a numerator would (§ 12). Which estimate belongs there is still open.
 
 Every asset and period lands on one scale — approximately standard normal — so values compare. Two
 students both score 80, but on different exams against different cohorts; without a common baseline
@@ -239,7 +255,8 @@ An SMA weights a price from 60 days ago exactly as much as yesterday's. To weigh
 signal = returns.ewm(halflife=H).mean()
 ```
 
-Tune the **half-life** — candidates are fractions of the lookback (1/2, 1/3, 1/5, 1/8). Grid-search them.
+Tune the **half-life** $H$ — the lag at which a return's weight has decayed to half the weight given
+to the newest one. Candidates are fractions of the lookback (1/2, 1/3, 1/5, 1/8). Grid-search them.
 
 MACD's 9-day signal line is an **empirical solution** — a value that fit historical data, nothing
 more. Every parameter here has that status, which is why they belong in
@@ -250,15 +267,18 @@ more. Every parameter here has that status, which is why they belong in
 § 8 and § 9 both gestured at MACD. Written out, it is three series built from two exponential
 moving averages of the **price**:
 
-**Definition (MACD).** For spans $f < s$ with smoothing constants $\alpha = 2/(\text{span}+1)$:
+**Definition (MACD).** For a fast and a slow span $n_f < n_s$, each with its own smoothing constant
+$\alpha = 2/(\text{span}+1)$:
 
 $$
-\text{MACD}_t = \text{EMA}_f(P)_t - \text{EMA}_s(P)_t , \qquad
+\text{MACD}_t = \text{EMA}_{n_f}(P)_t - \text{EMA}_{n_s}(P)_t , \qquad
 \text{signal}_t = \text{EMA}_9(\text{MACD})_t , \qquad
 \text{hist}_t = \text{MACD}_t - \text{signal}_t
 $$
 
-Conventionally $f = 12$, $s = 26$, and 9 for the signal line.
+where $P_t$ is the price on date $t$ and $\text{EMA}_n(P)_t$ its exponential moving average over
+span $n$. The asset subscript is dropped throughout — MACD is computed one asset at a time.
+Conventionally $n_f = 12$, $n_s = 26$, and 9 for the signal line.
 
 | Series                | Reads as                                 | Sign means                 |
 | --------------------- | ---------------------------------------- | -------------------------- |
@@ -277,16 +297,21 @@ $$
 c_i = \alpha_f (1-\alpha_f)^i - \alpha_s (1-\alpha_s)^i , \qquad \sum_i c_i = 0 .
 $$
 
+Here $\alpha_f$ and $\alpha_s$ are the smoothing constants of the fast and slow EMA, and $c_i$ is
+the net weight MACD places on the price $i$ days ago.
+
 A zero-sum weighting is unchanged when every price is shifted by a constant, so subtract $P_t$
-from each term. Writing $P_t - P_{t-i}$ as the sum of the last $i$ price changes and collecting the
-coefficient of the change at lag $j$:
+from each term. Writing $P_t - P_{t-i}$ as the sum of the last $i$ price changes — write
+$\Delta_{t-j} = P_{t-j} - P_{t-j-1}$ for the change at lag $j$ — and collecting the coefficient of
+that change:
 
 $$
-\text{MACD}_t = \sum_j w_j \Delta_{t-j} , \qquad
-w_j = \sum_{i \leq j} c_i = (1-\alpha_s)^{j+1} - (1-\alpha_f)^{j+1} .
+\text{MACD}_t = \sum_j k_j \Delta_{t-j} , \qquad
+k_j = \sum_{i \leq j} c_i = (1-\alpha_s)^{j+1} - (1-\alpha_f)^{j+1} .
 $$
 
-Since $\alpha_f > \alpha_s$, every $w_j \geq 0$: MACD is a **non-negative** weighted sum of past
+The $k_j$ are the **kernel** — the weight each past price change carries into today's value.
+Since $\alpha_f > \alpha_s$, every $k_j \geq 0$: MACD is a **non-negative** weighted sum of past
 price changes, exactly like a lookback mean.
 
 **Note (What actually differs).** The kernel. A 21-day momentum weights the last 21 returns
@@ -327,6 +352,41 @@ Everything above assumes the signal at `t` uses only data knowable at `t`. Look-
 here; the execution offsets in [04](04-understanding-backtesting.md) are the second line of defense
 and cannot rescue a signal contaminated at construction. The rolling-quantile rule (§7) and the
 train/validation/test split ([06](06-overfitting-and-robustness.md)) are the same discipline.
+
+## Appendix · Notation
+
+Every symbol used above, collected. Throughout, $s$ indexes the asset and $t$ the date; both are
+dropped where a formula concerns one asset on one day.
+
+| Symbol | Means | First used |
+| --- | --- | --- |
+| $s$ | asset — one of the 37 ETFs | § 1 |
+| $t$ | date, counted in periods (days here) | § 1 |
+| $r_{s,t}$ | return of asset $s$ over period $t$ | § 1 |
+| $MOM_{s,t}$ | the momentum signal for asset $s$ on date $t$ | § 1 |
+| $N$ | lookback length, in periods | § 1 |
+| $i$ | lag inside the lookback, $1 \ldots N$ | § 1 |
+| $w_{s,t}$ | weight — the position size given to asset $s$ on date $t$ | § 1 |
+| $x$, $y$ | one observation's signal value and its forward return | § 3 |
+| $\beta$ | slope of forward return on signal | § 3 |
+| $\epsilon$ | noise around that line | § 3 |
+| $\sigma_\epsilon$ | standard deviation of that noise | § 3 |
+| $m$ | observations sharing a bucket | § 3 |
+| G1 … G5 | buckets, lowest to highest signal value | § 4 |
+| $\sigma_{s,t}$ | volatility of asset $s$, estimated on data before $t$ | § 6 |
+| $H$ | EWMA half-life, in periods | § 9 |
+| $P_t$ | price on date $t$ | § 10 |
+| $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 10 |
+| $\alpha$ | EMA smoothing constant, $2/(\text{span}+1)$ | § 10 |
+| $\alpha_f$, $\alpha_s$ | the fast and slow EMA's own smoothing constants | § 10 |
+| $c_i$ | MACD's net weight on the price at lag $i$ | § 10 |
+| $\Delta_{t-j}$ | one-period price change at lag $j$ | § 10 |
+| $k_j$ | kernel — MACD's weight on the price change at lag $j$ | § 10 |
+
+**Note (Collisions to watch).** $\sigma_\epsilon$ (§ 3, noise around a fitted line) and
+$\sigma_{s,t}$ (§ 6, an asset's volatility) are different quantities; so are $w_{s,t}$ (a position)
+and $k_j$ (a kernel weight), which is why the latter is not written $w$. Chapter [01](01-what-is-cta.md)
+uses $s$ for a signed share count — here it is always the asset.
 
 ---
 
