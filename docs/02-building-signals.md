@@ -108,10 +108,10 @@ return from one observation to the next, 1.44% is linear in the signal and 98.56
 equity ETF, a **basis point** being 0.01%:
 
 | Component             | Size                            | At 12% correlation |
-| --------------------- | ------------------------------- | ----------------- |
-| Total return          | $\sigma_y$                    | 120 bp            |
-| What the signal moves | $\rho \sigma_y$               | **14.4 bp** |
-| What it does not      | $\sigma_y (1 - \rho^2)^{1/2}$ | **119 bp**  |
+| --------------------- | ------------------------------- | ------------------ |
+| Total return          | $\sigma_y$                    | 120 bp             |
+| What the signal moves | $\rho \sigma_y$               | **14.4 bp**  |
+| What it does not      | $\sigma_y (1 - \rho^2)^{1/2}$ | **119 bp**   |
 
 Across an x-axis running from $-2\sigma_x$ to $+2\sigma_x$ the trend line climbs about 58 bp end
 to end, while at every $x$ the points scatter over roughly 476 bp. **A 0.6% slope inside a 4.8%
@@ -166,12 +166,13 @@ concluding anything **from** a cloud.
 2. **Rank** those five by signal value, highest to lowest.
 3. **Assign** them to slots: highest signal into G5, next into G4, down to G1.
 4. **Record** the forward return each one went on to deliver, filed under its slot.
-5. **Repeat** steps 1–4 a few thousand times.
-6. **Average** everything filed under G1, then G2, and so on — five numbers, drawn as five bars.
+5. **Repeat** steps 1–4 a few hundred times.
+6. **Average** everything filed under G1, then G2, and so on — five numbers, drawn as five bars
+   with the error on each.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
-  <img alt="Six panels in two rows, each row running the same steps. Top row, a perfect linear relationship: five points drawn off the line, those five ranked into slots G1 to G5 rising monotonically, and the average over 4,000 draws as a clean staircase. Bottom row, the real 12 percent correlation cloud: five points drawn from it, those five ranked into a scrambled zigzag with G3 highest and G4 lowest, and the average over 4,000 draws as a monotone staircase running from a negative G1 to a positive G5" src="figures/bucket-construction-light.png">
+  <img alt="Six panels in two rows, each row running the same steps on a different world. Left column, the population with fifteen randomly drawn points marked in the same colour: on a perfect line they sit along it, on the real cloud they sit anywhere. Middle column, six draws of five plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle with no order at all. Right column, the average over 400 draws with error bars: a clean staircase on the line, and on the cloud a shorter staircase from a negative G1 to a positive G5 whose error bars are a third of the bar heights" src="figures/bucket-construction-light.png">
 </picture>
 
 **Why that carries information.** Three things are true of those six steps, and together they turn
@@ -182,11 +183,11 @@ else — no fitted line, no assumption that return rises with it. So they run un
 the answer is unknown, and any staircase that survives step 6 was not put in at step 1.
 
 **A single draw is worthless, and the average is not.** The figure's top row runs the steps on a
-perfect relationship, where one draw of five comes out already ordered — calibration rather than
+perfect relationship, where every draw of five comes out already ordered — calibration rather than
 evidence, fixing what success looks like. The bottom row runs the identical steps on § 2's real
-scatter, and the same draw comes back **scrambled**: the third-ranked signal delivered the best
-return, the fourth-ranked the worst. At 12% correlation nothing about one draw should be monotone.
-The staircase belongs to step 6, never to any draw inside it.
+scatter, and there the six draws **cross and tangle**: not one of them is monotone, and at 12%
+correlation not one should be. The staircase belongs to step 6, never to any draw inside it — which
+is why the bars are drawn with the error on them, and why § 4 keeps insisting on that.
 
 **The arithmetic says step 5 is what buys that.** Which is the one part of the construction that
 can be proved rather than shown.
@@ -198,11 +199,11 @@ because averaging shrinks the noise and leaves the signal intact.
 expectation $\beta$ times their mean signal, while the noise around that mean shrinks to
 $\sigma_\epsilon / m^{1/2}$:
 
-| | One observation | Mean of 300 |
-| --- | --- | --- |
-| Signal | 14.4 bp | 14.4 bp |
-| Noise | 119 bp | $119 / 300^{1/2} \approx 6.9$ bp |
-| Ratio | 1 : 8 | **2 : 1** |
+|        | One observation | Mean of 300                        |
+| ------ | --------------- | ---------------------------------- |
+| Signal | 14.4 bp         | 14.4 bp                            |
+| Noise  | 119 bp          | $119 / 300^{1/2} \approx 6.9$ bp |
+| Ratio  | 1 : 8           | **2 : 1**                    |
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/noise-shrinks-dark.png">
