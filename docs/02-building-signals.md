@@ -238,38 +238,6 @@ recipe; it is the reason the recipe works.**
 assets that move together push the effective count well below $m$, so the noise does not really
 reach 7 bp. The logic survives: averaging cancels noise and leaves systematic signal.
 
-**What the bars buy you.**
-
-- **They make a 10–15% correlation legible.** 300 observations behind each bar turn a 1:8
-  signal-to-noise ratio into 2:1. The scatter asks one point to carry the argument; a bar asks 300
-  to share it.
-- **They test ordering, not linearity.** What matters is that the top bucket beats the bottom, not
-  that the relationship is a line. A signal that saturates above some value has a poor correlation
-  and a perfect staircase.
-- **They are immune to the signal's scale.** Ranking survives any monotone transform — raw
-  momentum, its log and its z-score bucket identically — and no single 10σ day can move it. A
-  correlation has neither property, which is why [08](08-ic-and-r-squared.md) prefers rank IC.
-- **Five bars keep the shape a scalar throws away.** A lifted G1 says short-horizon moves partly
-  undo themselves; a lone tall G5 says the edge is one-sided; a flat G4–G5 says the signal
-  saturates.
-- **Error bars separate "no edge" from "not enough data."** A point estimate does not.
-
-**What they do not tell you.**
-
-- **When the edge happened.** Five averages over the whole sample cannot distinguish an edge spread
-  evenly over ten years from one that is entirely March 2020.
-- **What is inside a bar.** A mean hides skew and fat tails — +20 bp from most names drifting up,
-  and +20 bp from one name exploding, are the same bar and different propositions.
-- **Whether the edge is new.** Nothing is controlled for, so a staircase can be a beta tilt or a
-  volatility tilt wearing the signal's clothes ([06](06-overfitting-and-robustness.md)).
-- **Anything about a position.** Every number here is one asset's own forward return. Turning five
-  bars into a book — sizing, netting, costs — is [03](03-from-signal-to-position.md)'s and
-  [04](04-understanding-backtesting.md)'s work, and the answers there look nothing like these.
-
-Nothing in steps 1–6 ever used the hypothesis — only the *ranking* — so the bars read **backwards**:
-the closer the truth is to the line § 1 proposed, the more completely the staircase returns. Flat or
-scrambled bars are the same procedure answering "not close".
-
 ## 4. Risk-adjusted momentum
 
 Raw momentum is not comparable across time or assets. 2% monthly momentum in the 2021 inflation
