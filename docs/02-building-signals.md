@@ -234,12 +234,33 @@ means.plot.bar(yerr=errs)
 not the height of any one bar — a tall G5 with G1–G4 scrambled is usually small-sample noise, which
 is what the error bars exist to expose.
 
-**It prices the trade.** Long the top bucket, short the bottom: the expected spread is the gap
-between those bars. G5 at +2% and G1 at −1% is worth about 3%.
+**What it buys you.**
 
-**Why it beats the scatter.** Each bar is a cross-sectional portfolio held at every date, averaged
-down the time axis — it answers "how often does this rank correctly?", which is what decides
-whether the strategy earns.
+- **It makes a 10–15% correlation legible.** § 3.2's arithmetic: 300 observations behind each bar
+  turn a 1:8 signal-to-noise ratio into 2:1. The scatter asks one point to carry the argument; a
+  bar asks 300 to share it.
+- **It tests ordering, not linearity.** A long/short book needs the top bucket to beat the bottom;
+  it does not need the relationship to be a line. A signal that saturates above some value has a
+  poor correlation and a perfect staircase, and it trades perfectly well.
+- **It is immune to the signal's scale.** Ranking survives any monotone transform — raw momentum,
+  its log and its z-score bucket identically — and no single 10σ day can move it. A correlation has
+  neither property, which is why [08](08-ic-and-r-squared.md) prefers rank IC to Pearson.
+- **Five bars keep the shape that a scalar throws away.** Where a signal breaks is legible: a
+  lifted G1 is reversal (§ 5), a lone tall G5 is a long-only edge, a flat G4–G5 is saturation.
+- **Error bars separate "no edge" from "not enough data."** A correlation point estimate does not.
+- **It prices the trade.** Long the top bucket, short the bottom: G5 at +2% against G1 at −1% is
+  worth about 3%. That is a number you can size a position with — 0.12 is not.
+
+**What it does not tell you.**
+
+- **The spread is gross.** No transaction costs and no turnover, and the edge is small enough that
+  costs can take all of it ([04](04-understanding-backtesting.md)).
+- **The time axis is gone.** Sorting the whole sample at once cannot show whether the edge is spread
+  evenly over ten years or comes entirely from March 2020. Ranking *within each date* instead makes
+  every bar a portfolio actually held that day — § 7's cross-sectional angle, and
+  [03](03-from-signal-to-position.md)'s Portfolio 1 versus Portfolio 2.
+- **The error bars are optimistic.** § 3.2's caveat: overlapping windows and assets that move
+  together push the effective count well below $m$.
 
 ## 5. Reversal — why the lowest bucket misbehaves
 
