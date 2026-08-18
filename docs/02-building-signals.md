@@ -256,32 +256,65 @@ denominator that peeks at the future contaminates the signal as surely as a nume
 Every asset and period now lands on one scale, so values compare — two students both scoring 80 on
 different exams against different cohorts have not achieved the same thing.
 
-## 5. The bucketing trap, and the rolling-quantile fix
+## 5. One dataset, three ways to cut it
 
-Bucketing the standardized signal on **fixed intervals** (−2 to +2 in equal steps) starves the tails:
-a normal distribution puts almost everything in the middle, so the two buckets you actually trade
-become the least reliable bars, and one event can swing them.
+§ 3.2 took the five buckets as given. Forming them is a separate choice, and there are three
+defensible ones. Below they are run on identical data — the same 30 assets, the same rows, the same
+forward returns, carrying the same risk-adjusted edge from the first day to the last. Only the cut
+changes.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/three-bucketings-dark.png">
+  <img alt="Three bucket charts side by side, computed from one dataset by three different cuts. All three rise monotonically from G1 to G5 and look equally healthy. Under each bar are two numbers: the observation count and the share of that bucket drawn from the sample's violent era. Cutting on raw values gives equal counts of 4,200 but violent shares of 90, 40, 29, 39 and 88 percent against a 57 percent base rate. Cutting the standardized signal at fixed intervals gives counts of 1,047, 3,035, 12,886, 3,033 and 999 with violent shares still tilted at 80 and 79 percent in the tails. Cutting at rolling quantiles gives roughly 4,200 in every bucket and violent shares flat at 56 to 58 percent" src="figures/three-bucketings-light.png">
+</picture>
+
+**Read the counts, not the bars.** All three staircases are monotone, and all three would pass
+§ 3.2's test unchanged. Everything that separates them is in the two lines printed underneath.
+
+| Cut | What it answers | What it distorts |
+| --- | --- | --- |
+| **Raw values** | What the signal looks like at its own natural scale, before any modelling choice is imposed on it | The buckets sort on **volatility**. G1 and G5 are 90% and 88% violent-era observations against a 57% base rate, so the staircase is largely a volatility sort wearing the signal's name |
+| **Standardized, fixed intervals** | Whether the edge survives once every era is put on a common scale (§ 4) | It **starves the tails**: 1,047 and 999 observations in the two buckets you would trade, against 12,886 in the middle one you would not. Trailing volatility also lags a regime break, so the tails still tilt violent at 80% and 79% |
+| **Rolling quantile** | Whether the ordering holds using only what was knowable at the time — the only one of the three with no look-ahead | It **discards magnitude**. A signal at the 95th percentile of its own past ranks identically whether it is +2% or +20%, and that difference carried information |
+
+None of the three dominates, so produce all three and read them against each other. A staircase that
+survives all three cuts is a different claim from one that appears in only the first.
+
+### Why the whole-history ranking leaks
+
+The obvious repair for starved tails is to rank every observation and split into equal fifths. That
+fixes the counts and breaks something worse. Take one asset's momentum in time order —
+`+1%, +2%, −1%, −2%, +4%, +5%, +3%`.
+
+Ranked as a whole, the leading 1% sits fifth of seven and lands in a low bucket. But on the day it
+was observed only 1% and 2% existed, and against that history 1% was **high**. It reads as
+unremarkable only because of the 5% that had not happened yet. Sorting is where look-ahead gets in,
+and it gets in silently — the resulting chart looks cleaner, not dirtier.
+
+**Correct: at each `t`, rank only against history strictly before `t`.** The same 1% then goes to a
+high bucket early in the sample and a low one late, which is exactly right, because it carried
+different information on those two dates.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/signal-distribution-dark.png">
   <img alt="Two standard-normal density curves. Left, cut at fixed intervals of one sigma: the tail groups hold 11 and 12 observations while the central groups hold 1,290 each. Right, cut at rolling quantiles: every group holds 635" src="figures/signal-distribution-light.png">
 </picture>
 
-Ranking the **whole history** into equal groups is worse: whether today counts as "high" would
-depend on next year's extremes — clean-looking and pure look-ahead. **Correct: at each `t`, rank
-only against history strictly before `t`** — a **rolling quantile**, expanding or fixed-window.
-Better balanced than fixed intervals, though it discards some magnitude information.
+**Note (Two costs of the rolling window).** Early observations are ranked against almost no history,
+so the first stretch of the sample is unusable and needs a burn-in. And the window length is a
+choice: expanding uses everything but makes the rank's precision drift upward over the sample, while
+a fixed window keeps precision uniform and tracks regime changes, at the price of forgetting.
 
-No single view suffices; produce all three:
+### What none of the three shows
 
-| View                     | Shows                           | Hides                                   |
-| ------------------------ | ------------------------------- | --------------------------------------- |
-| Raw-value buckets        | The signal at its natural scale | Not comparable across regimes or assets |
-| Standardized buckets     | Regime-neutral comparison       | Sparse, unreliable tails                |
-| Rolling-quantile buckets | No look-ahead, balanced groups  | Magnitude information                   |
+The composition that separates the three panels appears only in the printed counts — **a bar chart
+cannot show who is inside a bucket.** Neither can any of them show when the edge happened, or what
+the distribution inside a bar looks like. Those need different plots: the same chart on subsamples,
+and the spread of returns within a bucket rather than its mean.
 
-A fourth angle: cross-sectional ranking — each asset against its peers that day rather than its own
-past. That is the Portfolio 1 vs Portfolio 2 distinction in [03](03-from-signal-to-position.md).
+A fourth angle sits outside this list: cross-sectional ranking — each asset against its peers that
+day rather than against its own past. That is the Portfolio 1 vs Portfolio 2 distinction in
+[03](03-from-signal-to-position.md).
 
 ## 6. Combining a slow and a fast horizon
 
