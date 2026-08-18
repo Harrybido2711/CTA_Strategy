@@ -71,7 +71,7 @@ Each layer is tested on its own terms, and passing one says nothing about the ne
 | Level                | Question                               | Typical measure                      | Where                                                                   |
 | -------------------- | -------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------- |
 | **Model**      | does the prediction track the outcome? | test IC, MSE, accuracy               | out-of-sample only                                                      |
-| **Signal**     | is the direction right, and tradeable? | bucket monotonicity, turnover        | [02 § 4](02-building-signals.md)                                        |
+| **Signal**     | is the direction right, and tradeable? | bucket monotonicity, turnover        | [02 § 3.2](02-building-signals.md)                                        |
 | **Strategy**   | does it survive real constraints?      | Sharpe, drawdown, return after costs | [04](04-understanding-backtesting.md), [05](05-evaluating-performance.md) |
 | **Robustness** | does it persist?                       | across years, markets, parameters    | [06](06-overfitting-and-robustness.md)                                   |
 
@@ -113,7 +113,7 @@ mistake is reading a data defect as a code bug.
 | Stage      | Failure                     | What you see                        | Where it is treated                   |
 | ---------- | --------------------------- | ----------------------------------- | ------------------------------------- |
 | Data       | Unadjusted corporate action | A vertical step in the equity curve | [100 § 1.1](100-dataset.md)           |
-| Signal     | No information              | Flat or non-monotone buckets        | [02 § 4](02-building-signals.md)      |
+| Signal     | No information              | Flat or non-monotone buckets        | [02 § 3.2](02-building-signals.md)      |
 | Sizing     | Exposure not what you think | Gross or net drifts from target     | [03](03-from-signal-to-position.md)    |
 | Simulation | Look-ahead bias             | Implausibly smooth, high Sharpe     | [04](04-understanding-backtesting.md)  |
 | Evaluation | One number hides the path   | Good Sharpe, unlivable drawdown     | [05](05-evaluating-performance.md)     |
@@ -156,7 +156,7 @@ y = close.pct_change(h).shift(-h)      # the return from t to t+h, labelled at t
 
 **One model or 37?** Pool the assets — stack `(date, ticker)` into rows and fit once. Per-asset
 models get ~1,600 rows each and overfit. Pooling requires the features to be comparable across
-assets, which is what the standardization in [02 § 6](02-building-signals.md) is for.
+assets, which is what the standardization in [02 § 4](02-building-signals.md) is for.
 
 **Note the effective sample size.** 37 tickers × ~1,600 days looks like 60,000 observations, but
 the assets move together, so the number of genuinely independent observations is closer to the
@@ -178,7 +178,7 @@ There is a second, subtler leak even after splitting by time. If the target is a
 return, the last five training rows describe returns that fall inside the validation window. Leave
 a gap of `h` observations between the segments — **purging**, sometimes with an extra **embargo**.
 
-- The same discipline as the rolling-quantile rule in [02 § 7](02-building-signals.md): rank and
+- The same discipline as the rolling-quantile rule in [02 § 5](02-building-signals.md): rank and
   fit using only what was knowable at the time.
 - Formal treatment of splits and why a backtest overstates: [06](06-overfitting-and-robustness.md).
 

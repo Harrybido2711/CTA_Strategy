@@ -165,7 +165,7 @@ w = w + (1.0 - w.sum(axis=1).values[:, None]) / w.shape[1]   # shift net to +100
 These weights feed the backtester unchanged. Which version wins is empirical: sign-based weighting is
 robust to a noisy signal since it only needs the ranking; proportional weighting extracts more when
 magnitude is informative and is punished harder when it isn't. Test both against the bucket chart in
-[02 § 4](02-building-signals.md).
+[02 § 3.2](02-building-signals.md).
 
 ---
 

@@ -15,8 +15,6 @@ Figures produced
     alpha-opacity        what turning the marker opacity down does and does not buy
     bucket-construction  draw five, rank them, repeat, average — where the bars come from
     noise-shrinks        why the bucket count m is the method, not a detail
-    bucket-chart         the core signal test: mean forward return per signal bucket
-    reversal-buckets     expected monotone buckets vs the reversal-broken version
     signal-distribution  why fixed-interval cuts starve the tails, and what fixes it
     signal-kernels       MACD is momentum with a hump-shaped kernel, not a box
 
@@ -277,78 +275,6 @@ def noise_shrinks(mode):
     save(fig, t, f"noise-shrinks-{mode}.png")
 
 
-# ----------------------------------------------------- fig: the bucket bar chart
-def bucket_chart(mode):
-    t = THEMES[mode]
-    labels = ["G1", "G2", "G3", "G4", "G5"]
-    vals = np.array([-1.1, -0.4, 0.3, 1.1, 2.0])   # illustrative; the shape is the point
-    err = np.array([0.30, 0.25, 0.24, 0.26, 0.33])
-
-    fig, ax = plt.subplots(figsize=(6.4, 4.2))
-    fig.patch.set_facecolor(t["surface"])
-    style_axes(ax, t, ylabel="mean forward return (%)",
-               xlabel="signal bucket   (low $\\rightarrow$ high)")
-
-    for i, v in enumerate(vals):
-        rounded_bar(ax, i, v, color=t["series"])
-    ax.errorbar(range(len(vals)), vals, yerr=err, fmt="none", ecolor=t["muted"],
-                elinewidth=1.1, capsize=3, capthick=1.1, zorder=4)
-    ax.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
-
-    ax.set_xticks(range(len(labels)))
-    ax.set_xticklabels(labels)
-    ax.set_xlim(-0.7, 4.9)
-    ax.set_ylim(-1.9, 3.0)
-
-    # the long/short spread is what the chart prices — label it, and only it
-    ax.annotate("", xy=(4.55, vals[4]), xytext=(4.55, vals[0]),
-                arrowprops=dict(arrowstyle="<->", color=t["muted"], linewidth=1.0))
-    ax.text(4.42, (vals[0] + vals[4]) / 2, "long/short\nspread ≈ 3.1%",
-            color=t["ink_secondary"], fontsize=8.6, ha="right", va="center")
-
-    titles(ax, t, "Sorted into buckets, the signal shows itself",
-           "monotone G1 $\\rightarrow$ G5 is the test — not the height of any single bar")
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
-    save(fig, t, f"bucket-chart-{mode}.png")
-
-# ---------------------------------------------------------------- fig: reversal
-def reversal_buckets(mode):
-    t = THEMES[mode]
-    labels = ["G1", "G2", "G3", "G4", "G5"]
-    expected = np.array([-1.1, -0.4, 0.3, 1.1, 2.0])
-    observed = np.array([1.4, -0.5, 0.2, 1.0, 2.0])
-    err = np.array([0.34, 0.28, 0.26, 0.28, 0.36])
-
-    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.2), sharey=True)
-    fig.patch.set_facecolor(t["surface"])
-
-    panels = [(expected, "Expected", "monotone staircase — the signal ranks correctly"),
-              (observed, "Observed", "G1 lifts — the worst losers rebound")]
-
-    for ax, (vals, title, subtitle) in zip(axes, panels):
-        style_axes(ax, t,
-                   ylabel="mean forward return (%)" if ax is axes[0] else None,
-                   xlabel="signal bucket   (low $\\rightarrow$ high)")
-        for i, v in enumerate(vals):
-            rounded_bar(ax, i, v, color=t["series"])
-        ax.errorbar(range(len(vals)), vals, yerr=err, fmt="none", ecolor=t["muted"],
-                    elinewidth=1.1, capsize=3, capthick=1.1, zorder=4)
-        ax.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
-        ax.set_xticks(range(len(labels)))
-        ax.set_xticklabels(labels)
-        ax.set_xlim(-0.65, 4.65)
-        ax.set_ylim(-2.0, 3.0)
-        titles(ax, t, title, subtitle)
-
-    # call the broken bucket out with a leader line rather than a second colour
-    axes[1].annotate("reversal", xy=(0.30, 1.50), xytext=(1.30, 2.55),
-                     color=t["ink_secondary"], fontsize=9,
-                     arrowprops=dict(arrowstyle="-", color=t["muted"], linewidth=1.0,
-                                     connectionstyle="arc3,rad=-0.25"))
-
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
-    save(fig, t, f"reversal-buckets-{mode}.png")
-
 # ------------------------------------------- fig: why fixed intervals starve tails
 def signal_distribution(mode):
     t = THEMES[mode]
@@ -487,7 +413,7 @@ def scatter_ladder(mode):
     save(fig, t, f"scatter-ladder-{mode}.png")   # save() already crops tight
 
 
-FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_construction, noise_shrinks, bucket_chart, reversal_buckets,
+FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_construction, noise_shrinks,
            signal_distribution, signal_kernels)
 
 if __name__ == "__main__":

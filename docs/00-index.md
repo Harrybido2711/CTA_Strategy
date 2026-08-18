@@ -66,7 +66,7 @@ appended elsewhere.
 | How do signal, strategy and backtest relate? | [00 · pipeline](00-pipeline.md) |
 | How can you sell a stock you don't own? | [01 § short selling](01-what-is-cta.md) |
 | Why does my equity curve have a vertical jump? | [100 § 1.1](100-dataset.md) |
-| Does my signal carry information? | [02 § 4](02-building-signals.md) |
+| Does my signal carry information? | [02 § 3.2](02-building-signals.md) |
 | Why is my R² only 0.005 — is the model useless? | [08](08-ic-and-r-squared.md) |
 | How do I compute and read an IC? | [08 § 2](08-ic-and-r-squared.md) |
 | Why does a 150% long leg not depend on price? | [03 § weights are money](03-from-signal-to-position.md) |

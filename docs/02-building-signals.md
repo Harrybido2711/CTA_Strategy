@@ -23,8 +23,8 @@ nothing in between.
 
 ### Why the sign alone is not enough
 
-Two assets that rose 20% and 10% over the same window produce the *same* signal, so a book built on
-it holds them in the same size. Trend **strength** is thrown away; only trend **direction**
+Two assets that rose 20% and 10% over the same window produce the *same* signal, so a strategy
+built on it takes the same size in both. Trend **strength** is thrown away; only trend **direction**
 survives.
 
 <picture>
@@ -34,12 +34,12 @@ survives.
 
 ### What to keep instead
 
-Neither repair below is obviously right, and both are tested the same way — § 4's bucket chart.
+Neither repair below is obviously right, and both are tested the same way — § 3.2's bucket chart.
 
 - **Keep the value, not the sign** — the definition below, which stays proportional to how strongly
   the asset trended.
 - **Make the value comparable first** — divide by volatility, so a 20% move in a quiet market
-  outranks a 20% move in a violent one (§ 6).
+  outranks a 20% move in a violent one (§ 4).
 
 **Definition (Momentum).** Averaging over $N$ periods rather than one, and keeping the value rather
 than its sign:
@@ -104,8 +104,9 @@ and on one regressor with an intercept the explained share is $R^2 = \rho^2$. At
 $R^2 = 0.0144$ — which does not mean "right 1.4% of the time", but: of the variation in forward
 return from one observation to the next, 1.44% is linear in the signal and 98.56% is not.
 
-**Example.** With a daily return standard deviation of $\sigma_y = 0.012$ — 120 bp, typical for an
-equity ETF, a **basis point** being 0.01%:
+**Example.** Everything below is **one asset's own** forward return, never a portfolio's. Take a
+daily return standard deviation of $\sigma_y = 0.012$ — 120 bp, typical for a single equity ETF,
+a **basis point** being 0.01%:
 
 | Component             | Size                            | At 12% correlation |
 | --------------------- | ------------------------------- | ------------------ |
@@ -118,7 +119,7 @@ to end, while at every $x$ the points scatter over roughly 476 bp. **A 0.6% slop
 cloud** — that ratio *is* the picture.
 
 **Note (And it is worse than that).** Part of those 119 bp is not the market's doing: pooling UNG
-with SHY, and 2021 with 2023, adds spread that standardization (§ 6) removes. Nor is a larger
+with SHY, and 2021 with 2023, adds spread that standardization (§ 4) removes. Nor is a larger
 $\rho$ on offer — a predictor correlating 50% with next month's return would be arbitraged away
 long before you found it in 37 liquid ETFs. 10–15% is a competitive market's ceiling, not a
 shortfall in craft.
@@ -135,11 +136,11 @@ renders, so the chart becomes a density map instead of a mass of ink — below, 
 before and the other two are both the after.
 
 **Note (Not the other alphas).** matplotlib's opacity keyword: not a regression intercept, not the
-excess return a manager is paid for, not § 10's smoothing constant $\alpha$. Code font is the tell.
+excess return a manager is paid for, not § 8's smoothing constant $\alpha$. Code font is the tell.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/alpha-opacity-dark.png">
-  <img alt="Three scatter panels of forward return against a signal. Left, at full opacity, 55,000 points render as one solid disc with no internal structure. Middle, the same rendering at alpha 0.01 on a book where a high signal rules out deep losses: a soft density cloud with the bottom-right corner visibly bitten out, annotated high signal, no deep loss. Right, alpha 0.01 on the original points: a smooth round density with no thin region anywhere" src="figures/alpha-opacity-light.png">
+  <img alt="Three scatter panels of forward return against a signal. Left, at full opacity, 55,000 points render as one solid disc with no internal structure. Middle, the same rendering at alpha 0.01 on a dataset where a high signal rules out deep losses: a soft density cloud with the bottom-right corner visibly bitten out, annotated high signal, no deep loss. Right, alpha 0.01 on the original points: a smooth round density with no thin region anywhere" src="figures/alpha-opacity-light.png">
 </picture>
 
 Sometimes it is enough — the middle panel, where high signal against a badly negative return has
@@ -177,10 +178,9 @@ concluding anything **from** a cloud.
   <img alt="Six panels in two rows, each row running the same steps on a different world. Left column, the population with fifteen randomly drawn points marked in the same colour: on a perfect line they sit along it, on the real cloud they sit anywhere. Middle column, six draws of five plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle with no order at all. Right column, the average over 400 draws with error bars: a clean staircase on the line, and on the cloud a shorter staircase from a negative G1 to a positive G5 whose error bars are a third of the bar heights" src="figures/bucket-construction-light.png">
 </picture>
 
-**The sort key is the signal, never the return.** Steps 2 and 3 order the five by $MOM_{s,t}$,
-which is known at $t$. Step 4 only *records* what followed; the forward return never participates
-in the ordering. So G1 holds the **lowest-signal** observations and G5 the highest — not the worst
-and best performers.
+**The sort key is the signal, never the return.** Steps 2 and 3 order by $MOM_{s,t}$, known at
+$t$; step 4 only *records* what followed. So G1 holds the lowest-**signal** observations, not the
+worst performers.
 
 **Example.** One draw of five, invented:
 
@@ -192,8 +192,7 @@ and best performers.
 | D | +3.4% | +0.2% |
 | E | −0.9% | −1.1% |
 
-Ranked by signal, D leads and B trails. Ranked by return, C leads and E trails. The two orderings
-fill the slots completely differently:
+Filled by signal, and then by forward return instead:
 
 | Slot | Sorted by **signal** | filed return | Sorted by **return** | filed return |
 | --- | --- | --- | --- | --- |
@@ -203,18 +202,15 @@ fill the slots completely differently:
 | G2 | E | −1.1% | A | −0.4% |
 | G1 | B | +0.9% | E | −1.1% |
 
-The left pair is what step 4 actually files, and it is a mess — no staircase anywhere, which is
-what one draw of five looks like at 12% correlation. The right pair is a flawless staircase, and it
-would be flawless for **any** signal whatsoever, including one straight out of a random number
-generator: each bar is reporting the sort key back to you. **The staircase is evidence only because
-the thing sorted on and the thing measured are different, and the second was not knowable when the
-first was computed.**
+The left pair is what step 4 files: a mess, which is what one draw looks like at 12% correlation.
+The right pair is flawless — and would be flawless for **any** signal, including one out of a random
+number generator, because each bar is reporting the sort key back to you. **The staircase is
+evidence only because the thing sorted on and the thing measured are different, and the second was
+not knowable when the first was computed.**
 
-**One draw tells you nothing; a few hundred do.** The top row of the figure runs the steps where
-the answer is known — every observation on a line — and every draw of five comes out ordered. The
-bottom row runs them on § 2's real scatter, where the six draws cross and tangle and not one is
-monotone. At 12% correlation none should be. **The staircase belongs to step 6, never to a draw
-inside it.**
+**The staircase belongs to step 6.** The figure's top row runs the steps where the answer is known
+and every draw of five comes out ordered. The bottom row runs them on § 2's real scatter, where the
+six draws cross and tangle — at 12% correlation not one of them should be monotone.
 
 **Claim.** Averaging within a group shrinks the noise and leaves the signal untouched, which is what
 step 5 buys.
@@ -242,83 +238,39 @@ recipe; it is the reason the recipe works.**
 assets that move together push the effective count well below $m$, so the noise does not really
 reach 7 bp. The logic survives: averaging cancels noise and leaves systematic signal.
 
+**What the bars buy you.**
+
+- **They make a 10–15% correlation legible.** 300 observations behind each bar turn a 1:8
+  signal-to-noise ratio into 2:1. The scatter asks one point to carry the argument; a bar asks 300
+  to share it.
+- **They test ordering, not linearity.** What matters is that the top bucket beats the bottom, not
+  that the relationship is a line. A signal that saturates above some value has a poor correlation
+  and a perfect staircase.
+- **They are immune to the signal's scale.** Ranking survives any monotone transform — raw
+  momentum, its log and its z-score bucket identically — and no single 10σ day can move it. A
+  correlation has neither property, which is why [08](08-ic-and-r-squared.md) prefers rank IC.
+- **Five bars keep the shape a scalar throws away.** A lifted G1 says short-horizon moves partly
+  undo themselves; a lone tall G5 says the edge is one-sided; a flat G4–G5 says the signal
+  saturates.
+- **Error bars separate "no edge" from "not enough data."** A point estimate does not.
+
+**What they do not tell you.**
+
+- **When the edge happened.** Five averages over the whole sample cannot distinguish an edge spread
+  evenly over ten years from one that is entirely March 2020.
+- **What is inside a bar.** A mean hides skew and fat tails — +20 bp from most names drifting up,
+  and +20 bp from one name exploding, are the same bar and different propositions.
+- **Whether the edge is new.** Nothing is controlled for, so a staircase can be a beta tilt or a
+  volatility tilt wearing the signal's clothes ([06](06-overfitting-and-robustness.md)).
+- **Anything about a position.** Every number here is one asset's own forward return. Turning five
+  bars into a book — sizing, netting, costs — is [03](03-from-signal-to-position.md)'s and
+  [04](04-understanding-backtesting.md)'s work, and the answers there look nothing like these.
+
 Nothing in steps 1–6 ever used the hypothesis — only the *ranking* — so the bars read **backwards**:
 the closer the truth is to the line § 1 proposed, the more completely the staircase returns. Flat or
 scrambled bars are the same procedure answering "not close".
 
-## 4. The bucketed bar chart — the core method
-
-1. Sort observations by signal value.
-2. Cut into groups G1 (low) → G5 (high).
-3. Take each group's **mean forward return**.
-4. Plot as bars **with error bars**.
-
-```python
-buckets = pd.qcut(signal.stack(), 5, labels=["G1","G2","G3","G4","G5"])
-grouped = fwd_return.stack().groupby(buckets)
-means, errs = grouped.mean(), grouped.sem()
-means.plot.bar(yerr=errs)
-```
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-chart-dark.png">
-  <img alt="Bucketed bar chart: mean forward return rises monotonically from bucket G1 to G5, with error bars, and the G5−G1 spread annotated as the long/short edge" src="figures/bucket-chart-light.png">
-</picture>
-
-**Reading it.** Monotone G1 → G5 means the signal carries information. Monotonicity is the test,
-not the height of any one bar — a tall G5 with G1–G4 scrambled is usually small-sample noise, which
-is what the error bars exist to expose.
-
-**What it buys you.**
-
-- **It makes a 10–15% correlation legible.** § 3.2's arithmetic: 300 observations behind each bar
-  turn a 1:8 signal-to-noise ratio into 2:1. The scatter asks one point to carry the argument; a
-  bar asks 300 to share it.
-- **It tests ordering, not linearity.** A long/short book needs the top bucket to beat the bottom;
-  it does not need the relationship to be a line. A signal that saturates above some value has a
-  poor correlation and a perfect staircase, and it trades perfectly well.
-- **It is immune to the signal's scale.** Ranking survives any monotone transform — raw momentum,
-  its log and its z-score bucket identically — and no single 10σ day can move it. A correlation has
-  neither property, which is why [08](08-ic-and-r-squared.md) prefers rank IC to Pearson.
-- **Five bars keep the shape that a scalar throws away.** Where a signal breaks is legible: a
-  lifted G1 is reversal (§ 5), a lone tall G5 is a long-only edge, a flat G4–G5 is saturation.
-- **Error bars separate "no edge" from "not enough data."** A correlation point estimate does not.
-- **It prices the trade.** Long the top bucket, short the bottom: G5 at +2% against G1 at −1% is
-  worth about 3%. That is a number you can size a position with — 0.12 is not.
-
-**What it does not tell you.**
-
-- **The spread is gross.** No transaction costs and no turnover, and the edge is small enough that
-  costs can take all of it ([04](04-understanding-backtesting.md)).
-- **The time axis is gone.** Sorting the whole sample at once cannot show whether the edge is spread
-  evenly over ten years or comes entirely from March 2020. Ranking *within each date* instead makes
-  every bar a portfolio actually held that day — § 7's cross-sectional angle, and
-  [03](03-from-signal-to-position.md)'s Portfolio 1 versus Portfolio 2.
-- **The error bars are optimistic.** § 3.2's caveat: overlapping windows and assets that move
-  together push the effective count well below $m$.
-
-## 5. Reversal — why the lowest bucket misbehaves
-
-On raw momentum the staircase usually breaks at the **bottom** bucket: the biggest losers bounce
-rather than keep losing.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/reversal-buckets-dark.png">
-  <img alt="Two bucket charts side by side. Left, expected: mean forward return rises monotonically G1 to G5. Right, observed: G1 lifts above zero instead of being the most negative bucket, breaking the staircase — annotated 'reversal'" src="figures/reversal-buckets-light.png">
-</picture>
-
-**Reversal**: over short horizons extreme moves partially undo themselves, and it strengthens with
-data frequency — at fine resolution prices zigzag rather than trend.
-
-**The standard fix, and why not to copy it blindly.** AQR skips the most recent month, reasoning
-that a trend must *form* before it is tradeable. The skip is real, but treating it as settled has
-drawn pushback: reversal is a second source of return, not noise. **Momentum money and reversal
-money are both money** — try to earn both.
-
-**Make the skip empirical.** The fix is a `shift`, but its size is measured, not inherited — 1 day,
-1 week, 1 month? Run the bucket chart at each and watch G1.
-
-## 6. Risk-adjusted momentum
+## 4. Risk-adjusted momentum
 
 Raw momentum is not comparable across time or assets. 2% monthly momentum in the 2021 inflation
 regime is unremarkable; the same 2% in the 2023 rate-hike drawdown is strong. Same number, different
@@ -331,12 +283,12 @@ MOM^{\text{risk-adj}}_{s,t}  =  \text{Avg}\left(\frac{r_{s,t-i}}{\sigma_{s,t}}\r
 $$
 
 where $\sigma_{s,t}$ is that asset's volatility, estimated on data strictly before $t$ — a
-denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 12).
+denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 10).
 
 Every asset and period now lands on one scale, so values compare — two students both scoring 80 on
 different exams against different cohorts have not achieved the same thing.
 
-## 7. The bucketing trap, and the rolling-quantile fix
+## 5. The bucketing trap, and the rolling-quantile fix
 
 Bucketing the standardized signal on **fixed intervals** (−2 to +2 in equal steps) starves the tails:
 a normal distribution puts almost everything in the middle, so the two buckets you actually trade
@@ -363,7 +315,7 @@ No single view suffices; produce all three:
 A fourth angle: cross-sectional ranking — each asset against its peers that day rather than its own
 past. That is the Portfolio 1 vs Portfolio 2 distinction in [03](03-from-signal-to-position.md).
 
-## 8. Combining a slow and a fast horizon
+## 6. Combining a slow and a fast horizon
 
 One lookback forces a choice between stable and timely. Instead use a **fast momentum to time the
 turns in a slow one** — MACD's structure, where a short EMA crossing a long one marks the entry
@@ -376,7 +328,7 @@ an artifact.
 **Where it pays.** Best in **commodities** — supply-and-demand cycles drive long, persistent trends.
 Equities second. **Bonds** weakest, being the most arbitraged, so deviations close fastest.
 
-## 9. EWMA instead of a simple moving average
+## 7. EWMA instead of a simple moving average
 
 An SMA weights a price from 60 days ago exactly as much as yesterday's. To weight recent prices more:
 
@@ -391,7 +343,7 @@ MACD's 9-day signal line is an **empirical solution** — a value that fit histo
 more. Every parameter here has that status, which is [06](06-overfitting-and-robustness.md)'s
 subject rather than something to accept on authority.
 
-## 10. MACD, stated precisely
+## 8. MACD, stated precisely
 
 Written out, MACD is three series built from two exponential moving averages of the **price**.
 
@@ -449,15 +401,15 @@ week — deliberately, since the newest return is the noisiest — and never ful
 </picture>
 
 Three common rules, in increasing order of information kept. All
-three still have to pass § 4's bucket test before they earn a backtest.
+three still have to pass § 3.2's bucket test before they earn a backtest.
 
 | Rule         | Go long when                            | Costs                                                            |
 | ------------ | --------------------------------------- | ---------------------------------------------------------------- |
 | Zero-line    | MACD is above zero                      | a slow trend filter, late                                        |
-| Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 11's subject                 |
+| Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 9's subject                 |
 | Proportional | always, sized by the standardized value | none of the magnitude, but see[03](03-from-signal-to-position.md) |
 
-## 11. Volatility clustering, and smoothing the fast leg
+## 9. Volatility clustering, and smoothing the fast leg
 
 Volatility arrives in clusters, and a fast signal is exposed: short-lived noise flips it
 long/short, and the churn eats the return in transaction costs before any edge is realized. Fix:
@@ -467,11 +419,11 @@ long/short, and the churn eats the return in transaction costs before any edge i
 long one and you have not denoised the signal — you have built another slow one and lost the
 timeliness the fast leg existed for.
 
-## 12. Information availability
+## 10. Information availability
 
 Everything above assumes the signal at `t` uses only data knowable at `t`. Look-ahead bias is born
 here; the execution offsets in [04](04-understanding-backtesting.md) are the second line of defense
-and cannot rescue a signal contaminated at construction. The rolling-quantile rule (§7) and the
+and cannot rescue a signal contaminated at construction. The rolling-quantile rule (§5) and the
 train/validation/test split ([06](06-overfitting-and-robustness.md)) are the same discipline.
 
 ## Background
@@ -499,7 +451,7 @@ times** B — that ratio *is* the magnitude, and since the signal is proportiona
 held six times larger. Nothing is lost: the sign still carries direction, the absolute value adds
 strength on top.
 
-One caveat, which is § 6's subject: 0.024 means nothing on its own. 2.4% for SHY and 2.4% for UNG
+One caveat, which is § 4's subject: 0.024 means nothing on its own. 2.4% for SHY and 2.4% for UNG
 are not the same trend, and neither are 2021's and 2023's. Only *relative* sizes are ever used.
 
 ## Appendix · Notation
@@ -515,19 +467,19 @@ asset on one day.
 | $x$, $y$, $\beta$, $\epsilon$           | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
 | $\rho$, $R^2$                               | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
 | $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$ | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
-| $m$                                           | observations sharing a bucket                                                                                                 | § 2       |
-| G1 … G5                                        | the buckets, lowest to highest signal value                                                                                   | § 4       |
-| $\sigma_{s,t}$                                | one asset's volatility, estimated on data before that date                                                                    | § 6       |
-| $H$                                           | EWMA half-life, in periods                                                                                                    | § 9       |
-| $P_t$, $\Delta_{t-j}$                       | price on that date, and the one-period change at that lag                                                                     | § 10      |
-| $n_f$, $n_s$                                | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 10      |
-| $\alpha_f$, $\alpha_s$                      | their smoothing constants, two over span plus one                                                                             | § 10      |
-| $c_i$, $k_j$                                | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 10      |
+| $m$                                           | observations sharing a bucket                                                                                                 | § 3.2 |
+| G1 … G5                                        | the buckets, lowest to highest signal value                                                                                   | § 3.2 |
+| $\sigma_{s,t}$                                | one asset's volatility, estimated on data before that date                                                                    | § 4       |
+| $H$                                           | EWMA half-life, in periods                                                                                                    | § 7       |
+| $P_t$, $\Delta_{t-j}$                       | price on that date, and the one-period change at that lag                                                                     | § 8      |
+| $n_f$, $n_s$                                | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 8      |
+| $\alpha_f$, $\alpha_s$                      | their smoothing constants, two over span plus one                                                                             | § 8      |
+| $c_i$, $k_j$                                | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 8      |
 
 **Note (Collisions to watch).** Three quantities wear a $\sigma$ and they are not interchangeable:
 $\sigma_y$ is the spread of forward return across the pooled cloud (§ 2), $\sigma_\epsilon$ the
 part of it the signal cannot reach (§ 2), and $\sigma_{s,t}$ one asset's trailing volatility on one
-date (§ 6). Likewise $w_{s,t}$ is a position and $k_j$ a kernel weight, which is why the latter is
+date (§ 4). Likewise $w_{s,t}$ is a position and $k_j$ a kernel weight, which is why the latter is
 not written $w$. And § 3.1's `alpha` is a plotting keyword, not $\alpha$ the smoothing constant
 and not a regression intercept — code font against maths is the tell. Chapter
 [01](01-what-is-cta.md) uses $s$ for a signed share count; here it is always the asset.
@@ -543,7 +495,7 @@ you already believe in.
 You should be able to explain:
 
 - [ ] Why a scatter plot proves nothing at a realistic 10–15% correlation
-- [ ] Why the bottom bucket lifts, and how you would measure the right skip
+- [ ] Why the sort key must be the signal and never the forward return
 - [ ] Why fixed-interval buckets starve the tails and full-history ranking leaks the future
 - [ ] Why MACD is momentum with a hump-shaped kernel rather than a separate indicator
 
