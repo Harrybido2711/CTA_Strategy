@@ -158,7 +158,7 @@ thinned enough to read. A signal that only rules something *out* is still tradea
 curve, an empty corner — it beats every statistic, because it gives the *shape*. The mistake is
 concluding anything **from** a cloud.
 
-### 3.2 Sort, then average
+### 3.2 Beta Method
 
 **The construction.** Six steps. Only the last one produces anything worth looking at.
 
@@ -169,6 +169,16 @@ concluding anything **from** a cloud.
 5. **Repeat** steps 1–4 a few hundred times.
 6. **Average** everything filed under G1, then G2, and so on — five numbers, drawn as five bars
    with the error on each.
+
+**The sort key is the signal, never the return.** Steps 2 and 3 order the five by $MOM_{s,t}$,
+which is known at $t$. Step 4 only *records* what followed; the forward return never participates
+in the ordering. So G1 holds the **lowest-signal** observations and G5 the highest — not the worst
+and best performers.
+
+Sorting on the forward return instead would produce a flawless staircase every time, for any signal
+at all, and would prove nothing: each bar would simply be reporting the sort key back to you. **The
+staircase is evidence only because the thing sorted on and the thing measured are different, and
+the second was not knowable when the first was computed.**
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
