@@ -160,30 +160,55 @@ concluding anything **from** a cloud.
 
 ### 3.2 Beta Method
 
-**The construction.** Six steps. Only the last one produces anything worth looking at.
+**The construction.** Six steps, and the figure below is the same six read left to right.
 
-1. **Draw** five observations at random — one observation being one asset on one date.
+1. **Draw** five observations at random — one observation being one asset on one date. The left
+   column marks fifteen of them, three draws' worth, all in one colour: any five will do.
 2. **Rank** those five by signal value, highest to lowest.
-3. **Assign** them to slots: highest signal into G5, next into G4, down to G1.
-4. **Record** the forward return each one went on to deliver, filed under its slot.
-5. **Repeat** steps 1–4 a few hundred times.
-6. **Average** everything filed under G1, then G2, and so on — five numbers, drawn as five bars
-   with the error on each.
+3. **Assign** them to slots — highest signal into G5, next into G4, down to G1.
+4. **Record** the forward return each one went on to deliver, filed under its slot. Steps 2–4 are
+   one line in the middle column: five points, one per slot.
+5. **Repeat** steps 1–4 a few hundred times. The middle column draws six of them.
+6. **Average** everything filed under G1, then G2, and so on — five numbers, drawn in the right
+   column as five bars with the error on each.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
+  <img alt="Six panels in two rows, each row running the same steps on a different world. Left column, the population with fifteen randomly drawn points marked in the same colour: on a perfect line they sit along it, on the real cloud they sit anywhere. Middle column, six draws of five plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle with no order at all. Right column, the average over 400 draws with error bars: a clean staircase on the line, and on the cloud a shorter staircase from a negative G1 to a positive G5 whose error bars are a third of the bar heights" src="figures/bucket-construction-light.png">
+</picture>
 
 **The sort key is the signal, never the return.** Steps 2 and 3 order the five by $MOM_{s,t}$,
 which is known at $t$. Step 4 only *records* what followed; the forward return never participates
 in the ordering. So G1 holds the **lowest-signal** observations and G5 the highest — not the worst
 and best performers.
 
-Sorting on the forward return instead would produce a flawless staircase every time, for any signal
-at all, and would prove nothing: each bar would simply be reporting the sort key back to you. **The
-staircase is evidence only because the thing sorted on and the thing measured are different, and
-the second was not knowable when the first was computed.**
+**Example.** One draw of five, invented:
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
-  <img alt="Six panels in two rows, each row running the same steps on a different world. Left column, the population with fifteen randomly drawn points marked in the same colour: on a perfect line they sit along it, on the real cloud they sit anywhere. Middle column, six draws of five plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle with no order at all. Right column, the average over 400 draws with error bars: a clean staircase on the line, and on the cloud a shorter staircase from a negative G1 to a positive G5 whose error bars are a third of the bar heights" src="figures/bucket-construction-light.png">
-</picture>
+| | Signal | Forward return |
+| --- | --- | --- |
+| A | +2.1% | −0.4% |
+| B | −1.8% | +0.9% |
+| C | +0.6% | +1.3% |
+| D | +3.4% | +0.2% |
+| E | −0.9% | −1.1% |
+
+Ranked by signal, D leads and B trails. Ranked by return, C leads and E trails. The two orderings
+fill the slots completely differently:
+
+| Slot | Sorted by **signal** | filed return | Sorted by **return** | filed return |
+| --- | --- | --- | --- | --- |
+| G5 | D | +0.2% | C | +1.3% |
+| G4 | A | −0.4% | B | +0.9% |
+| G3 | C | +1.3% | D | +0.2% |
+| G2 | E | −1.1% | A | −0.4% |
+| G1 | B | +0.9% | E | −1.1% |
+
+The left pair is what step 4 actually files, and it is a mess — no staircase anywhere, which is
+what one draw of five looks like at 12% correlation. The right pair is a flawless staircase, and it
+would be flawless for **any** signal whatsoever, including one straight out of a random number
+generator: each bar is reporting the sort key back to you. **The staircase is evidence only because
+the thing sorted on and the thing measured are different, and the second was not knowable when the
+first was computed.**
 
 **One draw tells you nothing; a few hundred do.** The top row of the figure runs the steps where
 the answer is known — every observation on a line — and every draw of five comes out ordered. The
