@@ -175,28 +175,17 @@ concluding anything **from** a cloud.
   <img alt="Six panels in two rows, each row running the same steps on a different world. Left column, the population with fifteen randomly drawn points marked in the same colour: on a perfect line they sit along it, on the real cloud they sit anywhere. Middle column, six draws of five plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle with no order at all. Right column, the average over 400 draws with error bars: a clean staircase on the line, and on the cloud a shorter staircase from a negative G1 to a positive G5 whose error bars are a third of the bar heights" src="figures/bucket-construction-light.png">
 </picture>
 
-**Why that carries information.** Three things are true of those six steps, and together they turn
-five bars into a test.
+**One draw tells you nothing; a few hundred do.** The top row of the figure runs the steps where
+the answer is known — every observation on a line — and every draw of five comes out ordered. The
+bottom row runs them on § 2's real scatter, where the six draws cross and tangle and not one is
+monotone. At 12% correlation none should be. **The staircase belongs to step 6, never to a draw
+inside it.**
 
-**Nothing about the hypothesis goes in.** Steps 1–6 use the *ranking* of the signal and nothing
-else — no fitted line, no assumption that return rises with it. So they run unchanged on data where
-the answer is unknown, and any staircase that survives step 6 was not put in at step 1.
+**Claim.** Averaging within a group shrinks the noise and leaves the signal untouched, which is what
+step 5 buys.
 
-**A single draw is worthless, and the average is not.** The figure's top row runs the steps on a
-perfect relationship, where every draw of five comes out already ordered — calibration rather than
-evidence, fixing what success looks like. The bottom row runs the identical steps on § 2's real
-scatter, and there the six draws **cross and tangle**: not one of them is monotone, and at 12%
-correlation not one should be. The staircase belongs to step 6, never to any draw inside it — which
-is why the bars are drawn with the error on them, and why § 4 keeps insisting on that.
-
-**The arithmetic says step 5 is what buys that.** Which is the one part of the construction that
-can be proved rather than shown.
-
-**Claim.** Sorting by the signal and averaging within groups detects what the scatter cannot,
-because averaging shrinks the noise and leaves the signal intact.
-
-**Proof.** Take $m$ observations sharing a similar signal value. Their mean forward return still has
-expectation $\beta$ times their mean signal, while the noise around that mean shrinks to
+**Proof.** Take $m$ observations sharing a similar signal value. Their mean return still has
+expectation $\beta$ times their mean signal, while the noise around it falls to
 $\sigma_\epsilon / m^{1/2}$:
 
 |        | One observation | Mean of 300                        |
@@ -210,19 +199,17 @@ $\sigma_\epsilon / m^{1/2}$:
   <img alt="Four bucket charts of the same population at 12 percent correlation, computed from 5, 30, 300 and 3,000 observations per bucket. At m equals 5 the bars swing between minus 80 and plus 93 basis points and are not monotone; by m equals 300 they have settled into a monotone staircase from about minus 20 to plus 20 basis points, and at m equals 3,000 the error bars are barely visible" src="figures/noise-shrinks-light.png">
 </picture>
 
-The true bucket means are identical in all four panels — near −20 bp at G1 and +20 bp at G5. Only
-the error on the estimate moves, and at $m = 5$ that error is larger than the whole staircase, so
-the bars come back scrambled. **Sample size is not a detail of the recipe; it is the entire reason
-the recipe works.**
+The true bars are identical in all four panels — near −20 bp at G1 and +20 bp at G5. Only the error
+moves, and at $m = 5$ it is larger than the whole staircase. **Sample size is not a detail of the
+recipe; it is the reason the recipe works.**
 
-Put together: the closer the truth is to the line § 1 hypothesized, the more completely the
-staircase returns, so the bars read **backwards** — as a measurement of that closeness. Bars that
-come back flat or scrambled are the same procedure answering "not close".
+**Note (Where that overstates it).** The $m^{1/2}$ assumes independence. Overlapping windows and
+assets that move together push the effective count well below $m$, so the noise does not really
+reach 7 bp. The logic survives: averaging cancels noise and leaves systematic signal.
 
-**Note (Where that overstates it).** The $m^{1/2}$ assumes independence. Overlapping lookback
-windows and assets that move together push the effective count well below $m$, so the noise does not
-really reach 7 bp. The logic survives the correction: averaging cancels noise and leaves systematic
-signal.
+Nothing in steps 1–6 ever used the hypothesis — only the *ranking* — so the bars read **backwards**:
+the closer the truth is to the line § 1 proposed, the more completely the staircase returns. Flat or
+scrambled bars are the same procedure answering "not close".
 
 ## 4. The bucketed bar chart — the core method
 
