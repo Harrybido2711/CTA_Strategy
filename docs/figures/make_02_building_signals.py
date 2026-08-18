@@ -32,9 +32,9 @@ from _style import THEMES, rounded_bar, save, style_axes, titles
 
 # -------------------------------------------------- fig: what sign() discards
 def binary_momentum(mode):
-    """02 s1 -- sign() collapses trend strength; both assets get the same weight.
+    """02 s1 -- sign() collapses trend strength; both windows get the same weight.
 
-    Schematic. Two illustrative paths over one lookback window, ending at +20%
+    Schematic. One asset over two illustrative lookback windows, ending at +20%
     and +10%. The right panel is the signal each produces: identical.
     """
     t = THEMES[mode]
@@ -63,7 +63,7 @@ def binary_momentum(mode):
     ax.set_xlim(0, n + 22)
     ax.set_xticks([])
     ax.set_ylim(94, 126)
-    titles(ax, t, "Two different trends", "one is twice the other over the same window")
+    titles(ax, t, "Two lookback windows", "one trend is twice the other")
 
     # ---- right: what sign() says about them
     style_axes(bx, t, ylabel="$MOM_{s,t}$")
@@ -87,14 +87,15 @@ def binary_momentum(mode):
 def alpha_opacity(mode):
     """02 s3.1 -- alpha turns ink into density; whether density reads is another matter.
 
-    Schematic. Left and right are the same 55,000 illustrative points at 12%
-    correlation -- about what 37 ETFs over six years give you -- drawn opaque
-    and at alpha=0.01. The middle panel is a different, invented dataset: what
-    the fix looks like when it works, a corner thin enough to read.
+    Schematic. Left and right are the same 5,000 illustrative points at 12%
+    correlation -- about twenty years of one asset's daily observations --
+    drawn opaque and at a low opacity. The middle panel is a different,
+    invented series: what the fix looks like when it works, a corner thin
+    enough to read.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(23)
-    n = 55000
+    n = 5000
     r = 0.12
     x = rng.standard_normal(n)
     y = r * x + (1 - r ** 2) ** 0.5 * rng.standard_normal(n)
@@ -139,9 +140,9 @@ def alpha_opacity(mode):
     axes[0].set_ylabel("forward return", color=t["ink_secondary"], fontsize=9, labelpad=8)
     fig.text(0.5, 0.01, "signal value", ha="center", color=t["muted"], fontsize=8.5)
     fig.text(0.5, -0.09,
-             "Illustrative. Outer panels are one dataset of 55,000 asset-dates at 12% correlation, "
-             "differing only in opacity. The middle is a different, invented book — what success "
-             "would look like, and it would be a result.",
+             "Illustrative. Outer panels are one asset's 5,000 daily observations at 12% "
+             "correlation, differing only in opacity. The middle is a different, invented series — "
+             "what success would look like, and it would be a result.",
              ha="center", color=t["ink_secondary"], fontsize=8.6)
     save(fig, t, f"alpha-opacity-{mode}.png")
 
@@ -280,16 +281,16 @@ def noise_shrinks(mode):
 def three_bucketings(mode):
     """02 s5 -- raw, standardized-at-fixed-intervals, and rolling quantile.
 
-    Schematic. One simulated panel of 30 assets over 1,200 days with a calm
-    era and a violent one, carrying the same risk-adjusted edge throughout.
-    Only the bucketing differs between panels; bar heights are mean forward
-    return in bp on a shared scale, and n is the count behind each bar.
+    Schematic. One simulated asset over 6,000 days -- roughly twenty-four years
+    -- with a calm era and a violent one, carrying the same risk-adjusted edge
+    throughout. Only the bucketing differs between panels; bar heights are mean
+    forward return in bp on a shared scale, and n is the count behind each bar.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(12)
-    A, T, W, rho = 30, 1200, 250, 0.12
+    A, T, W, rho = 1, 6000, 500, 0.12
 
-    vol = np.where(np.arange(T) < 800, 0.6, 2.0)[:, None]     # calm era, then violent
+    vol = np.where(np.arange(T) < 4000, 0.6, 2.0)[:, None]    # calm era, then violent
     z = rng.standard_normal((T, A))                            # the risk-adjusted signal
     fwd = 100 * vol * (rho * z + (1 - rho ** 2) ** 0.5 * rng.standard_normal((T, A)))
     raw = z * vol                                              # what you measure before scaling
@@ -302,7 +303,7 @@ def three_bucketings(mode):
     for i in range(2 * W, T):
         rq[i] = (sig[i - W:i] < sig[i]).mean(axis=0)
 
-    violent = np.repeat((np.arange(T) >= 800)[:, None], A, axis=1)
+    violent = np.repeat((np.arange(T) >= 4000)[:, None], A, axis=1)
 
     usable = np.zeros((T, A), bool)                            # same rows in all three panels
     usable[2 * W:] = True
@@ -348,10 +349,10 @@ def three_bucketings(mode):
         titles(ax, t, head, sub)
 
     fig.text(0.5, -0.06,
-             "Illustrative. 30 assets, a calm era then a violent one, the same risk-adjusted edge "
-             "throughout, and identical rows in all three panels — only the cut differs.\nUnder each "
-             "bar: how many observations it holds, and what share of them came from the violent era "
-             "(57% of the sample).",
+             "Illustrative. One asset over 6,000 days, calm and then violent, carrying the same "
+             "risk-adjusted edge throughout, with identical rows in all three panels — only the cut "
+             "differs.\nUnder each bar: how many observations it holds, and what share of them came "
+             "from the violent era.",
              ha="center", color=t["ink_secondary"], fontsize=8.6)
     save(fig, t, f"three-bucketings-{mode}.png")
 
