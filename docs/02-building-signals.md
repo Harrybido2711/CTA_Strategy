@@ -469,12 +469,12 @@ $$
 Since $\alpha_f > \alpha_s$, every $k_j \geq 0$: MACD is a non-negative weighted sum of past price
 changes, exactly like a lookback mean.
 
+</details>
+
 **Note (What actually differs).** The kernel. A 21-day momentum weights the last 21 returns
 equally and everything older at zero; MACD's weights rise from a small value at lag 0, peak around
 lag 8, and decay without ever reaching zero. It therefore discounts *yesterday* relative to last
 week — deliberately, since the newest return is the noisiest — and never fully forgets.
-
-</details>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/signal-kernels-dark.png">
