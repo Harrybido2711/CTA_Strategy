@@ -18,6 +18,7 @@ Figures produced
     three-bucketings     one dataset cut three ways, and what each cut distorts
     signal-distribution  why fixed-interval cuts starve the tails, and what fixes it
     signal-kernels       MACD is momentum with a hump-shaped kernel, not a box
+    signal-return-alignment  the lookback, the discarded gap, and the paired return
 
 All are schematics drawn from illustrative values.
 
@@ -27,6 +28,7 @@ an image is neither selectable nor searchable.
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.patches import FancyBboxPatch
 from _style import THEMES, rounded_bar, save, style_axes, titles
 
 
@@ -495,8 +497,113 @@ def scatter_ladder(mode):
     save(fig, t, f"scatter-ladder-{mode}.png")   # save() already crops tight
 
 
+# ----------------------------- fig: which return a signal is paired with
+def signal_return_alignment(mode):
+    """02 background -- the lookback, the discarded gap, and the paired return.
+
+    Schematic. One cell is one period, drawn at an illustrative N = 8 and
+    g = 3. The top row is the anatomy of a single observation; the lower rows
+    are the two dates that follow, showing that the whole pattern slides one
+    cell at a time, so lookbacks overlap almost entirely while the returns they
+    are scored on never do.
+    """
+    t = THEMES[mode]
+    N, G = 8, 3
+    CW, CH = 0.86, 0.44
+
+    STYLE = {
+        "look": (t["ramp"][5], "none", "-"),
+        "gap": (t["surface"], t["baseline"], (0, (2, 1.6))),
+        "ret": (t["ramp"][2], "none", "-"),
+    }
+
+    def cell(ax, i, y, kind):
+        face, edge, dash = STYLE[kind]
+        ax.add_patch(FancyBboxPatch(
+            (i + (1 - CW) / 2, y - CH / 2), CW, CH,
+            boxstyle="round,pad=0.004,rounding_size=0.07",
+            facecolor=face, edgecolor=edge, linewidth=1.0, linestyle=dash,
+            zorder=3))
+
+    def row(ax, y, shift=0):
+        """One date's cells: N lookback, G discarded, then the one it is scored on."""
+        for i in range(-N, 0):
+            cell(ax, i + shift, y, "look")
+        for i in range(0, G):
+            cell(ax, i + shift, y, "gap")
+        cell(ax, G + shift, y, "ret")
+
+    def bracket(ax, x0, x1, y, label, colour):
+        ax.plot([x0, x0, x1, x1], [y - 0.06, y, y, y - 0.06],
+                color=colour, linewidth=1.0, solid_joinstyle="miter", zorder=4)
+        ax.text((x0 + x1) / 2, y + 0.05, label, ha="center", va="bottom",
+                color=colour, fontsize=8.5, fontweight="600")
+
+    fig, (ax, bx) = plt.subplots(
+        2, 1, figsize=(8.6, 4.6),
+        gridspec_kw=dict(height_ratios=[1.0, 1.15], hspace=0.30))
+    fig.patch.set_facecolor(t["surface"])
+
+    # ---- top: the anatomy of one observation
+    ax.set_facecolor(t["surface"])
+    ax.set_xlim(-N - 0.5, G + 1.6)
+    ax.set_ylim(-0.78, 0.56)
+    ax.axis("off")
+
+    row(ax, 0.0)
+    bracket(ax, -N + 0.07, -0.07, 0.29,
+            "lookback — the returns the signal averages", t["ramp"][5])
+    bracket(ax, 0.07, G - 0.07, 0.29, "gap — discarded", t["muted"])
+    bracket(ax, G + 0.07, G + 0.93, 0.29, "scored on", t["ramp"][5])
+
+    for i, lab in ((-1, "$r_{t-1}$"), (0, "$r_t$"), (G, "$r_{t+g}$")):
+        ax.text(i + 0.5, -0.29, lab, ha="center", va="top",
+                color=t["muted"], fontsize=8.2)
+    # the decision instant sits on a boundary, not on a cell
+    ax.plot([0, 0], [-0.31, 0.31], color=t["ink_secondary"], linewidth=1.0,
+            linestyle=(0, (2, 1.6)), zorder=4)
+    ax.text(0.0, -0.52, "computed at $t$ — only the cells left of this line",
+            ha="center", va="top", color=t["ink_secondary"], fontsize=8.4)
+
+    titles(ax, t, "Which return a signal is paired with",
+           "one cell is one period; the signal at $t$ skips $g$ of them — the likeliest reversal — "
+           "before the return it is judged on")
+
+    # ---- bottom: the same pattern, one date later, and one later again
+    bx.set_facecolor(t["surface"])
+    bx.set_xlim(-N - 1.6, G + 6.4)
+    bx.set_ylim(-2.25, 0.78)
+    bx.axis("off")
+
+    bx.text(-N - 1.5, 0.52, "the same pattern one date later — and the pairing never repeats",
+            ha="left", va="center", color=t["ink_secondary"], fontsize=8.8, fontweight="600")
+
+    for k, lab in enumerate(("$t$", "$t+1$", "$t+2$")):
+        dy = -0.72 * k
+        row(bx, dy, shift=k)
+        bx.text(-N - 1.0, dy, lab, ha="right", va="center",
+                color=t["ink_secondary"], fontsize=8.6, fontweight="600")
+
+    corners = [(G + k + (1 + CW) / 2, -0.72 * k + CH / 2) for k in range(3)]
+    bx.plot(*zip(*corners), color=t["ramp"][2], linewidth=1.1,
+            linestyle=(0, (1.6, 1.6)), zorder=4)
+    bx.text(G + 3.2, -1.44,
+            "one return per date,\nand no two dates share one",
+            ha="left", va="center", color=t["ramp"][5], fontsize=8.4,
+            fontweight="600", linespacing=1.45)
+    bx.text(-N - 1.0, -1.98,
+            "consecutive lookbacks share all but one cell, so neighbouring signals are nearly the same number",
+            ha="left", va="center", color=t["ink_secondary"], fontsize=8.2)
+
+    fig.text(0.5, -0.01,
+             "Illustrative. Real lookbacks run 20-250 periods and the gap 1 day to 1 month; "
+             "the geometry is the same at any size.",
+             ha="center", color=t["ink_secondary"], fontsize=8.6)
+    save(fig, t, f"signal-return-alignment-{mode}.png")
+
+
 FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_construction, noise_shrinks,
-           three_bucketings, signal_distribution, signal_kernels)
+           three_bucketings, signal_distribution, signal_kernels, signal_return_alignment)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

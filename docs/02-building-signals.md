@@ -460,6 +460,56 @@ strength on top.
 One caveat, which is § 4's subject: 0.024 means nothing on its own. 2.4% earned in a calm year and
 2.4% earned in a violent one are not the same trend. Only *relative* sizes are ever used.
 
+### After I compute momentum on day $t$, which return does it get paired with?
+
+Not necessarily the next one. Three spans sit on the timeline, in this order:
+
+| Span | What it holds | Typical size |
+| --- | --- | --- |
+| **Lookback** | the $N$ returns the signal averages, ending at $t-1$ | 20–250 periods |
+| **Gap** | $g$ periods thrown away — neither averaged into the signal nor scored against it | 0, a week, or a month |
+| **Paired return** | $r_{s,t+g}$, the one period the signal is judged on | one period |
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/signal-return-alignment-dark.png">
+  <img alt="Two panels of cells laid on a timeline, one cell per period. The top panel is one observation: eight filled cells bracketed as the lookback the signal averages, then three dashed empty cells bracketed as the discarded gap, then a single filled cell bracketed as the one the signal is scored on, with a dotted vertical line marking that the signal is computed from the cells to its left only. The lower panel repeats the same pattern for dates t, t plus one and t plus two, each shifted one cell right, so the lookbacks overlap in all but one cell while the three scored cells form a descending diagonal, annotated one return per date and no two dates share one" src="figures/signal-return-alignment-light.png">
+</picture>
+
+**Two ways to write the same thing.** Both produce an identical pairing table, so use whichever
+reads better in your code:
+
+| Form | What it does | Where you meet it |
+| --- | --- | --- |
+| Slide the return column | pairs $MOM_{s,t}$ with $r_{s,t+g}$ rather than $r_{s,t}$ | `ret.shift(-g)` before the join |
+| Pull the window's end back | builds the signal from $r_{s,t-g-i}$, $i = 1 \ldots N$, then pairs it with $r_{s,t}$ as usual | 12-1 momentum: a twelve-month window that stops one month short of today |
+
+The `-1` in *12-1* **is** the gap.
+
+**Why leave one at all.** Two reasons, and they are not the same kind of reason:
+
+- **Executability** — a hard floor. § 1's window already ends at $t-1$, so at $g = 0$ the signal
+  is knowable before the period it is scored on begins. Anything tighter is look-ahead (§ 10), not
+  a modelling choice.
+- **Reversal** — a judgement call, and the one worth thinking about. A trend that has just formed
+  tends to hand a little of it back: the flow that built it is spent, and an over-bought book
+  unwinds. Score the signal on that period and you are measuring the trend and its immediate rebate
+  netted into one number — which is how a real edge arrives at the bucket chart looking flat, or
+  upside down.
+
+**What the gap costs.** It does not remove only the rebate; it removes the opening of the trend
+too. The longer the gap, the staler the signal and the less of the move you are still present for.
+So $g$ trades one against the other — and it is a **hyperparameter**: running $g$ at one day, one
+week and one month and keeping whichever bucket chart looks best is precisely what
+[06](06-overfitting-and-robustness.md) warns about. Set it from execution reality and a prior about
+how long the rebate lasts, never from the prettiest staircase.
+
+**One check.** The two forms must agree. If you slide the return column and the $MOM$ values move
+as well, the edit reached the signal, which it never should.
+
+The lower panel is also where § 3.2's caveat comes from. Step one date forward and the lookback
+keeps all but one of its cells, so neighbouring signals are nearly the same number — the reason the
+effective sample sits well below $m$.
+
 ## Appendix · Notation
 
 Throughout, $s$ indexes the asset and $t$ the date. The chapter works one asset at a time, so $s$
@@ -481,13 +531,14 @@ is fixed and is dropped wherever it adds nothing.
 | $n_f$, $n_s$                                | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 8       |
 | $\alpha_f$, $\alpha_s$                      | their smoothing constants, two over span plus one                                                                             | § 8       |
 | $c_i$, $k_j$                                | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 8       |
+| $g$                                           | gap length — periods between the end of the signal's window and the return it is scored on                                    | Background |
 
 **Note (Collisions to watch).** Three quantities wear a $\sigma$ and they are not interchangeable:
 $\sigma_y$ is the spread of forward return across the pooled cloud (§ 2), $\sigma_\epsilon$ the
 part of it the signal cannot reach (§ 2), and $\sigma_{s,t}$ one asset's trailing volatility on one
 date (§ 4). Likewise $w_{s,t}$ is a position and $k_j$ a kernel weight, which is why the latter is
 not written $w$. And § 3.1's `alpha` is a plotting keyword, not $\alpha$ the smoothing constant
-and not a regression intercept — code font against maths is the tell. Chapter
+and not a regression intercept — code font against maths is the tell. Lowercase $g$ is the gap, unrelated to the buckets G1 … G5. Chapter
 [01](01-what-is-cta.md) uses $s$ for a signed share count; here it is always the asset.
 
 ---
@@ -502,6 +553,7 @@ You should be able to explain:
 
 - [ ] Why a scatter plot proves nothing at a realistic 10–15% correlation
 - [ ] Why the sort key must be the signal and never the forward return
+- [ ] Why a gap sits between the signal's window and the return it is scored on, and what that gap costs
 - [ ] Why fixed-interval buckets starve the tails and full-history ranking leaks the future
 - [ ] Why MACD is momentum with a hump-shaped kernel rather than a separate indicator
 
