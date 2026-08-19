@@ -12,11 +12,11 @@
 
 Everything in this chapter is built from three numbers, one of each per asset per date.
 
-| Object | Symbol | What it is | Known at $t$? |
-| --- | --- | --- | --- |
-| **Weight** | $w_{s,t}$ | the share of capital held in asset $s$ on date $t$, signed — negative is a short | **yes**, you choose it |
-| **Signal** | $MOM_{s,t}$ | a number computed from data available at $t$, meant to say something about what comes next | **yes**, you compute it |
-| **Forward return** | $r_{s,t}$ | what the asset then goes on to deliver over the period the position is held | **no** — this is the unknown |
+| Object                   | Symbol        | What it is                                                                                  | Known at$t$?                      |
+| ------------------------ | ------------- | ------------------------------------------------------------------------------------------- | ----------------------------------- |
+| **Weight**         | $w_{s,t}$   | the share of capital held in asset$s$ on date $t$, signed — negative is a short        | **yes**, you choose it        |
+| **Signal**         | $MOM_{s,t}$ | a number computed from data available at$t$, meant to say something about what comes next | **yes**, you compute it       |
+| **Forward return** | $r_{s,t}$   | what the asset then goes on to deliver over the period the position is held                 | **no** — this is the unknown |
 
 **Note (Scope).** The signal is *computed* one asset at a time, from that asset's own history.
 Everything downstream is a **panel**: many assets × many dates, one signal and one forward return
@@ -83,6 +83,29 @@ Of the two factors in each term only one is yours: $r_{s,t}$ is the market's ans
 after the weight is already set. **So the whole of portfolio construction is the choice of
 $w_{s,t}$.**
 
+**But the weights are not free.** Two sums over the book are fixed before any signal is consulted,
+and every weight vector you may hold satisfies both:
+
+$$
+\textbf{net:}\quad \sum_s w_{s,t} = 1
+\qquad\qquad
+\textbf{gross:}\quad \sum_s |w_{s,t}| = G
+$$
+
+where $G$ is the gross target and the net is held at 1 only to within a tolerance $\delta$ —
+rebalancing is discrete, so it drifts between trades. The two sums are independent, and they
+control different things:
+
+| Sum | What it fixes | Typical value |
+| --- | --- | --- |
+| **Net**, $\sum_s w_{s,t}$ | how much *market* the book carries — the directional bet, since longs and shorts cancel here | 100% for a long-biased book, $\approx 0$ for a market-neutral one |
+| **Gross**, the same sum taken over absolute weights | how much *leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
+
+Two books can share a net of 100% and be nothing alike: one holding a single asset at 100%, another
+long 200% and short 100%. The second carries three times the position for the same market exposure,
+which is why both sums have to be stated and why a rising gross is never free —
+[01](01-what-is-cta.md).
+
 **The weights are where the signal enters.** You would like to put weight where the forward return
 is about to be high — but that is precisely the number you do not have. A signal is the stand-in you
 put in its place, which means setting $w_{s,t} \propto MOM_{s,t}$.
@@ -108,6 +131,14 @@ rather than loses it — is $\rho_s$.**
 
 </details>
 
+**Note (The constraints do not disturb this).** A raw signal satisfies neither sum, so reaching a
+legal weight vector takes two operations: **shift** the signal until the net lands where it should,
+then **scale** until the gross does. Both are affine with a positive scale, and a correlation is
+unchanged by those — $\rho(a + bx, y) = \rho(x, y)$ for any $b > 0$. The $\rho$ measured on the raw
+signal is therefore the same $\rho$ that governs the constrained portfolio, which is what lets the
+rest of the chapter ignore weights altogether. [03](03-from-signal-to-position.md) carries out both
+operations.
+
 The whole question therefore collapses to one number, and it is a number about the signal alone:
 
 $$
@@ -118,11 +149,11 @@ $$
 
 Three things follow, and between them they set the shape of the rest of the chapter.
 
-| Consequence | Dealt with in |
-| --- | --- |
-| **The portfolio never has to be built to test the signal.** Measure $\rho$ between the signal and the forward return directly, and you have measured the strategy | § 2, § 3 |
-| **Magnitude reaches the position, not just direction.** $w \propto MOM$ means a signal twice as large takes a position twice as large — which is what binary momentum throws away | § 1.0 |
-| **At equal $\rho$ a volatile asset contributes more than a quiet one**, since each term carries $\sigma_{MOM,s} \sigma_{r,s}$ alongside $\rho_s$. Ranking raw signals therefore ranks volatilities | § 4 |
+| Consequence                                                                                                                                                                                                    | Dealt with in |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| **The portfolio never has to be built to test the signal.** Measure $\rho$ between the signal and the forward return directly, and you have measured the strategy                                      | § 2, § 3    |
+| **Magnitude reaches the position, not just direction.** $w \propto MOM$ means a signal twice as large takes a position twice as large — which is what binary momentum throws away                     | § 1.0        |
+| **At equal $\rho$ a volatile asset contributes more than a quiet one**, since each term carries $\sigma_{MOM,s} \sigma_{r,s}$ alongside $\rho_s$. Ranking raw signals therefore ranks volatilities | § 4          |
 
 **Write the hypothesis before the code.** It names what would falsify the signal, and one you
 cannot falsify is a plot you will rationalize either way.
@@ -266,13 +297,13 @@ the worst performers.
 
 **Example.** One date's cross-section of five assets, invented, filed both ways:
 
-|   | Signal $MOM_{s,t}$ | Forward return $r_{s,t}$ | Slot by signal | Slot by return |
-| - | ------------------ | ------------------------ | -------------- | -------------- |
-| A | +2.1%              | −0.4%                   | G4             | G2             |
-| B | −1.8%             | +0.9%                    | G1             | G4             |
-| C | +0.6%              | +1.3%                    | G3             | G5             |
-| D | +3.4%              | +0.2%                    | G5             | G3             |
-| E | −0.9%             | −1.1%                   | G2             | G1             |
+|   | Signal$MOM_{s,t}$ | Forward return$r_{s,t}$ | Slot by signal | Slot by return |
+| - | ------------------- | ------------------------- | -------------- | -------------- |
+| A | +2.1%               | −0.4%                    | G4             | G2             |
+| B | −1.8%              | +0.9%                     | G1             | G4             |
+| C | +0.6%               | +1.3%                     | G3             | G5             |
+| D | +3.4%               | +0.2%                     | G5             | G3             |
+| E | −0.9%              | −1.1%                    | G2             | G1             |
 
 Read down *slot by signal* and the returns come out unordered — which is exactly what one date
 looks like at 12% correlation. Read down *slot by return* and the ordering is perfect, and would be perfect
@@ -291,10 +322,10 @@ moves with the bucketing choice (§ 5) — the ordering is what does not.
 
 Two further readings carry information, and nothing else on the chart does:
 
-| Read | What it establishes |
-| --- | --- |
+| Read                                                | What it establishes                                                                                                         |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | **G5 − G1, measured against the error bars** | the size of the edge next to what noise alone would draw. A rise that fits inside one error bar is not evidence of anything |
-| **The direction of the slope** | a *descending* staircase is not a dead signal — it is the same edge carrying the opposite sign |
+| **The direction of the slope**                | a*descending* staircase is not a dead signal — it is the same edge carrying the opposite sign                            |
 
 A scrambled middle does not disqualify a signal: clean tails around a muddled G2–G4 is a common
 shape and a perfectly tradeable one, since the tails are where the positions go.
@@ -356,12 +387,12 @@ Step 5 integrates over $t$, and an integral hands back an area, never the shape 
 underneath it. A staircase that is monotone over twenty years is equally consistent with an edge
 that held throughout and with one that worked for five years and was flat for fifteen.
 
-| Not on the chart | Where to look instead |
-| --- | --- |
-| **When** the edge happened | the equity curve of [04](04-understanding-backtesting.md) |
-| **Who** is inside a bucket — which assets, which regime | the composition printed under § 5's three cuts |
-| **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean |
-| **How independent** the observations are | overlapping windows, per the Note above |
+| Not on the chart                                                  | Where to look instead                                   |
+| ----------------------------------------------------------------- | ------------------------------------------------------- |
+| **When** the edge happened                                  | the equity curve of[04](04-understanding-backtesting.md) |
+| **Who** is inside a bucket — which assets, which regime    | the composition printed under § 5's three cuts         |
+| **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean          |
+| **How independent** the observations are                    | overlapping windows, per the Note above                 |
 
 ## 4. Risk-adjusted momentum
 
@@ -400,11 +431,11 @@ volatility level. Only the cut changes.
 **Read the counts, not the bars.** All three staircases are monotone, and all three would pass
 § 3.2's test unchanged. Everything that separates them is in the two lines printed underneath.
 
-| Cut                                     | What it answers                                                                                                     | What it distorts                                                                                                                                                                                                                                                       |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Raw values** | What the signal looks like at its own natural scale, before any modelling choice is imposed on it | **Volatility becomes the sort key.** Both tails are 46% high-volatility observations against a 25% base rate, and the middle is 9% — so the staircase is largely a volatility sort wearing the signal's name |
-| **Standardized, fixed intervals** | Whether the edge survives once every asset is put on a common scale (§ 4) | **Starved tails.** 782 and 770 observations in the two buckets you would actually trade, against 16,416 in the middle one you would not. Trailing vol also lags an asset's own vol break, so the tails still tilt to 32% and 29% |
-| **Cross-sectional quantile** | Whether the ordering holds using only what was knowable on the day — the only one of the three with no look-ahead | **Magnitude is discarded.** The top-ranked asset ranks identically whether it beat its peers by a nose or by a mile, and that difference carried information |
+| Cut                                     | What it answers                                                                                                    | What it distorts                                                                                                                                                                                                                       |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Raw values**                    | What the signal looks like at its own natural scale, before any modelling choice is imposed on it                  | **Volatility becomes the sort key.** Both tails are 46% high-volatility observations against a 25% base rate, and the middle is 9% — so the staircase is largely a volatility sort wearing the signal's name                    |
+| **Standardized, fixed intervals** | Whether the edge survives once every asset is put on a common scale (§ 4)                                         | **Starved tails.** 782 and 770 observations in the two buckets you would actually trade, against 16,416 in the middle one you would not. Trailing vol also lags an asset's own vol break, so the tails still tilt to 32% and 29% |
+| **Cross-sectional quantile**      | Whether the ordering holds using only what was knowable on the day — the only one of the three with no look-ahead | **Magnitude is discarded.** The top-ranked asset ranks identically whether it beat its peers by a nose or by a mile, and that difference carried information                                                                     |
 
 None of the three dominates, so produce all three and read them against each other. A staircase that
 survives all three cuts is a different claim from one that appears only in the first.
@@ -595,11 +626,11 @@ One caveat, which is § 4's subject: 0.024 means nothing on its own. 2.4% earned
 
 Not necessarily the next one. Three spans sit on the timeline, in this order:
 
-| Span | What it holds | Typical size |
-| --- | --- | --- |
-| **Lookback** | the $N$ returns the signal averages, ending at $t-1$ | 20–250 periods |
-| **Gap** | $g$ periods thrown away — neither averaged into the signal nor scored against it | 0, a week, or a month |
-| **Paired return** | $r_{s,t+g}$, the one period the signal is judged on | one period |
+| Span                    | What it holds                                                                       | Typical size          |
+| ----------------------- | ----------------------------------------------------------------------------------- | --------------------- |
+| **Lookback**      | the$N$ returns the signal averages, ending at $t-1$                             | 20–250 periods       |
+| **Gap**           | $g$ periods thrown away — neither averaged into the signal nor scored against it | 0, a week, or a month |
+| **Paired return** | $r_{s,t+g}$, the one period the signal is judged on                               | one period            |
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/signal-return-alignment-dark.png">
@@ -609,10 +640,10 @@ Not necessarily the next one. Three spans sit on the timeline, in this order:
 **Two ways to write the same thing.** Both produce an identical pairing table, so use whichever
 reads better in your code:
 
-| Form | What it does | Where you meet it |
-| --- | --- | --- |
-| Slide the return column | pairs $MOM_{s,t}$ with $r_{s,t+g}$ rather than $r_{s,t}$ | `ret.shift(-g)` before the join |
-| Pull the window's end back | builds the signal from $r_{s,t-g-i}$, $i = 1 \ldots N$, then pairs it with $r_{s,t}$ as usual | 12-1 momentum: a twelve-month window that stops one month short of today |
+| Form                       | What it does                                                                                       | Where you meet it                                                        |
+| -------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Slide the return column    | pairs$MOM_{s,t}$ with $r_{s,t+g}$ rather than $r_{s,t}$                                      | `ret.shift(-g)` before the join                                        |
+| Pull the window's end back | builds the signal from$r_{s,t-g-i}$, $i = 1 \ldots N$, then pairs it with $r_{s,t}$ as usual | 12-1 momentum: a twelve-month window that stops one month short of today |
 
 The `-1` in *12-1* **is** the gap.
 
@@ -647,28 +678,30 @@ Throughout, $s$ indexes the asset and $t$ the date. The signal is computed per a
 dropped inside constructions that never leave one asset (§§ 7–8); it carries weight everywhere the
 assets are ranked against each other.
 
-| Symbol                                          | Means                                                                                                                         | First used |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| $s$, $t$                                    | the asset, and the date in periods (days here)                                                                                | § 1       |
-| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$         | that asset's return in that period, the momentum signal it produces, and the share of capital that signal earns it            | § 1.0     |
-| $R_t$                                         | the portfolio's return on that date, $\sum_s w_{s,t} r_{s,t}$                                                                 | § 1.1     |
-| $\rho_s$, $\sigma_{MOM,s}$, $\sigma_{r,s}$   | one asset's signal-return correlation, and the standard deviations of its signal and its forward return                       | § 1.1     |
-| $N$, $i$                                    | lookback length, and the lag inside it running 1 to N                                                                         | § 1.0     |
-| $x$, $y$, $\beta$, $\epsilon$           | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
-| $\rho$, $R^2$                               | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
-| $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$ | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
-| $m$                                           | observations sharing a bucket                                                                                                 | § 3.2     |
-| G1 … G5                                        | the buckets, lowest to highest signal **within a date**                                                                       | § 3.2     |
-| $\sigma_{s,t}$                                | one asset's volatility, estimated on data before that date                                                                    | § 4       |
-| $H$                                           | EWMA half-life, in periods                                                                                                    | § 7       |
-| $P_t$, $\Delta_{t-j}$                       | price on that date, and the one-period change at that lag                                                                     | § 8       |
-| $n_f$, $n_s$                                | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 8       |
-| $\alpha_f$, $\alpha_s$                      | their smoothing constants, two over span plus one                                                                             | § 8       |
-| $c_i$, $k_j$                                | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 8       |
-| $g$                                           | gap length — periods between the end of the signal's window and the return it is scored on                                    | Background |
+| Symbol                                           | Means                                                                                                                         | First used |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| $s$, $t$                                     | the asset, and the date in periods (days here)                                                                                | § 1       |
+| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$          | that asset's return in that period, the momentum signal it produces, and the share of capital that signal earns it            | § 1.0     |
+| $R_t$                                          | the portfolio's return on that date,$\sum_s w_{s,t} r_{s,t}$                                                                | § 1.1     |
+| $G$, $\delta$ | the gross-exposure target the weights must sum in absolute value to, and the tolerance allowed on the net | § 1.1 |
+| $\rho_s$, $\sigma_{MOM,s}$, $\sigma_{r,s}$ | one asset's signal-return correlation, and the standard deviations of its signal and its forward return                       | § 1.1     |
+| $N$, $i$                                     | lookback length, and the lag inside it running 1 to N                                                                         | § 1.0     |
+| $x$, $y$, $\beta$, $\epsilon$            | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
+| $\rho$, $R^2$                                | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
+| $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$  | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
+| $m$                                            | observations sharing a bucket                                                                                                 | § 3.2     |
+| G1 … G5                                         | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
+| $\sigma_{s,t}$                                 | one asset's volatility, estimated on data before that date                                                                    | § 4       |
+| $H$                                            | EWMA half-life, in periods                                                                                                    | § 7       |
+| $P_t$, $\Delta_{t-j}$                        | price on that date, and the one-period change at that lag                                                                     | § 8       |
+| $n_f$, $n_s$                                 | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 8       |
+| $\alpha_f$, $\alpha_s$                       | their smoothing constants, two over span plus one                                                                             | § 8       |
+| $c_i$, $k_j$                                 | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 8       |
+| $g$                                            | gap length — periods between the end of the signal's window and the return it is scored on                                   | Background |
 
 **Note (Collisions to watch).** $R_t$ is the portfolio's return on a date (§ 1.1); $R^2$ is a share
-of variance (§ 2). They share a letter and nothing else. Three quantities wear a $\sigma$ and they
+of variance (§ 2). Lowercase $\delta$ is the tolerance on net exposure (§ 1.1); uppercase
+$\Delta_{t-j}$ is a one-period price change (§ 8). They share a letter and nothing else. Three quantities wear a $\sigma$ and they
 are not interchangeable:
 $\sigma_y$ is the spread of forward return across the pooled cloud (§ 2) — the panel-wide version of
 § 1.1's per-asset $\sigma_{r,s}$ — while $\sigma_\epsilon$ is the part of it the signal cannot reach
