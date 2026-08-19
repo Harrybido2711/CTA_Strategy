@@ -5,6 +5,9 @@ backtesting, and evaluation. Every chapter is backed by runnable code and real m
 
 📖 **Start at [00 · Index &amp; Learning Path](docs/00-index.md).**
 
+🤖 Coding agents: read **[AGENTS.md](AGENTS.md)** first — it carries the conventions this
+repository is written to.
+
 ---
 
 ## The Full Trading Pipeline
