@@ -100,7 +100,10 @@ So why is the correlation only 10–15%? Because the quantity being plotted is m
 $y = \beta x + \epsilon$. If $\epsilon$ is uncorrelated with $x$, the signal owns exactly
 $\rho^2$ of the return's variance, where $\rho$ is their correlation.
 
-**Proof.** Uncorrelated components add their variances,
+<details>
+<summary><b>Proof.</b> uncorrelated parts add their variances, so the explained share is exactly the squared correlation — 1.44% of it at 12%</summary>
+
+Uncorrelated components add their variances,
 
 $$
 \text{Var}(y) = \beta^2 \text{Var}(x) + \text{Var}(\epsilon)
@@ -109,6 +112,8 @@ $$
 and on one regressor with an intercept the explained share is $R^2 = \rho^2$. At $\rho = 0.12$,
 $R^2 = 0.0144$ — which does not mean "right 1.4% of the time", but: of the variation in forward
 return from one observation to the next, 1.44% is linear in the signal and 98.56% is not.
+
+</details>
 
 **Example.** Everything below is **one asset-date's** forward return, never a portfolio's. Take a
 daily return standard deviation of $\sigma_y = 0.012$ — 120 bp, typical for a single equity ETF,
@@ -246,15 +251,23 @@ traded short*, and carry the sign in the strategy rather than in the signal defi
 **Claim.** The ordering surfaces at all only because of step 4 — averaging shrinks the noise and
 leaves the signal untouched.
 
-**Proof.** Take $m$ observations sharing a similar signal value. Their mean return still has
-expectation $\beta$ times their mean signal, while the noise around it falls to
-$\sigma_\epsilon / m^{1/2}$:
+<details>
+<summary><b>Proof.</b> averaging leaves the signal where it was and divides the noise by the square root of m, turning 1 : 8 into 2 : 1</summary>
+
+Take $m$ observations sharing a similar signal value. Their mean return still has expectation
+$\beta$ times their mean signal — they were chosen for having nearly the same signal, so averaging
+them changes it barely at all — while the noise around it falls to $\sigma_\epsilon / m^{1/2}$:
 
 |        | One observation | Mean of 300                        |
 | ------ | --------------- | ---------------------------------- |
 | Signal | 14.4 bp         | 14.4 bp                            |
 | Noise  | 119 bp          | $119 / 300^{1/2} \approx 6.9$ bp |
 | Ratio  | 1 : 8           | **2 : 1**                    |
+
+The left column is the scatter of § 2 and the right column is one bar of the chart. Nothing was
+added — only the noise was taken away.
+
+</details>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/noise-shrinks-dark.png">
@@ -432,7 +445,10 @@ Conventionally $n_f = 12$, $n_s = 26$, and 9 for the signal line.
 **Claim.** MACD is a momentum signal. It is a weighted sum of past returns, differing from a
 lookback mean only in the shape of the weights.
 
-**Proof.** Each EMA is a weighted average of past prices whose weights sum to one, so their
+<details>
+<summary><b>Proof.</b> the two EMAs' weights cancel to a zero-sum kernel on one-period changes, hump-shaped rather than flat</summary>
+
+Each EMA is a weighted average of past prices whose weights sum to one, so their
 difference weights the price $i$ days ago by $c_i$, and those weights sum to **zero**:
 
 $$
@@ -457,6 +473,8 @@ changes, exactly like a lookback mean.
 equally and everything older at zero; MACD's weights rise from a small value at lag 0, peak around
 lag 8, and decay without ever reaching zero. It therefore discounts *yesterday* relative to last
 week — deliberately, since the newest return is the noisiest — and never fully forgets.
+
+</details>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/signal-kernels-dark.png">
