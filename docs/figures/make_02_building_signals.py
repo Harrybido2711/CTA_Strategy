@@ -18,6 +18,7 @@ Figures produced
     three-bucketings     one dataset cut three ways, and what each cut distorts
     signal-distribution  why fixed-interval cuts starve the tails, and what fixes it
     signal-kernels       MACD is momentum with a hump-shaped kernel, not a box
+    bucket-time-collapse     every date gives one draw; pooling them spends the t axis
     signal-return-alignment  the lookback, the discarded gap, and the paired return
 
 All are schematics drawn from illustrative values.
@@ -28,7 +29,7 @@ an image is neither selectable nor searchable.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import FancyBboxPatch
+from matplotlib.patches import FancyBboxPatch, Polygon
 from _style import THEMES, rounded_bar, save, style_axes, titles
 
 
@@ -497,6 +498,90 @@ def scatter_ladder(mode):
     save(fig, t, f"scatter-ladder-{mode}.png")   # save() already crops tight
 
 
+# ------------------------- fig: how the time axis collapses into five bars
+def bucket_time_collapse(mode):
+    """02 s3.2.1 -- every date contributes one draw; pooling them discards t.
+
+    Schematic. The strip along the time axis is one draw of five per date,
+    each panel showing slot on the horizontal and forward return on the
+    vertical; none is ordered on its own. Pooling every date leaves the five
+    averages -- and nothing about when they happened.
+    """
+    t = THEMES[mode]
+    rng = np.random.RandomState(11)
+
+    AX_Y = 6.6                       # the time axis
+    DATES = [1.7, 3.7, 5.7, 7.7, 9.7]
+    PW, PH, SHEAR = 1.15, 2.0, 0.5   # panel width, height, top-edge offset
+
+    fig, ax = plt.subplots(figsize=(9.0, 5.3))
+    fig.patch.set_facecolor(t["surface"])
+    ax.set_facecolor(t["surface"])
+    ax.set_xlim(0.2, 14.0)
+    ax.set_ylim(1.05, 9.0)
+    ax.axis("off")
+
+    # ---- the time axis, with one date mark per draw
+    ax.annotate("", xy=(13.5, AX_Y), xytext=(0.7, AX_Y),
+                arrowprops=dict(arrowstyle="-|>", color=t["baseline"], linewidth=1.1,
+                                shrinkA=0, shrinkB=0))
+    ax.text(13.7, AX_Y - 0.30, "$t$", ha="left", va="center",
+            color=t["muted"], fontsize=10)
+    for x in DATES:
+        ax.plot([x], [AX_Y], marker="o", markersize=4.2, color=t["ink_secondary"],
+                zorder=4)
+
+    # ---- one draw of five standing on each date
+    for x in DATES:
+        x0, y0 = x - PW / 2, AX_Y + 0.10
+        ax.add_patch(Polygon(
+            [(x0, y0), (x0 + PW, y0), (x0 + PW + SHEAR, y0 + PH), (x0 + SHEAR, y0 + PH)],
+            closed=True, facecolor=t["surface"], edgecolor=t["baseline"],
+            linewidth=1.0, zorder=3))
+        for k in range(5):
+            fx = 0.16 + 0.17 * k                       # slot, left to right
+            fy = rng.uniform(0.18, 0.82)               # its forward return
+            ax.plot([x0 + fx * PW + SHEAR * fy], [y0 + fy * PH], marker="o",
+                    markersize=3.4, color=t["ramp"][5], zorder=4)
+
+    ax.text(11.1, AX_Y + 1.55,
+            "one draw of five per date —\nslot across, forward return up.\n"
+            "Not one of them is ordered",
+            ha="left", va="center", color=t["ink_secondary"], fontsize=8.3,
+            linespacing=1.5)
+
+    # ---- the collapse
+    ax.annotate("", xy=(3.7, 4.85), xytext=(3.7, AX_Y - 0.45),
+                arrowprops=dict(arrowstyle="-|>", color=t["ramp"][5], linewidth=1.3,
+                                shrinkA=0, shrinkB=0))
+    ax.text(4.05, 5.78, "pool every date, then average within each slot",
+            ha="left", va="center", color=t["ramp"][5], fontsize=8.6, fontweight="600")
+    ax.text(4.05, 5.42, "the $t$ axis is spent here, and does not come back",
+            ha="left", va="center", color=t["ink_secondary"], fontsize=8.3)
+
+    # ---- what pooling leaves: five averages
+    ZERO, SCALE = 3.40, 0.048
+    bars = [(-20, "G1"), (-9, "G2"), (2, "G3"), (10, "G4"), (20, "G5")]
+    xs = [1.9, 2.8, 3.7, 4.6, 5.5]
+    ax.plot([1.35, 6.05], [ZERO, ZERO], color=t["baseline"], linewidth=0.9, zorder=2)
+    for x, (bp, label) in zip(xs, bars):
+        rounded_bar(ax, x, bp * SCALE, base=ZERO, width=0.56, color=t["ramp"][5])
+        tip = ZERO + bp * SCALE
+        ax.plot([x, x], [tip - 0.17, tip + 0.17], color=t["ink_secondary"],
+                linewidth=1.0, zorder=5)
+        ax.text(x, 1.92, label, ha="center", va="center",
+                color=t["muted"], fontsize=8.4)
+    ax.text(6.35, ZERO, "monotone G1 to G5, and that is\nthe whole claim — it says\nnothing about when",
+            ha="left", va="center", color=t["ink_secondary"], fontsize=8.3,
+            linespacing=1.5)
+    ax.text(1.35, 1.42, "average forward return per slot, pooled over the whole sample",
+            ha="left", va="center", color=t["muted"], fontsize=8.2)
+
+    titles(ax, t, "Every date contributes one draw; the pool keeps only the averages",
+           "illustrative — the bar chart is the whole history flattened onto a single picture")
+    save(fig, t, f"bucket-time-collapse-{mode}.png")
+
+
 # ----------------------------- fig: which return a signal is paired with
 def signal_return_alignment(mode):
     """02 background -- the lookback, the discarded gap, and the paired return.
@@ -603,7 +688,8 @@ def signal_return_alignment(mode):
 
 
 FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_construction, noise_shrinks,
-           three_bucketings, signal_distribution, signal_kernels, signal_return_alignment)
+           three_bucketings, signal_distribution, signal_kernels, signal_return_alignment,
+           bucket_time_collapse)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

@@ -166,6 +166,10 @@ concluding anything **from** a cloud.
 
 ### 3.2 Beta Method
 
+Stop asking each point what it did, and ask each *group* of points what they did on average.
+
+#### 3.2.1 Where the bars come from
+
 **The construction.** Six steps, and the figure below is the same six read left to right.
 
 1. **Draw** five observations at random — one observation being one date. The left
@@ -216,6 +220,51 @@ not knowable when the first was computed.**
 **The staircase belongs to step 6.** The figure's top row runs the steps where the answer is known
 and every draw of five comes out ordered. The bottom row runs them on § 2's real scatter, where the
 six draws cross and tangle — at 12% correlation not one of them should be monotone.
+
+Steps 1 to 5 were drawn as though the draws floated free of the calendar, and they do not: one
+observation is one **date**, so every draw sits somewhere on the time axis. The figure below redraws
+the same recipe that way — a strip of five-point draws standing along $t$, and step 6 flattening the
+strip into five numbers.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-time-collapse-dark.png">
+  <img alt="A horizontal time axis labelled t with five dates marked on it. Standing on each date is a small slanted panel holding one draw of five points, slot across and forward return up, and none of the five panels shows any ordering. An arrow labelled pool every date then average within each slot points down from the axis to a bucket chart of five bars with error bars, rising monotonically from about minus 20 basis points at G1 to plus 20 at G5, annotated that the ordering is the whole claim and that the chart says nothing about when the edge happened" src="figures/bucket-time-collapse-light.png">
+</picture>
+
+So the bar chart is an average over **dates** every bit as much as over observations, and that is
+what makes it legible at all: no single date's draw is ordered, and the ordering only surfaces once
+a few hundred of them are stacked.
+
+What it costs is the axis. Step 6 integrates over $t$, and an integral hands back an area, never the
+shape of the function underneath it — a staircase that is monotone over twenty years is equally
+consistent with an edge that held throughout and with one that worked for five years and was flat
+for fifteen. Recovering the shape takes a different plot: the equity curve of
+[04](04-understanding-backtesting.md). → § 5 and the counts printed under its three cuts are the
+first place this loss becomes visible.
+
+#### 3.2.2 Reading the staircase
+
+Three things are readable off a bucket chart, and it is worth being strict about which:
+
+| Read | What it establishes |
+| --- | --- |
+| **Monotonicity across G1 → G5** | the ordering claim of § 1, tested. This is the hypothesis — *higher signal, higher average forward return* — and it is the only thing the chart is really asserting |
+| **The G5 − G1 spread against the error bars** | the size of the edge relative to what noise alone would draw. A staircase whose whole rise fits inside one error bar is not evidence of anything |
+| **The direction of the slope** | a *descending* staircase is not a dead signal — it is the same edge carrying the opposite sign |
+
+An individual bar's height is not on that list. It moves with the bucketing choice (§ 5), so the
+level of G3 says far less than the fact that G3 sits between G2 and G4. Nor is a scrambled middle
+disqualifying: clean tails with a muddled G2–G4 is a common and perfectly tradeable shape, since the
+tails are where the positions actually go.
+
+On direction, adopt a convention early and keep it: **leave the signal's sign alone and let the
+chart come out upside down.** Flipping a signal the moment its staircase descends is cheap and
+tempting, and a dozen signals later you will not remember which ones you flipped. Read a descending
+staircase as *this works, traded short*, and carry the sign in the strategy rather than folding it
+back into the signal definition.
+
+How much of the staircase to believe is a question about the error bars, and those are set by one
+number.
 
 **Claim.** Averaging within a group shrinks the noise and leaves the signal untouched, which is what
 step 5 buys.
@@ -554,6 +603,7 @@ You should be able to explain:
 - [ ] Why a scatter plot proves nothing at a realistic 10–15% correlation
 - [ ] Why the sort key must be the signal and never the forward return
 - [ ] Why a gap sits between the signal's window and the return it is scored on, and what that gap costs
+- [ ] What pooling every date buys, and that the time axis is what it costs
 - [ ] Why fixed-interval buckets starve the tails and full-history ranking leaks the future
 - [ ] Why MACD is momentum with a hump-shaped kernel rather than a separate indicator
 
