@@ -29,7 +29,7 @@ an image is neither selectable nor searchable.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import FancyBboxPatch
+from matplotlib.patches import FancyBboxPatch, Polygon
 from _style import THEMES, rounded_bar, save, style_axes, titles
 
 
@@ -92,7 +92,7 @@ def alpha_opacity(mode):
     """02 s3.1 -- alpha turns ink into density; whether density reads is another matter.
 
     Schematic. Left and right are the same 5,000 illustrative points at 12%
-    correlation -- about twenty years of one asset's daily observations --
+    correlation -- asset-date cells pooled across the panel --
     drawn opaque and at a low opacity. The middle panel is a different,
     invented series: what the fix looks like when it works, a corner thin
     enough to read.
@@ -145,7 +145,7 @@ def alpha_opacity(mode):
                        fontsize=9, labelpad=8)
     fig.text(0.5, 0.01, "signal $MOM_{s,t}$   (σ)", ha="center", color=t["muted"], fontsize=8.5)
     fig.text(0.5, -0.09,
-             "Illustrative. Outer panels are one asset's 5,000 daily observations at 12% "
+             "Illustrative. Outer panels are 5,000 pooled asset-date observations at 12% "
              "correlation, differing only in opacity. The middle is a different, invented series — "
              "what success would look like, and it would be a result.",
              ha="center", color=t["ink_secondary"], fontsize=8.6)
@@ -171,16 +171,16 @@ def bucket_construction(mode):
     cy = 0.12 * cx + (1 - 0.12 ** 2) ** 0.5 * rng.standard_normal(n)
 
     def slots(px, py, k):
-        """k draws of five, each sorted by signal into rank slots G1..G5"""
+        """k dates of five assets, each sorted by signal into rank slots G1..G5"""
         idx = rng.randint(0, len(px), size=(k, 5))
         order = np.argsort(px[idx], axis=1)
         return np.take_along_axis(py[idx], order, axis=1), idx
 
     rows = (
-        (lx, ly, "If the relationship were perfect", "any five points, taken at random",
-         "every draw comes out ordered"),
-        (cx, cy, "On the real cloud", "any five points, taken at random",
-         "every draw comes back tangled"),
+        (lx, ly, "If the relationship were perfect", "one date's five assets",
+         "every date comes out ordered"),
+        (cx, cy, "On the real cloud", "one date's five assets",
+         "every date comes back tangled"),
     )
 
     fig, axes = plt.subplots(2, 3, figsize=(10.6, 6.6),
@@ -189,7 +189,7 @@ def bucket_construction(mode):
 
     for (px, py, head, sub, mid_sub), (ax, bx, cxx) in zip(rows, axes):
         ranked, idx = slots(px, py, shown)
-        picked = idx[:3].ravel()                     # three draws' worth, one colour
+        picked = idx[:3].ravel()                     # three dates' worth, one colour
 
         # ---- where the points come from
         style_axes(ax, t, ylabel="forward return $r_{s,t}$",
@@ -209,7 +209,7 @@ def bucket_construction(mode):
         bx.set_xticks(range(5))
         bx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
         bx.set_yticks([])
-        titles(bx, t, f"{shown} draws, ranked", mid_sub)
+        titles(bx, t, f"{shown} dates, ranked", mid_sub)
 
         # ---- and the average of many, with the error on it
         allr, _ = slots(px, py, total)
@@ -228,7 +228,7 @@ def bucket_construction(mode):
         cxx.set_xticks(range(5))
         cxx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
         cxx.set_yticks([])
-        titles(cxx, t, f"{total} draws, averaged", "bars with their error bars")
+        titles(cxx, t, f"{total} dates, averaged", "bars with their error bars")
 
     fig.text(0.5, -0.03,
              "Illustrative. Each row is scaled to its own height — the real staircase has the shape "
@@ -288,37 +288,42 @@ def noise_shrinks(mode):
 
 # ------------------- fig: one dataset, three ways of cutting it into buckets
 def three_bucketings(mode):
-    """02 s5 -- raw, standardized-at-fixed-intervals, and rolling quantile.
+    """02 s5 -- raw, standardized-at-fixed-intervals, and cross-sectional quantile.
 
-    Schematic. One simulated asset over 6,000 days -- roughly twenty-four years
-    -- with a calm era and a violent one, carrying the same risk-adjusted edge
-    throughout. Only the bucketing differs between panels; bar heights are mean
-    forward return in bp on a shared scale, and n is the count behind each bar.
+    Schematic. A simulated panel of 20 assets over 1,500 days. Every asset
+    carries the same risk-adjusted edge and its own volatility level, which
+    doubles on a date of its own. Only the bucketing differs between panels:
+    bar heights are mean forward return in bp on a shared scale, n is the count
+    behind each bar, and the second line is the share of that bucket drawn from
+    the top quartile of contemporaneous volatility -- 25% if the cut is
+    vol-neutral.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(12)
-    A, T, W, rho = 1, 6000, 500, 0.12
+    A, T, W, rho = 20, 1500, 250, 0.12
 
-    vol = np.where(np.arange(T) < 4000, 0.6, 2.0)[:, None]    # calm era, then violent
+    base = np.exp(rng.uniform(-1.0, 1.0, A))                   # each asset's own vol level
+    jump = rng.randint(W, T, A)                                # ... which doubles, on its own date
+    vol = base[None, :] * np.where(np.arange(T)[:, None] >= jump[None, :], 2.0, 1.0)
+
     z = rng.standard_normal((T, A))                            # the risk-adjusted signal
     fwd = 100 * vol * (rho * z + (1 - rho ** 2) ** 0.5 * rng.standard_normal((T, A)))
     raw = z * vol                                              # what you measure before scaling
 
-    # trailing volatility, and rank against own history — both use data before t only
-    sig = np.full((T, A), np.nan)
+    sig = np.full((T, A), np.nan)                              # trailing vol, data before t only
     for i in range(W, T):
         sig[i] = raw[i] / raw[i - W:i].std(axis=0)
-    rq = np.full((T, A), np.nan)                               # standardize first, then rank
-    for i in range(2 * W, T):
-        rq[i] = (sig[i - W:i] < sig[i]).mean(axis=0)
 
-    violent = np.repeat((np.arange(T) >= 4000)[:, None], A, axis=1)
+    xs = np.full((T, A), np.nan)                               # rank within that date's peers
+    for i in range(W, T):
+        xs[i] = sig[i].argsort().argsort() / (A - 1.0)
 
-    usable = np.zeros((T, A), bool)                            # same rows in all three panels
-    usable[2 * W:] = True
+    usable = np.zeros((T, A), bool)                            # same cells in all three panels
+    usable[W:] = True
+    hivol = vol >= np.quantile(vol[usable], 0.75)              # base rate 25% by construction
 
     def bars(key, edges=None):
-        k, y, v = key.ravel(), fwd.ravel(), violent.ravel()
+        k, y, v = key.ravel(), fwd.ravel(), hivol.ravel()
         ok = ~np.isnan(k) & usable.ravel()
         k, y, v = k[ok], y[ok], v[ok]
         cuts = np.quantile(k, [0.2, 0.4, 0.6, 0.8]) if edges is None else edges
@@ -333,7 +338,8 @@ def three_bucketings(mode):
         (bars(raw), "Raw values", "cut at the pooled quintiles of raw momentum"),
         (bars(sig, edges=np.array([-2.0, -1.0, 1.0, 2.0])), "Standardized, fixed intervals",
          "divided by trailing vol, then cut at ±1 and ±2"),
-        (bars(rq), "Rolling quantile", "ranked against its own past, then cut at the quintiles"),
+        (bars(xs), "Cross-sectional quantile",
+         "ranked against that day's peers, then cut at the quintiles"),
     )
 
     fig, axes = plt.subplots(1, 3, figsize=(11.2, 4.3), sharey=True,
@@ -350,19 +356,19 @@ def three_bucketings(mode):
                     elinewidth=1.1, capsize=3, capthick=1.1, zorder=5)
         ax.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
         ax.set_xlim(-0.6, 4.6)
-        ax.set_ylim(-58, 46)
+        ax.set_ylim(-100, 52)
         ax.set_xticks(range(5))
         ax.set_xticklabels(["G1", "G2", "G3", "G4", "G5"], fontsize=8)
         for i, (c, sh) in enumerate(zip(n, share)):
-            ax.text(i, -45, f"n={c:,}", ha="center", color=t["muted"], fontsize=7.2)
-            ax.text(i, -53, f"{sh:.0f}%", ha="center", color=t["muted"], fontsize=7.2)
+            ax.text(i, -78, f"n={c:,}", ha="center", color=t["muted"], fontsize=7.2)
+            ax.text(i, -90, f"{sh:.0f}%", ha="center", color=t["muted"], fontsize=7.2)
         titles(ax, t, head, sub)
 
     fig.text(0.5, -0.06,
-             "Illustrative. One asset over 6,000 days, calm and then violent, carrying the same "
-             "risk-adjusted edge throughout, with identical rows in all three panels — only the cut "
+             "Illustrative. 20 assets over 1,500 days, each carrying the same risk-adjusted edge and "
+             "its own volatility level, with identical cells in all three panels — only the cut "
              "differs.\nUnder each bar: how many observations it holds, and what share of them came "
-             "from the violent era.",
+             "from the top quartile of volatility (25% if the cut is vol-neutral).",
              ha="center", color=t["ink_secondary"], fontsize=8.6)
     save(fig, t, f"three-bucketings-{mode}.png")
 
@@ -383,7 +389,7 @@ def signal_distribution(mode):
     panels = [
         (fixed_cuts, "Fixed intervals", "the tails you actually trade are nearly empty",
          ["n=12", "n=340", "n=1,290", "n=1,290", "n=331", "n=11"]),
-        (quant_cuts, "Rolling quantile", "equal-sized groups, and no look-ahead",
+        (quant_cuts, "Cross-sectional quantile", "equal-sized groups, and no look-ahead",
          ["", "n=635", "n=635", "n=635", "n=635", ""]),
     ]
 
@@ -508,17 +514,19 @@ def scatter_ladder(mode):
 
 # ------------------------- fig: how the time axis collapses into five bars
 def bucket_time_collapse(mode):
-    """02 s3.2.3 -- every observation is a date; pooling the draws discards t.
+    """02 s3.2.3 -- every date has its own cross-section; pooling them spends t.
 
-    Schematic. One asset, one tick per date along the time axis. A draw of five
-    is five of those dates, scattered rather than adjacent, and the chapter
-    takes a few hundred such draws. Pooling them leaves five averages -- and
-    nothing about when any of it happened.
+    Schematic. Standing on each date is that date's cross-section: five assets,
+    ranked by signal into slots G1 to G5 across, forward return up. Not one of
+    them is ordered on its own. Pooling every date leaves the five averages --
+    and nothing about when any of it happened.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(11)
 
     AX_Y = 6.6                       # the time axis
+    DATES = [1.7, 3.7, 5.7, 7.7, 9.7]
+    PW, PH, SHEAR = 1.15, 2.0, 0.5   # panel width, height, top-edge offset
 
     fig, ax = plt.subplots(figsize=(9.0, 5.3))
     fig.patch.set_facecolor(t["surface"])
@@ -527,41 +535,41 @@ def bucket_time_collapse(mode):
     ax.set_ylim(1.05, 9.15)
     ax.axis("off")
 
-    # ---- the asset's own history: one tick per date
+    # ---- the time axis, with one mark per date
     ax.annotate("", xy=(13.5, AX_Y), xytext=(0.7, AX_Y),
                 arrowprops=dict(arrowstyle="-|>", color=t["baseline"], linewidth=1.1,
                                 shrinkA=0, shrinkB=0))
     ax.text(13.7, AX_Y - 0.30, "$t$", ha="left", va="center",
             color=t["muted"], fontsize=10)
-    obs = np.linspace(1.1, 12.4, 52)
-    for x in obs:
-        ax.plot([x, x], [AX_Y - 0.11, AX_Y + 0.11], color=t["grid"],
-                linewidth=1.1, zorder=3)
+    for x in DATES:
+        ax.plot([x], [AX_Y], marker="o", markersize=4.2, color=t["ink_secondary"],
+                zorder=4)
 
-    # ---- two draws of five: five dates each, of that same one asset
-    draws = ((7.25, t["ramp"][5], "one draw of five"),
-             (8.05, t["ramp"][2], "another draw, and a few hundred more"))
-    for lvl, colour, label in draws:
-        picks = np.sort(obs[rng.choice(len(obs), 5, replace=False)])
-        ax.plot([picks[0], picks[-1]], [lvl, lvl], color=colour, linewidth=1.0,
-                linestyle=(0, (2.2, 1.8)), zorder=3)
-        for x in picks:
-            ax.plot([x, x], [AX_Y + 0.14, lvl], color=colour, linewidth=0.9,
-                    alpha=0.5, zorder=3)
-            ax.plot([x], [lvl], marker="o", markersize=4.6, color=colour, zorder=5)
-        ax.text(picks[-1] + 0.28, lvl, label, ha="left", va="center", color=colour,
-                fontsize=8.4, fontweight="600")
+    # ---- each date's own cross-section standing on it
+    for x in DATES:
+        x0, y0 = x - PW / 2, AX_Y + 0.12
+        ax.add_patch(Polygon(
+            [(x0, y0), (x0 + PW, y0), (x0 + PW + SHEAR, y0 + PH), (x0 + SHEAR, y0 + PH)],
+            closed=True, facecolor=t["surface"], edgecolor=t["baseline"],
+            linewidth=1.0, zorder=3))
+        for k in range(5):
+            fx = 0.16 + 0.17 * k                       # the asset's slot, G1 to G5
+            fy = rng.uniform(0.18, 0.82)               # the return it went on to deliver
+            ax.plot([x0 + fx * PW + SHEAR * fy], [y0 + fy * PH], marker="o",
+                    markersize=3.4, color=t["ramp"][5], zorder=4)
 
-    ax.text(1.1, 8.80,
-            "one asset, one tick per date. A draw is any five of those dates — "
-            "they need not sit near each other",
-            ha="left", va="center", color=t["ink_secondary"], fontsize=8.4)
+    ax.text(11.1, AX_Y + 1.50,
+            "each panel is that date's\ncross-section — five assets,\n"
+            "signal slot G1 to G5 across,\nforward return $r_{s,t}$ up.\n"
+            "None of them is ordered",
+            ha="left", va="center", color=t["ink_secondary"], fontsize=8.3,
+            linespacing=1.5)
 
     # ---- the collapse
     ax.annotate("", xy=(3.7, 4.85), xytext=(3.7, AX_Y - 0.45),
                 arrowprops=dict(arrowstyle="-|>", color=t["ramp"][5], linewidth=1.3,
                                 shrinkA=0, shrinkB=0))
-    ax.text(4.05, 5.78, "rank each draw, file it by slot, average within each slot",
+    ax.text(4.05, 5.78, "pool every date, then average within each slot",
             ha="left", va="center", color=t["ramp"][5], fontsize=8.6, fontweight="600")
     ax.text(4.05, 5.42, "the $t$ axis is spent here, and does not come back",
             ha="left", va="center", color=t["ink_secondary"], fontsize=8.3)
@@ -586,8 +594,8 @@ def bucket_time_collapse(mode):
     ax.text(0.95, ZERO, "mean forward return $r_{s,t}$", rotation=90,
             ha="center", va="center", color=t["ink_secondary"], fontsize=8.4)
 
-    titles(ax, t, "Every observation is a date; the pool keeps only the averages",
-           "illustrative — one asset, and the bar plot is its whole history flattened onto one picture")
+    titles(ax, t, "Every date brings its own cross-section; the pool keeps only the averages",
+           "illustrative — the bar plot is every date's ranking flattened onto one picture")
     save(fig, t, f"bucket-time-collapse-{mode}.png")
 
 
