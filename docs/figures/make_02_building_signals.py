@@ -29,7 +29,7 @@ an image is neither selectable nor searchable.
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import FancyBboxPatch, Polygon
+from matplotlib.patches import FancyBboxPatch
 from _style import THEMES, rounded_bar, save, style_axes, titles
 
 
@@ -508,63 +508,60 @@ def scatter_ladder(mode):
 
 # ------------------------- fig: how the time axis collapses into five bars
 def bucket_time_collapse(mode):
-    """02 s3.2.1 -- every date contributes one draw; pooling them discards t.
+    """02 s3.2.3 -- every observation is a date; pooling the draws discards t.
 
-    Schematic. The strip along the time axis is one draw of five per date,
-    each panel showing slot on the horizontal and forward return on the
-    vertical; none is ordered on its own. Pooling every date leaves the five
-    averages -- and nothing about when they happened.
+    Schematic. One asset, one tick per date along the time axis. A draw of five
+    is five of those dates, scattered rather than adjacent, and the chapter
+    takes a few hundred such draws. Pooling them leaves five averages -- and
+    nothing about when any of it happened.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(11)
 
     AX_Y = 6.6                       # the time axis
-    DATES = [1.7, 3.7, 5.7, 7.7, 9.7]
-    PW, PH, SHEAR = 1.15, 2.0, 0.5   # panel width, height, top-edge offset
 
     fig, ax = plt.subplots(figsize=(9.0, 5.3))
     fig.patch.set_facecolor(t["surface"])
     ax.set_facecolor(t["surface"])
     ax.set_xlim(0.2, 14.0)
-    ax.set_ylim(1.05, 9.0)
+    ax.set_ylim(1.05, 9.15)
     ax.axis("off")
 
-    # ---- the time axis, with one date mark per draw
+    # ---- the asset's own history: one tick per date
     ax.annotate("", xy=(13.5, AX_Y), xytext=(0.7, AX_Y),
                 arrowprops=dict(arrowstyle="-|>", color=t["baseline"], linewidth=1.1,
                                 shrinkA=0, shrinkB=0))
     ax.text(13.7, AX_Y - 0.30, "$t$", ha="left", va="center",
             color=t["muted"], fontsize=10)
-    for x in DATES:
-        ax.plot([x], [AX_Y], marker="o", markersize=4.2, color=t["ink_secondary"],
-                zorder=4)
+    obs = np.linspace(1.1, 12.4, 52)
+    for x in obs:
+        ax.plot([x, x], [AX_Y - 0.11, AX_Y + 0.11], color=t["grid"],
+                linewidth=1.1, zorder=3)
 
-    # ---- one draw of five standing on each date
-    for x in DATES:
-        x0, y0 = x - PW / 2, AX_Y + 0.10
-        ax.add_patch(Polygon(
-            [(x0, y0), (x0 + PW, y0), (x0 + PW + SHEAR, y0 + PH), (x0 + SHEAR, y0 + PH)],
-            closed=True, facecolor=t["surface"], edgecolor=t["baseline"],
-            linewidth=1.0, zorder=3))
-        for k in range(5):
-            fx = 0.16 + 0.17 * k                       # slot, left to right
-            fy = rng.uniform(0.18, 0.82)               # its forward return
-            ax.plot([x0 + fx * PW + SHEAR * fy], [y0 + fy * PH], marker="o",
-                    markersize=3.4, color=t["ramp"][5], zorder=4)
+    # ---- two draws of five: five dates each, of that same one asset
+    draws = ((7.25, t["ramp"][5], "one draw of five"),
+             (8.05, t["ramp"][2], "another draw, and a few hundred more"))
+    for lvl, colour, label in draws:
+        picks = np.sort(obs[rng.choice(len(obs), 5, replace=False)])
+        ax.plot([picks[0], picks[-1]], [lvl, lvl], color=colour, linewidth=1.0,
+                linestyle=(0, (2.2, 1.8)), zorder=3)
+        for x in picks:
+            ax.plot([x, x], [AX_Y + 0.14, lvl], color=colour, linewidth=0.9,
+                    alpha=0.5, zorder=3)
+            ax.plot([x], [lvl], marker="o", markersize=4.6, color=colour, zorder=5)
+        ax.text(picks[-1] + 0.28, lvl, label, ha="left", va="center", color=colour,
+                fontsize=8.4, fontweight="600")
 
-    ax.text(11.1, AX_Y + 1.50,
-            "each panel is one draw of five\n"
-            "at that date — across: signal\n"
-            "slot G1 to G5;  up: forward\n"
-            "return $r_{s,t}$. None is ordered",
-            ha="left", va="center", color=t["ink_secondary"], fontsize=8.3,
-            linespacing=1.5)
+    ax.text(1.1, 8.80,
+            "one asset, one tick per date. A draw is any five of those dates — "
+            "they need not sit near each other",
+            ha="left", va="center", color=t["ink_secondary"], fontsize=8.4)
 
     # ---- the collapse
     ax.annotate("", xy=(3.7, 4.85), xytext=(3.7, AX_Y - 0.45),
                 arrowprops=dict(arrowstyle="-|>", color=t["ramp"][5], linewidth=1.3,
                                 shrinkA=0, shrinkB=0))
-    ax.text(4.05, 5.78, "pool every date, then average within each slot",
+    ax.text(4.05, 5.78, "rank each draw, file it by slot, average within each slot",
             ha="left", va="center", color=t["ramp"][5], fontsize=8.6, fontweight="600")
     ax.text(4.05, 5.42, "the $t$ axis is spent here, and does not come back",
             ha="left", va="center", color=t["ink_secondary"], fontsize=8.3)
@@ -589,8 +586,8 @@ def bucket_time_collapse(mode):
     ax.text(0.95, ZERO, "mean forward return $r_{s,t}$", rotation=90,
             ha="center", va="center", color=t["ink_secondary"], fontsize=8.4)
 
-    titles(ax, t, "Every date contributes one draw; the pool keeps only the averages",
-           "illustrative — the bar chart is the whole history flattened onto a single picture")
+    titles(ax, t, "Every observation is a date; the pool keeps only the averages",
+           "illustrative — one asset, and the bar plot is its whole history flattened onto one picture")
     save(fig, t, f"bucket-time-collapse-{mode}.png")
 
 

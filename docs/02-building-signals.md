@@ -176,6 +176,11 @@ ordered slots G1 … G5; the vertical axis is the **mean forward return** of the
 into each slot. Every observation lands in exactly one bar, and the error bar on it is the standard
 error of that mean.
 
+**Note (All five bars are one asset).** The sort runs across that asset's **dates**, not across its
+peers — G1 holds the dates on which its own signal was lowest. The cross-sectional version, where
+the assets are ranked against one another on the same date, is a different chart and belongs to
+[03](03-from-signal-to-position.md).
+
 Five steps build it:
 
 1. **Draw** five observations at random — one observation is one asset-date.
@@ -264,13 +269,13 @@ not really reach 7 bp. The logic survives: averaging cancels noise and leaves sy
 
 #### 3.2.3 What the bar plot cannot show
 
-Steps 1 to 4 were drawn as though the draws floated free of the calendar. They do not: one
-observation is one **date**, so every draw stands somewhere on $t$, and step 5 flattens the whole
-strip into five numbers.
+Steps 1 to 4 were drawn as though the observations floated free of the calendar. They do not: one
+observation is one **date**, so a draw of five is five dates lifted out of that asset's history —
+scattered, not adjacent — and step 5 flattens a few hundred such draws into five numbers.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-time-collapse-dark.png">
-  <img alt="A horizontal time axis labelled t with five dates marked on it. Standing on each date is a small slanted panel holding one draw of five points, signal slot G1 to G5 across and forward return up, and none of the five panels shows any ordering. An arrow labelled pool every date then average within each slot points down from the axis to a bar plot of mean forward return against signal bucket, five bars with error bars rising monotonically from about minus 20 basis points at G1 to plus 20 at G5, annotated that the ordering is the whole claim and that the chart says nothing about when the edge happened" src="figures/bucket-time-collapse-light.png">
+  <img alt="A horizontal time axis labelled t carrying one small tick per date of a single asset's history. Above it, two draws of five are marked, each as five stems rising from five widely separated dates to a dashed connector, showing that a draw is any five dates and that they need not sit near each other. An arrow labelled rank each draw, file it by slot, average within each slot points down from the axis to a bar plot of mean forward return against signal bucket, five bars with error bars rising monotonically from about minus 20 basis points at G1 to plus 20 at G5, annotated that the ordering is the whole claim and that the chart says nothing about when the edge happened" src="figures/bucket-time-collapse-light.png">
 </picture>
 
 Step 5 integrates over $t$, and an integral hands back an area, never the shape of the function
