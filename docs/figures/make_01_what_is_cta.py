@@ -57,7 +57,8 @@ def levels_vs_rebased(mode):
     ]
 
     for ax, (frame, title, subtitle, unit) in zip(axes, panels):
-        style_axes(ax, t, ylabel=f"close ({unit})" if unit else "index (start = 100)")
+        style_axes(ax, t, ylabel=f"close ({unit})" if unit else "index (start = 100)",
+                   xlabel="date")
         for tk, c in zip(tickers, colours):
             ax.plot(x, frame[tk], color=c, linewidth=1.6, zorder=3)
             ax.text(x[-1], frame[tk].iloc[-1], f"  {tk}", color=c, fontsize=8.8,

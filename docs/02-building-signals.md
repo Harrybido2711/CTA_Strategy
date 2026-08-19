@@ -166,108 +166,78 @@ concluding anything **from** a cloud.
 
 ### 3.2 Beta Method
 
-Stop asking each point what it did, and ask each *group* of points what they did on average.
+Stop asking each point what it did, and ask each *group* of points what they did on average. The
+answer comes back as a **bar plot**, and the rest of § 3 is about reading that one chart.
 
-#### 3.2.1 Where the bars come from
+#### 3.2.1 What a bar plot is
 
-**The construction.** Six steps, and the figure below is the same six read left to right.
+**Definition (Bar plot).** Five bars. The horizontal axis is the **signal**, coarsened into five
+ordered slots G1 … G5; the vertical axis is the **mean forward return** of the observations filed
+into each slot. Every observation lands in exactly one bar, and the error bar on it is the standard
+error of that mean.
 
-1. **Draw** five observations at random — one observation being one date. The left
-   column marks fifteen of them, three draws' worth, all in one colour: any five will do.
-2. **Rank** those five by signal value, highest to lowest.
-3. **Assign** them to slots — highest signal into G5, next into G4, down to G1.
-4. **Record** the forward return each one went on to deliver, filed under its slot. Steps 2–4 are
-   one line in the middle column: five points, one per slot.
-5. **Repeat** steps 1–4 a few hundred times. The middle column draws six of them.
-6. **Average** everything filed under G1, then G2, and so on — five numbers, drawn in the right
-   column as five bars with the error on each.
+Five steps build it:
+
+1. **Draw** five observations at random — one observation is one asset-date.
+2. **Rank** them by signal and file them into slots: highest $MOM_{s,t}$ into G5, down to G1.
+3. **Record** the forward return each one went on to deliver, under its slot.
+4. **Repeat** a few hundred times.
+5. **Average** everything filed under each slot.
+
+The figure runs those five left to right — the population and the points drawn from it, each draw
+sitting at the slots its five points fell into, and the average of many with the error on it.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
-  <img alt="Six panels in two rows, each row running the same steps on a different world. Left column, the population with fifteen randomly drawn points marked in the same colour: on a perfect line they sit along it, on the real cloud they sit anywhere. Middle column, six draws of five plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle with no order at all. Right column, the average over 400 draws with error bars: a clean staircase on the line, and on the cloud a shorter staircase from a negative G1 to a positive G5 whose error bars are a third of the bar heights" src="figures/bucket-construction-light.png">
+  <img alt="Six panels in two rows, each row running the same steps on a different world. Left column, forward return against signal, the population with fifteen randomly drawn points marked in the same colour: on a perfect line they sit along it, on the real cloud they sit anywhere. Middle column, six draws of five plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle with no order at all. Right column, mean forward return per signal bucket averaged over 400 draws with error bars: a clean staircase on the line, and on the cloud a shorter staircase from a negative G1 to a positive G5 whose error bars are a third of the bar heights" src="figures/bucket-construction-light.png">
 </picture>
 
-**The sort key is the signal, never the return.** Steps 2 and 3 order by $MOM_{s,t}$, known at
-$t$; step 4 only *records* what followed. So G1 holds the lowest-**signal** observations, not the
-worst performers.
+**The sort key is the signal, never the return.** Step 2 orders by $MOM_{s,t}$, which is known at
+$t$; step 3 only *records* what followed. G1 therefore holds the lowest-**signal** observations, not
+the worst performers.
 
-**Example.** One draw of five, invented:
+**Example.** One draw of five, invented, filed both ways:
 
-|   | Signal | Forward return |
-| - | ------ | -------------- |
-| A | +2.1%  | −0.4%         |
-| B | −1.8% | +0.9%          |
-| C | +0.6%  | +1.3%          |
-| D | +3.4%  | +0.2%          |
-| E | −0.9% | −1.1%         |
+|   | Signal $MOM_{s,t}$ | Forward return $r_{s,t}$ | Slot by signal | Slot by return |
+| - | ------------------ | ------------------------ | -------------- | -------------- |
+| A | +2.1%              | −0.4%                   | G4             | G2             |
+| B | −1.8%             | +0.9%                    | G1             | G4             |
+| C | +0.6%              | +1.3%                    | G3             | G5             |
+| D | +3.4%              | +0.2%                    | G5             | G3             |
+| E | −0.9%             | −1.1%                   | G2             | G1             |
 
-Filled by signal, and then by forward return instead:
+Read down *slot by signal* and the returns come out unordered — which is exactly what one draw looks
+like at 12% correlation. Read down *slot by return* and the ordering is perfect, and would be perfect
+for **any** signal including one straight out of a random number generator, because each bar is then
+reporting the sort key back to you. **The staircase is evidence only because the thing sorted on and
+the thing measured are different, and the second was not knowable when the first was computed.**
 
-| Slot | Sorted by signal | filed return | Sorted by return | filed return |
-| ---- | ------------------------- | ------------ | ------------------------- | ------------ |
-| G5   | D                         | +0.2%        | C                         | +1.3%        |
-| G4   | A                         | −0.4%       | B                         | +0.9%        |
-| G3   | C                         | +1.3%        | D                         | +0.2%        |
-| G2   | E                         | −1.1%       | A                         | −0.4%       |
-| G1   | B                         | +0.9%        | E                         | −1.1%       |
+One bar therefore carries three pieces of information: which fifth of the signal's range it stands
+for, the average return that fifth went on to earn, and how much of that average is sampling noise.
 
-The left pair is what step 4 files: a mess, which is what one draw looks like at 12% correlation.
-The right pair is flawless — and would be flawless for **any** signal, including one out of a random
-number generator, because each bar is reporting the sort key back to you. **The staircase is
-evidence only because the thing sorted on and the thing measured are different, and the second was
-not knowable when the first was computed.**
+#### 3.2.2 How the bar plot shows a trend
 
-**The staircase belongs to step 6.** The figure's top row runs the steps where the answer is known
-and every draw of five comes out ordered. The bottom row runs them on § 2's real scatter, where the
-six draws cross and tangle — at 12% correlation not one of them should be monotone.
+**The trend is the ordering, not the heights.** § 1's hypothesis was *higher signal, higher forward
+return*; on a bar plot that is precisely the statement G1 < G2 < G3 < G4 < G5. A single bar's level
+moves with the bucketing choice (§ 5) — the ordering is what does not.
 
-Steps 1 to 5 were drawn as though the draws floated free of the calendar, and they do not: one
-observation is one **date**, so every draw sits somewhere on the time axis. The figure below redraws
-the same recipe that way — a strip of five-point draws standing along $t$, and step 6 flattening the
-strip into five numbers.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-time-collapse-dark.png">
-  <img alt="A horizontal time axis labelled t with five dates marked on it. Standing on each date is a small slanted panel holding one draw of five points, slot across and forward return up, and none of the five panels shows any ordering. An arrow labelled pool every date then average within each slot points down from the axis to a bucket chart of five bars with error bars, rising monotonically from about minus 20 basis points at G1 to plus 20 at G5, annotated that the ordering is the whole claim and that the chart says nothing about when the edge happened" src="figures/bucket-time-collapse-light.png">
-</picture>
-
-So the bar chart is an average over **dates** every bit as much as over observations, and that is
-what makes it legible at all: no single date's draw is ordered, and the ordering only surfaces once
-a few hundred of them are stacked.
-
-What it costs is the axis. Step 6 integrates over $t$, and an integral hands back an area, never the
-shape of the function underneath it — a staircase that is monotone over twenty years is equally
-consistent with an edge that held throughout and with one that worked for five years and was flat
-for fifteen. Recovering the shape takes a different plot: the equity curve of
-[04](04-understanding-backtesting.md). → § 5 and the counts printed under its three cuts are the
-first place this loss becomes visible.
-
-#### 3.2.2 Reading the staircase
-
-Three things are readable off a bucket chart, and it is worth being strict about which:
+Two further readings carry information, and nothing else on the chart does:
 
 | Read | What it establishes |
 | --- | --- |
-| **Monotonicity across G1 → G5** | the ordering claim of § 1, tested. This is the hypothesis — *higher signal, higher average forward return* — and it is the only thing the chart is really asserting |
-| **The G5 − G1 spread against the error bars** | the size of the edge relative to what noise alone would draw. A staircase whose whole rise fits inside one error bar is not evidence of anything |
+| **G5 − G1, measured against the error bars** | the size of the edge next to what noise alone would draw. A rise that fits inside one error bar is not evidence of anything |
 | **The direction of the slope** | a *descending* staircase is not a dead signal — it is the same edge carrying the opposite sign |
 
-An individual bar's height is not on that list. It moves with the bucketing choice (§ 5), so the
-level of G3 says far less than the fact that G3 sits between G2 and G4. Nor is a scrambled middle
-disqualifying: clean tails with a muddled G2–G4 is a common and perfectly tradeable shape, since the
-tails are where the positions actually go.
+A scrambled middle does not disqualify a signal: clean tails around a muddled G2–G4 is a common
+shape and a perfectly tradeable one, since the tails are where the positions go.
 
-On direction, adopt a convention early and keep it: **leave the signal's sign alone and let the
-chart come out upside down.** Flipping a signal the moment its staircase descends is cheap and
-tempting, and a dozen signals later you will not remember which ones you flipped. Read a descending
-staircase as *this works, traded short*, and carry the sign in the strategy rather than folding it
-back into the signal definition.
+On direction, adopt a convention and keep it: **leave the signal's sign alone and let the chart come
+out upside down.** Flipping a signal the moment its staircase descends is cheap, and a dozen signals
+later you will not remember which ones you flipped. Read a descending staircase as *this works,
+traded short*, and carry the sign in the strategy rather than in the signal definition.
 
-How much of the staircase to believe is a question about the error bars, and those are set by one
-number.
-
-**Claim.** Averaging within a group shrinks the noise and leaves the signal untouched, which is what
-step 5 buys.
+**Claim.** The ordering surfaces at all only because of step 4 — averaging shrinks the noise and
+leaves the signal untouched.
 
 **Proof.** Take $m$ observations sharing a similar signal value. Their mean return still has
 expectation $\beta$ times their mean signal, while the noise around it falls to
@@ -281,7 +251,7 @@ $\sigma_\epsilon / m^{1/2}$:
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/noise-shrinks-dark.png">
-  <img alt="Four bucket charts of the same population at 12 percent correlation, computed from 5, 30, 300 and 3,000 observations per bucket. At m equals 5 the bars swing between minus 80 and plus 93 basis points and are not monotone; by m equals 300 they have settled into a monotone staircase from about minus 20 to plus 20 basis points, and at m equals 3,000 the error bars are barely visible" src="figures/noise-shrinks-light.png">
+  <img alt="Four bucket charts of the same population at 12 percent correlation, mean forward return in basis points against signal bucket, computed from 5, 30, 300 and 3,000 observations each. At m equals 5 the bars swing between minus 80 and plus 93 basis points and are not monotone; by m equals 300 they have settled into a monotone staircase from about minus 20 to plus 20 basis points, and at m equals 3,000 the error bars are barely visible" src="figures/noise-shrinks-light.png">
 </picture>
 
 The true bars are identical in all four panels — near −20 bp at G1 and +20 bp at G5. Only the error
@@ -291,6 +261,28 @@ recipe; it is the reason the recipe works.**
 **Note (Where that overstates it).** The $m^{1/2}$ assumes independence. Overlapping lookback
 windows and returns that cluster in time push the effective count well below $m$, so the noise does
 not really reach 7 bp. The logic survives: averaging cancels noise and leaves systematic signal.
+
+#### 3.2.3 What the bar plot cannot show
+
+Steps 1 to 4 were drawn as though the draws floated free of the calendar. They do not: one
+observation is one **date**, so every draw stands somewhere on $t$, and step 5 flattens the whole
+strip into five numbers.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-time-collapse-dark.png">
+  <img alt="A horizontal time axis labelled t with five dates marked on it. Standing on each date is a small slanted panel holding one draw of five points, signal slot G1 to G5 across and forward return up, and none of the five panels shows any ordering. An arrow labelled pool every date then average within each slot points down from the axis to a bar plot of mean forward return against signal bucket, five bars with error bars rising monotonically from about minus 20 basis points at G1 to plus 20 at G5, annotated that the ordering is the whole claim and that the chart says nothing about when the edge happened" src="figures/bucket-time-collapse-light.png">
+</picture>
+
+Step 5 integrates over $t$, and an integral hands back an area, never the shape of the function
+underneath it. A staircase that is monotone over twenty years is equally consistent with an edge
+that held throughout and with one that worked for five years and was flat for fifteen.
+
+| Not on the chart | Where to look instead |
+| --- | --- |
+| **When** the edge happened | the equity curve of [04](04-understanding-backtesting.md) |
+| **Who** is inside a bucket — which era, which regime | the observation counts printed under § 5's three cuts |
+| **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean |
+| **How independent** the observations are | overlapping windows, per the Note above |
 
 ## 4. Risk-adjusted momentum
 
@@ -361,10 +353,9 @@ a fixed window keeps precision uniform and tracks regime changes, at the price o
 
 ### What none of the three shows
 
-The composition that separates the three panels appears only in the printed counts — **a bar chart
-cannot show who is inside a bucket.** Neither can any of them show when the edge happened, or what
-the distribution inside a bar looks like. Those need different plots: the same chart on subsamples,
-and the spread of returns within a bucket rather than its mean.
+The composition that separates these three panels shows up only in the printed counts — which is
+§ 3.2.3's point arriving with numbers attached. The bars themselves look equally healthy in all
+three.
 
 A fourth angle sits outside this chapter entirely: cross-sectional ranking — each asset against
 its peers that day rather than against its own past. That is the Portfolio 1 vs Portfolio 2 distinction in
@@ -555,7 +546,7 @@ how long the rebate lasts, never from the prettiest staircase.
 **One check.** The two forms must agree. If you slide the return column and the $MOM$ values move
 as well, the edit reached the signal, which it never should.
 
-The lower panel is also where § 3.2's caveat comes from. Step one date forward and the lookback
+The lower panel is also where § 3.2.2's caveat comes from. Step one date forward and the lookback
 keeps all but one of its cells, so neighbouring signals are nearly the same number — the reason the
 effective sample sits well below $m$.
 

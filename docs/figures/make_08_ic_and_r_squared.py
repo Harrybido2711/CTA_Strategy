@@ -52,7 +52,7 @@ def prediction_shrinkage(mode):
          "standard deviation $\\approx$ 0.2% — about 12$\\times$ narrower"),
     ]
     for ax, y, colour, title, subtitle in panels:
-        style_axes(ax, t, grid=False)
+        style_axes(ax, t, ylabel="density", grid=False)
         ax.plot(x, y, color=colour, linewidth=1.9, zorder=3)
         ax.fill_between(x, y, color=colour, alpha=0.13, zorder=2)
         ax.set_yticks([])

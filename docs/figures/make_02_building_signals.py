@@ -58,7 +58,8 @@ def binary_momentum(mode):
     fig.patch.set_facecolor(t["surface"])
 
     # ---- left: what actually happened over the lookback
-    style_axes(ax, t, ylabel="rebased to 100", xlabel="lookback window $R_{s,t-1}$")
+    style_axes(ax, t, ylabel="price, rebased to 100",
+               xlabel="the lookback window, day 0 to day N")
     for series, colour, label in ((strong, c_strong, "+20%"), (weak, c_weak, "+10%")):
         ax.plot(x, series, color=colour, linewidth=1.9, zorder=3)
         ax.text(n + 3, series[-1], label, color=t["ink"], fontsize=9.4,
@@ -69,7 +70,7 @@ def binary_momentum(mode):
     titles(ax, t, "Two lookback windows", "one trend is twice the other")
 
     # ---- right: what sign() says about them
-    style_axes(bx, t, ylabel="$MOM_{s,t}$")
+    style_axes(bx, t, ylabel="signal $MOM_{s,t}$", xlabel="which window")
     for i, colour in enumerate((c_strong, c_weak)):
         rounded_bar(bx, i, 1.0, color=colour, width=0.42)
     bx.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
@@ -140,8 +141,9 @@ def alpha_opacity(mode):
                         arrowprops=dict(arrowstyle="-", color=t["muted"], linewidth=1.0,
                                         connectionstyle="arc3,rad=-0.25"))
 
-    axes[0].set_ylabel("forward return", color=t["ink_secondary"], fontsize=9, labelpad=8)
-    fig.text(0.5, 0.01, "signal value", ha="center", color=t["muted"], fontsize=8.5)
+    axes[0].set_ylabel("forward return $r_{s,t}$   (σ)", color=t["ink_secondary"],
+                       fontsize=9, labelpad=8)
+    fig.text(0.5, 0.01, "signal $MOM_{s,t}$   (σ)", ha="center", color=t["muted"], fontsize=8.5)
     fig.text(0.5, -0.09,
              "Illustrative. Outer panels are one asset's 5,000 daily observations at 12% "
              "correlation, differing only in opacity. The middle is a different, invented series — "
@@ -190,7 +192,8 @@ def bucket_construction(mode):
         picked = idx[:3].ravel()                     # three draws' worth, one colour
 
         # ---- where the points come from
-        style_axes(ax, t, ylabel="return", xlabel="$MOM$", grid=False)
+        style_axes(ax, t, ylabel="forward return $r_{s,t}$",
+                   xlabel="signal $MOM_{s,t}$", grid=False)
         ax.scatter(px, py, s=3.0, color=t["series"], alpha=0.10, linewidths=0, zorder=2)
         ax.scatter(px[picked], py[picked], s=34, color=t["series"], zorder=4)
         ax.set_xticks([])
@@ -198,7 +201,8 @@ def bucket_construction(mode):
         titles(ax, t, head, sub)
 
         # ---- each draw, at the rank slot its five points fell into
-        style_axes(bx, t, ylabel="return", xlabel="rank slot", grid=False)
+        style_axes(bx, t, ylabel="forward return $r_{s,t}$",
+                   xlabel="rank slot (G1 = lowest signal)", grid=False)
         for row in ranked:
             bx.plot(range(5), row, color=t["series"], alpha=0.42, linewidth=1.1,
                     marker="o", markersize=4.6, zorder=4)
@@ -210,7 +214,8 @@ def bucket_construction(mode):
         # ---- and the average of many, with the error on it
         allr, _ = slots(px, py, total)
         means, errs = allr.mean(axis=0), allr.std(axis=0) / total ** 0.5
-        style_axes(cxx, t, ylabel="mean return", xlabel="signal bucket")
+        style_axes(cxx, t, ylabel="mean forward return $r_{s,t}$",
+                   xlabel="signal bucket ($MOM$)")
         for i, v in enumerate(means):
             rounded_bar(cxx, i, v, color=t["series"], width=0.34)
         cxx.errorbar(range(5), means, yerr=errs, fmt="none", ecolor=t["muted"],
@@ -256,7 +261,8 @@ def noise_shrinks(mode):
         groups = y[order].reshape(5, m)
         means, errs = groups.mean(axis=1), groups.std(axis=1) / m ** 0.5
 
-        style_axes(ax, t, ylabel="mean forward return (bp)" if ax is axes[0] else None)
+        style_axes(ax, t, ylabel="mean forward return (bp)" if ax is axes[0] else None,
+                   xlabel="signal bucket ($MOM$)")
         for i, v in enumerate(means):
             rounded_bar(ax, i, v, color=t["series"], width=0.34)
         ax.errorbar(range(5), means, yerr=errs, fmt="none", ecolor=t["muted"],
@@ -335,7 +341,8 @@ def three_bucketings(mode):
     fig.patch.set_facecolor(t["surface"])
 
     for ax, ((m, e, n, share), head, sub) in zip(axes, panels):
-        style_axes(ax, t, ylabel="mean forward return (bp)" if ax is axes[0] else None)
+        style_axes(ax, t, ylabel="mean forward return (bp)" if ax is axes[0] else None,
+                   xlabel="signal bucket ($MOM$)")
         for i, v in enumerate(m):
             if not np.isnan(v):
                 rounded_bar(ax, i, v, color=t["series"], width=0.34)
@@ -382,7 +389,7 @@ def signal_distribution(mode):
 
     for ax, (cuts, title, subtitle, counts) in zip(axes, panels):
         style_axes(ax, t, ylabel="density" if ax is axes[0] else None,
-                   xlabel="standardized signal   (σ)", grid=False)
+                   xlabel="standardized signal $MOM_{s,t}$   (σ)", grid=False)
         ax.plot(x, y, color=t["series"], linewidth=2.0, solid_capstyle="round", zorder=3)
         ax.fill_between(x, y, color=t["wash"], alpha=0.10, zorder=2)
         for c in cuts:
@@ -420,8 +427,8 @@ def signal_kernels(mode):
 
     fig, ax = plt.subplots(figsize=(7.0, 4.3))
     fig.patch.set_facecolor(t["surface"])
-    style_axes(ax, t, ylabel="weight on that day's return",
-               xlabel="lag (trading days ago)")
+    style_axes(ax, t, ylabel="weight the signal puts on $r_{s,t-i}$",
+               xlabel="lag $i$ (trading days before $t$)")
 
     ax.step(lags, box, where="post", color=t["muted"], linewidth=1.7, zorder=3)
     ax.fill_between(lags, 0, box, step="post", color=t["muted"], alpha=0.13, zorder=2)
@@ -489,8 +496,9 @@ def scatter_ladder(mode):
                     color=t["series"], linewidth=1.6, solid_capstyle="butt",
                     clip_on=False, zorder=5)
 
-    axes[0].set_ylabel("forward return", color=t["ink_secondary"], fontsize=9, labelpad=8)
-    fig.text(0.5, 0.01, "signal value", ha="center", color=t["muted"], fontsize=8.5)
+    axes[0].set_ylabel("forward return $r_{s,t}$   (σ)", color=t["ink_secondary"],
+                       fontsize=9, labelpad=8)
+    fig.text(0.5, 0.01, "signal $MOM_{s,t}$   (σ)", ha="center", color=t["muted"], fontsize=8.5)
     fig.text(0.5, -0.09,
              "Illustrative. Every panel holds a real relationship — only the first two are "
              "strong enough for the eye to find it.",
@@ -544,9 +552,11 @@ def bucket_time_collapse(mode):
             ax.plot([x0 + fx * PW + SHEAR * fy], [y0 + fy * PH], marker="o",
                     markersize=3.4, color=t["ramp"][5], zorder=4)
 
-    ax.text(11.1, AX_Y + 1.55,
-            "one draw of five per date —\nslot across, forward return up.\n"
-            "Not one of them is ordered",
+    ax.text(11.1, AX_Y + 1.50,
+            "each panel is one draw of five\n"
+            "at that date — across: signal\n"
+            "slot G1 to G5;  up: forward\n"
+            "return $r_{s,t}$. None is ordered",
             ha="left", va="center", color=t["ink_secondary"], fontsize=8.3,
             linespacing=1.5)
 
@@ -574,8 +584,10 @@ def bucket_time_collapse(mode):
     ax.text(6.35, ZERO, "monotone G1 to G5, and that is\nthe whole claim — it says\nnothing about when",
             ha="left", va="center", color=t["ink_secondary"], fontsize=8.3,
             linespacing=1.5)
-    ax.text(1.35, 1.42, "average forward return per slot, pooled over the whole sample",
-            ha="left", va="center", color=t["muted"], fontsize=8.2)
+    ax.text(3.7, 1.42, "signal bucket ($MOM$)", ha="center", va="center",
+            color=t["muted"], fontsize=8.4)
+    ax.text(0.95, ZERO, "mean forward return $r_{s,t}$", rotation=90,
+            ha="center", va="center", color=t["ink_secondary"], fontsize=8.4)
 
     titles(ax, t, "Every date contributes one draw; the pool keeps only the averages",
            "illustrative — the bar chart is the whole history flattened onto a single picture")
