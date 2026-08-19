@@ -2,13 +2,27 @@
 
 > - **Answers:** how to turn an intuition into a computable signal, and how to tell whether it carries information before backtesting it.
 > - **Prerequisites:** [01 · What Is a CTA Strategy](01-what-is-cta.md); the data it runs on is [100 · The Dataset](100-dataset.md).
-> - **After reading:** state a signal as a hypothesis, test it with a bucket chart, normalize it, and combine horizons without drowning in noise.
+> - **After reading:** state a signal as a hypothesis, test it with a bar plot, normalize it, and combine horizons without drowning in noise.
 
 ---
 
 ## 1. A signal is a hypothesis, not a formula
 
-### The simplest signal — the sign of the last return
+### 1.0 The three objects
+
+Everything in this chapter is built from three numbers, one of each per asset per date.
+
+| Object | Symbol | What it is | Known at $t$? |
+| --- | --- | --- | --- |
+| **Weight** | $w_{s,t}$ | the share of capital held in asset $s$ on date $t$, signed — negative is a short | **yes**, you choose it |
+| **Signal** | $MOM_{s,t}$ | a number computed from data available at $t$, meant to say something about what comes next | **yes**, you compute it |
+| **Forward return** | $r_{s,t}$ | what the asset then goes on to deliver over the period the position is held | **no** — this is the unknown |
+
+**Note (Scope).** The signal is *computed* one asset at a time, from that asset's own history.
+Everything downstream is a **panel**: many assets × many dates, one signal and one forward return
+per cell. § 3.2 ranks the assets **against each other on each date** — the cross-sectional sort,
+which is what a CTA actually trades — and [03](03-from-signal-to-position.md) turns those ranks
+into positions.
 
 **Definition (Binary momentum).** The simplest member of the family — carry the sign of last
 period's return, and nothing else:
@@ -21,13 +35,7 @@ where $s$ indexes the asset and $t$ the date, $r_{s,t-1}$ is that asset's return
 just ended, and $MOM_{s,t}$ the signal it produces for today — either +1 (long) or −1 (short), with
 nothing in between.
 
-**Note (Scope).** The signal is *computed* one asset at a time, from that asset's own history.
-Everything downstream is a **panel**: many assets × many dates, one signal and one forward return
-per cell. § 3.2 ranks the assets **against each other on each date** — the cross-sectional sort,
-which is what a CTA actually trades — and [03](03-from-signal-to-position.md) turns those ranks
-into positions.
-
-### Why the sign alone is not enough
+#### Why the sign alone is not enough
 
 One window in which the asset rose 20% and another in which it rose 10% produce the *same* signal,
 so a strategy built on it takes the same size in both. Trend **strength** is thrown away; only trend **direction**
@@ -38,9 +46,9 @@ survives.
   <img alt="Left panel: one asset's price over two lookback windows, rebased to 100, the darker one climbing to 120 and the lighter one to 110. Right panel: the momentum signal each path produces, two bars of identical height at plus one, joined by an arrow labelled identical" src="figures/binary-momentum-light.png">
 </picture>
 
-### What to keep instead
+#### What to keep instead
 
-Neither repair below is obviously right, and both are tested the same way — § 3.2's bucket chart.
+Neither repair below is obviously right, and both are tested the same way — § 3.2's bar plot.
 
 - **Keep the value, not the sign** — the definition below, which stays proportional to how strongly
   the asset trended.
@@ -51,25 +59,73 @@ Neither repair below is obviously right, and both are tested the same way — §
 than its sign:
 
 $$
-\textbf{signal:}\quad MOM_{s,t}  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
+MOM_{s,t}  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
 $$
 
 with $N$ the lookback length and $i$ the lag inside it — the average runs over the $N$ returns
 ending yesterday.
 
+### 1.1 Why studying the signal is the same as studying the portfolio
+
+Those definitions say what a signal *is*. They do not say why anyone would spend a chapter on one:
+a signal is not a strategy, it earns nothing, and it is not something you can hold. The reason runs
+backwards, from what you are actually paid on.
+
+**Start from the portfolio, because that is what you optimize.** Its return on a date is the
+weighted sum of what its holdings did:
+
+$$
+R_t  =  \sum_s w_{s,t} r_{s,t}
+$$
+
+where $R_t$ is the portfolio's return on date $t$ and the sum runs over every asset in the universe.
+Of the two factors in each term only one is yours: $r_{s,t}$ is the market's answer, and it arrives
+after the weight is already set. **So the whole of portfolio construction is the choice of
+$w_{s,t}$.**
+
+**The weights are where the signal enters.** You would like to put weight where the forward return
+is about to be high — but that is precisely the number you do not have. A signal is the stand-in you
+put in its place, which means setting $w_{s,t} \propto MOM_{s,t}$.
+
+**Claim.** Under that rule the portfolio's expected return is proportional to the correlation
+between the signal and the forward return, and to nothing else that can change its sign.
+
+<details>
+<summary><b>Proof.</b> expected portfolio return factorises into a leverage scale, two volatilities, and the signal-return correlation — and only the last can be negative</summary>
+
+Take the signal and the return as centred. With $w_{s,t} \propto MOM_{s,t}$,
+
+$$
+E[R_t]  \propto  \sum_s E[MOM_{s,t} r_{s,t}]  =  \sum_s \rho_s \sigma_{MOM,s} \sigma_{r,s}
+$$
+
+using $E[xy] = \rho \sigma_x \sigma_y$ for centred $x$ and $y$, where $\rho_s$ is the correlation
+between asset $s$'s signal and its forward return and $\sigma_{MOM,s}$, $\sigma_{r,s}$ are their
+standard deviations. The dropped constant is a leverage choice, and the two volatilities are
+properties of the asset that you can measure. All three are positive no matter what the signal does.
+**The only factor that can carry a sign — the only one deciding whether the portfolio makes money
+rather than loses it — is $\rho_s$.**
+
+</details>
+
+The whole question therefore collapses to one number, and it is a number about the signal alone:
+
 $$
 \textbf{hypothesis:}\quad MOM \uparrow  \Longrightarrow  \text{return} \uparrow
 \qquad\qquad
-\textbf{consequence:}\quad MOM_{s,t}  \propto  w_{s,t}  \propto  \text{return}
+\textbf{that is:}\quad \rho > 0
 $$
 
-Here $w_{s,t}$ is the **weight** — the position size given to asset $s$ on date $t$. That third
-line is what makes the signal tradeable: it doesn't merely correlate with return, it says **how
-much** to allocate; how far the magnitude reaches the position is
-[03](03-from-signal-to-position.md)'s decision.
+Three things follow, and between them they set the shape of the rest of the chapter.
 
-Write the hypothesis first: it names what would falsify the signal, and one you cannot falsify is a
-plot you will rationalize either way.
+| Consequence | Dealt with in |
+| --- | --- |
+| **The portfolio never has to be built to test the signal.** Measure $\rho$ between the signal and the forward return directly, and you have measured the strategy | § 2, § 3 |
+| **Magnitude reaches the position, not just direction.** $w \propto MOM$ means a signal twice as large takes a position twice as large — which is what binary momentum throws away | § 1.0 |
+| **At equal $\rho$ a volatile asset contributes more than a quiet one**, since each term carries $\sigma_{MOM,s} \sigma_{r,s}$ alongside $\rho_s$. Ranking raw signals therefore ranks volatilities | § 4 |
+
+**Write the hypothesis before the code.** It names what would falsify the signal, and one you
+cannot falsify is a plot you will rationalize either way.
 
 ## 2. What you hoped for, and what you get
 
@@ -482,7 +538,7 @@ week — deliberately, since the newest return is the noisiest — and never ful
 </picture>
 
 Three common rules, in increasing order of information kept. All
-three still have to pass § 3.2's bucket test before they earn a backtest.
+three still have to pass § 3.2's bar plot before they earn a backtest.
 
 | Rule         | Go long when                            | Costs                                                            |
 | ------------ | --------------------------------------- | ---------------------------------------------------------------- |
@@ -568,13 +624,13 @@ The `-1` in *12-1* **is** the gap.
 - **Reversal** — a judgement call, and the one worth thinking about. A trend that has just formed
   tends to hand a little of it back: the flow that built it is spent, and an over-bought book
   unwinds. Score the signal on that period and you are measuring the trend and its immediate rebate
-  netted into one number — which is how a real edge arrives at the bucket chart looking flat, or
+  netted into one number — which is how a real edge arrives at the bar plot looking flat, or
   upside down.
 
 **What the gap costs.** It does not remove only the rebate; it removes the opening of the trend
 too. The longer the gap, the staler the signal and the less of the move you are still present for.
 So $g$ trades one against the other — and it is a **hyperparameter**: running $g$ at one day, one
-week and one month and keeping whichever bucket chart looks best is precisely what
+week and one month and keeping whichever bar plot looks best is precisely what
 [06](06-overfitting-and-robustness.md) warns about. Set it from execution reality and a prior about
 how long the rebate lasts, never from the prettiest staircase.
 
@@ -594,8 +650,10 @@ assets are ranked against each other.
 | Symbol                                          | Means                                                                                                                         | First used |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
 | $s$, $t$                                    | the asset, and the date in periods (days here)                                                                                | § 1       |
-| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$         | that asset's return in that period, the momentum signal it produces, and the position size that signal earns                  | § 1       |
-| $N$, $i$                                    | lookback length, and the lag inside it running 1 to N                                                                         | § 1       |
+| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$         | that asset's return in that period, the momentum signal it produces, and the share of capital that signal earns it            | § 1.0     |
+| $R_t$                                         | the portfolio's return on that date, $\sum_s w_{s,t} r_{s,t}$                                                                 | § 1.1     |
+| $\rho_s$, $\sigma_{MOM,s}$, $\sigma_{r,s}$   | one asset's signal-return correlation, and the standard deviations of its signal and its forward return                       | § 1.1     |
+| $N$, $i$                                    | lookback length, and the lag inside it running 1 to N                                                                         | § 1.0     |
 | $x$, $y$, $\beta$, $\epsilon$           | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
 | $\rho$, $R^2$                               | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
 | $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$ | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
@@ -609,10 +667,12 @@ assets are ranked against each other.
 | $c_i$, $k_j$                                | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 8       |
 | $g$                                           | gap length — periods between the end of the signal's window and the return it is scored on                                    | Background |
 
-**Note (Collisions to watch).** Three quantities wear a $\sigma$ and they are not interchangeable:
-$\sigma_y$ is the spread of forward return across the pooled cloud (§ 2), $\sigma_\epsilon$ the
-part of it the signal cannot reach (§ 2), and $\sigma_{s,t}$ one asset's trailing volatility on one
-date (§ 4). Likewise $w_{s,t}$ is a position and $k_j$ a kernel weight, which is why the latter is
+**Note (Collisions to watch).** $R_t$ is the portfolio's return on a date (§ 1.1); $R^2$ is a share
+of variance (§ 2). They share a letter and nothing else. Three quantities wear a $\sigma$ and they
+are not interchangeable:
+$\sigma_y$ is the spread of forward return across the pooled cloud (§ 2) — the panel-wide version of
+§ 1.1's per-asset $\sigma_{r,s}$ — while $\sigma_\epsilon$ is the part of it the signal cannot reach
+(§ 2) and $\sigma_{s,t}$ one asset's trailing volatility on one date (§ 4). Likewise $w_{s,t}$ is a position and $k_j$ a kernel weight, which is why the latter is
 not written $w$. And § 3.1's `alpha` is a plotting keyword, not $\alpha$ the smoothing constant
 and not a regression intercept — code font against maths is the tell. Lowercase $g$ is the gap, unrelated to the buckets G1 … G5. Chapter
 [01](01-what-is-cta.md) uses $s$ for a signed share count; here it is always the asset.
