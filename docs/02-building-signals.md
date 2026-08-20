@@ -263,6 +263,11 @@ Five steps build it:
 4. **Repeat** for every date in the sample.
 5. **Average** everything filed under each bucket.
 
+**Note (Step 2 presupposes a common scale).** Ranking assets against each other only means something
+if their signals are already measured on one scale, and raw momentum is not — § 4. Read step 2 as
+ranking a signal that has already been made comparable; § 4 is a precondition for this section, not
+a later refinement of it.
+
 The figure runs those five left to right on a five-asset universe, so one date contributes exactly
 one observation per bucket — the population, each date sitting at the slots its five assets fell
 into, and the average of many with the error on it.
@@ -377,6 +382,13 @@ that held throughout and with one that worked for five years and was flat for fi
 
 ## 4. Risk-adjusted momentum
 
+**Whether two assets' signals may be compared at all is an assumption, and it is yours to make.** A
+universe of five hundred large-cap equities might plausibly sit on one scale already. A CTA universe
+does not: 50 bp in a session is an ordinary day for an equity index and, for a Treasury future, an
+event that would lead the news. So for momentum the answer is settled before any data is consulted —
+the assets are **not** on a common scale, and putting them there is a precondition for § 3.2's sort.
+State the assumption either way, because everything downstream inherits it.
+
 Raw momentum is not comparable **across assets**, and a cross-sectional sort does nothing but
 compare across assets. 2% monthly momentum in a Treasury ETF is a large move; the same 2% in a
 semiconductor ETF is a quiet month. Rank the two against each other on raw momentum and the
@@ -396,6 +408,22 @@ denominator that peeks at the future contaminates the signal as surely as a nume
 Every asset and every period now lands on one scale, so the ranking in § 3.2 compares like with
 like — two students both scoring 80 on different exams against different cohorts have not achieved
 the same thing.
+
+**Note (A second route to the same plane).** Dividing by $\sigma_{s,t}$ is not the only way. You can
+also replace the value outright by **its percentile against that asset's own past**, which lands
+every asset on $[0, 1]$ by construction and needs no volatility estimate at all.
+
+**Example.** Two assets, each with five past signal values and one for today:
+
+| Asset | Its own past signals | Today | Beats | Percentile |
+| --- | --- | --- | --- | --- |
+| A | −10, 8, 4, 0, −5 | **+7** | four of five | **80** |
+| B | −100, −80, 90, −60, 20 | **−70** | two of five | **40** |
+
+Raw, `+7` against `−70` is not a comparison anybody should make. As percentiles, 80 against 40 is —
+and it says A is the stronger trend *relative to its own history*, which is the only sense in which
+the question has an answer. The cost is the one § 5 charges for every rank: the magnitudes are
+gone.
 
 ## 5. We Need Three Graphs
 
