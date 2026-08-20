@@ -12,6 +12,7 @@ Figures produced
 ----------------
     ratio-grid           the (slow, fast) search space, and the 2:1 band it returns
     fast-times-slow  a fast window fires before a slow one at both ends
+    ewma-weights     an SMA weights every lag alike; an EWMA decays from the newest
     signal-kernels   MACD is momentum with a hump-shaped kernel, not a box
 
 All are schematics drawn from illustrative values.
@@ -209,6 +210,54 @@ def ratio_grid(mode):
     save(fig, t, f"ratio-grid-{mode}.png")
 
 
+# ------------------------ fig: what an SMA and an EWMA weight a past return by
+def ewma_weights(mode):
+    """03 s2 -- an SMA gives every lag the same weight; an EWMA decays from the newest.
+
+    Schematic. Weight carried by the return at each lag, both normalised to sum
+    to one, so only the shape is compared. The box is a 21-day mean; the curve
+    is an EWMA with a 10-day half-life.
+    """
+    t = THEMES[mode]
+    lags = np.arange(0, 46)
+
+    box = np.where(lags < 21, 1.0 / 21, 0.0)
+    lam = 0.5 ** (1 / 10)                              # 10-day half-life
+    ewma = (1 - lam) * lam ** lags
+
+    fig, ax = plt.subplots(figsize=(7.2, 4.2))
+    fig.patch.set_facecolor(t["surface"])
+    style_axes(ax, t, ylabel="weight on that return",
+               xlabel="lag in trading days   (0 = the newest return)")
+
+    ax.plot(lags, box, color=t["ramp"][2], linewidth=2.0, zorder=3)
+    ax.plot(lags, ewma, color=t["ramp"][5], linewidth=2.0, zorder=4)
+    ax.scatter([0], [ewma[0]], s=30, color=t["ramp"][5], zorder=5)
+
+    lead = dict(arrowstyle="-", color=t["muted"], linewidth=1.0)
+    top = ewma[0]
+    ax.annotate("EWMA", xy=(4, ewma[4]), xytext=(8.5, top * 1.10), color=t["ink"],
+                fontsize=9.2, fontweight="600", ha="left",
+                arrowprops=dict(connectionstyle="arc3,rad=0.2", **lead), zorder=6)
+    ax.annotate("21-day SMA", xy=(15, 1.0 / 21), xytext=(22.5, top * 0.94), color=t["ink"],
+                fontsize=9.2, fontweight="600", ha="left",
+                arrowprops=dict(connectionstyle="arc3,rad=-0.2", **lead), zorder=6)
+    ax.annotate("over-weighted", xy=(0.5, top * 0.99), xytext=(6.2, top * 0.80),
+                color=t["ink_secondary"], fontsize=8.8, ha="left",
+                arrowprops=dict(connectionstyle="arc3,rad=0.25", **lead), zorder=6)
+    ax.annotate("under-weighted", xy=(27, ewma[27]), xytext=(31, top * 0.30),
+                color=t["ink_secondary"], fontsize=8.8, ha="left",
+                arrowprops=dict(connectionstyle="arc3,rad=-0.25", **lead), zorder=6)
+
+    ax.set_xlim(-1.5, 46)
+    ax.set_ylim(0, ewma[0] * 1.24)
+    ax.set_yticks([])
+    titles(ax, t, "The same total weight, spread two different ways",
+           "illustrative — a 21-day box against a 10-day half-life")
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    save(fig, t, f"ewma-weights-{mode}.png")
+
+
 # --------------------------------------------------------- fig: signal kernels
 def signal_kernels(mode):
     """02 -- MACD is momentum with a different weighting of past returns.
@@ -251,7 +300,7 @@ def signal_kernels(mode):
     fig.tight_layout(rect=(0, 0, 1, 0.93))
     save(fig, t, f"signal-kernels-{mode}.png")
 
-FIGURES = (fast_times_the_slow, ratio_grid, signal_kernels)
+FIGURES = (fast_times_the_slow, ratio_grid, ewma_weights, signal_kernels)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

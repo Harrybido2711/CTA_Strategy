@@ -80,18 +80,74 @@ on one hard enough and someone takes the other side and presses it back.
 
 ## 2. EWMA instead of a simple moving average
 
-An SMA weights a price from 60 days ago exactly as much as yesterday's. To weight recent prices more:
+### 2.1 Why the newest return should weigh most
+
+A momentum signal is a weighted sum of past returns, and a simple moving average is one particular
+choice of those weights: make every one of them equal. Stated that way it is a claim about
+information — that a return from sixty days ago tells you exactly as much about where the asset
+stands today as yesterday's does.
+
+It does not. **The newest return is the most recent evidence about the state the asset is in now**,
+so it should carry the most weight, and a return from three months ago the least. An exponentially
+weighted moving average is that preference written down.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/ewma-weights-dark.png">
+  <img alt="Weight carried by each past return against its lag in trading days, both curves normalised to the same total. The 21-day simple moving average is a flat box: identical weight out to twenty-one days, then nothing. The EWMA is a curve starting highest at lag zero and decaying smoothly, annotated over-weighted at the newest lags and under-weighted at the old ones, and it stays above zero past forty-five days" src="figures/ewma-weights-light.png">
+</picture>
+
+Two things change at once. Relative to the box the newest lags are **over-weighted** and the old ones
+**under-weighted** — and the box's hard edge at twenty-one days is gone, so an EWMA thins out
+without ever quite forgetting.
+
+### 2.2 The recursion, and the weights it produces
+
+**Definition (EWMA).** Carry one running number and update it as each observation arrives:
+
+$$
+\text{EWMA}_t  =  (1 - \lambda) a_t + \lambda \text{EWMA}_{t-1}
+$$
+
+where $a_t$ is the newest observation and $\lambda \in (0, 1)$ the decay — how much of the old
+average survives each step.
+
+**Example.** Take $\lambda = 1/2$ and three observations $a_1, a_2, a_3$, oldest first. Two updates
+run the whole thing:
+
+```text
+after a₂ :  (a₁ + a₂) / 2
+after a₃ :  [(a₁ + a₂) / 2] / 2  +  a₃ / 2   =   a₃/2 + a₂/4 + a₁/4
+```
+
+| Observation | Age | Weight it ends up with |
+| --- | --- | --- |
+| $a_3$ | newest | **1/2** |
+| $a_2$ | one step back | 1/4 |
+| $a_1$ | oldest | 1/4 |
+
+The newest observation carries half the total on its own, and each step back halves what is left —
+which is what *exponential* names. The oldest two tie only because the recursion had to start
+somewhere; run it long enough and that seam washes out.
+
+### 2.3 Choosing how fast it decays
+
+Tune the **half-life** $H$ — the lag at which a return's weight has decayed to half the weight given
+to the newest one. Candidates are fractions of the lookback (1/2, 1/3, 1/5, 1/8), and they are
+grid-searched exactly as § 1.2's ratio is.
 
 ```python
 signal = returns.ewm(halflife=H).mean()
 ```
 
-Tune the **half-life** $H$ — the lag at which a return's weight has decayed to half the weight given
-to the newest one. Candidates are fractions of the lookback (1/2, 1/3, 1/5, 1/8). Grid-search them.
-
 MACD's 9-day signal line is an **empirical solution** — a value that fit historical data, nothing
 more. Every parameter here has that status, which is [07](07-overfitting-and-robustness.md)'s
 subject rather than something to accept on authority.
+
+**Note (Weighting the newest most is a choice, not a theorem).** § 3.2 shows that MACD's weights
+peak around lag 8 rather than at lag 0, so it *discounts* the newest return rather than favouring
+it. Both positions are defensible: the newest return is the most recent evidence, and it is also
+the one carrying the most reversal ([02](02-testing-a-signal.md)'s Background). Which wins is an
+empirical question settled by the bar plot, not a matter of taste.
 
 ## 3. MACD, stated precisely
 
@@ -188,7 +244,8 @@ asset subscript $s$ of [02](02-testing-a-signal.md) is dropped.
 | Symbol | Means | First used |
 | --- | --- | --- |
 | $N_f$, $N_s$ | fast and slow lookback lengths, in periods | § 1.2 |
-| $H$ | EWMA half-life, in periods | § 2 |
+| $a_t$, $\lambda$ | the newest observation, and the EWMA decay that keeps $\lambda$ of the old average | § 2.2 |
+| $H$ | EWMA half-life, in periods | § 2.3 |
 | $P_t$, $\Delta_{t-j}$ | price on that date, and the one-period change at that lag | § 3.1 |
 | $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 3.1 |
 | $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one | § 3.1 |
