@@ -18,10 +18,11 @@ Everything in this chapter is built from three numbers, one of each per asset pe
 | **Signal** | $MOM_{s,t}$ | a number computed from data available at $t$, meant to say something about what comes next | **yes**, you compute it |
 | **Forward return** | $r_{s,t}$ | what the asset then goes on to deliver while the position is held | **no** — this is the unknown |
 
-**Note (Scope).** The signal is *computed* one asset at a time, from that asset's own history;
-everything downstream is a **panel** of many assets × many dates. § 3.2 ranks the assets against
-each other on each date — the cross-sectional sort a CTA actually trades — and
-[03](03-from-signal-to-position.md) turns those ranks into positions.
+**Note (Scope).** This chapter describes **one asset at a time**: a single series of dates, each
+carrying that asset's own signal and its own forward return. That restriction is not a
+simplification — assets have different volatilities, so their raw signals are not on one scale and
+cannot be compared until § 4 puts them there. Combining several assets into one book comes after
+that, in [03](03-from-signal-to-position.md).
 
 **Definition (Binary momentum).** The simplest member of the family — the sign of last period's
 return, and nothing else:
@@ -252,26 +253,29 @@ ordered slots G1 … G5; the vertical axis is the **mean forward return** of the
 into each slot. Every observation lands in exactly one bar, and the error bar on it is the standard
 error of that mean.
 
-**Note (The buckets are cut inside a date).** G5 does not hold the assets whose momentum was
-highest *ever*; it holds, for each date, the assets whose momentum was highest **that day**.
-Membership therefore changes daily, and over a long sample every asset passes through every bucket.
+**Note (A bucket holds dates, not assets).** G5 is not a set of assets. It holds the **dates** on
+which this one asset's signal stood in the top fifth of its own history, and G1 the dates on which
+it stood in the bottom fifth. One asset passes through every bucket as the years go by, and the
+whole chart describes that asset alone.
 
 Five steps build it:
 
-1. **Take a date.** Its cross-section is every asset carrying a signal that day.
-2. **Rank** those assets by signal and cut into five groups: highest $MOM_{s,t}$ into G5, down to G1.
-3. **Record** the forward return each asset went on to deliver, filed under its bucket.
-4. **Repeat** for every date in the sample.
-5. **Average** everything filed under each bucket.
+1. **Fix one asset.** Its history gives one signal $MOM_{s,t}$ and one forward return $r_{s,t}$ per
+   date.
+2. **Score each date's signal against that asset's own past** — where it stood among the values that
+   came before it. § 4 gives two ways to do this.
+3. **File each date** into one of five slots by that score: the highest fifth into G5, down to G1.
+4. **Record** under each slot the forward return that date went on to deliver.
+5. **Average** the returns filed under each slot.
 
-**Note (Step 2 presupposes a common scale).** Ranking assets against each other only means something
-if their signals are already measured on one scale, and raw momentum is not — § 4. Read step 2 as
-ranking a signal that has already been made comparable; § 4 is a precondition for this section, not
-a later refinement of it.
+**Note (Why step 2 scores rather than ranks outright).** The asset's own volatility changes over the
+years, so the same +2% is a strong month in a calm tape and a quiet one in a violent tape. Scoring
+against the past is what makes two dates comparable at all — § 4 is a precondition for this section,
+not a later refinement of it.
 
-The figure runs those five left to right on a five-asset universe, so one date contributes exactly
-one observation per bucket — the population, each date sitting at the slots its five assets fell
-into, and the average of many with the error on it.
+The figure runs those five left to right, so five dates drawn at random contribute one observation
+per slot — the population, each draw sitting at the slots its five dates fell into, and the average
+of many with the error on it.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
@@ -282,18 +286,18 @@ into, and the average of many with the error on it.
 $t$; step 3 only *records* what followed. G1 therefore holds the lowest-**signal** observations, not
 the worst performers.
 
-**Example.** One date's cross-section of five assets, invented, filed both ways:
+**Example.** Five dates from one asset's history, invented, filed both ways:
 
-|   | Signal$MOM_{s,t}$ | Forward return$r_{s,t}$ | Slot by signal | Slot by return |    |
-| - | ----------------------------------------------- | -------------- | -------------- | -- |
-| A | +2.1%                                           | −0.4%         | G4             | G2 |
-| B | −1.8%                                          | +0.9%          | G1             | G4 |
-| C | +0.6%                                           | +1.3%          | G3             | G5 |
-| D | +3.4%                                           | +0.2%          | G5             | G3 |
-| E | −0.9%                                          | −1.1%         | G2             | G1 |
+| Date | Signal | Forward return | Slot by signal | Slot by return |
+| --- | --- | --- | --- | --- |
+| $t_1$ | +2.1% | −0.4% | G4 | G2 |
+| $t_2$ | −1.8% | +0.9% | G1 | G4 |
+| $t_3$ | +0.6% | +1.3% | G3 | G5 |
+| $t_4$ | +3.4% | +0.2% | G5 | G3 |
+| $t_5$ | −0.9% | −1.1% | G2 | G1 |
 
-Read down *slot by signal* and the returns come out unordered — which is exactly what one date
-looks like at 12% correlation. Read down *slot by return* and the ordering is perfect, and would be perfect
+Read down *slot by signal* and the returns come out unordered — which is exactly what five dates
+look like at 12% correlation. Read down *slot by return* and the ordering is perfect, and would be perfect
 for **any** signal including one straight out of a random number generator, because each bar is then
 reporting the sort key back to you. **The staircase is evidence only because the thing sorted on and
 the thing measured are different, and the second was not knowable when the first was computed.**
@@ -352,18 +356,16 @@ The true bars are identical in all four panels — near −20 bp at G1 and +20 b
 moves, and at $m = 5$ it is larger than the whole staircase. **Sample size is not a detail of the
 recipe; it is the reason the recipe works.**
 
-**Note (Where that overstates it).** The $m^{1/2}$ assumes independence, and a panel violates it
-twice over. Down the time axis, overlapping lookback windows and returns that cluster in time make
-consecutive observations near-copies. Across a date, every asset in the bucket shares that day's
-market move, so the observations inside one bar are not $m$ independent draws either. Both push the
-effective count well below $m$, and the noise does not really reach 7 bp. The logic survives:
-averaging cancels noise and leaves systematic signal.
+**Note (Where that overstates it).** The $m^{1/2}$ assumes independence, and one asset's history
+violates it twice over: overlapping lookback windows share most of their inputs, and returns
+cluster in time, so consecutive observations are near-copies rather than independent draws. Both
+push the effective count well below $m$, and the noise does not really reach 7 bp. The logic
+survives: averaging cancels noise and leaves systematic signal.
 
 #### 3.2.3 What the bar plot cannot show
 
-Step 2 ranks inside a single date, so every date produces its own little staircase — five buckets
-and five average returns, computed from that morning's cross-section alone. Step 5 flattens all of
-them onto one picture.
+Every date contributes one observation — its signal's score, and the return that followed. Step 5
+flattens all of them onto one picture, five slots wide.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-time-collapse-dark.png">
@@ -390,12 +392,15 @@ event that would lead the news. So for momentum the answer is settled before any
 the assets are **not** on a common scale, and putting them there is a precondition for § 3.2's sort.
 State the assumption either way, because everything downstream inherits it.
 
-Raw momentum is not comparable **across assets**, and a cross-sectional sort does nothing but
-compare across assets. 2% monthly momentum in a Treasury ETF is a large move; the same 2% in a
+Raw momentum is not comparable **across time**, and § 3.2 compares nothing else: its five slots sort
+one asset's own dates against one another. 2% in the calm 2021 tape and 2% in the 2023 rate-hike
+drawdown are different events, and filing them into the same slot says they are the same.
+
+The identical failure reappears one step later, **across assets**, the moment you want more than one
+name in a book. 2% monthly momentum in a Treasury ETF is a large move; the same 2% in a
 semiconductor ETF is a quiet month. Rank the two against each other on raw momentum and the
 semiconductor wins every time — not because its trend is stronger but because everything about it is
-larger. The same failure repeats across time: 2% in the calm 2021 tape and 2% in the 2023 rate-hike
-drawdown are different events.
+larger.
 
 Divide by volatility:
 
@@ -406,13 +411,14 @@ $$
 where $\sigma_{s,t}$ is that asset's volatility, estimated on data strictly before $t$ — a
 denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 6).
 
-Every asset and every period now lands on one scale, so the ranking in § 3.2 compares like with
+Every date, and later every asset, now lands on one scale, so § 3.2's slots compare like with
 like — two students both scoring 80 on different exams against different cohorts have not achieved
 the same thing.
 
 **Note (A second route to the same plane).** Dividing by $\sigma_{s,t}$ is not the only way. You can
 also replace the value outright by **its percentile against that asset's own past**, which lands
-every asset on $[0, 1]$ by construction and needs no volatility estimate at all.
+every date on $[0, 1]$ by construction and needs no volatility estimate at all. That is exactly the
+score § 3.2's step 2 asks for.
 
 **Example.** Two assets, each with five past signal values and one for today:
 
@@ -429,9 +435,9 @@ gone.
 ## 5. We Need Three Graphs
 
 § 3.2 took the five buckets as given. Where to put the boundaries is a separate choice, and there
-are three defensible answers. Below they run on identical data — 20 assets over 1,500 days, the same
-cells, the same forward returns, every asset carrying the same risk-adjusted edge and its own
-volatility level. Only the cut changes.
+are three defensible answers. Below they run on identical data — one asset over 6,000 days, the same
+dates, the same forward returns, carrying the same risk-adjusted edge from the first day to the
+last, with a calm era and a violent one. Only the cut changes.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/three-bucketings-dark.png">
@@ -445,38 +451,37 @@ volatility level. Only the cut changes.
 | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Raw values**                    | What the signal looks like at its own natural scale, before any modelling choice is imposed on it                  | **Volatility becomes the sort key.** Both tails are 46% high-volatility observations against a 25% base rate, and the middle is 9% — so the staircase is largely a volatility sort wearing the signal's name                    |
 | **Standardized, fixed intervals** | Whether the edge survives once every asset is put on a common scale (§ 4)                                         | **Starved tails.** 782 and 770 observations in the two buckets you would actually trade, against 16,416 in the middle one you would not. Trailing vol also lags an asset's own vol break, so the tails still tilt to 32% and 29% |
-| **Cross-sectional quantile**      | Whether the ordering holds using only what was knowable on the day — the only one of the three with no look-ahead | **Magnitude is discarded.** The top-ranked asset ranks identically whether it beat its peers by a nose or by a mile, and that difference carried information                                                                     |
+| **Rolling quantile** | Whether the ordering holds using only what was knowable at the time — the only one of the three with no look-ahead | **Magnitude is discarded.** A date at the 95th percentile of the asset's own past scores the same whether the signal was +2% or +20%, and that difference carried information |
 
 None of the three dominates, so produce all three and read them against each other. A staircase that
 survives all three cuts is a different claim from one that appears only in the first.
 
-### Why ranking the pooled panel leaks
+### Why ranking the whole history leaks
 
-The obvious repair for starved tails is to rank every cell in the panel at once and split into equal
-fifths. That fixes the counts and breaks something worse. Take one asset's momentum in time order —
+The obvious repair for starved tails is to rank the asset's whole history at once and split into
+equal fifths. That fixes the counts and breaks something worse. Take its momentum in time order —
 `+1%, +2%, −1%, −2%, +4%, +5%, +3%`.
 
-Ranked against the pooled panel — which contains every date, the ones after `t` among them — the
+Ranked against the whole history — which contains every date, the ones after `t` among them — the
 leading 1% sits fifth of seven and lands in a low bucket. But on the day it was observed only 1% and
 2% existed, and against what was knowable then 1% was **high**. It reads as unremarkable only
 because of the 5% that had not happened yet. Sorting is where look-ahead gets in, and it gets in
 silently — the resulting chart looks cleaner, not dirtier.
 
-**Correct: rank inside date `t`'s cross-section, and nothing else.** Every signal in that ranking
-was on screen that morning, so no future date can reach it. The same 1% then lands in a high bucket
-on a day when its peers are flat and a low one on a day when they are running — which is exactly
-right, because it carried different information on those two days.
+**Correct: at each `t`, rank only against the history strictly before `t`.** Every value in that
+ranking was on screen that morning, so no future date can reach it. The same 1% then lands in a high
+bucket early in the sample and a low one late — which is exactly right, because it carried different
+information on those two dates.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/signal-distribution-dark.png">
   <img alt="Two standard-normal density curves of the standardized signal. Left, cut at fixed intervals of one sigma: the tail groups hold 11 and 12 observations while the central groups hold 1,290 each. Right, cut at the cross-sectional quantiles: every group holds 635" src="figures/signal-distribution-light.png">
 </picture>
 
-**Note (What the cross-sectional cut needs instead).** No burn-in — that day's ranking reads only
-that day, so the first date in the sample is as usable as the last. What it does need is a universe
-wide enough that five buckets are not two names apiece, and members comparable enough that ranking
-them means anything: § 4's standardization is a prerequisite for this cut, not an alternative to it.
-The 37 ETFs of [100](100-dataset.md) give about seven per bucket.
+**Note (Two costs of the rolling window).** Early dates are ranked against almost no history, so the
+first stretch of the sample is unusable and needs a burn-in. And the window length is a choice:
+expanding uses everything but lets the rank's precision drift upward over the sample, while a fixed
+window keeps precision uniform and tracks a change of regime, at the price of forgetting.
 
 ### What none of the three shows
 
@@ -599,7 +604,7 @@ ranked against each other.
 of variance (§ 2); they share a letter and nothing else.
 
 Three quantities wear a $\sigma$ and are not interchangeable: $\sigma_y$ is the spread of forward
-return across the pooled cloud (§ 2) — the panel-wide version of § 1.1's per-asset $\sigma_{r,s}$ —
+return across the pooled cloud (§ 2) — the sample-wide version of § 1.1's per-date $\sigma_{r,s}$ —
 $\sigma_\epsilon$ is the part of it the signal cannot reach (§ 2), and $\sigma_{s,t}$ is one asset's
 trailing volatility on one date (§ 4).
 
@@ -613,8 +618,8 @@ is always the asset.
 
 ## Next → [02a · MACD and the Shape of a Lookback](02a-macd-and-lookbacks.md)
 
-Before moving on, **build the 21-day momentum signal across the 37-ETF universe and plot its bucket
-chart three ways** — raw values, standardized, and cross-sectional quantile — then compare them.
+Before moving on, **build the 21-day momentum signal on a single ETF and plot its bucket chart three
+ways** — raw values, standardized at fixed intervals, and rolling quantile — then compare them.
 Chapter 02a then asks what shape the lookback itself should have.
 
 You should be able to explain:
@@ -623,6 +628,6 @@ You should be able to explain:
 - [ ] Why the sort key must be the signal and never the forward return
 - [ ] Why a gap sits between the signal's window and the return it is scored on, and what that gap costs
 - [ ] Why the buckets are cut inside a date, and that the time axis is what pooling costs
-- [ ] Why fixed-interval buckets starve the tails and pooled-panel ranking leaks the future
+- [ ] Why fixed-interval buckets starve the tails and whole-history ranking leaks the future
 
 [← 01](01-what-is-cta.md) · [Index](00-index.md) · reference: [07 · Toolbox](07-toolbox-pandas.md)
