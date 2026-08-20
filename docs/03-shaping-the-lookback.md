@@ -228,13 +228,58 @@ Three common rules, in increasing order of information kept. All three still hav
 
 ## 4. Volatility clustering, and smoothing the fast leg
 
-Volatility arrives in clusters, and a fast signal is exposed: short-lived noise flips it
-long/short, and the churn eats the return in transaction costs before any edge is realized. Fix:
-**smooth the fast signal** to filter the shortest cycles.
+### 4.1 What volatility clustering is
 
-**Constraint:** the smoothing window must be **shorter than the signal's own period**. Smooth with a
-long one and you have not denoised the signal — you have built another slow one and lost the
-timeliness the fast leg existed for.
+**Definition (Volatility clustering).** Large moves are followed by large moves and small by small,
+**regardless of sign**. Returns themselves are close to uncorrelated from one day to the next, but
+their *absolute* values are strongly and persistently autocorrelated.
+
+Direction is unpredictable; **amplitude is not**. That asymmetry is the whole of it, and it means a
+market has stretches — days to months — where everything is simply bigger, without the underlying
+trend having changed at all.
+
+### 4.2 Why the fast leg is the one it breaks
+
+The fast leg is a short average of returns, so its swings scale with the amplitude around it. Enter
+a cluster and it starts crossing the slow leg repeatedly — not because the trend turned, but because
+the noise grew.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/whipsaw-and-smoother-dark.png">
+  <img alt="Two panels sharing one price path, calm at both ends with a shaded volatility cluster in the middle, each carrying a slow moving average and a fast one, with every crossing of the two marked by a dot. On the left the raw fast leg crosses the slow leg nine times inside the cluster. On the right the same fast leg passed through a short smoother first crosses three times" src="figures/whipsaw-and-smoother-light.png">
+</picture>
+
+**The crossings are not merely expensive, they are backwards.** A downward spike drags the fast leg
+under the slow one and flips the book short — at the bottom of the spike. The snap-back flips it
+long again, at the top. Repeat that through a cluster and the rule has been buying high and selling
+low on a schedule set by noise, which is worse than holding nothing: **whipsaw is not scatter around
+the right answer, it is the opposite of the right answer**, taken over and over.
+
+The bill arrives twice. Nine crossings instead of three is nine round trips instead of three, and
+they land in exactly the stretch where spreads are widest and depth is thinnest. At forty crossings
+a year and five basis points a round trip, that is 200 bp of annual drag against a gross edge that
+might be four hundred.
+
+### 4.3 The smoother, and where it goes
+
+**Definition (Smoother).** A second, shorter average applied to the **signal** after it is computed
+and before the rule reads its sign. A single day's noise then no longer moves the sign on its own —
+a flip has to be agreed to by several days in a row.
+
+You have already met one: **MACD's 9-day signal line is a smoother**, and its histogram is the
+crossing test run against the smoothed version rather than the raw one. The 9 in 26/12/9 is this
+parameter (§ 3.1).
+
+**Constraint.** The smoothing window must be **shorter than the signal's own period**. Smooth a
+10-day signal with a 20-day window and you have not denoised it — you have built another slow leg,
+and lost the timeliness the fast one existed for (§ 1.1). That leaves a band: long enough to kill
+single-day flips, short enough to keep the lead over the slow leg.
+
+**Note (Standardizing does not help here).** [02](02-testing-a-signal.md) § 4 divides the signal by
+its trailing volatility, which is the right fix for comparing dates — and it does nothing at all for
+churn, because dividing by a positive number can never change a sign. Comparability and turnover are
+separate problems needing separate tools. A **deadband** is the other tool for this one: require the
+crossing to exceed some margin before the position flips, rather than acting on the exact touch.
 
 ## Appendix · Notation
 

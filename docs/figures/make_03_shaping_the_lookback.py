@@ -13,6 +13,7 @@ Figures produced
     ratio-grid           the (slow, fast) search space, and the 2:1 band it returns
     fast-times-slow  a fast window fires before a slow one at both ends
     ewma-weights     an SMA weights every lag alike; an EWMA decays from the newest
+    whipsaw-and-smoother  a volatility cluster whipsaws the fast leg, and what a smoother removes
     signal-kernels   MACD is momentum with a hump-shaped kernel, not a box
 
 All are schematics drawn from illustrative values.
@@ -258,6 +259,74 @@ def ewma_weights(mode):
     save(fig, t, f"ewma-weights-{mode}.png")
 
 
+# --------------- fig: what a volatility cluster does to the fast leg, and the fix
+def whipsaw_and_smoother(mode):
+    """03 s4 -- a volatility cluster whipsaws the fast leg; a smoother removes most of it.
+
+    Schematic. One price path, calm at both ends and violent in the shaded
+    middle, carrying a slow average and a fast one. Left: the raw fast leg
+    crosses the slow leg repeatedly inside the cluster, and every crossing is a
+    round trip. Right: the same fast leg passed through a short smoother first.
+    """
+    t = THEMES[mode]
+    rng = np.random.RandomState(41)
+    T = 420
+    day = np.arange(T)
+
+    vol = np.where((day > 150) & (day < 300), 5.0, 0.75)       # the cluster
+    drift = np.where(day < 230, 0.10, -0.07)
+    px = 100 + np.cumsum(drift + vol * rng.standard_normal(T))
+
+    def ema(x, span):
+        a = 2.0 / (span + 1)
+        out = np.empty_like(x)
+        out[0] = x[0]
+        for i in range(1, len(x)):
+            out[i] = a * x[i] + (1 - a) * out[i - 1]
+        return out
+
+    slow = ema(px, 90)
+    fast = ema(px, 8)
+    smoothed = ema(fast, 4)                                    # shorter than the fast period
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.0, 4.2), sharey=True,
+                             gridspec_kw=dict(wspace=0.10))
+    fig.patch.set_facecolor(t["surface"])
+
+    for ax, (leg, head, sub) in zip(axes, (
+            (fast, "The fast leg, raw", "every dot is a crossing — and a round trip"),
+            (smoothed, "The fast leg, smoothed first", "the same cluster, most of the churn gone"))):
+        style_axes(ax, t, ylabel="price" if ax is axes[0] else None, xlabel="date $t$", grid=False)
+        ax.axvspan(150, 300, color=t["grid"], zorder=0)
+        ax.plot(day, px, color=t["ramp"][0], linewidth=0.8, zorder=2)
+        ax.plot(day, slow, color=t["ramp"][6], linewidth=2.0, zorder=4)
+        ax.plot(day, leg, color=t["ramp"][3], linewidth=1.7, zorder=3)
+
+        cross = np.flatnonzero(np.diff(np.sign(leg - slow)) != 0) + 1
+        inside = cross[(cross >= 150) & (cross < 300)]
+        ax.scatter(day[cross], leg[cross], s=26, color=t["ink"], zorder=6)
+
+        ax.set_xticks([])
+        ax.set_yticks([])
+        titles(ax, t, head, sub)
+        ax.text(225, ax.get_ylim()[0] + 0.06 * np.ptp(ax.get_ylim()),
+                f"{inside.size} crossings inside the cluster",
+                color=t["ink"], fontsize=9.0, fontweight="600", ha="center", zorder=6)
+
+    lead = dict(arrowstyle="-", color=t["muted"], linewidth=1.0)
+    axes[0].annotate("slow  $MOM_L$", xy=(95, slow[95]), xytext=(112, slow[95] - 26),
+                     color=t["ink"], fontsize=9.0, ha="left",
+                     arrowprops=dict(connectionstyle="arc3,rad=-0.2", **lead), zorder=7)
+    axes[0].annotate("fast  $MOM_S$", xy=(60, fast[60]), xytext=(14, fast[60] + 30),
+                     color=t["ink"], fontsize=9.0, ha="left",
+                     arrowprops=dict(connectionstyle="arc3,rad=0.2", **lead), zorder=7)
+    fig.text(0.5, -0.05,
+             "Illustrative. The shaded stretch is a volatility cluster: the same trend underneath, "
+             "several times the amplitude on top.",
+             ha="center", color=t["ink_secondary"], fontsize=8.6)
+    save(fig, t, f"whipsaw-and-smoother-{mode}.png")
+
+
 # --------------------------------------------------------- fig: signal kernels
 def signal_kernels(mode):
     """02 -- MACD is momentum with a different weighting of past returns.
@@ -300,7 +369,8 @@ def signal_kernels(mode):
     fig.tight_layout(rect=(0, 0, 1, 0.93))
     save(fig, t, f"signal-kernels-{mode}.png")
 
-FIGURES = (fast_times_the_slow, ratio_grid, ewma_weights, signal_kernels)
+FIGURES = (fast_times_the_slow, ratio_grid, ewma_weights, whipsaw_and_smoother,
+           signal_kernels)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):
