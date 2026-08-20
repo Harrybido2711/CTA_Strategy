@@ -39,14 +39,31 @@ and matters more there: a fast leg rolling over while the slow one is still posi
 holder beginning to leave looks like from outside. Waiting for the slow window to agree means
 selling to them on the way out.
 
-**Ratio.** Conventionally about **2:1** (MACD's 26/12), but that is a starting point rather than a
-result. Find the pairing by **grid search** — slow window on one axis, fast on the other — and read
-it as a **heat map**. Half the grid is empty by construction, since the fast window must be the
-shorter one. Space the candidates geometrically rather than evenly: a day, a week, two weeks, a
-month, a quarter. For daily-to-weekly holding the warm region tends to land around **two weeks
-against a month** — an empirical regularity, not a law, and
-[07](07-overfitting-and-robustness.md)'s subject the moment you start trusting it. A real edge is a
-contiguous warm region; one hot cell is an artifact.
+**Ratio.** The pairing is found by experiment, not chosen. Put the slow lookback $N_s$ on one axis
+and the fast one $N_f$ on the other, run [02](02-testing-a-signal.md)'s bar-plot test in every cell,
+and read the grid as a heat map.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/ratio-grid-dark.png">
+  <img alt="A five-by-five grid with a geometric ladder of lookbacks — one day, one week, two weeks, one month, one quarter — on both axes: fast lookback across, slow lookback up. Every cell on and above the diagonal is greyed out and struck through, labelled the fast leg must be the shorter one. The remaining cells are shaded, and the darkest run in a diagonal band: two weeks against one week, one month against two weeks, and one quarter against one month. The first two are outlined and annotated approximately two to one" src="figures/ratio-grid-light.png">
+</picture>
+
+Two things are true of that grid before any data is collected. **Half of it is empty by
+construction** — $N_f < N_s$ or there is no fast leg, so everything on and above the diagonal is
+struck out. And the candidates should be spaced **geometrically** rather than evenly: a day, a week,
+two weeks, a month, a quarter. Even spacing spends most of the grid on pairs that differ by a
+rounding error.
+
+**What a diagonal band means.** The warm cells run diagonally, and that shape is the finding rather
+than any single cell in it. On a geometric ladder a diagonal is a constant **ratio**, so what
+carries is $N_s / N_f$ and not either window on its own — which is why the answer is quoted as a
+ratio at all. Research lands it near **2:1**, and MACD's 26/12 is one instance; for daily-to-weekly
+holding the band shows up around two weeks against a month. An empirical regularity, not a law, and
+[07](07-overfitting-and-robustness.md)'s subject the moment you start trusting it.
+
+**Note (One hot cell is not a band).** A single dark square with pale neighbours is an artifact of
+however many parameter combinations were tried, not an edge. What earns belief is a contiguous
+warm region, because a real effect cannot switch off between one week and eight days.
 
 **Where it pays.** Best in **commodities**, and the reason is what moves them. An equity price
 answers to earnings, to the firm's own performance, to whoever is running it — many small
@@ -160,13 +177,15 @@ asset subscript $s$ of [02](02-testing-a-signal.md) is dropped.
 
 | Symbol | Means | First used |
 | --- | --- | --- |
+| $N_f$, $N_s$ | fast and slow lookback lengths, in periods | § 1 |
 | $H$ | EWMA half-life, in periods | § 2 |
 | $P_t$, $\Delta_{t-j}$ | price on that date, and the one-period change at that lag | § 3 |
 | $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 3 |
 | $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one | § 3 |
 | $c_i$, $k_j$ | MACD's net weight on the price at that lag, and its kernel weight on the price change | § 3 |
 
-**Note (Collisions to watch).** $k_j$ is a kernel weight, not a portfolio weight — [02](02-testing-a-signal.md)
+**Note (Collisions to watch).** $N_f, N_s$ are plain lookback lengths and $n_f, n_s$ are the EMA
+spans that play the same two roles — case is the tell. $k_j$ is a kernel weight, not a portfolio weight — [02](02-testing-a-signal.md)
 reserves $w_{s,t}$ for the latter, which is why the kernel is not written $w$. And $\alpha$ here is a
 smoothing constant, not [02 § 3.1](02-testing-a-signal.md)'s `alpha` plotting keyword and not a
 regression intercept; code font against maths is the tell.

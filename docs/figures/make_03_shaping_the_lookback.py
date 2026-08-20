@@ -10,6 +10,7 @@ reader's theme.
 
 Figures produced
 ----------------
+    ratio-grid           the (slow, fast) search space, and the 2:1 band it returns
     fast-times-slow  a fast window fires before a slow one at both ends
     signal-kernels   MACD is momentum with a hump-shaped kernel, not a box
 
@@ -149,6 +150,65 @@ def fast_times_the_slow(mode):
     save(fig, t, f"fast-times-slow-{mode}.png")
 
 
+# ---------------------- fig: the grid the fast/slow pairing is searched over
+def ratio_grid(mode):
+    """03 s1 -- the search space for (slow, fast), and why 2:1 shows up as a band.
+
+    Schematic. A geometric ladder on both axes. Half the grid is empty by
+    construction because the fast leg must be the shorter one; the rest is
+    shaded by an illustrative score that peaks where the slow window is about
+    twice the fast. Warm cells fall on a diagonal, which is the whole point:
+    the ratio is what carries, not the absolute windows.
+    """
+    t = THEMES[mode]
+    labels = ["1d", "1w", "2w", "1m", "1q"]
+    days = np.array([1.0, 5.0, 10.0, 21.0, 63.0])
+    n = len(labels)
+
+    fig, ax = plt.subplots(figsize=(6.6, 5.2))
+    fig.patch.set_facecolor(t["surface"])
+    ax.set_facecolor(t["surface"])
+
+    for i in range(n):                                  # i indexes the slow leg, on y
+        for j in range(n):                              # j indexes the fast leg, on x
+            if j >= i:                                  # fast must be strictly shorter
+                ax.add_patch(plt.Rectangle((j, i), 1, 1, facecolor=t["grid"],
+                                           edgecolor=t["surface"], linewidth=1.6, zorder=2))
+                ax.plot([j + 0.28, j + 0.72], [i + 0.28, i + 0.72],
+                        color=t["baseline"], linewidth=1.1, zorder=3)
+                continue
+            score = np.exp(-((np.log(days[i] / days[j]) - np.log(2.0)) ** 2) / (2 * 0.55 ** 2))
+            shade = t["ramp"][int(round(score * (len(t["ramp"]) - 1)))]
+            ax.add_patch(plt.Rectangle((j, i), 1, 1, facecolor=shade,
+                                       edgecolor=t["surface"], linewidth=1.6, zorder=2))
+
+    for i, j in ((2, 1), (3, 2)):                       # the 2:1 pairs, as drawn on the board
+        ax.add_patch(plt.Rectangle((j + 0.06, i + 0.06), 0.88, 0.88, fill=False,
+                                   edgecolor=t["ink"], linewidth=1.8, zorder=5))
+
+    ax.text(3.5, 3.5, "≈ 2:1", color=t["ink"], fontsize=9.8, fontweight="600",
+            ha="center", va="center", zorder=6)
+    ax.text(3.0, 0.5, "the fast leg must be the shorter one", color=t["ink_secondary"],
+            fontsize=8.8, ha="center", va="center", zorder=6)
+
+    ax.set_xlim(0, n)
+    ax.set_ylim(0, n)
+    ax.set_xticks(np.arange(n) + 0.5)
+    ax.set_yticks(np.arange(n) + 0.5)
+    ax.set_xticklabels(labels, fontsize=9)
+    ax.set_yticklabels(labels, fontsize=9)
+    ax.tick_params(colors=t["muted"], length=0)
+    for side in ax.spines.values():
+        side.set_visible(False)
+    ax.set_xlabel("fast lookback $N_f$", color=t["ink_secondary"], fontsize=9.4, labelpad=8)
+    ax.set_ylabel("slow lookback $N_s$", color=t["ink_secondary"], fontsize=9.4, labelpad=8)
+
+    titles(ax, t, "One grid search, and the band it comes back with",
+           "illustrative — darker is better, and the warm cells run diagonally")
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    save(fig, t, f"ratio-grid-{mode}.png")
+
+
 # --------------------------------------------------------- fig: signal kernels
 def signal_kernels(mode):
     """02 -- MACD is momentum with a different weighting of past returns.
@@ -191,7 +251,7 @@ def signal_kernels(mode):
     fig.tight_layout(rect=(0, 0, 1, 0.93))
     save(fig, t, f"signal-kernels-{mode}.png")
 
-FIGURES = (fast_times_the_slow, signal_kernels)
+FIGURES = (fast_times_the_slow, ratio_grid, signal_kernels)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):
