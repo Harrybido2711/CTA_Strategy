@@ -181,6 +181,14 @@ chapter's Background covers — do not invent topics for it.
 
 ### 4.7 Chapter skeleton
 
+**Sub-headings are numbered decimally.** `## 3.` for a section, `### 3.2` for a movement inside it,
+`#### 3.2.1` for a stage inside that — `docs/02-testing-a-signal.md` is the worked example. Split
+only sections that hold more than one movement; short ones stay flat. `### N.0` is reserved for a
+setup preamble, as in 02's `### 1.0 The three objects`. A bolded lead-in such as `**Ratio.**` marks
+a beat inside a movement — when that beat outgrows a few paragraphs, promote it to `### N.M` and
+drop the bold. Cite the sub-section in cross-references and in the notation appendix: `§ 3.2`, not
+`§ 3`.
+
 **Numbered chapters only.** Orientation docs such as `00-pipeline.md` carry none of it — title,
 content, `[← Index]` footer. They are maps, not lessons.
 
