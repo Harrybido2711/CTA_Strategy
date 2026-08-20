@@ -12,48 +12,37 @@
 
 Everything in this chapter is built from three numbers, one of each per asset per date.
 
-| Object                   | Symbol        | What it is                                                                                  | Known at$t$?                      |
-| ------------------------ | ------------- | ------------------------------------------------------------------------------------------- | ----------------------------------- |
-| **Weight**         | $w_{s,t}$   | the share of capital held in asset$s$ on date $t$, signed — negative is a short        | **yes**, you choose it        |
-| **Signal**         | $MOM_{s,t}$ | a number computed from data available at$t$, meant to say something about what comes next | **yes**, you compute it       |
-| **Forward return** | $r_{s,t}$   | what the asset then goes on to deliver over the period the position is held                 | **no** — this is the unknown |
+| Object | Symbol | What it is | Known at $t$ ? |
+| --- | --- | --- | --- |
+| **Weight** | $w_{s,t}$ | the share of capital held in asset $s$ on date $t$, signed — negative is a short | **yes**, you choose it |
+| **Signal** | $MOM_{s,t}$ | a number computed from data available at $t$, meant to say something about what comes next | **yes**, you compute it |
+| **Forward return** | $r_{s,t}$ | what the asset then goes on to deliver while the position is held | **no** — this is the unknown |
 
-**Note (Scope).** The signal is *computed* one asset at a time, from that asset's own history.
-Everything downstream is a **panel**: many assets × many dates, one signal and one forward return
-per cell. § 3.2 ranks the assets **against each other on each date** — the cross-sectional sort,
-which is what a CTA actually trades — and [03](03-from-signal-to-position.md) turns those ranks
-into positions.
+**Note (Scope).** The signal is *computed* one asset at a time, from that asset's own history;
+everything downstream is a **panel** of many assets × many dates. § 3.2 ranks the assets against
+each other on each date — the cross-sectional sort a CTA actually trades — and
+[03](03-from-signal-to-position.md) turns those ranks into positions.
 
-**Definition (Binary momentum).** The simplest member of the family — carry the sign of last
-period's return, and nothing else:
+**Definition (Binary momentum).** The simplest member of the family — the sign of last period's
+return, and nothing else:
 
 $$
 MOM_{s,t}  =  \text{sign}\left( r_{s,t-1} \right)
 $$
 
 where $s$ indexes the asset and $t$ the date, $r_{s,t-1}$ is that asset's return over the period
-just ended, and $MOM_{s,t}$ the signal it produces for today — either +1 (long) or −1 (short), with
-nothing in between.
+just ended, and $MOM_{s,t}$ is either +1 (long) or −1 (short), with nothing in between.
 
 #### Why the sign alone is not enough
 
-One window in which the asset rose 20% and another in which it rose 10% produce the *same* signal,
-so a strategy built on it takes the same size in both. Trend **strength** is thrown away; only trend **direction**
-survives.
+A window in which the asset rose 20% and one in which it rose 10% produce the *same* signal, so a
+strategy built on it takes the same size in both. Trend **direction** survives; trend **strength**
+is thrown away.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/binary-momentum-dark.png">
   <img alt="Left panel: one asset's price over two lookback windows, rebased to 100, the darker one climbing to 120 and the lighter one to 110. Right panel: the momentum signal each path produces, two bars of identical height at plus one, joined by an arrow labelled identical" src="figures/binary-momentum-light.png">
 </picture>
-
-#### What to keep instead
-
-Neither repair below is obviously right, and both are tested the same way — § 3.2's bar plot.
-
-- **Keep the value, not the sign** — the definition below, which stays proportional to how strongly
-  the asset trended.
-- **Make the value comparable first** — divide by volatility, so a 20% move in a quiet market
-  outranks a 20% move in a violent one (§ 4).
 
 **Definition (Momentum).** Averaging over $N$ periods rather than one, and keeping the value rather
 than its sign:
@@ -63,28 +52,24 @@ MOM_{s,t}  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
 $$
 
 with $N$ the lookback length and $i$ the lag inside it — the average runs over the $N$ returns
-ending yesterday.
+ending yesterday. What it keeps is a magnitude proportional to how strongly the asset trended.
 
 ### 1.1 Why studying the signal is the same as studying the portfolio
 
-Those definitions say what a signal *is*. They do not say why anyone would spend a chapter on one:
-a signal is not a strategy, it earns nothing, and it is not something you can hold. The reason runs
-backwards, from what you are actually paid on.
+A signal is not a strategy: it earns nothing and cannot be held. The reason to spend a chapter on
+one runs backwards, from what you are actually paid on.
 
-**Start from the portfolio, because that is what you optimize.** Its return on a date is the
-weighted sum of what its holdings did:
+**Start from the portfolio, because that is what you optimize.**
 
 $$
 R_t  =  \sum_s w_{s,t} r_{s,t}
 $$
 
-where $R_t$ is the portfolio's return on date $t$ and the sum runs over every asset in the universe.
-Of the two factors in each term only one is yours: $r_{s,t}$ is the market's answer, and it arrives
-after the weight is already set. **So the whole of portfolio construction is the choice of
-$w_{s,t}$.**
+$R_t$ is the portfolio's return on date $t$, summed over every asset in the universe. Of the two
+factors in each term only one is yours — $r_{s,t}$ is the market's answer, and it arrives after the
+weight is already set. **So the whole of portfolio construction is the choice of $w_{s,t}$.**
 
-**But the weights are not free.** Two sums over the book are fixed before any signal is consulted,
-and every weight vector you may hold satisfies both:
+**But the weights are not free.** Two sums over the book are fixed before any signal is consulted:
 
 $$
 \textbf{net:}\quad \sum_s w_{s,t} = 1
@@ -92,23 +77,21 @@ $$
 \textbf{gross:}\quad \sum_s |w_{s,t}| = G
 $$
 
-where $G$ is the gross target and the net is held at 1 only to within a tolerance $\delta$ —
-rebalancing is discrete, so it drifts between trades. The two sums are independent, and they
-control different things:
+$G$ is the gross target; the net holds at 1 only to within a tolerance $\delta$, since rebalancing
+is discrete and the book drifts between trades. The two sums are independent:
 
 | Sum | What it fixes | Typical value |
 | --- | --- | --- |
-| **Net**, $\sum_s w_{s,t}$ | how much *market* the book carries — the directional bet, since longs and shorts cancel here | 100% for a long-biased book, $\approx 0$ for a market-neutral one |
-| **Gross**, the same sum taken over absolute weights | how much *leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
+| **Net**, $\sum_s w_{s,t}$ | how much *market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased, $\approx 0$ market-neutral |
+| **Gross**, the same sum over absolute weights | how much *leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
 
-Two books can share a net of 100% and be nothing alike: one holding a single asset at 100%, another
-long 200% and short 100%. The second carries three times the position for the same market exposure,
-which is why both sums have to be stated and why a rising gross is never free —
-[01](01-what-is-cta.md).
+A book holding one asset at 100% and a book long 200% / short 100% carry the same net and three
+times the position — which is why both sums have to be stated, and why gross is never free
+([01](01-what-is-cta.md)).
 
-**The weights are where the signal enters.** You would like to put weight where the forward return
-is about to be high — but that is precisely the number you do not have. A signal is the stand-in you
-put in its place, which means setting $w_{s,t} \propto MOM_{s,t}$.
+**The weights are where the signal enters.** You want weight where the forward return is about to be
+high, and that is precisely the number you do not have. The signal is the stand-in you put in its
+place, which means setting $w_{s,t} \propto MOM_{s,t}$.
 
 **Claim.** Under that rule the portfolio's expected return is proportional to the correlation
 between the signal and the forward return, and to nothing else that can change its sign.
@@ -123,23 +106,21 @@ E[R_t]  \propto  \sum_s E[MOM_{s,t} r_{s,t}]  =  \sum_s \rho_s \sigma_{MOM,s} \s
 $$
 
 using $E[xy] = \rho \sigma_x \sigma_y$ for centred $x$ and $y$, where $\rho_s$ is the correlation
-between asset $s$'s signal and its forward return and $\sigma_{MOM,s}$, $\sigma_{r,s}$ are their
-standard deviations. The dropped constant is a leverage choice, and the two volatilities are
-properties of the asset that you can measure. All three are positive no matter what the signal does.
-**The only factor that can carry a sign — the only one deciding whether the portfolio makes money
-rather than loses it — is $\rho_s$.**
+between asset $s$'s signal and its forward return and $\sigma_{MOM,s}$, $\sigma_{r,s}$ their standard
+deviations. The dropped constant is a leverage choice and the volatilities are measurable properties
+of the asset — all three positive whatever the signal does. **Only $\rho_s$ can carry a sign, so only
+$\rho_s$ decides whether the portfolio makes money or loses it.**
 
 </details>
 
-**Note (The constraints do not disturb this).** A raw signal satisfies neither sum, so reaching a
-legal weight vector takes two operations: **shift** the signal until the net lands where it should,
-then **scale** until the gross does. Both are affine with a positive scale, and a correlation is
-unchanged by those — $\rho(a + bx, y) = \rho(x, y)$ for any $b > 0$. The $\rho$ measured on the raw
-signal is therefore the same $\rho$ that governs the constrained portfolio, which is what lets the
-rest of the chapter ignore weights altogether. [03](03-from-signal-to-position.md) carries out both
-operations.
+**Note (The constraints do not disturb this).** Reaching a legal weight vector means **shifting**
+the signal until the net lands right and **scaling** until the gross does — both affine with a
+positive scale, under which correlation is unchanged: $\rho(a + bx, y) = \rho(x, y)$ for $b > 0$. The
+$\rho$ measured on the raw signal is therefore the $\rho$ governing the constrained portfolio, which
+is what lets the rest of the chapter ignore weights altogether; [03](03-from-signal-to-position.md)
+carries out both operations.
 
-The whole question therefore collapses to one number, and it is a number about the signal alone:
+Everything collapses to that one number, and it is a number about the signal alone:
 
 $$
 \textbf{hypothesis:}\quad MOM \uparrow  \Longrightarrow  \text{return} \uparrow
@@ -297,13 +278,13 @@ the worst performers.
 
 **Example.** One date's cross-section of five assets, invented, filed both ways:
 
-|   | Signal$MOM_{s,t}$ | Forward return$r_{s,t}$ | Slot by signal | Slot by return |
-| - | ------------------- | ------------------------- | -------------- | -------------- |
-| A | +2.1%               | −0.4%                    | G4             | G2             |
-| B | −1.8%              | +0.9%                     | G1             | G4             |
-| C | +0.6%               | +1.3%                     | G3             | G5             |
-| D | +3.4%               | +0.2%                     | G5             | G3             |
-| E | −0.9%              | −1.1%                    | G2             | G1             |
+|   | Signal$MOM_{s,t}$ | Forward return$r_{s,t}$ | Slot by signal | Slot by return |    |
+| - | ----------------------------------------------- | -------------- | -------------- | -- |
+| A | +2.1%                                           | −0.4%         | G4             | G2 |
+| B | −1.8%                                          | +0.9%          | G1             | G4 |
+| C | +0.6%                                           | +1.3%          | G3             | G5 |
+| D | +3.4%                                           | +0.2%          | G5             | G3 |
+| E | −0.9%                                          | −1.1%         | G2             | G1 |
 
 Read down *slot by signal* and the returns come out unordered — which is exactly what one date
 looks like at 12% correlation. Read down *slot by return* and the ordering is perfect, and would be perfect
@@ -678,26 +659,26 @@ Throughout, $s$ indexes the asset and $t$ the date. The signal is computed per a
 dropped inside constructions that never leave one asset (§§ 7–8); it carries weight everywhere the
 assets are ranked against each other.
 
-| Symbol                                           | Means                                                                                                                         | First used |
-| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| $s$, $t$                                     | the asset, and the date in periods (days here)                                                                                | § 1       |
-| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$          | that asset's return in that period, the momentum signal it produces, and the share of capital that signal earns it            | § 1.0     |
-| $R_t$                                          | the portfolio's return on that date,$\sum_s w_{s,t} r_{s,t}$                                                                | § 1.1     |
-| $G$, $\delta$ | the gross-exposure target the weights must sum in absolute value to, and the tolerance allowed on the net | § 1.1 |
-| $\rho_s$, $\sigma_{MOM,s}$, $\sigma_{r,s}$ | one asset's signal-return correlation, and the standard deviations of its signal and its forward return                       | § 1.1     |
-| $N$, $i$                                     | lookback length, and the lag inside it running 1 to N                                                                         | § 1.0     |
-| $x$, $y$, $\beta$, $\epsilon$            | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
-| $\rho$, $R^2$                                | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
-| $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$  | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
-| $m$                                            | observations sharing a bucket                                                                                                 | § 3.2     |
-| G1 … G5                                         | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
-| $\sigma_{s,t}$                                 | one asset's volatility, estimated on data before that date                                                                    | § 4       |
-| $H$                                            | EWMA half-life, in periods                                                                                                    | § 7       |
-| $P_t$, $\Delta_{t-j}$                        | price on that date, and the one-period change at that lag                                                                     | § 8       |
-| $n_f$, $n_s$                                 | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 8       |
-| $\alpha_f$, $\alpha_s$                       | their smoothing constants, two over span plus one                                                                             | § 8       |
-| $c_i$, $k_j$                                 | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 8       |
-| $g$                                            | gap length — periods between the end of the signal's window and the return it is scored on                                   | Background |
+| Symbol                                                                                                            | Means                                                                                                                         | First used |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| $s$, $t$                                                                                                      | the asset, and the date in periods (days here)                                                                                | § 1       |
+| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$                                                                           | that asset's return in that period, the momentum signal it produces, and the share of capital that signal earns it            | § 1.0     |
+| $R_t$                                          | the portfolio's return on that date,$\sum_s w_{s,t} r_{s,t}$ | § 1.1                                                                                                                        |            |
+| $G$, $\delta$                                                                                                 | the gross-exposure target the weights must sum in absolute value to, and the tolerance allowed on the net                     | § 1.1     |
+| $\rho_s$, $\sigma_{MOM,s}$, $\sigma_{r,s}$                                                                  | one asset's signal-return correlation, and the standard deviations of its signal and its forward return                       | § 1.1     |
+| $N$, $i$                                                                                                      | lookback length, and the lag inside it running 1 to N                                                                         | § 1.0     |
+| $x$, $y$, $\beta$, $\epsilon$                                                                             | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
+| $\rho$, $R^2$                                                                                                 | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
+| $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$                                                                   | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
+| $m$                                                                                                             | observations sharing a bucket                                                                                                 | § 3.2     |
+| G1 … G5                                                                                                          | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
+| $\sigma_{s,t}$                                                                                                  | one asset's volatility, estimated on data before that date                                                                    | § 4       |
+| $H$                                                                                                             | EWMA half-life, in periods                                                                                                    | § 7       |
+| $P_t$, $\Delta_{t-j}$                                                                                         | price on that date, and the one-period change at that lag                                                                     | § 8       |
+| $n_f$, $n_s$                                                                                                  | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 8       |
+| $\alpha_f$, $\alpha_s$                                                                                        | their smoothing constants, two over span plus one                                                                             | § 8       |
+| $c_i$, $k_j$                                                                                                  | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 8       |
+| $g$                                                                                                             | gap length — periods between the end of the signal's window and the return it is scored on                                   | Background |
 
 **Note (Collisions to watch).** $R_t$ is the portfolio's return on a date (§ 1.1); $R^2$ is a share
 of variance (§ 2). Lowercase $\delta$ is the tolerance on net exposure (§ 1.1); uppercase
