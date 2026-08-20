@@ -262,16 +262,16 @@ Five steps build it:
 
 1. **Fix one asset.** Its history gives one signal $MOM_{s,t}$ and one forward return $r_{s,t}$ per
    date.
-2. **Score each date's signal against that asset's own past** — where it stood among the values that
-   came before it. § 4 gives two ways to do this.
-3. **File each date** into one of five slots by that score: the highest fifth into G5, down to G1.
+2. **Rank the dates by signal value**, highest to lowest.
+3. **File each date** into one of five slots by that rank: the highest fifth into G5, down to G1.
 4. **Record** under each slot the forward return that date went on to deliver.
 5. **Average** the returns filed under each slot.
 
-**Note (Why step 2 scores rather than ranks outright).** The asset's own volatility changes over the
-years, so the same +2% is a strong month in a calm tape and a quiet one in a violent tape. Scoring
-against the past is what makes two dates comparable at all — § 4 is a precondition for this section,
-not a later refinement of it.
+**Note (Step 2 is where this chapter's one defect lives).** Ranked on *what*, exactly? Take the raw
+momentum value and everything above still runs — but the asset's own volatility changes over the
+years, so +2% is a strong month in a calm tape and a quiet one in a violent tape, and step 3 files
+them into the same slot as if they were the same event. § 4 is the correction, and until it lands
+the plot below should be read as machinery rather than as a result.
 
 The figure runs those five left to right, so five dates drawn at random contribute one observation
 per slot — the population, each draw sitting at the slots its five dates fell into, and the average
@@ -383,21 +383,22 @@ that held throughout and with one that worked for five years and was flat for fi
 | **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean          |
 | **How independent** the observations are                    | overlapping windows, per the Note above                 |
 
-## 4. Risk-adjusted momentum
+## 4. Step 2, corrected — risk-adjusted momentum
 
-**Whether two assets' signals may be compared at all is an assumption, and it is yours to make.** A
-universe of five hundred large-cap equities might plausibly sit on one scale already. A CTA universe
-does not: 50 bp in a session is an ordinary day for an equity index and, for a Treasury future, an
-event that would lead the news. So for momentum the answer is settled before any data is consulted —
-the assets are **not** on a common scale, and putting them there is a precondition for § 3.2's sort.
-State the assumption either way, because everything downstream inherits it.
+**This section repairs § 3.2, it does not extend it.** Every piece of machinery there survives: the
+sort key is knowable at $t$, the returns are recorded honestly, and the averaging shrinks noise
+exactly as the proof says. What § 3.2 never settled is *what step 2 ranks*, and ranking the raw
+momentum value produces a chart about something other than the signal.
 
 Raw momentum is not comparable **across time**, and § 3.2 compares nothing else: its five slots sort
 one asset's own dates against one another. 2% in the calm 2021 tape and 2% in the 2023 rate-hike
 drawdown are different events, and filing them into the same slot says they are the same.
 
 The identical failure reappears one step later, **across assets**, the moment you want more than one
-name in a book. 2% monthly momentum in a Treasury ETF is a large move; the same 2% in a
+name in a book — and there it is an assumption you have to state rather than a fact. A universe of
+five hundred large-cap equities might plausibly sit on one scale already. A CTA universe does not:
+50 bp in a session is an ordinary day for an equity index and, for a Treasury future, an event that
+would lead the news. 2% monthly momentum in a Treasury ETF is a large move; the same 2% in a
 semiconductor ETF is a quiet month. Rank the two against each other on raw momentum and the
 semiconductor wins every time — not because its trend is stronger but because everything about it is
 larger.
@@ -417,8 +418,8 @@ the same thing.
 
 **Note (A second route to the same plane).** Dividing by $\sigma_{s,t}$ is not the only way. You can
 also replace the value outright by **its percentile against that asset's own past**, which lands
-every date on $[0, 1]$ by construction and needs no volatility estimate at all. That is exactly the
-score § 3.2's step 2 asks for.
+every date on $[0, 1]$ by construction and needs no volatility estimate at all. Either route hands
+step 2 something it can legitimately rank.
 
 **Example.** Two assets, each with five past signal values and one for today:
 
