@@ -493,40 +493,37 @@ Not necessarily the next one. Three spans sit on the timeline, in this order:
   <img alt="Two panels of cells laid on a timeline, one cell per period. The top panel is one observation: eight filled cells bracketed as the lookback the signal averages, then three dashed empty cells bracketed as the discarded gap, then a single filled cell bracketed as the one the signal is scored on, with a dotted vertical line marking that the signal is computed from the cells to its left only. The lower panel repeats the same pattern for dates t, t plus one and t plus two, each shifted one cell right, so the lookbacks overlap in all but one cell while the three scored cells form a descending diagonal, annotated one return per date and no two dates share one" src="figures/signal-return-alignment-light.png">
 </picture>
 
-**Two ways to write the same thing.** Both produce an identical pairing table, so use whichever
-reads better in your code:
+The gap is the only free choice of the three. The `-1` in **12-1 momentum** is exactly this gap: a
+twelve-month window stopping one month short of today.
 
-| Form                       | What it does                                                                                       | Where you meet it                                                        |
-| -------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| Slide the return column    | pairs$MOM_{s,t}$ with $r_{s,t+g}$ rather than $r_{s,t}$                                      | `ret.shift(-g)` before the join                                        |
-| Pull the window's end back | builds the signal from$r_{s,t-g-i}$, $i = 1 \ldots N$, then pairs it with $r_{s,t}$ as usual | 12-1 momentum: a twelve-month window that stops one month short of today |
+**Why leave one at all.** Not executability — § 1's window already ends at $t-1$, so $g = 0$ is
+knowable in time and anything tighter is look-ahead (§ 5). Executability fixes the floor at zero;
+**reversal** decides everything above it.
 
-The `-1` in *12-1* **is** the gap.
+**Reversal is not an anomaly, it is the normal state of the tape.** A trend that has just formed
+hands a little of it back, and at daily frequency that rebate is large enough to cancel the edge
+outright — which is how a real signal arrives at the bar plot looking flat, or upside down. Three
+mechanisms produce it, and they are not equally fragile:
 
-**Why leave one at all.** Two reasons, and they are not the same kind of reason:
+| Mechanism | What happens | Competed away? |
+| --- | --- | --- |
+| **Bid–ask bounce** | Closes print alternately at the bid and the ask, oscillating around the true mid — negative serial correlation by construction | **No.** A measurement artefact; no price moved |
+| **Paying for liquidity** | An order that must fill now pushes price past fair value, and whoever takes the other side is repaid when it returns | **No.** A fee for a service actually rendered |
+| **Overreaction** | News is over-extrapolated, then partly corrected | **Yes** — the only part that decays |
 
-- **Executability** — a hard floor. § 1's window already ends at $t-1$, so at $g = 0$ the signal
-  is knowable before the period it is scored on begins. Anything tighter is look-ahead (§ 5), not
-  a modelling choice.
-- **Reversal** — a judgement call, and the one worth thinking about. A trend that has just formed
-  tends to hand a little of it back: the flow that built it is spent, and an over-bought book
-  unwinds. Score the signal on that period and you are measuring the trend and its immediate rebate
-  netted into one number — which is how a real edge arrives at the bar plot looking flat, or
-  upside down.
+Two of the three are not mistakes, which is why reversal survives competition instead of being
+arbitraged into nothing. It also **strengthens as you sample finer**: the bounce is a roughly fixed
+number of ticks per trade while the trend grows with the horizon, so at one day the bounce dominates
+and at one month it is rounding error. That ratio is what sets $g$.
 
-**What the gap costs.** It does not remove only the rebate; it removes the opening of the trend
-too. The longer the gap, the staler the signal and the less of the move you are still present for.
-So $g$ trades one against the other — and it is a **hyperparameter**: running $g$ at one day, one
-week and one month and keeping whichever bar plot looks best is precisely what
-[07](07-overfitting-and-robustness.md) warns about. Set it from execution reality and a prior about
-how long the rebate lasts, never from the prettiest staircase.
+**What the gap costs.** It removes the opening of the trend along with the rebate, so a longer $g$
+is a staler signal. That makes $g$ a **hyperparameter**, and running it at a day, a week and a month
+and keeping whichever bar plot looks best is what [07](07-overfitting-and-robustness.md) warns
+about. Set it from your trading frequency and a prior on how long the rebate lasts.
 
-**One check.** The two forms must agree. If you slide the return column and the $MOM$ values move
-as well, the edit reached the signal, which it never should.
-
-The lower panel is also where § 3.2.2's caveat comes from. Step one date forward and the lookback
-keeps all but one of its cells, so neighbouring signals are nearly the same number — the reason the
-effective sample sits well below $m$.
+The lower panel is also where § 3.2.2's caveat comes from: step one date forward and the lookback
+keeps all but one of its cells, so neighbouring signals are near-copies and the effective sample
+sits well below $m$.
 
 ## Appendix · Notation
 
