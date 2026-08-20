@@ -178,7 +178,7 @@ There is a second, subtler leak even after splitting by time. If the target is a
 return, the last five training rows describe returns that fall inside the validation window. Leave
 a gap of `h` observations between the segments — **purging**, sometimes with an extra **embargo**.
 
-- The same discipline as the rolling-quantile rule in [02 § 5](02-building-signals.md): rank and
+- The same discipline as the score-against-your-own-past rule in [02 § 4](02-building-signals.md): rank and
   fit using only what was knowable at the time.
 - Formal treatment of splits and why a backtest overstates: [06](06-overfitting-and-robustness.md).
 

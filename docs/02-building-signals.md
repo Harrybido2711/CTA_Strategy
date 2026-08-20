@@ -309,7 +309,7 @@ for, the average return that fifth went on to earn, and how much of that average
 
 **The trend is the ordering, not the heights.** § 1's hypothesis was *higher signal, higher forward
 return*; on a bar plot that is precisely the statement G1 < G2 < G3 < G4 < G5. A single bar's level
-moves with the bucketing choice (§ 5) — the ordering is what does not.
+moves with where the boundaries are cut (§ 4) — the ordering is what does not.
 
 Two further readings carry information, and nothing else on the chart does:
 
@@ -379,7 +379,7 @@ that held throughout and with one that worked for five years and was flat for fi
 | Not on the chart                                                  | Where to look instead                                   |
 | ----------------------------------------------------------------- | ------------------------------------------------------- |
 | **When** the edge happened                                  | the equity curve of[04](04-understanding-backtesting.md) |
-| **Who** is inside a bucket — which assets, which regime    | the composition printed under § 5's three cuts         |
+| **Who** is inside a bucket — which dates, which regime      | the dates behind each bar, tabulated rather than averaged         |
 | **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean          |
 | **How independent** the observations are                    | overlapping windows, per the Note above                 |
 
@@ -409,7 +409,7 @@ MOM^{\text{risk-adj}}_{s,t}  =  \text{Avg}\left(\frac{r_{s,t-i}}{\sigma_{s,t}}\r
 $$
 
 where $\sigma_{s,t}$ is that asset's volatility, estimated on data strictly before $t$ — a
-denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 6).
+denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 5).
 
 Every date, and later every asset, now lands on one scale, so § 3.2's slots compare like with
 like — two students both scoring 80 on different exams against different cohorts have not achieved
@@ -429,71 +429,20 @@ score § 3.2's step 2 asks for.
 
 Raw, `+7` against `−70` is not a comparison anybody should make. As percentiles, 80 against 40 is —
 and it says A is the stronger trend *relative to its own history*, which is the only sense in which
-the question has an answer. The cost is the one § 5 charges for every rank: the magnitudes are
-gone.
+the question has an answer. The cost is the one every rank charges: the magnitudes are gone.
 
-## 5. We Need Three Graphs
+**Note (Which cut to use once it is scored).** The percentile route hands back a uniform score, so
+cutting at the quintiles gives five equal groups for free. The volatility route does not: a
+standardized signal is roughly normal, so cutting it at fixed intervals such as ±1 and ±2 leaves
+almost everything in the middle and starves the two tails you would actually trade. Cut it at its
+quintiles instead.
 
-§ 3.2 took the five buckets as given. Where to put the boundaries is a separate choice, and there
-are three defensible answers. Below they run on identical data — one asset over 6,000 days, the same
-dates, the same forward returns, carrying the same risk-adjusted edge from the first day to the
-last, with a calm era and a violent one. Only the cut changes.
+**The rule this section leaves behind.** Every signal is either **standardized** or **scored against
+its own past** before it is compared to anything. A raw momentum value is never ranked against
+another date, and never against another asset — the comparison is meaningless in both directions,
+and the resulting bar plot reports volatility while wearing the signal's name.
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/three-bucketings-dark.png">
-  <img alt="Three bucket charts side by side, mean forward return in basis points against signal bucket, computed from one asset's 6,000-day history by three different cuts. All three rise from G1 to G5 and look equally healthy. Under each bar are two numbers: the observation count and the share of that bucket drawn from the sample's violent era. Cutting on raw values gives equal counts of 1,000 but violent shares of 68, 22, 16, 23 and 71 percent against a 40 percent base rate. Cutting the standardized signal at fixed intervals gives counts of 159, 640, 3,369, 675 and 157 with violent shares still tilted at 51 and 54 percent in the tails. Cutting at rolling quantiles gives roughly 1,000 in every bucket and violent shares flat at 39 to 41 percent" src="figures/three-bucketings-light.png">
-</picture>
-
-**Read the counts, not the bars.** All three staircases are monotone, and all three would pass
-§ 3.2's test unchanged. Everything that separates them is in the two lines printed underneath.
-
-| Cut                                     | What it answers                                                                                                    | What it distorts                                                                                                                                                                                                                       |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Raw values**                    | What the signal looks like at its own natural scale, before any modelling choice is imposed on it                  | **Volatility becomes the sort key.** Both tails are about 70% violent-era observations against a 40% base rate, and the middle is 16% — so the staircase is largely a volatility sort wearing the signal's name                    |
-| **Standardized, fixed intervals** | Whether the edge survives once every date is put on a common scale (§ 4)                                         | **Starved tails.** 159 and 157 observations in the two buckets you would actually trade, against 3,369 in the middle one you would not. Trailing vol also lags a change of regime, so the tails still tilt to 51% and 54% |
-| **Rolling quantile** | Whether the ordering holds using only what was knowable at the time — the only one of the three with no look-ahead | **Magnitude is discarded.** A date at the 95th percentile of the asset's own past scores the same whether the signal was +2% or +20%, and that difference carried information |
-
-None of the three dominates, so produce all three and read them against each other. A staircase that
-survives all three cuts is a different claim from one that appears only in the first.
-
-### Why ranking the whole history leaks
-
-The obvious repair for starved tails is to rank the asset's whole history at once and split into
-equal fifths. That fixes the counts and breaks something worse. Take its momentum in time order —
-`+1%, +2%, −1%, −2%, +4%, +5%, +3%`.
-
-Ranked against the whole history — which contains every date, the ones after `t` among them — the
-leading 1% sits fifth of seven and lands in a low bucket. But on the day it was observed only 1% and
-2% existed, and against what was knowable then 1% was **high**. It reads as unremarkable only
-because of the 5% that had not happened yet. Sorting is where look-ahead gets in, and it gets in
-silently — the resulting chart looks cleaner, not dirtier.
-
-**Correct: at each `t`, rank only against the history strictly before `t`.** Every value in that
-ranking was on screen that morning, so no future date can reach it. The same 1% then lands in a high
-bucket early in the sample and a low one late — which is exactly right, because it carried different
-information on those two dates.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/signal-distribution-dark.png">
-  <img alt="Two standard-normal density curves of the standardized signal. Left, cut at fixed intervals of one sigma: the tail groups hold 11 and 12 observations while the central groups hold 1,290 each. Right, cut at the cross-sectional quantiles: every group holds 635" src="figures/signal-distribution-light.png">
-</picture>
-
-**Note (Two costs of the rolling window).** Early dates are ranked against almost no history, so the
-first stretch of the sample is unusable and needs a burn-in. And the window length is a choice:
-expanding uses everything but lets the rank's precision drift upward over the sample, while a fixed
-window keeps precision uniform and tracks a change of regime, at the price of forgetting.
-
-### What none of the three shows
-
-The composition that separates these three panels shows up only in the printed counts — which is
-§ 3.2.3's point arriving with numbers attached. The bars themselves look equally healthy in all
-three.
-
-Nor does any of them say what to do with a rank once you have it. Whether G5 becomes a long and G1
-a short, at what size, and whether the split is absolute or relative, is the Portfolio 1 vs
-Portfolio 2 question of [03](03-from-signal-to-position.md).
-
-## 6. Information availability
+## 5. Information availability
 
 Everything above assumes the signal at `t` uses only data knowable at `t`. Look-ahead bias is born
 here; the execution offsets in [04](04-understanding-backtesting.md) are the second line of defense
@@ -556,7 +505,7 @@ The `-1` in *12-1* **is** the gap.
 **Why leave one at all.** Two reasons, and they are not the same kind of reason:
 
 - **Executability** — a hard floor. § 1's window already ends at $t-1$, so at $g = 0$ the signal
-  is knowable before the period it is scored on begins. Anything tighter is look-ahead (§ 6), not
+  is knowable before the period it is scored on begins. Anything tighter is look-ahead (§ 5), not
   a modelling choice.
 - **Reversal** — a judgement call, and the one worth thinking about. A trend that has just formed
   tends to hand a little of it back: the flow that built it is spent, and an over-bought book
@@ -618,16 +567,16 @@ is always the asset.
 
 ## Next → [02a · MACD and the Shape of a Lookback](02a-macd-and-lookbacks.md)
 
-Before moving on, **build the 21-day momentum signal on a single ETF and plot its bucket chart three
-ways** — raw values, standardized at fixed intervals, and rolling quantile — then compare them.
-Chapter 02a then asks what shape the lookback itself should have.
+Before moving on, **build the 21-day momentum signal on a single ETF, score it both ways — divided
+by trailing volatility, and as a percentile against its own past — and plot the bucket chart for
+each.** Chapter 02a then asks what shape the lookback itself should have.
 
 You should be able to explain:
 
 - [ ] Why a scatter plot proves nothing at a realistic 10–15% correlation
 - [ ] Why the sort key must be the signal and never the forward return
 - [ ] Why a gap sits between the signal's window and the return it is scored on, and what that gap costs
-- [ ] Why the buckets are cut inside a date, and that the time axis is what pooling costs
-- [ ] Why fixed-interval buckets starve the tails and whole-history ranking leaks the future
+- [ ] Why a bucket holds dates rather than assets, and that the time axis is what pooling costs
+- [ ] Why a raw signal is never compared to anything, across dates or across assets
 
 [← 01](01-what-is-cta.md) · [Index](00-index.md) · reference: [07 · Toolbox](07-toolbox-pandas.md)

@@ -110,7 +110,7 @@ spanning December 2025 is trustworthy.
 Assigned work. The pipeline stays as-is — only the signal changes.
 
 1. **Re-plot performance** with the risk-adjusted signal bucketed by rolling quantile instead of raw
-   value — [02 §§ 4–5](../docs/02-building-signals.md).
+   value — [02 § 4](../docs/02-building-signals.md).
 2. **Add a MACD-style fast leg** to the grid search; read the heat map, don't pick the maximum —
    [02a § 1](../docs/02a-macd-and-lookbacks.md), [06 § 4](../docs/06-overfitting-and-robustness.md).
 3. **Smooth the fast leg** with a window shorter than its own period, or it becomes another slow

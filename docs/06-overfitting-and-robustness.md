@@ -45,7 +45,7 @@ the model looks like it generalizes when it has memorized.
 
 That is forward-looking bias in subtle form: no row contains future data, but the **split** does.
 Cut on time, never on shuffled rows. Same logic as the rolling-quantile rule in
-[02 § 5](02-building-signals.md) — when you ask "is this value high?", the comparison set must
+[02 § 4](02-building-signals.md) — when you ask "is this value high?", the comparison set must
 contain only the past.
 
 ## 3. Why a backtest overstates

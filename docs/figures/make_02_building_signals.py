@@ -15,8 +15,6 @@ Figures produced
     alpha-opacity        what turning the marker opacity down does and does not buy
     bucket-construction  draw five, rank them, repeat, average — where the bars come from
     noise-shrinks        why the bucket count m is the method, not a detail
-    three-bucketings     one dataset cut three ways, and what each cut distorts
-    signal-distribution  why fixed-interval cuts starve the tails, and what fixes it
     bucket-time-collapse     every date gives one draw; pooling them spends the t axis
     signal-return-alignment  the lookback, the discarded gap, and the paired return
 
@@ -285,130 +283,6 @@ def noise_shrinks(mode):
     save(fig, t, f"noise-shrinks-{mode}.png")
 
 
-# ------------------- fig: one dataset, three ways of cutting it into buckets
-def three_bucketings(mode):
-    """02 s5 -- raw, standardized-at-fixed-intervals, and rolling quantile.
-
-    Schematic. One simulated asset over 6,000 days -- roughly twenty-four years
-    -- with a calm era and a violent one, carrying the same risk-adjusted edge
-    throughout. Only the bucketing differs between panels: bar heights are mean
-    forward return in bp on a shared scale, n is the count behind each bar, and
-    the second line is the share of that bucket drawn from the violent era.
-    """
-    t = THEMES[mode]
-    rng = np.random.RandomState(9)
-    A, T, W, rho = 1, 6000, 500, 0.12
-
-    vol = np.where(np.arange(T) < 4000, 0.6, 2.0)[:, None]     # calm era, then violent
-    z = rng.standard_normal((T, A))                            # the risk-adjusted signal
-    fwd = 100 * vol * (rho * z + (1 - rho ** 2) ** 0.5 * rng.standard_normal((T, A)))
-    raw = z * vol                                              # what you measure before scaling
-
-    sig = np.full((T, A), np.nan)                              # trailing vol, data before t only
-    for i in range(W, T):
-        sig[i] = raw[i] / raw[i - W:i].std(axis=0)
-
-    xs = np.full((T, A), np.nan)                               # rank against its own past
-    for i in range(2 * W, T):
-        xs[i] = (sig[i - W:i] < sig[i]).mean(axis=0)
-
-    usable = np.zeros((T, A), bool)                            # same dates in all three panels
-    usable[2 * W:] = True
-    hivol = np.repeat((np.arange(T) >= 4000)[:, None], A, axis=1)
-
-    def bars(key, edges=None):
-        k, y, v = key.ravel(), fwd.ravel(), hivol.ravel()
-        ok = ~np.isnan(k) & usable.ravel()
-        k, y, v = k[ok], y[ok], v[ok]
-        cuts = np.quantile(k, [0.2, 0.4, 0.6, 0.8]) if edges is None else edges
-        g = np.digitize(k, cuts)
-        m = np.array([y[g == j].mean() if (g == j).sum() else np.nan for j in range(5)])
-        e = np.array([y[g == j].std() / max((g == j).sum(), 1) ** 0.5 for j in range(5)])
-        n = np.array([(g == j).sum() for j in range(5)])
-        share = np.array([100 * v[g == j].mean() if (g == j).sum() else np.nan for j in range(5)])
-        return m, e, n, share
-
-    panels = (
-        (bars(raw), "Raw values", "cut at the pooled quintiles of raw momentum"),
-        (bars(sig, edges=np.array([-2.0, -1.0, 1.0, 2.0])), "Standardized, fixed intervals",
-         "divided by trailing vol, then cut at ±1 and ±2"),
-        (bars(xs), "Rolling quantile",
-         "ranked against its own past, then cut at the quintiles"),
-    )
-
-    fig, axes = plt.subplots(1, 3, figsize=(11.2, 4.3), sharey=True,
-                             gridspec_kw=dict(wspace=0.12))
-    fig.patch.set_facecolor(t["surface"])
-
-    for ax, ((m, e, n, share), head, sub) in zip(axes, panels):
-        style_axes(ax, t, ylabel="mean forward return (bp)" if ax is axes[0] else None,
-                   xlabel="signal bucket ($MOM$)")
-        for i, v in enumerate(m):
-            if not np.isnan(v):
-                rounded_bar(ax, i, v, color=t["series"], width=0.34)
-        ax.errorbar(range(5), m, yerr=e, fmt="none", ecolor=t["muted"],
-                    elinewidth=1.1, capsize=3, capthick=1.1, zorder=5)
-        ax.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
-        ax.set_xlim(-0.6, 4.6)
-        ax.set_ylim(-100, 52)
-        ax.set_xticks(range(5))
-        ax.set_xticklabels(["G1", "G2", "G3", "G4", "G5"], fontsize=8)
-        for i, (c, sh) in enumerate(zip(n, share)):
-            ax.text(i, -78, f"n={c:,}", ha="center", color=t["muted"], fontsize=7.2)
-            ax.text(i, -90, f"{sh:.0f}%", ha="center", color=t["muted"], fontsize=7.2)
-        titles(ax, t, head, sub)
-
-    fig.text(0.5, -0.06,
-             "Illustrative. One asset over 6,000 days, calm and then violent, carrying the same "
-             "risk-adjusted edge throughout, with identical dates in all three panels — only the "
-             "cut differs.\nUnder each bar: how many observations it holds, and what share of them "
-             "came from the violent era.",
-             ha="center", color=t["ink_secondary"], fontsize=8.6)
-    save(fig, t, f"three-bucketings-{mode}.png")
-
-
-# ------------------------------------------- fig: why fixed intervals starve tails
-def signal_distribution(mode):
-    t = THEMES[mode]
-    x = np.linspace(-3.4, 3.4, 600)
-    y = np.exp(-x ** 2 / 2) / np.sqrt(2 * np.pi)
-
-    fig, axes = plt.subplots(1, 2, figsize=(9.4, 4.1), sharey=True)
-    fig.patch.set_facecolor(t["surface"])
-
-    fixed_cuts = [-2, -1, 0, 1, 2]
-    q = 0.8416  # quintile boundaries of a standard normal
-    quant_cuts = [-2 * q, -q, 0, q, 2 * q]
-
-    panels = [
-        (fixed_cuts, "Fixed intervals", "the tails you actually trade are nearly empty",
-         ["n=12", "n=340", "n=1,290", "n=1,290", "n=331", "n=11"]),
-        (quant_cuts, "Cross-sectional quantile", "equal-sized groups, and no look-ahead",
-         ["", "n=635", "n=635", "n=635", "n=635", ""]),
-    ]
-
-    for ax, (cuts, title, subtitle, counts) in zip(axes, panels):
-        style_axes(ax, t, ylabel="density" if ax is axes[0] else None,
-                   xlabel="standardized signal $MOM_{s,t}$   (σ)", grid=False)
-        ax.plot(x, y, color=t["series"], linewidth=2.0, solid_capstyle="round", zorder=3)
-        ax.fill_between(x, y, color=t["wash"], alpha=0.10, zorder=2)
-        for c in cuts:
-            ax.axvline(c, color=t["grid"], linewidth=1.0, zorder=1)
-
-        edges = [-3.4] + list(cuts) + [3.4]
-        for (lo, hi), label in zip(zip(edges, edges[1:]), counts):
-            if label:
-                ax.text((lo + hi) / 2, 0.435, label, ha="center", va="bottom",
-                        color=t["ink_secondary"], fontsize=8.0)
-
-        ax.set_ylim(0, 0.50)
-        ax.set_xlim(-3.4, 3.4)
-        ax.set_yticks([])
-        titles(ax, t, title, subtitle)
-
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
-    save(fig, t, f"signal-distribution-{mode}.png")
-
 # ----------------------- fig: the calibration ladder, and where reality sits
 def scatter_ladder(mode):
     """02 s2 -- what each correlation looks like; the eye's floor is ~30%.
@@ -634,7 +508,7 @@ def signal_return_alignment(mode):
 
 
 FIGURES = (binary_momentum, scatter_ladder, alpha_opacity, bucket_construction, noise_shrinks,
-           three_bucketings, signal_distribution, signal_return_alignment,
+           signal_return_alignment,
            bucket_time_collapse)
 
 if __name__ == "__main__":
