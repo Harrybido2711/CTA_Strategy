@@ -18,6 +18,8 @@ What settles them is 02's bar plot, which is why that chapter comes first.
 
 ## 1. Combining a slow and a fast horizon
 
+### 1.1 Why two windows beat one
+
 One lookback forces a choice between stable and timely. A long window rides a trend without being
 shaken out of it but arrives late at both ends; a short one turns on time, and turns on noise too.
 Rather than choose, carry both and let the **fast window time the turns of the slow one**.
@@ -39,9 +41,11 @@ and matters more there: a fast leg rolling over while the slow one is still posi
 holder beginning to leave looks like from outside. Waiting for the slow window to agree means
 selling to them on the way out.
 
-**Ratio.** The pairing is found by experiment, not chosen. Put the slow lookback $N_s$ on one axis
-and the fast one $N_f$ on the other, run [02](02-testing-a-signal.md)'s bar-plot test in every cell,
-and read the grid as a heat map.
+### 1.2 Finding the pairing
+
+The pairing is found by experiment, not chosen. Put the slow lookback $N_s$ on one axis and the
+fast one $N_f$ on the other, run [02](02-testing-a-signal.md)'s bar-plot test in every cell, and
+read the grid as a heat map.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/ratio-grid-dark.png">
@@ -65,13 +69,14 @@ holding the band shows up around two weeks against a month. An empirical regular
 however many parameter combinations were tried, not an edge. What earns belief is a contiguous
 warm region, because a real effect cannot switch off between one week and eight days.
 
-**Where it pays.** Best in **commodities**, and the reason is what moves them. An equity price
-answers to earnings, to the firm's own performance, to whoever is running it — many small
-idiosyncratic forces, none of which trend for long. A commodity answers to global energy supply,
-shipping, and whether the large participants are in the market at all, and it is far too large for
-one fund to push on its own, so a move that starts tends to be everyone moving together. Equities
-second. **Bonds** weakest: lean on one hard enough and someone takes the other side and presses it
-back.
+### 1.3 Where the combination pays
+
+Best in **commodities**, and the reason is what moves them. An equity price answers to earnings, to
+the firm's own performance, to whoever is running it — many small idiosyncratic forces, none of
+which trend for long. A commodity answers to global energy supply, shipping, and whether the large
+participants are in the market at all, and it is far too large for one fund to push on its own, so
+a move that starts tends to be everyone moving together. Equities second. **Bonds** weakest: lean
+on one hard enough and someone takes the other side and presses it back.
 
 ## 2. EWMA instead of a simple moving average
 
@@ -89,6 +94,8 @@ more. Every parameter here has that status, which is [07](07-overfitting-and-rob
 subject rather than something to accept on authority.
 
 ## 3. MACD, stated precisely
+
+### 3.1 The three series
 
 Written out, MACD is three series built from two exponential moving averages of the **price**.
 
@@ -110,6 +117,8 @@ Conventionally $n_f = 12$, $n_s = 26$, and 9 for the signal line.
 | **MACD line**   | recent average price versus a longer one | trend direction            |
 | **Signal line** | a smoothed MACD                          | the level MACD is crossing |
 | **Histogram**   | MACD minus its own smoothing             | trend acceleration         |
+
+### 3.2 Why it is momentum, not a separate indicator
 
 **Claim.** MACD is a momentum signal. It is a weighted sum of past returns, differing from a
 lookback mean only in the shape of the weights.
@@ -150,9 +159,10 @@ week — deliberately, since the newest return is the noisiest — and never ful
   <img alt="Weight given to each past daily return, against lag in trading days, for two signals normalised to the same total. A 21-day momentum is a flat box: equal weight for the last 21 days and zero beyond. MACD with spans 12 and 26 is a hump that starts low at lag zero, peaks around lag 8, then decays slowly and never reaches zero within sixty days" src="figures/signal-kernels-light.png">
 </picture>
 
-Three common rules, in increasing order of information kept. All
-three still have to pass [02 § 3.2](02-testing-a-signal.md)'s bar plot before they earn a
-backtest.
+### 3.3 From a value to a rule
+
+Three common rules, in increasing order of information kept. All three still have to pass
+[02 § 3.2](02-testing-a-signal.md)'s bar plot before they earn a backtest.
 
 | Rule         | Go long when                            | Costs                                                            |
 | ------------ | --------------------------------------- | ---------------------------------------------------------------- |
@@ -177,12 +187,12 @@ asset subscript $s$ of [02](02-testing-a-signal.md) is dropped.
 
 | Symbol | Means | First used |
 | --- | --- | --- |
-| $N_f$, $N_s$ | fast and slow lookback lengths, in periods | § 1 |
+| $N_f$, $N_s$ | fast and slow lookback lengths, in periods | § 1.2 |
 | $H$ | EWMA half-life, in periods | § 2 |
-| $P_t$, $\Delta_{t-j}$ | price on that date, and the one-period change at that lag | § 3 |
-| $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 3 |
-| $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one | § 3 |
-| $c_i$, $k_j$ | MACD's net weight on the price at that lag, and its kernel weight on the price change | § 3 |
+| $P_t$, $\Delta_{t-j}$ | price on that date, and the one-period change at that lag | § 3.1 |
+| $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 3.1 |
+| $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one | § 3.1 |
+| $c_i$, $k_j$ | MACD's net weight on the price at that lag, and its kernel weight on the price change | § 3.2 |
 
 **Note (Collisions to watch).** $N_f, N_s$ are plain lookback lengths and $n_f, n_s$ are the EMA
 spans that play the same two roles — case is the tell. $k_j$ is a kernel weight, not a portfolio weight — [02](02-testing-a-signal.md)
