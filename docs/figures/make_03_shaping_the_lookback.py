@@ -92,9 +92,9 @@ def fast_times_the_slow(mode):
     ax.plot(slow_ma, color=t["ramp"][5], linewidth=2.1, zorder=4)
     ax.plot(fast_ma, color=t["ramp"][2], linewidth=2.1, zorder=3)
 
-    ax.text(86, fast_ma[86] - 2.2, f"fast, {N_F}-day", color=t["ramp"][2],
+    ax.text(86, fast_ma[86] - 2.2, f"fast, {N_F}-day", color=t["ink"],
             fontsize=8.6, fontweight="600", ha="left", va="top")
-    ax.text(118, slow_ma[118] - 2.2, f"slow, {N_S}-day", color=t["ramp"][5],
+    ax.text(118, slow_ma[118] - 2.2, f"slow, {N_S}-day", color=t["ink"],
             fontsize=8.6, fontweight="600", ha="left", va="top")
     ax.text(5, 97.0, "price", color=t["muted"], fontsize=8.6, ha="left")
 
@@ -103,7 +103,7 @@ def fast_times_the_slow(mode):
             (88.2, (s_in, s_out), t["ramp"][5], "held by the slow rule alone")):
         ax.plot([p0, p1], [y, y], color=colour, linewidth=3.6,
                 solid_capstyle="butt", zorder=5)
-        ax.text(p0 - 3, y, label, color=colour, fontsize=8.3,
+        ax.text(p0 - 3, y, label, color=t["ink_secondary"], fontsize=8.3,
                 fontweight="600", ha="right", va="center")
 
     titles(ax, t, "A fast window fires at both ends before a slow one does",
@@ -129,7 +129,7 @@ def fast_times_the_slow(mode):
             (s_out, t["ramp"][5], -13.5, "left",  "old exit")):
         bx.plot([i], [0], marker="o", markersize=5.2, color=colour,
                 markeredgecolor=t["surface"], markeredgewidth=1.2, zorder=6)
-        bx.text(i + (-4 if ha == "right" else 4), y, label, color=colour,
+        bx.text(i + (-4 if ha == "right" else 4), y, label, color=t["ink"],
                 fontsize=8.5, fontweight="600", ha=ha, va="center")
 
     for (p0, p1), note in (((f_in, s_in), "of the rally the slow rule sits out"),

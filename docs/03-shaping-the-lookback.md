@@ -18,16 +18,43 @@ What settles them is 02's bar plot, which is why that chapter comes first.
 
 ## 1. Combining a slow and a fast horizon
 
-One lookback forces a choice between stable and timely. Instead use a **fast momentum to time the
-turns in a slow one** — MACD's structure, where a short EMA crossing a long one marks the entry
-earlier.
+One lookback forces a choice between stable and timely. A long window rides a trend without being
+shaken out of it but arrives late at both ends; a short one turns on time, and turns on noise too.
+Rather than choose, carry both and let the **fast window time the turns of the slow one**.
 
-**Ratio.** Conventionally about **2:1** (MACD's 26/12), but that is a starting point: find the pairing
-by **grid search**, read as a **heat map**. A real edge is a contiguous warm region; one hot cell is
-an artifact.
+Each rule is still the sign of its own momentum, so each fires when its own line crosses zero. Draw
+the two over the same price path and the short window crosses first at both ends — that gap, and
+nothing else, is what the combination trades on.
 
-**Where it pays.** Best in **commodities** — supply-and-demand cycles drive long, persistent trends.
-Equities second. **Bonds** weakest, being the most arbitraged, so deviations close fastest.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fast-times-slow-dark.png">
+  <img alt="Two stacked panels sharing a trading-day axis. The upper panel plots price rebased to 100 over one path that falls, turns and rolls over, with a 20-day and a 40-day moving average drawn over it, and two horizontal bars underneath showing how long each rule holds. The lower panel plots the momentum each window produces against zero: the 20-day line crosses zero upward 10 days before the 40-day line does, and crosses back down 14 days before it, so the fast rule enters and exits earlier at both ends" src="figures/fast-times-slow-light.png">
+</picture>
+
+**What the early signal means.** A fast momentum turning up while the slow one is still negative is
+not only an arithmetic consequence of the shorter window. It is the first evidence that flow has
+changed direction — that whoever was selling has stopped, or something large has started buying —
+while the move is still too small to register over a quarter. The same reading runs the other way
+and matters more there: a fast leg rolling over while the slow one is still positive is what a large
+holder beginning to leave looks like from outside. Waiting for the slow window to agree means
+selling to them on the way out.
+
+**Ratio.** Conventionally about **2:1** (MACD's 26/12), but that is a starting point rather than a
+result. Find the pairing by **grid search** — slow window on one axis, fast on the other — and read
+it as a **heat map**. Half the grid is empty by construction, since the fast window must be the
+shorter one. Space the candidates geometrically rather than evenly: a day, a week, two weeks, a
+month, a quarter. For daily-to-weekly holding the warm region tends to land around **two weeks
+against a month** — an empirical regularity, not a law, and
+[07](07-overfitting-and-robustness.md)'s subject the moment you start trusting it. A real edge is a
+contiguous warm region; one hot cell is an artifact.
+
+**Where it pays.** Best in **commodities**, and the reason is what moves them. An equity price
+answers to earnings, to the firm's own performance, to whoever is running it — many small
+idiosyncratic forces, none of which trend for long. A commodity answers to global energy supply,
+shipping, and whether the large participants are in the market at all, and it is far too large for
+one fund to push on its own, so a move that starts tends to be everyone moving together. Equities
+second. **Bonds** weakest: lean on one hard enough and someone takes the other side and presses it
+back.
 
 ## 2. EWMA instead of a simple moving average
 
