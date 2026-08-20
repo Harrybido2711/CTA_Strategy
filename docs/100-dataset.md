@@ -206,7 +206,7 @@ python ../analyze_cta_data.py
 ```
 
 Then scan every ticker for `|close.pct_change()| > 0.4` and confirm you land on the five SPDRs that
-are still unadjusted. Every chapter from [02](02-building-signals.md) onward is exercised on this
+are still unadjusted. Every chapter from [02](02-testing-a-signal.md) onward is exercised on this
 data — anything you miss here propagates into all of it.
 
 You should be able to explain:

@@ -1,7 +1,7 @@
-# 04 · Understanding Backtesting
+# 05 · Understanding Backtesting
 
 > - **Answers:** what a backtester computes, why decision and fill must be offset in time, and how large that offset should be.
-> - **Prerequisites:** [03 · From Signal to Position](03-from-signal-to-position.md).
+> - **Prerequisites:** [04 · From Signal to Position](04-from-signal-to-position.md).
 > - **After reading:** read every column of the output, and say whether your backtest has look-ahead bias.
 
 A backtester does one thing: **convert a target dollar exposure into shares, simulate the trade,
@@ -122,7 +122,7 @@ Multi-asset runs this loop for all 37 assets and sums each `portfolio` into the 
 
 ---
 
-## Next → [05 · Evaluating Performance](05-evaluating-performance.md)
+## Next → [06 · Evaluating Performance](06-evaluating-performance.md)
 
 Before moving on, **run the backtest and trace one asset by hand** — pick a single ticker and follow
 one row from `dollar` through `target_shrs`, `curr_shrs`, `traded_shrs`, `TWAP`, to `portfolio`:
@@ -137,4 +137,4 @@ You should be able to explain:
 - [ ] Exactly where the two time offsets are, and whether your code delays twice
 - [ ] Why turnover is never zero even at constant `dollar`
 
-[← 03](03-from-signal-to-position.md) · [Index](00-index.md)
+[← 04](04-from-signal-to-position.md) · [Index](00-index.md)

@@ -1,8 +1,8 @@
-"""Figures for docs/02a-macd-and-lookbacks.md.
+"""Figures for docs/03-shaping-the-lookback.md.
 
 Run from anywhere:
 
-    python docs/figures/make_02a_macd_and_lookbacks.py
+    python docs/figures/make_03_shaping_the_lookback.py
 
 Writes light- and dark-mode PNGs into docs/figures/. The chapter references
 them through a <picture> element so GitHub serves the variant matching the
@@ -71,4 +71,4 @@ if __name__ == "__main__":
     for mode in ("light", "dark"):
         for f in FIGURES:
             f(mode)
-    print(f"wrote {2 * len(FIGURES)} figures for 02a-macd-and-lookbacks.md")
+    print(f"wrote {2 * len(FIGURES)} figures for 03-shaping-the-lookback.md")

@@ -1,12 +1,12 @@
-# 02a · Shaping the Lookback
+# 03 · Shaping the Lookback
 
 > - **Answers:** how long a lookback to use, how to weight the returns inside it, and what MACD is once the chart-package vocabulary is stripped away.
-> - **Prerequisites:** [02 · Testing a Signal](02-building-signals.md) — every section here hands you a knob, and 02's bar plot is the only gauge that reads one.
+> - **Prerequisites:** [02 · Testing a Signal](02-testing-a-signal.md) — every section here hands you a knob, and 02's bar plot is the only gauge that reads one.
 > - **After reading:** pair a fast horizon with a slow one, replace a boxcar average with an EWMA, read MACD as a weighted sum of past returns, and say why the fast leg has to be smoothed.
 
 ---
 
-[02](02-building-signals.md) left two blanks inside its own definition. Writing momentum as
+[02](02-testing-a-signal.md) left two blanks inside its own definition. Writing momentum as
 $\text{Avg}(r_{s,t-i})$, $i = 1 \ldots N$ fixes neither the length of the window nor the weight each
 return carries inside it — the average is a boxcar only because nobody said otherwise. This chapter
 is about both blanks, and about MACD, which turns out to be the same object with the second one
@@ -41,7 +41,7 @@ Tune the **half-life** $H$ — the lag at which a return's weight has decayed to
 to the newest one. Candidates are fractions of the lookback (1/2, 1/3, 1/5, 1/8). Grid-search them.
 
 MACD's 9-day signal line is an **empirical solution** — a value that fit historical data, nothing
-more. Every parameter here has that status, which is [06](06-overfitting-and-robustness.md)'s
+more. Every parameter here has that status, which is [07](07-overfitting-and-robustness.md)'s
 subject rather than something to accept on authority.
 
 ## 3. MACD, stated precisely
@@ -107,14 +107,14 @@ week — deliberately, since the newest return is the noisiest — and never ful
 </picture>
 
 Three common rules, in increasing order of information kept. All
-three still have to pass [02 § 3.2](02-building-signals.md)'s bar plot before they earn a
+three still have to pass [02 § 3.2](02-testing-a-signal.md)'s bar plot before they earn a
 backtest.
 
 | Rule         | Go long when                            | Costs                                                            |
 | ------------ | --------------------------------------- | ---------------------------------------------------------------- |
 | Zero-line    | MACD is above zero                      | a slow trend filter, late                                        |
 | Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 4's subject                  |
-| Proportional | always, sized by the standardized value | none of the magnitude, but see[03](03-from-signal-to-position.md) |
+| Proportional | always, sized by the standardized value | none of the magnitude, but see[04](04-from-signal-to-position.md) |
 
 ## 4. Volatility clustering, and smoothing the fast leg
 
@@ -129,7 +129,7 @@ timeliness the fast leg existed for.
 ## Appendix · Notation
 
 Throughout, $t$ is the date. Everything in this chapter is computed one asset at a time, so the
-asset subscript $s$ of [02](02-building-signals.md) is dropped.
+asset subscript $s$ of [02](02-testing-a-signal.md) is dropped.
 
 | Symbol | Means | First used |
 | --- | --- | --- |
@@ -139,14 +139,14 @@ asset subscript $s$ of [02](02-building-signals.md) is dropped.
 | $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one | § 3 |
 | $c_i$, $k_j$ | MACD's net weight on the price at that lag, and its kernel weight on the price change | § 3 |
 
-**Note (Collisions to watch).** $k_j$ is a kernel weight, not a portfolio weight — [02](02-building-signals.md)
+**Note (Collisions to watch).** $k_j$ is a kernel weight, not a portfolio weight — [02](02-testing-a-signal.md)
 reserves $w_{s,t}$ for the latter, which is why the kernel is not written $w$. And $\alpha$ here is a
-smoothing constant, not [02 § 3.1](02-building-signals.md)'s `alpha` plotting keyword and not a
+smoothing constant, not [02 § 3.1](02-testing-a-signal.md)'s `alpha` plotting keyword and not a
 regression intercept; code font against maths is the tell.
 
 ---
 
-## Next → [03 · From Signal to Position](03-from-signal-to-position.md)
+## Next → [04 · From Signal to Position](04-from-signal-to-position.md)
 
 Before moving on, **plot the kernel of your own signal** — the weight it places on the return at
 each lag — beside a boxcar of the same total. If you cannot draw it, you do not yet know what your
@@ -159,4 +159,4 @@ You should be able to explain:
 - [ ] Why MACD is momentum with a hump-shaped kernel rather than a separate indicator
 - [ ] Why the smoothing window must be shorter than the fast signal's own period
 
-[← 02](02-building-signals.md) · [Index](00-index.md) · reference: [07 · Toolbox](07-toolbox-pandas.md)
+[← 02](02-testing-a-signal.md) · [Index](00-index.md) · reference: [08 · Toolbox](08-toolbox-pandas.md)

@@ -22,7 +22,7 @@ Everything in this chapter is built from three numbers, one of each per asset pe
 carrying that asset's own signal and its own forward return. That restriction is not a
 simplification — assets have different volatilities, so their raw signals are not on one scale and
 cannot be compared until § 4 puts them there. Combining several assets into one book comes after
-that, in [03](03-from-signal-to-position.md).
+that, in [04](04-from-signal-to-position.md).
 
 **Definition (Binary momentum).** The simplest member of the family — the sign of last period's
 return, and nothing else:
@@ -118,7 +118,7 @@ $\rho_s$ decides whether the portfolio makes money or loses it.**
 the signal until the net lands right and **scaling** until the gross does — both affine with a
 positive scale, under which correlation is unchanged: $\rho(a + bx, y) = \rho(x, y)$ for $b > 0$. The
 $\rho$ measured on the raw signal is therefore the $\rho$ governing the constrained portfolio, which
-is what lets the rest of the chapter ignore weights altogether; [03](03-from-signal-to-position.md)
+is what lets the rest of the chapter ignore weights altogether; [04](04-from-signal-to-position.md)
 carries out both operations.
 
 Everything collapses to that one number, and it is a number about the signal alone:
@@ -217,7 +217,7 @@ chart is a density map rather than a mass of ink. Below, the left panel is the b
 two are both the after.
 
 **Note (Not the other alphas).** matplotlib's opacity keyword: not a regression intercept, not the
-excess return a manager is paid for, not [02a](02a-macd-and-lookbacks.md)'s smoothing constant
+excess return a manager is paid for, not [03](03-shaping-the-lookback.md)'s smoothing constant
 $\alpha$. Code font is the tell.
 
 <picture>
@@ -378,7 +378,7 @@ that held throughout and with one that worked for five years and was flat for fi
 
 | Not on the chart                                                  | Where to look instead                                   |
 | ----------------------------------------------------------------- | ------------------------------------------------------- |
-| **When** the edge happened                                  | the equity curve of[04](04-understanding-backtesting.md) |
+| **When** the edge happened                                  | the equity curve of[05](05-understanding-backtesting.md) |
 | **Who** is inside a bucket — which dates, which regime      | the dates behind each bar, tabulated rather than averaged         |
 | **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean          |
 | **How independent** the observations are                    | overlapping windows, per the Note above                 |
@@ -446,9 +446,9 @@ and the resulting bar plot reports volatility while wearing the signal's name.
 ## 5. Information availability
 
 Everything above assumes the signal at `t` uses only data knowable at `t`. Look-ahead bias is born
-here; the execution offsets in [04](04-understanding-backtesting.md) are the second line of defense
+here; the execution offsets in [05](05-understanding-backtesting.md) are the second line of defense
 and cannot rescue a signal contaminated at construction. The rolling-quantile rule (§5) and the
-train/validation/test split ([06](06-overfitting-and-robustness.md)) are the same discipline.
+train/validation/test split ([07](07-overfitting-and-robustness.md)) are the same discipline.
 
 ## Background
 
@@ -518,7 +518,7 @@ The `-1` in *12-1* **is** the gap.
 too. The longer the gap, the staler the signal and the less of the move you are still present for.
 So $g$ trades one against the other — and it is a **hyperparameter**: running $g$ at one day, one
 week and one month and keeping whichever bar plot looks best is precisely what
-[06](06-overfitting-and-robustness.md) warns about. Set it from execution reality and a prior about
+[07](07-overfitting-and-robustness.md) warns about. Set it from execution reality and a prior about
 how long the rebate lasts, never from the prettiest staircase.
 
 **One check.** The two forms must agree. If you slide the return column and the $MOM$ values move
@@ -559,18 +559,18 @@ $\sigma_\epsilon$ is the part of it the signal cannot reach (§ 2), and $\sigma_
 trailing volatility on one date (§ 4).
 
 Lowercase $g$ is the gap, unrelated to the buckets G1 … G5, and lowercase $\delta$ is the tolerance
-on net exposure (§ 1.1), unrelated to [02a](02a-macd-and-lookbacks.md)'s $\Delta$. Section 3.1's
+on net exposure (§ 1.1), unrelated to [03](03-shaping-the-lookback.md)'s $\Delta$. Section 3.1's
 `alpha` is a plotting keyword, not a smoothing constant and not a regression intercept — code font
 against maths is the tell. Chapter [01](01-what-is-cta.md) uses $s$ for a signed share count; here it
 is always the asset.
 
 ---
 
-## Next → [02a · Shaping the Lookback](02a-macd-and-lookbacks.md)
+## Next → [03 · Shaping the Lookback](03-shaping-the-lookback.md)
 
 Before moving on, **build the 21-day momentum signal on a single ETF, score it both ways — divided
 by trailing volatility, and as a percentile against its own past — and plot the bucket chart for
-each.** Chapter 02a then asks what shape the lookback itself should have.
+each.** Chapter 03 then asks what shape the lookback itself should have.
 
 You should be able to explain:
 
@@ -580,4 +580,4 @@ You should be able to explain:
 - [ ] Why a bucket holds dates rather than assets, and that the time axis is what pooling costs
 - [ ] Why a raw signal is never compared to anything, across dates or across assets
 
-[← 01](01-what-is-cta.md) · [Index](00-index.md) · reference: [07 · Toolbox](07-toolbox-pandas.md)
+[← 01](01-what-is-cta.md) · [Index](00-index.md) · reference: [08 · Toolbox](08-toolbox-pandas.md)

@@ -1,8 +1,8 @@
-"""Figures for docs/02-building-signals.md.
+"""Figures for docs/02-testing-a-signal.md.
 
 Run from anywhere:
 
-    python docs/figures/make_02_building_signals.py
+    python docs/figures/make_02_testing_a_signal.py
 
 Writes light- and dark-mode PNGs into docs/figures/. The chapter references
 them through a <picture> element so GitHub serves the variant matching the
@@ -515,4 +515,4 @@ if __name__ == "__main__":
     for mode in ("light", "dark"):
         for fn in FIGURES:
             fn(mode)
-    print(f"wrote {2 * len(FIGURES)} figures for 02-building-signals.md")
+    print(f"wrote {2 * len(FIGURES)} figures for 02-testing-a-signal.md")

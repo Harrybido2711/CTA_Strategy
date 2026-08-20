@@ -200,7 +200,7 @@ Then the numbered sections, then `## Background` and `## Appendix · Notation` i
 `Open questions` are **optional** — a pitfalls list that only restates the chapter is weight without
 information, so drop it rather than pad it.
 
-Cross-references are relative links: `[03](03-from-signal-to-position.md)`.
+Cross-references are relative links: `[04](04-from-signal-to-position.md)`.
 
 ### 4.8 Language
 
@@ -240,7 +240,7 @@ dataset, and label a schematic as illustrative in its subtitle so it is never mi
 | Chapter | Script |
 | --- | --- |
 | `01-what-is-cta.md` | `make_01_what_is_cta.py` |
-| `02-building-signals.md` | `make_02_building_signals.py` |
+| `02-testing-a-signal.md` | `make_02_testing_a_signal.py` |
 | … | `make_<chapter-stem>.py` |
 
 Shared design tokens and drawing primitives (`THEMES`, `rounded_bar`, `style_axes`, `titles`,
@@ -257,7 +257,7 @@ To add a figure:
    colour-flipped.
 3. Reference it from the chapter through a `<picture>` element so GitHub serves the matching
    variant, with a descriptive `alt` that states what the figure *shows*.
-4. Re-run only that script — `python docs/figures/make_02_building_signals.py` — and commit the
+4. Re-run only that script — `python docs/figures/make_02_testing_a_signal.py` — and commit the
    regenerated PNGs. Editing one chapter's figure must not churn another's.
 
 A new chapter gets a new script; copy an existing docstring's shape, which lists every figure the

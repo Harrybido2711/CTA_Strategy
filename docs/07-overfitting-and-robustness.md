@@ -1,7 +1,7 @@
-# 06 · Overfitting & Robustness
+# 07 · Overfitting & Robustness
 
 > - **Answers:** why a good backtest is weak evidence, and what makes it stronger.
-> - **Prerequisites:** [05 · Evaluating Performance](05-evaluating-performance.md).
+> - **Prerequisites:** [06 · Evaluating Performance](06-evaluating-performance.md).
 > - **After reading:** split a time series correctly, and state honestly how much of a result is signal and how much is search.
 
 > 🟡 **Partly written.** §§ 1–2, 4 complete; §§ 3, 5–6 outline.
@@ -45,7 +45,7 @@ the model looks like it generalizes when it has memorized.
 
 That is forward-looking bias in subtle form: no row contains future data, but the **split** does.
 Cut on time, never on shuffled rows. Same logic as the rolling-quantile rule in
-[02 § 4](02-building-signals.md) — when you ask "is this value high?", the comparison set must
+[02 § 4](02-testing-a-signal.md) — when you ask "is this value high?", the comparison set must
 contain only the past.
 
 ## 3. Why a backtest overstates
@@ -117,4 +117,4 @@ You should be able to explain:
 - [ ] Why a plateau is trustworthy and a single hot cell is not
 - [ ] How many degrees of freedom this strategy has already spent
 
-[← 05](05-evaluating-performance.md) · [Index](00-index.md)
+[← 06](06-evaluating-performance.md) · [Index](00-index.md)

@@ -44,9 +44,9 @@ flowchart LR
     class MARKET venue;
 ```
 
-Stage 2 → [100](docs/100-dataset.md) · stage 3 → [02](docs/02-building-signals.md) ·
-stages 4–6 → [03](docs/03-from-signal-to-position.md) · stages 8–9 →
-[04](docs/04-understanding-backtesting.md) and [05](docs/05-evaluating-performance.md).
+Stage 2 → [100](docs/100-dataset.md) · stage 3 → [02](docs/02-testing-a-signal.md) ·
+stages 4–6 → [04](docs/04-from-signal-to-position.md) · stages 8–9 →
+[05](docs/05-understanding-backtesting.md) and [06](docs/06-evaluating-performance.md).
 
 ## Contents
 
@@ -55,17 +55,19 @@ stages 4–6 → [03](docs/03-from-signal-to-position.md) · stages 8–9 →
 | 00 | [Index &amp; Learning Path](docs/00-index.md) | How to read this series, prerequisites per chapter | ✅ |
 | 01 | [What Is a CTA Strategy](docs/01-what-is-cta.md) | What a CTA trades, momentum, long/short mechanics, market participants | ✅ |
 | — | [How a Strategy Is Built](docs/00-pipeline.md) | Orientation: how signal, strategy, backtest and momentum relate, and the order they get built in | ✅ |
-| 02 | [Building Your Own Signal](docs/02-building-signals.md) | Hypothesis framing, bucketed bar charts, reversal, risk-adjusted momentum, rolling quantiles, fast/slow combination, EWMA, smoothing | ✅ |
-| 03 | [From Signal to Position](docs/03-from-signal-to-position.md) | weight → dollar → shares, holding period, the two portfolios | ✅ |
-| 04 | [Understanding Backtesting](docs/04-understanding-backtesting.md) | Every column, timing offsets, look-ahead bias | ✅ |
-| 05 | [Evaluating Performance](docs/05-evaluating-performance.md) | Why a single number hides the time dimension; Sharpe, drawdown, turnover, attribution | 🟡 partial |
-| 06 | [Overfitting &amp; Robustness](docs/06-overfitting-and-robustness.md) | Train/validation/test, why time series can't be split randomly, heat-map parameter sensitivity | 🟡 partial |
+| 02 | [Testing a Signal](docs/02-testing-a-signal.md) | Hypothesis framing, why a scatter proves nothing, the bar plot and how to read it, risk-adjusted momentum | ✅ |
+| 03 | [Shaping the Lookback](docs/03-shaping-the-lookback.md) | Window length, fast/slow combination, EWMA half-life, MACD as a kernel, smoothing the fast leg | ✅ |
+| 04 | [From Signal to Position](docs/04-from-signal-to-position.md) | weight → dollar → shares, holding period, the two portfolios | ✅ |
+| 05 | [Understanding Backtesting](docs/05-understanding-backtesting.md) | Every column, timing offsets, look-ahead bias | ✅ |
+| 06 | [Evaluating Performance](docs/06-evaluating-performance.md) | Why a single number hides the time dimension; Sharpe, drawdown, turnover, attribution | 🟡 partial |
+| 07 | [Overfitting &amp; Robustness](docs/07-overfitting-and-robustness.md) | Train/validation/test, why time series can't be split randomly, heat-map parameter sensitivity | 🟡 partial |
 
 Read 01 → 06 in order. The rest is reference, consulted rather than stepped through:
 
 | #  | Document | What it is | Status |
 | -- | -------- | ---------- | ------ |
-| 07 | [Toolbox: pandas](docs/07-toolbox-pandas.md) | How the non-obvious pandas calls behave | ✅ |
+| 08 | [Toolbox: pandas](docs/08-toolbox-pandas.md) | How the non-obvious pandas calls behave | ✅ |
+| 09 | [IC and R²](docs/09-ic-and-r-squared.md) | What each measures, and why a signal is judged by the first | ✅ |
 | 99 | [Glossary](docs/99-glossary.md) | English–Chinese term reference | ✅ |
 | 100 | [The Dataset](docs/100-dataset.md) | The 37-ticker sample, split adjustment, data-quality checks | ✅ |
 
@@ -81,17 +83,17 @@ that owns each concept; there is no parallel per-session record.
 | Understand what a CTA trades, and how shorting works | [01](docs/01-what-is-cta.md)                                                                             |
 | Check my price data before trusting it               | [100 § 1.1](docs/100-dataset.md)                                                       |
 | See what the 37 tickers actually are                 | [100 § 2](docs/100-dataset.md)                                                         |
-| Test whether my signal carries information           | [02 § 3.2](docs/02-building-signals.md)                                                                   |
-| Write down MACD, and see why it is momentum         | [02a](docs/02a-macd-and-lookbacks.md)                                                                   |
-| Know what a bar plot cannot tell me                  | [02 § 3.2.3](docs/02-building-signals.md)                                                                   |
-| Make signals comparable across dates and assets      | [02 § 4](docs/02-building-signals.md)                                                              |
-| Combine a fast and slow horizon                      | [02a](docs/02a-macd-and-lookbacks.md)                                                             |
-| Turn a signal into position weights                  | [03](docs/03-from-signal-to-position.md)                                                                 |
-| Look up what`curr_shrs` means                      | [04 § columns](docs/04-understanding-backtesting.md)                                                    |
-| Work out whether I have look-ahead bias              | [04 § offsets](docs/04-understanding-backtesting.md) · [06 § 2](docs/06-overfitting-and-robustness.md) |
-| Judge an equity curve honestly                       | [05 § 1](docs/05-evaluating-performance.md)                                                             |
-| Tune parameters without fooling myself               | [06 § 4](docs/06-overfitting-and-robustness.md)                                                         |
-| Look up a pandas function                            | [07](docs/07-toolbox-pandas.md)                                                                          |
+| Test whether my signal carries information           | [02 § 3.2](docs/02-testing-a-signal.md)                                                                   |
+| Write down MACD, and see why it is momentum         | [03](docs/03-shaping-the-lookback.md)                                                                   |
+| Know what a bar plot cannot tell me                  | [02 § 3.2.3](docs/02-testing-a-signal.md)                                                                   |
+| Make signals comparable across dates and assets      | [02 § 4](docs/02-testing-a-signal.md)                                                              |
+| Combine a fast and slow horizon                      | [03](docs/03-shaping-the-lookback.md)                                                             |
+| Turn a signal into position weights                  | [04](docs/04-from-signal-to-position.md)                                                                 |
+| Look up what`curr_shrs` means                      | [05 § columns](docs/05-understanding-backtesting.md)                                                    |
+| Work out whether I have look-ahead bias              | [05 § offsets](docs/05-understanding-backtesting.md) · [07 § 2](docs/07-overfitting-and-robustness.md) |
+| Judge an equity curve honestly                       | [06 § 1](docs/06-evaluating-performance.md)                                                             |
+| Tune parameters without fooling myself               | [07 § 4](docs/07-overfitting-and-robustness.md)                                                         |
+| Look up a pandas function                            | [08](docs/08-toolbox-pandas.md)                                                                          |
 | Look up a term                                       | [99 · Glossary](docs/99-glossary.md)                                                                    |
 | See what to build next                               | [Backtests.md § Next Steps](Backtest_prototype/Backtests.md)                                            |
 
@@ -100,7 +102,7 @@ that owns each concept; there is no parallel per-session record.
 | Path                                          | What's in it                                                                                              |
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | [`docs/`](docs/)                             | The series — concepts that stay true over time                                                           |
-| [`docs/figures/`](docs/figures/)             | [`make_figures.py`](docs/figures/make_figures.py) + generated light/dark PNGs                            |
+| [`docs/figures/`](docs/figures/)             | [`docs/figures/`](docs/figures/) (one `make_<chapter>.py` per chapter) + generated light/dark PNGs                            |
 | [`CTA_data/`](CTA_data/)                     | Daily OHLCV for 37 ETFs                                                                                   |
 | `CTA_data/_unadjusted_raw/`                 | Pre-adjustment originals — deliberately outside the loaders' glob                                        |
 | [`Backtest_prototype/`](Backtest_prototype/) | [`backtest.py`](Backtest_prototype/backtest.py) + [implementation notes](Backtest_prototype/Backtests.md) |

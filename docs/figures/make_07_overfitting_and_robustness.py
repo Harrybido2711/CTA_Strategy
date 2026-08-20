@@ -1,8 +1,8 @@
-"""Figures for docs/06-overfitting-and-robustness.md.
+"""Figures for docs/07-overfitting-and-robustness.md.
 
 Run from anywhere:
 
-    python docs/figures/make_06_overfitting_and_robustness.py
+    python docs/figures/make_07_overfitting_and_robustness.py
 
 Writes light- and dark-mode PNGs into docs/figures/. The chapter references
 them through a <picture> element so GitHub serves the variant matching the
@@ -74,4 +74,4 @@ if __name__ == "__main__":
     for mode in ("light", "dark"):
         for fn in FIGURES:
             fn(mode)
-    print(f"wrote {2 * len(FIGURES)} figures for 06-overfitting-and-robustness.md")
+    print(f"wrote {2 * len(FIGURES)} figures for 07-overfitting-and-robustness.md")

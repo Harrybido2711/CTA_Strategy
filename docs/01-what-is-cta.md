@@ -100,7 +100,7 @@ across assets and across time. That is why one momentum rule can be applied to m
 nothing else in common, from Treasury futures to natural gas.
 
 **Note.** Turning this into a number — a lookback window, a normalization, a test that it carries
-information — is [02](02-building-signals.md)'s subject. Here it is only the premise.
+information — is [02](02-testing-a-signal.md)'s subject. Here it is only the premise.
 
 ### Why momentum might work
 
@@ -112,7 +112,7 @@ Two contested explanations, no proof. Momentum has been durably profitable regar
   positions take time to build and unwind, investors chase winners, and major events do not
   resolve in a single day.
 
-[02](02-building-signals.md) turns this from a story into something testable.
+[02](02-testing-a-signal.md) turns this from a story into something testable.
 
 ## 3. Long and Short, the Two Sides of a Position
 
@@ -286,7 +286,7 @@ four are futures, and all four are different asset classes.
 
 ---
 
-## Next → [02 · Testing a Signal](02-building-signals.md)
+## Next → [02 · Testing a Signal](02-testing-a-signal.md)
 
 Before moving on, **rebase all 37 tickers to 100** and find the best and worst performer over the
 sample. Chapter 02 turns the momentum premise above into a number you can test.

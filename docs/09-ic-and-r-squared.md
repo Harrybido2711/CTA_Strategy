@@ -1,7 +1,7 @@
-# 08 · IC and R²
+# 09 · IC and R²
 
 > - **Answers:** what the Information Coefficient and R² each measure, what they look like on the same prediction, and why a signal is judged by the first.
-> - **Prerequisites:** [02](02-building-signals.md) for the bucket test, [00 · pipeline](00-pipeline.md) for where a prediction sits in the chain.
+> - **Prerequisites:** [02](02-testing-a-signal.md) for the bucket test, [00 · pipeline](00-pipeline.md) for where a prediction sits in the chain.
 > - **After reading:** compute a rank IC series, deflate its t-statistic for overlapping windows, and explain why a daily R² of 0.18 can belong to a signal with no edge at all.
 
 ---
@@ -128,7 +128,7 @@ is inflated by roughly $h^{1/2}$.
 
 **Note.** A Newey–West correction with lag $h - 1$ is the rigorous version; dividing by $h$ is the
 cheap one and blocks most of the self-deception. The same overlap discipline governs the purge gap
-between train and validation folds — [06 § 2](06-overfitting-and-robustness.md).
+between train and validation folds — [07 § 2](07-overfitting-and-robustness.md).
 
 **Note (Plausible magnitudes).** On daily data with a horizon of days to weeks:
 
@@ -233,7 +233,7 @@ Suppose the prediction is exactly half the true return:
 
 The ordering is perfect, so IC = 1, while R² is penalised to about 0.72. Yet the model is entirely
 tradeable — double the position size. Sizing is a **separate layer** of the chain
-([03](03-from-signal-to-position.md)), so a scale error is corrected for free downstream while a
+([04](04-from-signal-to-position.md)), so a scale error is corrected for free downstream while a
 ranking error cannot be corrected at all. R² penalises both; IC measures only the part that
 survives to the P&L.
 
@@ -313,7 +313,7 @@ per-year breakdown, the effective breadth this universe actually has — belongs
 
 ## Next → [Backtest Prototype — Implementation Notes](../Backtest_prototype/Backtests.md)
 
-Take the momentum signal from [02](02-building-signals.md) and compute its rank IC series against
+Take the momentum signal from [02](02-testing-a-signal.md) and compute its rank IC series against
 5-day forward returns. Report four things: the mean, the ICIR, the t-statistic **after** dividing
 the observation count by the horizon, and the mean IC per calendar year. The last one is the one
 that will surprise you.

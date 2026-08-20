@@ -71,9 +71,9 @@ Each layer is tested on its own terms, and passing one says nothing about the ne
 | Level                | Question                               | Typical measure                      | Where                                                                   |
 | -------------------- | -------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------- |
 | **Model**      | does the prediction track the outcome? | test IC, MSE, accuracy               | out-of-sample only                                                      |
-| **Signal**     | is the direction right, and tradeable? | bucket monotonicity, turnover        | [02 § 3.2](02-building-signals.md)                                        |
-| **Strategy**   | does it survive real constraints?      | Sharpe, drawdown, return after costs | [04](04-understanding-backtesting.md), [05](05-evaluating-performance.md) |
-| **Robustness** | does it persist?                       | across years, markets, parameters    | [06](06-overfitting-and-robustness.md)                                   |
+| **Signal**     | is the direction right, and tradeable? | bucket monotonicity, turnover        | [02 § 3.2](02-testing-a-signal.md)                                        |
+| **Strategy**   | does it survive real constraints?      | Sharpe, drawdown, return after costs | [05](05-understanding-backtesting.md), [06](06-evaluating-performance.md) |
+| **Robustness** | does it persist?                       | across years, markets, parameters    | [07](07-overfitting-and-robustness.md)                                   |
 
 **Note (Each arrow loses candidates).** High test accuracy is not economic value; economic value is
 not profit after costs; profit after costs is not stability out of sample. A model can predict
@@ -85,11 +85,11 @@ or because acting on it every day costs more than the edge.
 | # | Stage                                          | What happens                                                                  | Chapter                               |
 | - | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------- |
 | 0 | **Validate the data**                    | Confirm prices are continuous and corporate actions are adjusted              | [100](100-dataset.md)                  |
-| 1 | **State a hypothesis, compute a signal** | Turn an intuition into a number, then test that it carries information        | [02](02-building-signals.md)           |
-| 2 | **Size the positions**                   | Signal → weights → dollars → shares                                        | [03](03-from-signal-to-position.md)    |
-| 3 | **Simulate**                             | Apply the positions to history with realistic timing                          | [04](04-understanding-backtesting.md)  |
-| 4 | **Evaluate**                             | Reduce the PnL series to numbers you can judge                                | [05](05-evaluating-performance.md)     |
-| 5 | **Attack the result**                    | Ask how much of it is signal and how much is search                           | [06](06-overfitting-and-robustness.md) |
+| 1 | **State a hypothesis, compute a signal** | Turn an intuition into a number, then test that it carries information        | [02](02-testing-a-signal.md)           |
+| 2 | **Size the positions**                   | Signal → weights → dollars → shares                                        | [04](04-from-signal-to-position.md)    |
+| 3 | **Simulate**                             | Apply the positions to history with realistic timing                          | [05](05-understanding-backtesting.md)  |
+| 4 | **Evaluate**                             | Reduce the PnL series to numbers you can judge                                | [06](06-evaluating-performance.md)     |
+| 5 | **Attack the result**                    | Ask how much of it is signal and how much is search                           | [07](07-overfitting-and-robustness.md) |
 | 6 | **Try a model**                          | Ask whether a learned prediction beats the rule — same sizing, same backtest | —                                    |
 
 **Note (Stage 0 is not optional).** Every later stage inherits whatever is wrong with the data. An
@@ -113,11 +113,11 @@ mistake is reading a data defect as a code bug.
 | Stage      | Failure                     | What you see                        | Where it is treated                   |
 | ---------- | --------------------------- | ----------------------------------- | ------------------------------------- |
 | Data       | Unadjusted corporate action | A vertical step in the equity curve | [100 § 1.1](100-dataset.md)           |
-| Signal     | No information              | Flat or non-monotone buckets        | [02 § 3.2](02-building-signals.md)      |
-| Sizing     | Exposure not what you think | Gross or net drifts from target     | [03](03-from-signal-to-position.md)    |
-| Simulation | Look-ahead bias             | Implausibly smooth, high Sharpe     | [04](04-understanding-backtesting.md)  |
-| Evaluation | One number hides the path   | Good Sharpe, unlivable drawdown     | [05](05-evaluating-performance.md)     |
-| Robustness | Parameters were searched    | Result vanishes out of sample       | [06](06-overfitting-and-robustness.md) |
+| Signal     | No information              | Flat or non-monotone buckets        | [02 § 3.2](02-testing-a-signal.md)      |
+| Sizing     | Exposure not what you think | Gross or net drifts from target     | [04](04-from-signal-to-position.md)    |
+| Simulation | Look-ahead bias             | Implausibly smooth, high Sharpe     | [05](05-understanding-backtesting.md)  |
+| Evaluation | One number hides the path   | Good Sharpe, unlivable drawdown     | [06](06-evaluating-performance.md)     |
+| Robustness | Parameters were searched    | Result vanishes out of sample       | [07](07-overfitting-and-robustness.md) |
 | Model      | Fitted to the sample        | Good IC in train, none in test      | out-of-sample split                   |
 
 **Note.** The order is forced in one direction — you cannot evaluate before simulating, or simulate
@@ -156,7 +156,7 @@ y = close.pct_change(h).shift(-h)      # the return from t to t+h, labelled at t
 
 **One model or 37?** Pool the assets — stack `(date, ticker)` into rows and fit once. Per-asset
 models get ~1,600 rows each and overfit. Pooling requires the features to be comparable across
-assets, which is what the standardization in [02 § 4](02-building-signals.md) is for.
+assets, which is what the standardization in [02 § 4](02-testing-a-signal.md) is for.
 
 **Note the effective sample size.** 37 tickers × ~1,600 days looks like 60,000 observations, but
 the assets move together, so the number of genuinely independent observations is closer to the
@@ -178,9 +178,9 @@ There is a second, subtler leak even after splitting by time. If the target is a
 return, the last five training rows describe returns that fall inside the validation window. Leave
 a gap of `h` observations between the segments — **purging**, sometimes with an extra **embargo**.
 
-- The same discipline as the score-against-your-own-past rule in [02 § 4](02-building-signals.md): rank and
+- The same discipline as the score-against-your-own-past rule in [02 § 4](02-testing-a-signal.md): rank and
   fit using only what was knowable at the time.
-- Formal treatment of splits and why a backtest overstates: [06](06-overfitting-and-robustness.md).
+- Formal treatment of splits and why a backtest overstates: [07](07-overfitting-and-robustness.md).
 
 ### How does a model's output become a signal?
 
@@ -218,6 +218,6 @@ ic.mean(), ic.mean() / ic.std()          # average IC, and its stability
 ```
 
 → Why that is the right statistic rather than R², what each one measures, why they can disagree
-completely, and how to read the magnitudes: [08 · IC and R²](08-ic-and-r-squared.md).
+completely, and how to read the magnitudes: [09 · IC and R²](09-ic-and-r-squared.md).
 
 [← Index](00-index.md)

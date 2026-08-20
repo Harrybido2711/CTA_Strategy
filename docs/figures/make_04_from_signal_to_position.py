@@ -1,8 +1,8 @@
-"""Figures for docs/03-from-signal-to-position.md.
+"""Figures for docs/04-from-signal-to-position.md.
 
 Run from anywhere:
 
-    python docs/figures/make_03_from_signal_to_position.py
+    python docs/figures/make_04_from_signal_to_position.py
 
 Writes light- and dark-mode PNGs into docs/figures/. The chapter references
 them through a <picture> element so GitHub serves the variant matching the
@@ -72,4 +72,4 @@ if __name__ == "__main__":
     for mode in ("light", "dark"):
         for fn in FIGURES:
             fn(mode)
-    print(f"wrote {2 * len(FIGURES)} figures for 03-from-signal-to-position.md")
+    print(f"wrote {2 * len(FIGURES)} figures for 04-from-signal-to-position.md")

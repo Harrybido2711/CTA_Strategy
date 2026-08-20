@@ -1,7 +1,7 @@
-# 05 · Evaluating Performance
+# 06 · Evaluating Performance
 
 > - **Answers:** given an equity curve, how do you judge whether it is any good?
-> - **Prerequisites:** [04 · Understanding Backtesting](04-understanding-backtesting.md).
+> - **Prerequisites:** [05 · Understanding Backtesting](05-understanding-backtesting.md).
 > - **After reading:** report performance in the terms a practitioner expects, and know what each number hides.
 
 > 🟡 **Partly written.** § 1 complete; §§ 2–5 outline.
@@ -38,7 +38,7 @@ skew, fat tails, path dependence — and that both portfolios here land near zer
 ## 4. Drawdown, turnover, capacity
 
 *(outline)* — Maximum drawdown and drawdown *duration*, often the binding constraint in practice.
-Turnover from daily rebalancing (never zero — see [03](03-from-signal-to-position.md)) and its cost.
+Turnover from daily rebalancing (never zero — see [04](04-from-signal-to-position.md)) and its cost.
 Where the strategy stops scaling.
 
 ## 5. Attribution and benchmarking
@@ -61,14 +61,14 @@ random-sign portfolio? Net vs gross exposure makes this non-obvious for a 150/50
 
 ---
 
-## Next → [06 · Overfitting & Robustness](06-overfitting-and-robustness.md)
+## Next → [07 · Overfitting & Robustness](07-overfitting-and-robustness.md)
 
 Before moving on, **plot the equity curve and annotate its three worst drawdowns** with what the
-market was doing at the time. Chapter 06 asks how much of the remaining result is real.
+market was doing at the time. Chapter 07 asks how much of the remaining result is real.
 
 You should be able to explain:
 
 - [ ] Why a Sharpe number alone cannot distinguish steady earnings from one lucky quarter
 - [ ] Why dropping the worst asset is fitting rather than analysis
 
-[← 04](04-understanding-backtesting.md) · [Index](00-index.md)
+[← 05](05-understanding-backtesting.md) · [Index](00-index.md)

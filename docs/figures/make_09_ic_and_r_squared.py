@@ -1,8 +1,8 @@
-"""Figures for docs/08-ic-and-r-squared.md.
+"""Figures for docs/09-ic-and-r-squared.md.
 
 Run from anywhere:
 
-    python docs/figures/make_08_ic_and_r_squared.py
+    python docs/figures/make_09_ic_and_r_squared.py
 
 Writes light- and dark-mode PNGs into docs/figures/. The chapter references
 them through a <picture> element so GitHub serves the variant matching the
@@ -134,4 +134,4 @@ if __name__ == "__main__":
     for mode in ("light", "dark"):
         for fn in FIGURES:
             fn(mode)
-    print(f"wrote {2 * len(FIGURES)} figures for 08-ic-and-r-squared.md")
+    print(f"wrote {2 * len(FIGURES)} figures for 09-ic-and-r-squared.md")
