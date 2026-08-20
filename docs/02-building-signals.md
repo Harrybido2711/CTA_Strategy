@@ -2,7 +2,7 @@
 
 > - **Answers:** how to turn an intuition into a computable signal, and how to tell whether it carries information before backtesting it.
 > - **Prerequisites:** [01 · What Is a CTA Strategy](01-what-is-cta.md); the data it runs on is [100 · The Dataset](100-dataset.md).
-> - **After reading:** state a signal as a hypothesis, test it with a bar plot, normalize it, and combine horizons without drowning in noise.
+> - **After reading:** state a signal as a hypothesis, test whether it carries information with a bar plot, and normalize it so assets compare.
 
 ---
 
@@ -216,7 +216,8 @@ chart is a density map rather than a mass of ink. Below, the left panel is the b
 two are both the after.
 
 **Note (Not the other alphas).** matplotlib's opacity keyword: not a regression intercept, not the
-excess return a manager is paid for, not § 8's smoothing constant $\alpha$. Code font is the tell.
+excess return a manager is paid for, not [02a](02a-macd-and-lookbacks.md)'s smoothing constant
+$\alpha$. Code font is the tell.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/alpha-opacity-dark.png">
@@ -403,7 +404,7 @@ MOM^{\text{risk-adj}}_{s,t}  =  \text{Avg}\left(\frac{r_{s,t-i}}{\sigma_{s,t}}\r
 $$
 
 where $\sigma_{s,t}$ is that asset's volatility, estimated on data strictly before $t$ — a
-denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 10).
+denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 6).
 
 Every asset and every period now lands on one scale, so the ranking in § 3.2 compares like with
 like — two students both scoring 80 on different exams against different cohorts have not achieved
@@ -487,116 +488,7 @@ Nor does any of them say what to do with a rank once you have it. Whether G5 bec
 a short, at what size, and whether the split is absolute or relative, is the Portfolio 1 vs
 Portfolio 2 question of [03](03-from-signal-to-position.md).
 
-## 6. Combining a slow and a fast horizon
-
-One lookback forces a choice between stable and timely. Instead use a **fast momentum to time the
-turns in a slow one** — MACD's structure, where a short EMA crossing a long one marks the entry
-earlier.
-
-**Ratio.** Conventionally about **2:1** (MACD's 26/12), but that is a starting point: find the pairing
-by **grid search**, read as a **heat map**. A real edge is a contiguous warm region; one hot cell is
-an artifact.
-
-**Where it pays.** Best in **commodities** — supply-and-demand cycles drive long, persistent trends.
-Equities second. **Bonds** weakest, being the most arbitraged, so deviations close fastest.
-
-## 7. EWMA instead of a simple moving average
-
-An SMA weights a price from 60 days ago exactly as much as yesterday's. To weight recent prices more:
-
-```python
-signal = returns.ewm(halflife=H).mean()
-```
-
-Tune the **half-life** $H$ — the lag at which a return's weight has decayed to half the weight given
-to the newest one. Candidates are fractions of the lookback (1/2, 1/3, 1/5, 1/8). Grid-search them.
-
-MACD's 9-day signal line is an **empirical solution** — a value that fit historical data, nothing
-more. Every parameter here has that status, which is [06](06-overfitting-and-robustness.md)'s
-subject rather than something to accept on authority.
-
-## 8. MACD, stated precisely
-
-Written out, MACD is three series built from two exponential moving averages of the **price**.
-
-**Definition (MACD).** For a fast and a slow span $n_f < n_s$, each with its own smoothing constant
-$\alpha = 2/(\text{span}+1)$:
-
-$$
-\text{MACD}_t = \text{EMA}_{n_f}(P)_t - \text{EMA}_{n_s}(P)_t , \qquad
-\text{signal}_t = \text{EMA}_9(\text{MACD})_t , \qquad
-\text{hist}_t = \text{MACD}_t - \text{signal}_t
-$$
-
-where $P_t$ is the price on date $t$ and $\text{EMA}_n(P)_t$ its exponential moving average over
-span $n$. The asset subscript is dropped throughout — MACD is computed one asset at a time.
-Conventionally $n_f = 12$, $n_s = 26$, and 9 for the signal line.
-
-| Series                | Reads as                                 | Sign means                 |
-| --------------------- | ---------------------------------------- | -------------------------- |
-| **MACD line**   | recent average price versus a longer one | trend direction            |
-| **Signal line** | a smoothed MACD                          | the level MACD is crossing |
-| **Histogram**   | MACD minus its own smoothing             | trend acceleration         |
-
-**Claim.** MACD is a momentum signal. It is a weighted sum of past returns, differing from a
-lookback mean only in the shape of the weights.
-
-<details>
-<summary><b>Proof.</b> the two EMAs' weights cancel to a zero-sum kernel on one-period changes, hump-shaped rather than flat</summary>
-
-Each EMA is a weighted average of past prices whose weights sum to one, so their
-difference weights the price $i$ days ago by $c_i$, and those weights sum to **zero**:
-
-$$
-\text{MACD}_t = \sum_i c_i P_{t-i} , \qquad
-c_i = \alpha_f (1-\alpha_f)^i - \alpha_s (1-\alpha_s)^i , \qquad \sum_i c_i = 0 .
-$$
-
-A zero-sum weighting is unchanged when every price shifts by a constant, so subtract $P_t$ from each
-term and write $P_t - P_{t-i}$ as a sum of one-period changes
-$\Delta_{t-j} = P_{t-j} - P_{t-j-1}$. Collecting the coefficient of the change at lag $j$ gives the
-**kernel** $k_j$:
-
-$$
-\text{MACD}_t = \sum_j k_j \Delta_{t-j} , \qquad
-k_j = \sum_{i \leq j} c_i = (1-\alpha_s)^{j+1} - (1-\alpha_f)^{j+1} .
-$$
-
-Since $\alpha_f > \alpha_s$, every $k_j \geq 0$: MACD is a non-negative weighted sum of past price
-changes, exactly like a lookback mean.
-
-</details>
-
-**Note (What actually differs).** The kernel. A 21-day momentum weights the last 21 returns
-equally and everything older at zero; MACD's weights rise from a small value at lag 0, peak around
-lag 8, and decay without ever reaching zero. It therefore discounts *yesterday* relative to last
-week — deliberately, since the newest return is the noisiest — and never fully forgets.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/signal-kernels-dark.png">
-  <img alt="Weight given to each past daily return, against lag in trading days, for two signals normalised to the same total. A 21-day momentum is a flat box: equal weight for the last 21 days and zero beyond. MACD with spans 12 and 26 is a hump that starts low at lag zero, peaks around lag 8, then decays slowly and never reaches zero within sixty days" src="figures/signal-kernels-light.png">
-</picture>
-
-Three common rules, in increasing order of information kept. All
-three still have to pass § 3.2's bar plot before they earn a backtest.
-
-| Rule         | Go long when                            | Costs                                                            |
-| ------------ | --------------------------------------- | ---------------------------------------------------------------- |
-| Zero-line    | MACD is above zero                      | a slow trend filter, late                                        |
-| Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 9's subject                  |
-| Proportional | always, sized by the standardized value | none of the magnitude, but see[03](03-from-signal-to-position.md) |
-
-## 9. Volatility clustering, and smoothing the fast leg
-
-Volatility arrives in clusters, and a fast signal is exposed: short-lived noise flips it
-long/short, and the churn eats the return in transaction costs before any edge is realized. Fix:
-**smooth the fast signal** to filter the shortest cycles.
-
-**Constraint:** the smoothing window must be **shorter than the signal's own period**. Smooth with a
-long one and you have not denoised the signal — you have built another slow one and lost the
-timeliness the fast leg existed for.
-
-## 10. Information availability
+## 6. Information availability
 
 Everything above assumes the signal at `t` uses only data knowable at `t`. Look-ahead bias is born
 here; the execution offsets in [04](04-understanding-backtesting.md) are the second line of defense
@@ -659,7 +551,7 @@ The `-1` in *12-1* **is** the gap.
 **Why leave one at all.** Two reasons, and they are not the same kind of reason:
 
 - **Executability** — a hard floor. § 1's window already ends at $t-1$, so at $g = 0$ the signal
-  is knowable before the period it is scored on begins. Anything tighter is look-ahead (§ 10), not
+  is knowable before the period it is scored on begins. Anything tighter is look-ahead (§ 6), not
   a modelling choice.
 - **Reversal** — a judgement call, and the one worth thinking about. A trend that has just formed
   tends to hand a little of it back: the flow that built it is spent, and an over-bought book
@@ -684,8 +576,8 @@ effective sample sits well below $m$.
 ## Appendix · Notation
 
 Throughout, $s$ indexes the asset and $t$ the date. The signal is computed per asset, so $s$ is
-dropped inside constructions that never leave one asset (§§ 7–8); it carries weight everywhere the
-assets are ranked against each other.
+dropped wherever a formula never leaves one asset; it carries weight everywhere the assets are
+ranked against each other.
 
 | Symbol                                                                                                            | Means                                                                                                                         | First used |
 | ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
@@ -701,31 +593,29 @@ assets are ranked against each other.
 | $m$                                                                                                             | observations sharing a bucket                                                                                                 | § 3.2     |
 | G1 … G5                                                                                                          | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
 | $\sigma_{s,t}$                                                                                                  | one asset's volatility, estimated on data before that date                                                                    | § 4       |
-| $H$                                                                                                             | EWMA half-life, in periods                                                                                                    | § 7       |
-| $P_t$, $\Delta_{t-j}$                                                                                         | price on that date, and the one-period change at that lag                                                                     | § 8       |
-| $n_f$, $n_s$                                                                                                  | fast and slow EMA spans, conventionally 12 and 26                                                                             | § 8       |
-| $\alpha_f$, $\alpha_s$                                                                                        | their smoothing constants, two over span plus one                                                                             | § 8       |
-| $c_i$, $k_j$                                                                                                  | MACD's net weight on the price at that lag, and its kernel weight on the price change                                         | § 8       |
 | $g$                                                                                                             | gap length — periods between the end of the signal's window and the return it is scored on                                   | Background |
 
-**Note (Collisions to watch).** $R_t$ is the portfolio's return on a date (§ 1.1); $R^2$ is a share
-of variance (§ 2). Lowercase $\delta$ is the tolerance on net exposure (§ 1.1); uppercase
-$\Delta_{t-j}$ is a one-period price change (§ 8). They share a letter and nothing else. Three quantities wear a $\sigma$ and they
-are not interchangeable:
-$\sigma_y$ is the spread of forward return across the pooled cloud (§ 2) — the panel-wide version of
-§ 1.1's per-asset $\sigma_{r,s}$ — while $\sigma_\epsilon$ is the part of it the signal cannot reach
-(§ 2) and $\sigma_{s,t}$ one asset's trailing volatility on one date (§ 4). Likewise $w_{s,t}$ is a position and $k_j$ a kernel weight, which is why the latter is
-not written $w$. And § 3.1's `alpha` is a plotting keyword, not $\alpha$ the smoothing constant
-and not a regression intercept — code font against maths is the tell. Lowercase $g$ is the gap, unrelated to the buckets G1 … G5. Chapter
-[01](01-what-is-cta.md) uses $s$ for a signed share count; here it is always the asset.
+**Note (Collisions to watch).** $R_t$ is the portfolio's return on a date (§ 1.1) and $R^2$ a share
+of variance (§ 2); they share a letter and nothing else.
+
+Three quantities wear a $\sigma$ and are not interchangeable: $\sigma_y$ is the spread of forward
+return across the pooled cloud (§ 2) — the panel-wide version of § 1.1's per-asset $\sigma_{r,s}$ —
+$\sigma_\epsilon$ is the part of it the signal cannot reach (§ 2), and $\sigma_{s,t}$ is one asset's
+trailing volatility on one date (§ 4).
+
+Lowercase $g$ is the gap, unrelated to the buckets G1 … G5, and lowercase $\delta$ is the tolerance
+on net exposure (§ 1.1), unrelated to [02a](02a-macd-and-lookbacks.md)'s $\Delta$. Section 3.1's
+`alpha` is a plotting keyword, not a smoothing constant and not a regression intercept — code font
+against maths is the tell. Chapter [01](01-what-is-cta.md) uses $s$ for a signed share count; here it
+is always the asset.
 
 ---
 
-## Next → [03 · From Signal to Position](03-from-signal-to-position.md)
+## Next → [02a · MACD and the Shape of a Lookback](02a-macd-and-lookbacks.md)
 
 Before moving on, **build the 21-day momentum signal across the 37-ETF universe and plot its bucket
-chart three ways** — raw values, standardized, and cross-sectional quantile — then compare them. Chapter 03 assumes you have a signal
-you already believe in.
+chart three ways** — raw values, standardized, and cross-sectional quantile — then compare them.
+Chapter 02a then asks what shape the lookback itself should have.
 
 You should be able to explain:
 
@@ -734,6 +624,5 @@ You should be able to explain:
 - [ ] Why a gap sits between the signal's window and the return it is scored on, and what that gap costs
 - [ ] Why the buckets are cut inside a date, and that the time axis is what pooling costs
 - [ ] Why fixed-interval buckets starve the tails and pooled-panel ranking leaks the future
-- [ ] Why MACD is momentum with a hump-shaped kernel rather than a separate indicator
 
 [← 01](01-what-is-cta.md) · [Index](00-index.md) · reference: [07 · Toolbox](07-toolbox-pandas.md)

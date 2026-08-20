@@ -88,7 +88,7 @@ signal = returns.ewm(halflife=H).mean()
 ```
 
 `halflife` is the periods after which an observation's weight halves — the parameter worth
-grid-searching ([02 § 7](02-building-signals.md)).
+grid-searching ([02a § 2](02a-macd-and-lookbacks.md)).
 
 `span`, `com`, and `alpha` parameterize the same decay differently. Pick one and state which: a
 "20" means three different things depending on the argument.

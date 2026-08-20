@@ -27,8 +27,8 @@ where the concept has its home, per [convention 1](00-index.md#writing-conventio
 | Bucketed bar chart | 分组柱状图 | Sort by signal, split into groups, plot mean forward return per group — the core signal test | [02](02-building-signals.md) |
 | Reversal | 反转 | Extreme recent moves partially undo themselves; strongest at high frequency | [02](02-building-signals.md) |
 | Skip / lag | 跳过期 | Dropping the most recent period from the lookback so reversal does not contaminate momentum | [02](02-building-signals.md) |
-| EWMA | 指数加权移动平均 | Moving average weighting recent observations more heavily; tuned by half-life | [02](02-building-signals.md) |
-| Half-life | 半衰期 | Periods after which an EWMA observation's weight has decayed by half | [02](02-building-signals.md) |
+| EWMA | 指数加权移动平均 | Moving average weighting recent observations more heavily; tuned by half-life | [02a](02a-macd-and-lookbacks.md) |
+| Half-life | 半衰期 | Periods after which an EWMA observation's weight has decayed by half | [02a](02a-macd-and-lookbacks.md) |
 | Volatility clustering | 波动率聚类 | Volatility arrives in bursts, not evenly — what makes a fast signal churn | [02](02-building-signals.md) |
 | Smoothing | 平滑 | Filtering the shortest cycles out of a fast signal; window must be shorter than its period | [02](02-building-signals.md) |
 | Grid search | 网格搜索 | Sweeping a parameter pair exhaustively rather than guessing | [06](06-overfitting-and-robustness.md) |

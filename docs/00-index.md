@@ -11,6 +11,7 @@
 flowchart LR
     C01["01<br/>What Is a CTA"]
     C02["02<br/>Signals"]
+    C02A["02a<br/>MACD"]
     C03["03<br/>Positions"]
     C04["04<br/>Backtesting"]
     C05["05<br/>Performance"]
@@ -18,7 +19,7 @@ flowchart LR
     C07["07<br/>Toolbox"]
     C08["08<br/>IC and R²"]
 
-    C01 --> C02 --> C03 --> C04 --> C05 --> C06
+    C01 --> C02 --> C02A --> C03 --> C04 --> C05 --> C06
     C07 -. reference .-> C02
     C07 -. reference .-> C04
     C08 -. reference .-> C02
@@ -26,7 +27,7 @@ flowchart LR
 
     classDef done fill:#ecfdf5,stroke:#059669,color:#064e3b,stroke-width:1.5px;
     classDef part fill:#fefce8,stroke:#ca8a04,color:#713f12,stroke-width:1.5px;
-    class C01,C02,C03,C04,C07,C08 done;
+    class C01,C02,C02A,C03,C04,C07,C08 done;
     class C05,C06 part;
 ```
 
@@ -38,7 +39,8 @@ Everything from 07 up is reference, consulted rather than stepped through.
 | 01 | [What Is a CTA Strategy](01-what-is-cta.md) | — | ✅ |
 | — | [How a Strategy Is Built](00-pipeline.md) — orientation | 01 | ✅ |
 | 02 | [Building Your Own Signal](02-building-signals.md) | 01 | ✅ |
-| 03 | [From Signal to Position](03-from-signal-to-position.md) | 02 | ✅ |
+| 02a | [MACD and the Shape of a Lookback](02a-macd-and-lookbacks.md) | 02 | ✅ |
+| 03 | [From Signal to Position](03-from-signal-to-position.md) | 02a | ✅ |
 | 04 | [Understanding Backtesting](04-understanding-backtesting.md) | 03 | ✅ |
 | 05 | [Evaluating Performance](05-evaluating-performance.md) | 04 | 🟡 §1 |
 | 06 | [Overfitting & Robustness](06-overfitting-and-robustness.md) | 05 | 🟡 §§1–2, 4 |
@@ -67,6 +69,7 @@ appended elsewhere.
 | How can you sell a stock you don't own? | [01 § short selling](01-what-is-cta.md) |
 | Why does my equity curve have a vertical jump? | [100 § 1.1](100-dataset.md) |
 | Does my signal carry information? | [02 § 3.2](02-building-signals.md) |
+| What is MACD actually averaging? | [02a § 3](02a-macd-and-lookbacks.md) |
 | Why is my R² only 0.005 — is the model useless? | [08](08-ic-and-r-squared.md) |
 | How do I compute and read an IC? | [08 § 2](08-ic-and-r-squared.md) |
 | Why does a 150% long leg not depend on price? | [03 § weights are money](03-from-signal-to-position.md) |

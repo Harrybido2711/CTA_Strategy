@@ -197,4 +197,4 @@ You should be able to explain:
 - [ ] Why net is invariant under overlap but gross shrinks
 - [ ] Why the median, not the mean, defines Portfolio 2's long/short split
 
-[← 02](02-building-signals.md) · [Index](00-index.md)
+[← 02a](02a-macd-and-lookbacks.md) · [Index](00-index.md)
