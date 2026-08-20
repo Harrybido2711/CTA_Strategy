@@ -1,8 +1,8 @@
-# 02 · Building Your Own Signal
+# 02 · Testing a Signal
 
-> - **Answers:** how to turn an intuition into a computable signal, and how to tell whether it carries information before backtesting it.
+> - **Answers:** why one correlation is the only number deciding whether a strategy makes money, and how to measure it long before a backtest.
 > - **Prerequisites:** [01 · What Is a CTA Strategy](01-what-is-cta.md); the data it runs on is [100 · The Dataset](100-dataset.md).
-> - **After reading:** state a signal as a hypothesis, test whether it carries information with a bar plot, and normalize it so assets compare.
+> - **After reading:** state a signal as a hypothesis, measure whether it carries information with a bar plot, and say what that plot cannot tell you.
 
 ---
 
@@ -566,7 +566,7 @@ is always the asset.
 
 ---
 
-## Next → [02a · MACD and the Shape of a Lookback](02a-macd-and-lookbacks.md)
+## Next → [02a · Shaping the Lookback](02a-macd-and-lookbacks.md)
 
 Before moving on, **build the 21-day momentum signal on a single ETF, score it both ways — divided
 by trailing volatility, and as a percentile against its own past — and plot the bucket chart for

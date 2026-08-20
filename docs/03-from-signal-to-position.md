@@ -1,7 +1,7 @@
 # 03 · From Signal to Position
 
 > - **Answers:** how a signal becomes "how many dollars, then how many shares, of each asset."
-> - **Prerequisites:** [02 · Building Your Own Signal](02-building-signals.md).
+> - **Prerequisites:** [02 · Testing a Signal](02-building-signals.md).
 > - **After reading:** trace the weight → dollar → shares chain, and explain how a holding period is implemented through weights.
 
 ---

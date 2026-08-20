@@ -10,8 +10,8 @@
 %%{init: {'theme':'base','themeVariables':{'fontSize':'11px','lineColor':'#94a3b8'},'flowchart':{'nodeSpacing':16,'rankSpacing':26,'padding':6}}}%%
 flowchart LR
     C01["01<br/>What Is a CTA"]
-    C02["02<br/>Signals"]
-    C02A["02a<br/>MACD"]
+    C02["02<br/>Testing"]
+    C02A["02a<br/>Lookback"]
     C03["03<br/>Positions"]
     C04["04<br/>Backtesting"]
     C05["05<br/>Performance"]
@@ -38,8 +38,8 @@ Everything from 07 up is reference, consulted rather than stepped through.
 |---|---|---|---|
 | 01 | [What Is a CTA Strategy](01-what-is-cta.md) | — | ✅ |
 | — | [How a Strategy Is Built](00-pipeline.md) — orientation | 01 | ✅ |
-| 02 | [Building Your Own Signal](02-building-signals.md) | 01 | ✅ |
-| 02a | [MACD and the Shape of a Lookback](02a-macd-and-lookbacks.md) | 02 | ✅ |
+| 02 | [Testing a Signal](02-building-signals.md) — is there information in it? | 01 | ✅ |
+| 02a | [Shaping the Lookback](02a-macd-and-lookbacks.md) — window length, weights, MACD | 02 | ✅ |
 | 03 | [From Signal to Position](03-from-signal-to-position.md) | 02a | ✅ |
 | 04 | [Understanding Backtesting](04-understanding-backtesting.md) | 03 | ✅ |
 | 05 | [Evaluating Performance](05-evaluating-performance.md) | 04 | 🟡 §1 |

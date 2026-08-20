@@ -1,10 +1,20 @@
-# 02a · MACD and the Shape of a Lookback
+# 02a · Shaping the Lookback
 
 > - **Answers:** how long a lookback to use, how to weight the returns inside it, and what MACD is once the chart-package vocabulary is stripped away.
-> - **Prerequisites:** [02 · Building Your Own Signal](02-building-signals.md) — every rule here is a signal, and still has to pass its bar plot.
+> - **Prerequisites:** [02 · Testing a Signal](02-building-signals.md) — every section here hands you a knob, and 02's bar plot is the only gauge that reads one.
 > - **After reading:** pair a fast horizon with a slow one, replace a boxcar average with an EWMA, read MACD as a weighted sum of past returns, and say why the fast leg has to be smoothed.
 
 ---
+
+[02](02-building-signals.md) left two blanks inside its own definition. Writing momentum as
+$\text{Avg}(r_{s,t-i})$, $i = 1 \ldots N$ fixes neither the length of the window nor the weight each
+return carries inside it — the average is a boxcar only because nobody said otherwise. This chapter
+is about both blanks, and about MACD, which turns out to be the same object with the second one
+filled in differently.
+
+Every answer below is a **parameter**, and no parameter here is settled by convention. MACD's
+26/12/9 fit somebody's historical data once; the fast/slow ratio and the half-life are grid-searched.
+What settles them is 02's bar plot, which is why that chapter comes first.
 
 ## 1. Combining a slow and a fast horizon
 

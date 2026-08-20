@@ -286,7 +286,7 @@ four are futures, and all four are different asset classes.
 
 ---
 
-## Next → [02 · Building Your Own Signal](02-building-signals.md)
+## Next → [02 · Testing a Signal](02-building-signals.md)
 
 Before moving on, **rebase all 37 tickers to 100** and find the best and worst performer over the
 sample. Chapter 02 turns the momentum premise above into a number you can test.
