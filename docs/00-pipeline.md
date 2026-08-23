@@ -2,11 +2,6 @@
 
 ## 1. The Chain, End to End
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/strategy-pipeline-dark.png">
-  <img alt="Market data and features feed two alternative paths. On the left a rule such as momentum or MACD produces a signal directly by sign or threshold. On the right a machine-learning model produces a prediction — future return, probability of a rise, or volatility — which a trading rule then converts into the same signal. Both paths converge on one signal node of long, short or flat, which feeds position sizing and risk limits, then the backtest with costs, delay and turnover, and finally return, Sharpe, drawdown and turnover. A bracket marks everything down to position as the strategy, and the backtest and metrics as validation" src="figures/strategy-pipeline-light.png">
-</picture>
-
 In one line: **a model finds the pattern, a prediction states the judgement, a signal picks the
 direction, a position sizes the bet, and the backtest asks whether any of it survives.**
 
@@ -26,103 +21,173 @@ Each stage does one thing, asks one question, and hands one object to the next. 
 the work, answer the question, and only then pass the handoff on — the question is the gate, and a
 stage that fails it is not repaired by anything downstream.
 
-| # | Step | What you do | The question it asks | What it hands to the next step |
-| - | --- | --- | --- | --- |
-| 0 | **Validate the data** — [100](100-dataset.md) | Confirm prices are continuous, corporate actions are adjusted, and the `shift(-h)` alignment is right — verify a handful of rows by hand. | Can I trust a single number in this dataset? | A record every downstream statistic can be read against. An unadjusted split is the largest move in the sample by construction, so a trend follower reads it as its strongest signal ever — and the curve looks *better*, not worse. |
-| 1 | **State a hypothesis, compute a signal** — [02 § 3.2](02-testing-a-signal.md) | Turn an intuition into a number, then test that it carries information: sort dates by signal, file them into buckets, plot the mean forward return per bucket with its error bar. | Is higher signal followed by higher forward return — is the direction right, and tradeable? | Permission to size positions. A monotone staircase whose tails separate beyond the error bars (a t-score past ±2) is the green light. This is the cheapest test in the chain — and the one place Sharpe must not appear yet, because it folds the mean, the volatility and the risk-free rate into a single number you cannot decompose. |
-| 2 | **Size the positions** — [04](04-from-signal-to-position.md) | Convert the signal into weights, weights into dollars, dollars into shares; apply risk limits; carry the position as a signed quantity. | How much should I bet, and is the exposure what I think it is? | A PnL path with a real gross and net exposure and a real cost of acting. It is here, at a 150/50 book, that the risk-free-rate question becomes concrete — a question the signal stage never had to answer. |
-| 3 | **Simulate** — [05](05-understanding-backtesting.md) | Apply the positions to history under real constraints: costs, delay, turnover, realistic timing. | Does any of it survive reality — and is the PnL honest, or a look-ahead artefact? | A PnL series that can be reduced to metrics. This is the first stage at which a Sharpe is even meaningful: a leak announces itself as an implausibly smooth, high-Sharpe curve. |
-| 4 | **Evaluate** — [06](06-evaluating-performance.md) | Reduce the PnL series to numbers you can judge — Sharpe, drawdown, turnover, hit rate — and read them beside the equity curve, not instead of it. | Is the strategy any good, and where does it fail — which regime produced the drawdowns? | A verdict that the strategy *might* work. One number hides the path, so the verdict stays provisional until the next stage attacks it. |
-| 5 | **Attack the result** — [07](07-overfitting-and-robustness.md) | Test how much of the result survives across years, markets and parameters; split out-of-sample; deflate the Sharpe for the search you did. | How much of this is real edge, and how much is the search itself? | A baseline that has survived attack — the only thing a model is worth being compared with. |
-| 6 | **Try a model** | Learn a prediction from the features; run it through the same sizing, the same backtest, the same metrics; compare against the rule. | Does a learned prediction beat the rule, or merely add parameters? | Closes the loop: the model is judged exactly as the rule was, which is why the whole chain had to be built rule-first. |
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/strategy-pipeline-dark.png">
+  <img alt="Seven boxes stacked in a vertical chain, top to bottom: validate the data, state a hypothesis and compute a signal, size the positions, simulate, evaluate, attack the result, try a model. Each box carries the question the stage must answer, and each arrow is labelled with the object it hands to the next stage — trusted data, edge confirmed, sized book, honest PnL, verdict, surviving baseline" src="figures/strategy-pipeline-light.png">
+</picture>
 
-**Note (Stage 0 is not optional).** Every later stage inherits whatever is wrong with the data. An
-unadjusted split is the largest move in the sample by construction, so a trend follower reads it as
-the strongest signal it has ever seen — and the equity curve will look *better*, not worse.
+| # | Step | What you do | The question it asks |
+| - | --- | --- | --- |
+| 0 | **Validate the data** | Confirm prices are continuous, corporate actions are adjusted, and the target is aligned | Can I trust a single number in this dataset? |
+| 1 | **State a hypothesis, compute a signal** | Turn the intuition into a number, then test it with the bucket plot | Is higher signal followed by higher forward return? |
+| 2 | **Size the positions** | Signal → weights → dollars → shares, with risk limits | How much should I bet, and is the exposure what I think it is? |
+| 3 | **Simulate** | Apply the positions under costs, delay, turnover and realistic timing | Does any of it survive reality? |
+| 4 | **Evaluate** | Reduce the PnL to Sharpe, drawdown, turnover, hit rate | Is the strategy any good, and where does it fail? |
+| 5 | **Attack the result** | Test across years, markets and parameters; out-of-sample; deflate the Sharpe | How much is real edge, and how much is search? |
+| 6 | **Try a model** | Learn a prediction; run the same sizing, backtest and metrics as the rule | Does a learned prediction beat the rule? |
 
-**Note (Test the signal before you backtest it).** Stage 1 ends with a check — sort assets into
-buckets by signal value and look at the mean forward return per bucket. It is cheaper than a
-backtest, and a monotone staircase is much harder to fool yourself with than a rising equity curve.
-A signal that fails here will not be rescued by anything downstream.
+Each row is unpacked below: what the stage actually does, the metrics that judge it, and the object
+it hands to the next stage.
 
-**Note (Stage 6 comes last for a reason).** A model is only worth testing once the rule-based
-version, its costs and its failure modes are understood — otherwise there is no baseline to beat
-and no way to tell whether the model added value or merely added parameters.
+### 2.1 Stage 0 — Validate the data
 
-## 3. Where a Model Enters, and Where It Does Not
+**What it does.** Check that the price series are continuous and corporate actions are adjusted,
+and that the forward-return target is aligned with the signal that labels it — verify a handful of
+rows by hand before trusting anything downstream. Five sector SPDRs (XLB, XLE, XLK, XLU, XLY)
+still carry an unadjusted 2-for-1 split effective 2025-12-05, so any result spanning that date is
+suspect until the split is adjusted.
 
-**Definition (Prediction).** A *prediction* is a model's estimate of a future quantity — next
-period's return, the probability of a rise, expected volatility. It is a number about the world,
-carrying no instruction.
+**What judges it.** Continuity (no gaps, zeros or negative prices), split-adjusted consistency, and
+a hand-checked alignment between the signal at `t` and the return it labels.
 
-**Definition (Signal).** A *signal* is a decision: long, short, or flat. Converting a prediction
-into one requires a **trading rule** — a threshold, a sign, a ranking.
+**What it hands on.** A record every downstream statistic can be read against. An unadjusted split
+is the largest move in the sample by construction, so a trend follower reads it as its strongest
+signal ever — and the equity curve looks *better*, not worse.
 
-```python
-prediction = model.predict(features)
+→ [100 · The Dataset](100-dataset.md)
 
-if   prediction >  0.01: signal =  1     # long
-elif prediction < -0.01: signal = -1     # short
-else:                    signal =  0     # flat
-```
+### 2.2 Stage 1 — State a hypothesis, compute a signal
 
-**Note (Why keep them apart).** The threshold is a choice, not a model output, and it is where
-transaction costs enter the decision: widening the dead band trades hit rate for turnover without
-retraining anything. Collapse prediction and signal into one step and that dial disappears.
+**What it does.** Turn the intuition into a number — a momentum signal is the trailing 21-day mean
+of daily returns — then ask whether that number carries information. The test is the bucket plot:
+rank dates by signal, file them into five ordered buckets G1 … G5, and plot the mean forward return
+each bucket went on to deliver, with the standard error of that mean as the error bar.
 
-**Note (Even when a model outputs a direction).** Some models classify rather than regress, and
-appear to emit a signal directly. The layers still exist and are still worth separating:
+**What judges it.** Bucket monotonicity (G1 < G2 < … < G5), the G5 − G1 spread measured against the
+error bars, and a two-sample t-score on the head against the tail — past ±2 the separation is
+significant at the 5% level. Turnover matters too: a signal you cannot act on cheaply costs more
+than it earns.
 
-```text
-P(up) = 70%          prediction   — what the model believes
-long                 signal       — the direction that belief implies
-30% of capital       position     — how much that belief is worth betting
-+0.4% after fees     result       — what the market paid for it
-```
+**What it hands on.** Permission to size positions. This is the cheapest test in the chain, and a
+signal that fails here is rescued by nothing downstream. It is also the one place Sharpe must not
+appear: Sharpe folds the mean, the volatility and the risk-free rate into a single number you
+cannot decompose.
 
-**Claim.** A model replaces the rule, not the backtest.
+→ [02 § 3.2](02-testing-a-signal.md)
 
-Momentum, MACD and a gradient-boosted tree are alternative ways of producing the same object — a
-signal. They sit at the same point in the chain and are judged the same way. What follows the
-signal (sizing, costs, execution, metrics) is unchanged, which is precisely what makes a rule and a
-model comparable at all. If adopting a model required a different backtester, any performance
-difference would be uninterpretable.
+### 2.3 Stage 2 — Size the positions
 
-**Note.** So the constraint from the rule-based case survives intact: the backtester must not know
-where the signal came from. In this project it holds — the multi-asset backtester is a loop over
-the single-asset one and contains no strategy logic. See
-[Backtest Prototype — Implementation Notes](../Backtest_prototype/Backtests.md).
+**What it does.** Convert the signal into target weights, weights into dollar exposure, dollars
+into shares, and apply risk limits — carrying the position as a signed quantity, long or short.
+The two portfolios here size differently: Portfolio 1 longs 150% of the positive-momentum assets
+(equal weight) and shorts 50% of the negative ones; Portfolio 2 sizes by whether momentum is above
+or below the cross-sectional median, so an asset can be shorted even with positive momentum. A
+5-day holding period is implemented as overlapping portfolios, so the weights evolve smoothly as
+old signals roll off rather than jumping every fifth day.
 
-## 4. Four Levels of Validation
+**What judges it.** Gross exposure (about 2.0), net exposure (Portfolio 1 about +1.0, Portfolio 2
+about 0), and turnover — the cost of acting on the signal each day.
+
+**What it hands on.** A PnL path with a real gross and net exposure and a real cost of acting. It
+is here, at a 150/50 book, that the risk-free-rate question becomes concrete — a question the
+signal stage never had to answer.
+
+→ [04 · From Signal to Position](04-from-signal-to-position.md)
+
+### 2.4 Stage 3 — Simulate
+
+**What it does.** Apply the sized positions to history under the constraints a real book faces: an
+execution delay (a signal dated `t` trades a day later), an approximate execution price,
+transaction costs, and the turnover the rebalancing implies.
+
+**What judges it.** Honesty, not goodness: check for look-ahead bias — its single entry point is
+the alignment of the forward return with the signal — and measure the drag that costs and delay
+put on the raw signal.
+
+**What it hands on.** A PnL series that can be reduced to metrics. This is the first stage at
+which a Sharpe is even meaningful: a leak announces itself as an implausibly smooth, high-Sharpe
+curve.
+
+→ [05 · Understanding Backtesting](05-understanding-backtesting.md)
+
+### 2.5 Stage 4 — Evaluate
+
+**What it does.** Reduce the PnL series to the numbers a practitioner quotes — annualised return,
+Sharpe, maximum drawdown, hit rate, turnover — and read them beside the equity curve, not instead
+of it, so a number is never separated from the path that produced it.
+
+**What judges it.** The headline statistics and the drawdowns they hide: a Sharpe of 0.2 could be
+steady earnings or one great quarter followed by five years of bleeding. One number hides the time
+dimension, so the curve and its worst drawdowns are part of the judgement.
+
+**What it hands on.** A verdict that the strategy *might* work. The verdict stays provisional
+until the next stage attacks it.
+
+→ [06 · Evaluating Performance](06-evaluating-performance.md)
+
+### 2.6 Stage 5 — Attack the result
+
+**What it does.** Ask how much of the result survives once you stop believing it: across years,
+across markets, across the parameters you searched. Split the sample out-of-sample — with a purge,
+and sometimes an embargo, so the target of the last training rows cannot leak into validation —
+and deflate the Sharpe for the number of variants you tried.
+
+**What judges it.** Out-of-sample performance, the deflated Sharpe, and parameter sensitivity: a
+broad plateau of neighbouring good parameters is more believable than a single bright cell.
+
+**What it hands on.** A baseline that has survived attack — the only thing a model is worth being
+compared with.
+
+→ [07 · Overfitting & Robustness](07-overfitting-and-robustness.md)
+
+### 2.7 Stage 6 — Try a model
+
+**What it does.** Replace the rule with a learned prediction — a regression on the same features —
+and run it through the *same* sizing, the *same* backtest, the *same* metrics. Keep prediction and
+signal apart: a **prediction** is the model's estimate of a future quantity, a **signal** is the
+long/short/flat decision you make from it, and the conversion needs a trading rule — a threshold, a
+sign, a ranking. A model replaces the rule, not the backtest.
+
+**What judges it.** The test IC — rank correlation between prediction and forward return, per
+date — its mean, and its stability (mean divided by its standard deviation). Expect predictions
+far narrower than reality: at tiny R² a 2.5% spread of returns yields predictions inside ±0.5%, so
+an absolute threshold never fires — threshold on the prediction's own quantiles.
+
+**What it hands on.** Closes the loop: the model is judged exactly as the rule was, which is why
+the whole chain had to be built rule-first.
+
+→ [09 · IC and R²](09-ic-and-r-squared.md); the prediction-to-signal conversion is in Background.
+
+## 3. Four Levels of Validation
 
 Each layer is tested on its own terms, and passing one says nothing about the next.
 
-| Level                | Question                               | Typical measure                      | Where                                                                   |
-| -------------------- | -------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------- |
-| **Model**      | does the prediction track the outcome? | test IC, MSE, accuracy               | out-of-sample only                                                      |
-| **Signal**     | is the direction right, and tradeable? | bucket monotonicity, turnover        | [02 § 3.2](02-testing-a-signal.md)                                        |
+| Level                | Question                               | Typical measure                      | Where          |
+| -------------------- | -------------------------------------- | ------------------------------------ | -------------- |
+| **Model**      | does the prediction track the outcome? | test IC, MSE, accuracy               | OOS only       |
+| **Signal**     | is the direction right, and tradeable? | bucket monotonicity, turnover        | [02 § 3.2](02-testing-a-signal.md) |
 | **Strategy**   | does it survive real constraints?      | Sharpe, drawdown, return after costs | [05](05-understanding-backtesting.md), [06](06-evaluating-performance.md) |
-| **Robustness** | does it persist?                       | across years, markets, parameters    | [07](07-overfitting-and-robustness.md)                                   |
+| **Robustness** | does it persist?                       | across years, markets, parameters    | [07](07-overfitting-and-robustness.md) |
 
 **Note (Each arrow loses candidates).** High test accuracy is not economic value; economic value is
 not profit after costs; profit after costs is not stability out of sample. A model can predict
 direction 55% of the time and still lose money, because the 45% it gets wrong are the larger moves,
 or because acting on it every day costs more than the edge.
 
-## 5. Where Each Stage Fails
+## 4. Where Each Stage Fails
 
 The stages fail in different ways, and the symptoms are easy to misattribute — the most common
 mistake is reading a data defect as a code bug.
 
-| Stage      | Failure                     | What you see                        | Where it is treated                   |
-| ---------- | --------------------------- | ----------------------------------- | ------------------------------------- |
-| Data       | Unadjusted corporate action | A vertical step in the equity curve | [100 § 1.1](100-dataset.md)           |
-| Signal     | No information              | Flat or non-monotone buckets        | [02 § 3.2](02-testing-a-signal.md)      |
-| Sizing     | Exposure not what you think | Gross or net drifts from target     | [04](04-from-signal-to-position.md)    |
-| Simulation | Look-ahead bias             | Implausibly smooth, high Sharpe     | [05](05-understanding-backtesting.md)  |
-| Evaluation | One number hides the path   | Good Sharpe, unlivable drawdown     | [06](06-evaluating-performance.md)     |
+| Stage      | Failure                     | What you see                        | Where it is treated |
+| ---------- | --------------------------- | ----------------------------------- | ------------------- |
+| Data       | Unadjusted corporate action | A vertical step in the equity curve | [100 § 1.1](100-dataset.md) |
+| Signal     | No information              | Flat or non-monotone buckets        | [02 § 3.2](02-testing-a-signal.md) |
+| Sizing     | Exposure not what you think | Gross or net drifts from target     | [04](04-from-signal-to-position.md) |
+| Simulation | Look-ahead bias             | Implausibly smooth, high Sharpe     | [05](05-understanding-backtesting.md) |
+| Evaluation | One number hides the path   | Good Sharpe, unlivable drawdown     | [06](06-evaluating-performance.md) |
 | Robustness | Parameters were searched    | Result vanishes out of sample       | [07](07-overfitting-and-robustness.md) |
-| Model      | Fitted to the sample        | Good IC in train, none in test      | out-of-sample split                   |
+| Model      | Fitted to the sample        | Good IC in train, none in test      | OOS split |
 
 **Note.** The order is forced in one direction — you cannot evaluate before simulating, or simulate
 before sizing. The one shortcut is that stage 1 can be validated *without* stages 2–4, and it
