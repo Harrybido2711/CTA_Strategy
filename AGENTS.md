@@ -58,6 +58,7 @@ itself. No index or indirection layer in between. Cross-link both ways: `docs/` 
 | --- | --- |
 | Write or revise a `docs/` chapter | § 4 below, then [`docs/01-what-is-cta.md`](docs/01-what-is-cta.md) end to end |
 | Add or change a figure | § 5 below, then [`docs/figures/_style.py`](docs/figures/_style.py) |
+| Use a repo skill (`colors`, `figures`, …) | [`skills/INDEX.md`](skills/INDEX.md) |
 | Write a formula | § 4.4 — the renderer rejects a lot of ordinary LaTeX |
 | Touch the data | § 6 — there is an unadjusted split in five files |
 | Commit | § 7 |
@@ -256,8 +257,8 @@ Shared design tokens and drawing primitives (`THEMES`, `rounded_bar`, `style_axe
 script. **Never re-declare a colour inside a chapter script** — change the token in `_style.py` and
 every chapter moves together. That single home is what keeps the figures one visual system. The
 semantic meaning of each colour — blue for the strategy, green for validation, violet for the crux —
-is documented in [`docs/figures/COLORS.md`](docs/figures/COLORS.md); read it before choosing a
-colour for a new figure.
+is documented in [`skills/colors.md`](skills/colors.md); read it before choosing a colour for a new
+figure. Reusable skills are indexed in [`skills/INDEX.md`](skills/INDEX.md).
 
 To add a figure:
 
