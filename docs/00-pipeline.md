@@ -2,6 +2,11 @@
 
 ## 1. The Chain, End to End
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/signal-origins-dark.png">
+  <img alt="Market data and features feed two alternative paths. On the left a rule such as momentum or MACD produces a signal directly by sign or threshold. On the right a machine-learning model produces a prediction — future return, probability of a rise, or volatility — which a trading rule then converts into the same signal. Both paths converge on one signal node of long, short or flat, which feeds position sizing and risk limits, then the backtest with costs, delay and turnover, and finally return, Sharpe, drawdown and turnover. A bracket marks everything down to position as the strategy, and the backtest and metrics as validation" src="figures/signal-origins-light.png">
+</picture>
+
 In one line: **a model finds the pattern, a prediction states the judgement, a signal picks the
 direction, a position sizes the bet, and the backtest asks whether any of it survives.**
 
