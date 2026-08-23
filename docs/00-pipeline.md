@@ -20,7 +20,36 @@ direction, a position sizes the bet, and the backtest asks whether any of it sur
 | **Backtest**                    | apply it all to history under real constraints | a PnL series                         | after costs and delay   |
 | **Metrics**                     | judge the PnL                                  | Sharpe, drawdown, turnover, hit rate | Sharpe 0.4, −18%       |
 
-## 2. Where a Model Enters, and Where It Does Not
+## 2. The Build Order, Step by Step
+
+Each stage does one thing, asks one question, and hands one object to the next. Read a row as: do
+the work, answer the question, and only then pass the handoff on — the question is the gate, and a
+stage that fails it is not repaired by anything downstream.
+
+| # | Step | What you do | The question it asks | What it hands to the next step |
+| - | --- | --- | --- | --- |
+| 0 | **Validate the data** — [100](100-dataset.md) | Confirm prices are continuous, corporate actions are adjusted, and the `shift(-h)` alignment is right — verify a handful of rows by hand. | Can I trust a single number in this dataset? | A record every downstream statistic can be read against. An unadjusted split is the largest move in the sample by construction, so a trend follower reads it as its strongest signal ever — and the curve looks *better*, not worse. |
+| 1 | **State a hypothesis, compute a signal** — [02 § 3.2](02-testing-a-signal.md) | Turn an intuition into a number, then test that it carries information: sort dates by signal, file them into buckets, plot the mean forward return per bucket with its error bar. | Is higher signal followed by higher forward return — is the direction right, and tradeable? | Permission to size positions. A monotone staircase whose tails separate beyond the error bars (a t-score past ±2) is the green light. This is the cheapest test in the chain — and the one place Sharpe must not appear yet, because it folds the mean, the volatility and the risk-free rate into a single number you cannot decompose. |
+| 2 | **Size the positions** — [04](04-from-signal-to-position.md) | Convert the signal into weights, weights into dollars, dollars into shares; apply risk limits; carry the position as a signed quantity. | How much should I bet, and is the exposure what I think it is? | A PnL path with a real gross and net exposure and a real cost of acting. It is here, at a 150/50 book, that the risk-free-rate question becomes concrete — a question the signal stage never had to answer. |
+| 3 | **Simulate** — [05](05-understanding-backtesting.md) | Apply the positions to history under real constraints: costs, delay, turnover, realistic timing. | Does any of it survive reality — and is the PnL honest, or a look-ahead artefact? | A PnL series that can be reduced to metrics. This is the first stage at which a Sharpe is even meaningful: a leak announces itself as an implausibly smooth, high-Sharpe curve. |
+| 4 | **Evaluate** — [06](06-evaluating-performance.md) | Reduce the PnL series to numbers you can judge — Sharpe, drawdown, turnover, hit rate — and read them beside the equity curve, not instead of it. | Is the strategy any good, and where does it fail — which regime produced the drawdowns? | A verdict that the strategy *might* work. One number hides the path, so the verdict stays provisional until the next stage attacks it. |
+| 5 | **Attack the result** — [07](07-overfitting-and-robustness.md) | Test how much of the result survives across years, markets and parameters; split out-of-sample; deflate the Sharpe for the search you did. | How much of this is real edge, and how much is the search itself? | A baseline that has survived attack — the only thing a model is worth being compared with. |
+| 6 | **Try a model** | Learn a prediction from the features; run it through the same sizing, the same backtest, the same metrics; compare against the rule. | Does a learned prediction beat the rule, or merely add parameters? | Closes the loop: the model is judged exactly as the rule was, which is why the whole chain had to be built rule-first. |
+
+**Note (Stage 0 is not optional).** Every later stage inherits whatever is wrong with the data. An
+unadjusted split is the largest move in the sample by construction, so a trend follower reads it as
+the strongest signal it has ever seen — and the equity curve will look *better*, not worse.
+
+**Note (Test the signal before you backtest it).** Stage 1 ends with a check — sort assets into
+buckets by signal value and look at the mean forward return per bucket. It is cheaper than a
+backtest, and a monotone staircase is much harder to fool yourself with than a rising equity curve.
+A signal that fails here will not be rescued by anything downstream.
+
+**Note (Stage 6 comes last for a reason).** A model is only worth testing once the rule-based
+version, its costs and its failure modes are understood — otherwise there is no baseline to beat
+and no way to tell whether the model added value or merely added parameters.
+
+## 3. Where a Model Enters, and Where It Does Not
 
 **Definition (Prediction).** A *prediction* is a model's estimate of a future quantity — next
 period's return, the probability of a rise, expected volatility. It is a number about the world,
@@ -64,7 +93,7 @@ where the signal came from. In this project it holds — the multi-asset backtes
 the single-asset one and contains no strategy logic. See
 [Backtest Prototype — Implementation Notes](../Backtest_prototype/Backtests.md).
 
-## 3. Four Levels of Validation
+## 4. Four Levels of Validation
 
 Each layer is tested on its own terms, and passing one says nothing about the next.
 
@@ -79,31 +108,6 @@ Each layer is tested on its own terms, and passing one says nothing about the ne
 not profit after costs; profit after costs is not stability out of sample. A model can predict
 direction 55% of the time and still lose money, because the 45% it gets wrong are the larger moves,
 or because acting on it every day costs more than the edge.
-
-## 4. The Build Order
-
-| # | Stage                                          | What happens                                                                  | Chapter                               |
-| - | ---------------------------------------------- | ----------------------------------------------------------------------------- | ------------------------------------- |
-| 0 | **Validate the data**                    | Confirm prices are continuous and corporate actions are adjusted              | [100](100-dataset.md)                  |
-| 1 | **State a hypothesis, compute a signal** | Turn an intuition into a number, then test that it carries information        | [02](02-testing-a-signal.md)           |
-| 2 | **Size the positions**                   | Signal → weights → dollars → shares                                        | [04](04-from-signal-to-position.md)    |
-| 3 | **Simulate**                             | Apply the positions to history with realistic timing                          | [05](05-understanding-backtesting.md)  |
-| 4 | **Evaluate**                             | Reduce the PnL series to numbers you can judge                                | [06](06-evaluating-performance.md)     |
-| 5 | **Attack the result**                    | Ask how much of it is signal and how much is search                           | [07](07-overfitting-and-robustness.md) |
-| 6 | **Try a model**                          | Ask whether a learned prediction beats the rule — same sizing, same backtest | —                                    |
-
-**Note (Stage 0 is not optional).** Every later stage inherits whatever is wrong with the data. An
-unadjusted split is the largest move in the sample by construction, so a trend follower reads it as
-the strongest signal it has ever seen — and the equity curve will look *better*, not worse.
-
-**Note (Test the signal before you backtest it).** Stage 1 ends with a check — sort assets into
-buckets by signal value and look at the mean forward return per bucket. It is cheaper than a
-backtest, and a monotone staircase is much harder to fool yourself with than a rising equity curve.
-A signal that fails here will not be rescued by anything downstream.
-
-**Note (Stage 6 comes last for a reason).** A model is only worth testing once the rule-based
-version, its costs and its failure modes are understood — otherwise there is no baseline to beat
-and no way to tell whether the model added value or merely added parameters.
 
 ## 5. Where Each Stage Fails
 
