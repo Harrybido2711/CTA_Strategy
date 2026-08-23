@@ -2,11 +2,6 @@
 
 ## 1. The Chain, End to End
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/signal-origins-dark.png">
-  <img alt="Market data and features feed two alternative paths. On the left a rule such as momentum or MACD produces a signal directly by sign or threshold. On the right a machine-learning model produces a prediction — future return, probability of a rise, or volatility — which a trading rule then converts into the same signal. Both paths converge on one signal node of long, short or flat, which feeds position sizing and risk limits, then the backtest with costs, delay and turnover, and finally return, Sharpe, drawdown and turnover. A bracket marks everything down to position as the strategy, and the backtest and metrics as validation" src="figures/signal-origins-light.png">
-</picture>
-
 In one line: **a model finds the pattern, a prediction states the judgement, a signal picks the
 direction, a position sizes the bet, and the backtest asks whether any of it survives.**
 
@@ -27,8 +22,8 @@ the work, answer the question, and only then pass the handoff on — the questio
 stage that fails it is not repaired by anything downstream.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/strategy-pipeline-dark.png">
-  <img alt="Seven boxes stacked in a vertical chain, top to bottom: validate the data, state a hypothesis and compute a signal, size the positions, simulate, evaluate, attack the result, try a model. Each box carries the question the stage must answer, and each arrow is labelled with the object it hands to the next stage — trusted data, edge confirmed, sized book, honest PnL, verdict, surviving baseline" src="figures/strategy-pipeline-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="figures/build-order-dark.png">
+  <img alt="Seven build stages in a vertical chain: stages 0–2 in blue as the strategy, stages 3–5 in green as validation, and stage 1, the signal, in violet as the crux. Each box carries the question the stage must answer; each arrow is labelled with the object it hands to the next stage — trusted data, edge confirmed, sized book, honest PnL, verdict, surviving baseline. To the right, the signal's two sources — a rule (momentum, MACD) or a learned model feeding a prediction — converge on the signal, and stage 6 loops a learned prediction back to replace the rule" src="figures/build-order-light.png">
 </picture>
 
 | # | Step | What you do | The question it asks |

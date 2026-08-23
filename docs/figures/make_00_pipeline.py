@@ -10,8 +10,7 @@ reader's theme.
 
 Figures produced
 ----------------
-    strategy-pipeline  the seven-stage build order, each stage gated by a question
-    signal-origins     the two ways a signal gets made: a rule or a learned model
+    build-order  the seven build stages with the two ways a signal gets made
 
 All are schematics drawn from illustrative values.
 
@@ -24,19 +23,24 @@ from matplotlib.patches import FancyBboxPatch
 from _style import THEMES, save, titles
 
 
-# ------------------------------------------------- fig: the strategy pipeline
-def strategy_pipeline(mode):
-    """00-pipeline -- the build order, seven stages, each gated by a question.
+# ------------------------------------------------- fig: the merged build order
+def build_order(mode):
+    """00-pipeline -- the seven build stages with the two ways a signal gets made.
 
-    Schematic. The point is the order and the gate: each stage does one thing,
-    asks one question, and only hands on when the answer is yes. The label on
-    each arrow is the object handed to the next stage.
+    Schematic, drawn as one figure with two coupled views. Left: the build
+    order -- seven stages, each gated by the question it asks, handing a
+    labelled object to the next; the brackets mark what is the strategy and
+    what is only its validation. Right: the signal's two sources -- a rule
+    (momentum, MACD) or a learned model (prediction) -- converge on the same
+    signal, and stage 6's learned prediction feeds back to replace the rule.
     """
     t = THEMES[mode]
-    W, H = 4.9, 0.64              # box size
-    CX = 3.6                      # centre x of the chain
-    GS = 0.92                     # vertical gap between box centres
-    TOP = 6.3                     # centre y of the top box
+
+    # ---- chain geometry
+    W, H = 4.5, 0.62            # stage panel
+    CX = 3.7                    # chain centre x
+    GS = 1.02                   # vertical gap between stage centres
+    TOP = 8.0                   # top stage centre y
 
     names = [
         "0 · Validate the data",
@@ -61,135 +65,127 @@ def strategy_pipeline(mode):
         "honest PnL", "verdict", "surviving baseline",
     ]
 
-    fig, ax = plt.subplots(figsize=(9.2, 7.2))
+    fig, ax = plt.subplots(figsize=(11.0, 8.0))
     fig.patch.set_facecolor(t["surface"])
     ax.set_facecolor(t["surface"])
-    ax.set_xlim(0, 9.6)
-    ax.set_ylim(-0.5, 6.9)
+    ax.set_xlim(0, 13.2)
+    ax.set_ylim(-0.4, 8.8)
     ax.axis("off")
 
     ys = [TOP - i * GS for i in range(len(names))]
-    for name, question, y in zip(names, questions, ys):
+
+    # ---- left rail: what is the strategy, what is its validation
+    ax.plot([1.15, 1.02, 1.02, 1.15], [ys[0] + H / 2, ys[0] + H / 2,
+                                       ys[2] - H / 2, ys[2] - H / 2],
+            color=t["ramp"][5], linewidth=1.1, solid_joinstyle="miter", zorder=3)
+    ax.text(0.60, (ys[0] + ys[2]) / 2, "the strategy", ha="center", va="center",
+            rotation=90, color=t["ramp"][5], fontsize=8.8, fontweight="600")
+    ax.plot([1.15, 1.02, 1.02, 1.15], [ys[3] + H / 2, ys[3] + H / 2,
+                                       ys[5] - H / 2, ys[5] - H / 2],
+            color=t["validation"], linewidth=1.1, solid_joinstyle="miter", zorder=3)
+    ax.text(0.60, (ys[3] + ys[5]) / 2, "validation", ha="center", va="center",
+            rotation=90, color=t["validation"], fontsize=8.8, fontweight="600")
+
+    # ---- the seven stages: blue = strategy, green = validation, violet = the crux
+    fills = [t["ramp"][5], t["accent"], t["ramp"][5],
+             t["validation"], t["validation"], t["validation"], t["ramp"][4]]
+    for name, question, y, fill in zip(names, questions, ys, fills):
         ax.add_patch(FancyBboxPatch(
             (CX - W / 2, y - H / 2), W, H,
             boxstyle="round,pad=0.02,rounding_size=0.15", zorder=3,
-            facecolor=t["ramp"][5], edgecolor="none"))
+            facecolor=fill, edgecolor="none"))
         ax.text(CX, y + 0.10, name, ha="center", va="center",
                 color=t["surface"], fontsize=9.6, fontweight="600", zorder=4)
         ax.text(CX, y - 0.145, question, ha="center", va="center",
-                color=t["surface"], fontsize=7.5, alpha=0.85, zorder=4)
+                color=t["surface"], fontsize=7.4, alpha=0.85, zorder=4)
 
+    # ---- handoff arrows + labels between stages
     for i in range(len(ys) - 1):
         y0, y1 = ys[i] - H / 2, ys[i + 1] + H / 2
         ax.annotate("", xy=(CX, y1 - 0.02), xytext=(CX, y0 + 0.02),
                     arrowprops=dict(arrowstyle="-|>", color=t["baseline"],
                                     linewidth=1.1, shrinkA=0, shrinkB=0))
-        ax.plot([CX, CX + W / 2 + 0.10], [(y0 + y1) / 2] * 2,
+        ax.plot([CX, CX + W / 2 + 0.12], [(y0 + y1) / 2] * 2,
                 color=t["baseline"], linewidth=0.7, zorder=4)
-        ax.text(CX + W / 2 + 0.14, (y0 + y1) / 2, handoffs[i],
-                ha="left", va="center", color=t["ink_secondary"], fontsize=7.6,
-                bbox=dict(boxstyle="round,pad=0.18", facecolor=t["surface"],
+        ax.text(CX + W / 2 + 0.16, (y0 + y1) / 2, handoffs[i],
+                ha="left", va="center", color=t["ink_secondary"], fontsize=7.5,
+                bbox=dict(boxstyle="round,pad=0.16", facecolor=t["surface"],
                           edgecolor="none"), zorder=5)
 
-    titles(ax, t, "The build order: each stage is gated by its question",
-           "seven stages in a forced order; the label on each arrow is what the stage hands on")
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
-    save(fig, t, f"strategy-pipeline-{mode}.png")
+    # ---- inset: the signal's two sources, aligned with stage 1
+    iy = ys[1]                          # stage 1 centre y
+    ax.text(7.1, iy + 1.14, "the signal's two sources", ha="left", va="center",
+            color=t["ink_secondary"], fontsize=8.2, fontstyle="italic")
+    # rule box
+    rb = (8.1, iy + 0.42)
+    ax.add_patch(FancyBboxPatch((rb[0] - 1.15, rb[1] - 0.26), 2.3, 0.52,
+                 boxstyle="round,pad=0.02,rounding_size=0.12", zorder=3,
+                 facecolor=t["ramp"][3], edgecolor="none"))
+    ax.text(rb[0], rb[1] + 0.07, "rule", ha="center", va="center",
+            color=t["surface"], fontsize=8.4, fontweight="600", zorder=4)
+    ax.text(rb[0], rb[1] - 0.13, "momentum · MACD", ha="center", va="center",
+            color=t["surface"], fontsize=7.0, alpha=0.9, zorder=4)
+    # model box
+    mb = (8.1, iy - 0.42)
+    ax.add_patch(FancyBboxPatch((mb[0] - 1.15, mb[1] - 0.26), 2.3, 0.52,
+                 boxstyle="round,pad=0.02,rounding_size=0.12", zorder=3,
+                 facecolor=t["ramp"][3], edgecolor="none"))
+    ax.text(mb[0], mb[1] + 0.07, "ML model", ha="center", va="center",
+            color=t["surface"], fontsize=8.4, fontweight="600", zorder=4)
+    ax.text(mb[0], mb[1] - 0.13, r"$\rightarrow$ prediction", ha="center", va="center",
+            color=t["surface"], fontsize=7.0, alpha=0.9, zorder=4)
+    # signal node
+    sn = (10.0, iy)
+    ax.add_patch(FancyBboxPatch((sn[0] - 0.55, sn[1] - 0.26), 1.1, 0.52,
+                 boxstyle="round,pad=0.02,rounding_size=0.12", zorder=3,
+                 facecolor=t["accent"], edgecolor="none"))
+    ax.text(sn[0], sn[1], "signal", ha="center", va="center",
+            color=t["surface"], fontsize=8.4, fontweight="600", zorder=4)
+    # converging arrows into the signal node
+    for bx in (rb, mb):
+        ax.annotate("", xy=(sn[0] - 0.58, sn[1]), xytext=(bx[0] + 1.18, bx[1]),
+                    arrowprops=dict(arrowstyle="-|>", color=t["baseline"],
+                                    linewidth=1.0, shrinkA=0, shrinkB=0))
+    # dashed tie to stage 1
+    ax.plot([CX + W / 2, 6.95], [iy, iy], color=t["muted"], linewidth=0.9,
+            linestyle=(0, (3, 2)), zorder=2)
+    ax.text((CX + W / 2 + 6.95) / 2, iy + 0.24, "stage 1 builds the signal",
+            ha="center", va="center", color=t["muted"], fontsize=7.2,
+            fontstyle="italic")
 
+    # ---- feedback: stage 6's learned prediction replaces the rule
+    fx = 11.2                              # right rail x
+    ax.plot([CX + W / 2, fx], [ys[6], ys[6]], color=t["ramp"][4], linewidth=1.0, zorder=2)
+    ax.plot([fx, fx], [ys[6], mb[1]], color=t["ramp"][4], linewidth=1.0, zorder=2)
+    ax.annotate("", xy=(mb[0] + 1.18, mb[1]), xytext=(fx, mb[1]),
+                arrowprops=dict(arrowstyle="-|>", color=t["ramp"][4], linewidth=1.0,
+                                shrinkA=0, shrinkB=0))
+    ax.text(fx + 0.12, (ys[6] + mb[1]) / 2, "a learned prediction\nreplaces the rule",
+            ha="left", va="center", color=t["ramp"][4], fontsize=7.8,
+            fontweight="600", linespacing=1.35)
 
-# ------------------------------------------------- fig: the two ways to a signal
-def signal_origins(mode):
-    """00-pipeline -- the two ways a signal gets made, and what validates it.
-
-    Schematic. A rule (momentum, MACD) and an ML model (OLS, ridge, lasso,
-    trees) are alternative ways of producing the same object -- a signal. The
-    backtest sits downstream of both and validates the whole strategy, not the
-    model. This is the object chain; ``strategy_pipeline`` is the build order
-    that assembles it stage by stage.
-    """
-    t = THEMES[mode]
-    W, H = 4.6, 0.56                    # shared-spine box size
-    BW = 3.5                            # branch box width
-    CX, LX, RX = 4.7, 2.15, 7.25        # centre, left-branch, right-branch
-
-    #  (x, y, w, label, sublabel, kind)
-    nodes = [
-        (CX, 6.0, W,  "market data / features", "prices, volume, volatility", "input"),
-        (LX, 4.9, BW, "rule", "momentum, MACD", "strat"),
-        (RX, 4.9, BW, "ML model", "OLS, ridge, lasso, trees", "strat"),
-        (RX, 3.8, BW, "prediction", "return, P(up), volatility", "strat"),
-        (CX, 2.7, W,  "signal", "long / short / flat", "strat"),
-        (CX, 1.6, W,  "position", "how much to bet, and risk limits", "strat"),
-        (CX, 0.5, W,  "backtest", "costs, delay, turnover, execution", "instr"),
-        (CX, -0.6, W, "return · Sharpe · drawdown · turnover", "", "instr"),
+    # ---- colour key
+    key = [
+        (t["ramp"][5], "the strategy · stages 0–2"),
+        (t["validation"], "validation · stages 3–5"),
+        (t["accent"], "the signal — the crux · stage 1"),
     ]
-    edges = [(0, 1, None), (0, 2, None), (1, 4, "sign / threshold"),
-             (2, 3, None), (3, 4, "trading rule"), (4, 5, None),
-             (5, 6, None), (6, 7, None)]
+    kx0, ky = 1.8, 0.35
+    for i, (color, label) in enumerate(key):
+        x0 = kx0 + i * 3.6
+        ax.add_patch(FancyBboxPatch((x0, ky - 0.13), 0.8, 0.26,
+                     boxstyle="round,pad=0.02,rounding_size=0.08", zorder=3,
+                     facecolor=color, edgecolor="none"))
+        ax.text(x0 + 0.95, ky, label, ha="left", va="center",
+                color=t["ink_secondary"], fontsize=7.6)
 
-    fig, ax = plt.subplots(figsize=(9.0, 6.6))
-    fig.patch.set_facecolor(t["surface"])
-    ax.set_facecolor(t["surface"])
-    ax.set_xlim(0, 9.6)
-    ax.set_ylim(-1.25, 6.6)
-    ax.axis("off")
-
-    face = {"input": None, "strat": t["ramp"][5], "instr": t["ramp"][1]}
-    for x, y, w, label, sub, kind in nodes:
-        if kind == "input":
-            style = dict(facecolor=t["surface"], edgecolor=t["baseline"], linewidth=1.1)
-            ink, subink = t["ink_secondary"], t["muted"]
-        else:
-            style = dict(facecolor=face[kind], edgecolor="none")
-            ink = t["surface"] if kind == "strat" else t["ink"]
-            subink = ink
-        ax.add_patch(FancyBboxPatch(
-            (x - w / 2, y - H / 2), w, H,
-            boxstyle="round,pad=0.02,rounding_size=0.15", zorder=3, **style))
-        dy = 0.10 if sub else 0.0
-        ax.text(x, y + dy, label, ha="center", va="center",
-                color=ink, fontsize=9.8, fontweight="600", zorder=4)
-        if sub:
-            ax.text(x, y - 0.145, sub, ha="center", va="center",
-                    color=subink, fontsize=7.8, alpha=0.85, zorder=4)
-
-    for a, b, note in edges:
-        xa, ya, _, _, _, _ = nodes[a]
-        xb, yb, _, _, _, _ = nodes[b]
-        ax.annotate("", xy=(xb, yb + H / 2 + 0.02), xytext=(xa, ya - H / 2 - 0.02),
-                    arrowprops=dict(arrowstyle="-|>", color=t["baseline"], linewidth=1.1,
-                                    shrinkA=0, shrinkB=0,
-                                    connectionstyle="arc3,rad=0"))
-        if note:
-            ax.text((xa + xb) / 2 + (0.30 if xb < xa else -0.30),
-                    (ya + yb) / 2, note, ha="center", va="center",
-                    color=t["ink_secondary"], fontsize=7.6, rotation=0,
-                    bbox=dict(boxstyle="round,pad=0.18", facecolor=t["surface"],
-                              edgecolor="none"), zorder=5)
-
-    # the correction this figure exists to make
-    ax.text(9.5, 2.7, "both paths end here —\nML replaces the rule,\nnot the backtest",
-            ha="right", va="center", color=t["ramp"][5], fontsize=8.4,
-            fontweight="600", linespacing=1.5)
-    ax.annotate("", xy=(CX + W / 2 + 0.05, 2.7), xytext=(7.5, 2.7),
-                arrowprops=dict(arrowstyle="-", color=t["baseline"], linewidth=0.9))
-
-    ax.plot([0.42, 0.30, 0.30, 0.42], [5.2, 5.2, 1.32, 1.32],
-            color=t["ramp"][5], linewidth=1.1, solid_joinstyle="miter", zorder=3)
-    ax.text(0.14, 3.26, "the strategy", ha="center", va="center", rotation=90,
-            color=t["ramp"][5], fontsize=8.8, fontweight="600")
-    ax.plot([0.42, 0.30, 0.30, 0.42], [0.78, 0.78, -0.88, -0.88],
-            color=t["muted"], linewidth=1.1, solid_joinstyle="miter", zorder=3)
-    ax.text(0.14, -0.05, "validation", ha="center", va="center", rotation=90,
-            color=t["muted"], fontsize=8.8, fontweight="600")
-
-    titles(ax, t, "Two ways to make a signal, one way to validate it",
-           "a rule and a model are alternatives; the backtest is downstream of both")
+    titles(ax, t, "How a CTA strategy is built",
+           "seven stages, each gated by its question; blue = strategy, teal = validation, amber = the signal, the crux")
     fig.tight_layout(rect=(0, 0, 1, 0.94))
-    save(fig, t, f"signal-origins-{mode}.png")
+    save(fig, t, f"build-order-{mode}.png")
 
 
-FIGURES = (strategy_pipeline, signal_origins)
+FIGURES = (build_order,)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

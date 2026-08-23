@@ -35,6 +35,8 @@ THEMES = {
         baseline="#c3c2b7",
         series="#2a78d6",
         wash="#2a78d6",
+        accent="#6d28d9",       # violet: the crux, what the strategy hinges on
+        validation="#1f8f63",   # green: what only measures the strategy
         # sequential blue ramp, steps 100 -> 700; lightest = near zero
         ramp=["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#256abf", "#184f95", "#0d366b"],
     ),
@@ -47,6 +49,8 @@ THEMES = {
         baseline="#383835",
         series="#3987e5",
         wash="#3987e5",
+        accent="#8b5cf6",       # violet for a dark surface: the crux
+        validation="#35a37a",   # green for a dark surface
         # on a dark surface "near zero" must recede toward the surface, so the
         # same single hue runs dark -> light instead of light -> dark
         ramp=["#0d366b", "#184f95", "#256abf", "#3987e5", "#6da7ec", "#9ec5f4", "#cde2fb"],
