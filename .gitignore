@@ -9,3 +9,7 @@ __pycache__/
 # Local tooling — keep out of the repo
 .claude/
 CLAUDE.md
+skills/
+
+# Personal chat records — keep out of the repo
+chat_records/
