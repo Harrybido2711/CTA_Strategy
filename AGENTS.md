@@ -254,7 +254,10 @@ dataset, and label a schematic as illustrative in its subtitle so it is never mi
 Shared design tokens and drawing primitives (`THEMES`, `rounded_bar`, `style_axes`, `titles`,
 `save`) live in [`docs/figures/_style.py`](docs/figures/_style.py) and are imported by every chapter
 script. **Never re-declare a colour inside a chapter script** — change the token in `_style.py` and
-every chapter moves together. That single home is what keeps the figures one visual system.
+every chapter moves together. That single home is what keeps the figures one visual system. The
+semantic meaning of each colour — blue for the strategy, green for validation, violet for the crux —
+is documented in [`docs/figures/COLORS.md`](docs/figures/COLORS.md); read it before choosing a
+colour for a new figure.
 
 To add a figure:
 
