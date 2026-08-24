@@ -161,45 +161,55 @@ replacement on the same day: enormous flow unrelated to any balance sheet.
 
 ---
 
-## 3. Price discovery
+## 3. How a trade happens
 
-### 3.1 Finding a counterparty
+§ 2 said why someone *wants* to trade. Wanting to is not enough. A and B still have to
+**find each other**, then **agree a price** — and because agreeing a price one negotiation
+at a time is unworkable at scale, in practice **someone has to be standing there
+already**. Three beats, and the third exists because the second is slow.
 
-If A wants to buy and B wants to sell and neither knows the other exists, they need a
-**platform** — Amazon, Etsy, Craigslist for a pen; an exchange for a stock. That part is
-easy. Agreeing a price is the hard part.
+### 3.1 Finding each other — the platform
 
-### 3.2 Which price is "the" price
+Two people who do not know the other exists need a venue: Amazon, Etsy or Craigslist for
+a pen; an exchange for a stock. **This is the easy half.** Matching *who* is solved by
+listing everyone in one place. Agreeing *at what price* is the hard half.
 
-Four candidates, none of them canonical:
+### 3.2 Agreeing a price
+
+There is no canonical answer — four candidates, each with a defect:
 
 | Candidate | Definition | Weakness |
 | --- | --- | --- |
 | **Last traded price** | What the last identical item actually traded at | Depends entirely on *when* — one second ago is a good proxy, one year ago is not |
-| **Mid price** | (highest bid + lowest ask) / 2 | Needs a live two-sided book |
-| **Fundamental price** | What the thing is worth — manufacturing cost for a pen; a DCF or multiples valuation for a stock | Is a judgement, not an observation |
+| **Mid price** | (highest bid + lowest ask) / 2 | Needs a live two-sided book to exist at all |
+| **Fundamental price** | What the thing is worth — manufacturing cost for a pen, a DCF or multiples for a stock | A judgement, not an observation |
 | **Bid or ask** | One side's standing quote | Not fair by construction — it is one side only |
 
-A negotiated trade can land anywhere in between: a \$7 bid against a \$10 ask may settle
-at \$8 or \$9, and nothing forces the midpoint.
+So the price is **negotiated**, and it can land anywhere in the gap: a \$7 bid against a
+\$10 ask may settle at \$8 or at \$9, and nothing forces the midpoint.
 
-### 3.3 The mystery box
+### 3.3 When there is no price to agree on
 
-Change the pen to a **mystery box** and the fundamental price disappears. The only way to
-learn the price is **to trade** — that is what *price discovery* means.
+Replace the pen with a **mystery box** and the fundamental price vanishes — nobody knows
+what it is worth. The only way to learn it is **to trade**, which is what *price
+discovery* means.
 
 - Some participants are **informed** (they know the box is worth \$10), others **naive**
-  (they think it is worth \$5).
-- In the classic model the informed keep buying at \$5, more buyers push the price up,
-  and it converges to \$10, where they stop.
-- The informed traders are the mechanism by which the price becomes right.
+  (they think \$5).
+- The informed keep buying at \$5; more buyers push the price up; it converges to \$10,
+  and they stop.
+- **The informed traders are the mechanism** by which the price becomes right. Price
+  discovery is not a poll — it is the informed being paid to correct the naive.
 
-### 3.4 Why a market maker exists
+### 3.4 Why it takes a market maker
 
-Negotiating every trade is slow, even once the platform solves discovery. It is far
-better if **someone is always standing there** with a price already written on the board
-— you either take it or you don't. That standing willingness to buy and sell is the
-service; § 8 is why it gets paid for.
+Even with the platform solving *who*, negotiating every single trade is far too slow. It
+is enormously better if **someone is always standing there** with a price already on the
+board — you take it or you leave it, and the trade is done in one step instead of a
+haggle.
+
+That standing willingness to buy **and** sell is the service. It is not free, and § 8 is
+what it is being paid for.
 
 ---
 
