@@ -130,7 +130,13 @@ Classify by the risk factor that dominates its P&L.
 
 ---
 
-## 2. Why anyone buys or sells
+## 2. Why trades happen
+
+A trade is two parties taking **opposite sides** — one buys, one sells. Each side acts on
+one of the four motives below, and **the two motives need not match**: a speculator buys
+from a switcher, a dividend buyer buys from someone who needs cash. That asymmetry is
+what keeps a market alive — at any moment some pairing of motives is there to clear the
+other side, which is why a trade happens at all.
 
 ### 2.1 The four motives
 
@@ -153,9 +159,11 @@ they want is **capital preservation** — first, do not lose the money.
 Selling to switch is likelier than it looks: buying Tesla may mean selling Apple, and
 that says nothing about Apple.
 
-### 2.2 Flow that has nothing to do with the company
+### 2.2 When a trade needs no opinion at all
 
-This is the part worth carrying into signal work.
+The four motives all require *some* opinion. A trade can also happen with none: rules
+force it — the index changes, the unwind hits a leverage limit. This is the part worth
+carrying into signal work.
 
 SPY is an ETF run by State Street holding the S&P 500 constituents at index weights. When
 a company drops out of the index:
