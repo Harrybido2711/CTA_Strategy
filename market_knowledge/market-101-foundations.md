@@ -17,55 +17,94 @@ The names are everywhere — **equities, fixed income, FX, commodities, real est
 derivatives**. Naming them is not separating them. What makes two instruments belong to
 different *classes* rather than being two tickers?
 
-### 1.1 What separates them: the risk factor
+### 1.1 What separates them: three layers
 
-**An asset class is a set of instruments driven by the same risk factor.** That is the
-whole of it. Every other criterion is a stand-in, used because the risk factor is not
-printed on the instrument.
+Textbooks hand you the list and skip the logic. The separation works on three levels,
+each one **causing** the next.
 
-**Why not "different real-life uses",** the answer everyone reaches for first? Because a
-classification only earns its keep if it **predicts co-movement** — things inside a class
-move together, things across classes need not. Real-life use fails that test: gold has
-industrial uses and is also a monetary hedge, and the industrial use tells you nothing
-about how it trades.
+**Layer 1 — Claim structure.** The hardest, most legal distinction: *what right do you
+actually hold?* Equity is a **residual** claim — you get what is left after everyone else
+is paid, so the upside is unbounded and the floor is zero. A bond is a **contractual**
+claim — the cash flows are agreed in advance, so the upside is locked and the risk is
+default. A commodity carries **no cash-flow claim at all**; you own the physical thing,
+and the return can only come from price. Cash is pure time value.
+
+**Layer 2 — Return driver.** Those claim structures put returns at the mercy of different
+economic variables: growth and earnings for equities, the level of rates and credit
+compensation for bonds, supply-demand and inflation for commodities. **This is why the
+correlations are low** — not because the labels differ, but because the macro variables
+behind them do.
+
+**Layer 3 — Risk factor exposure.** The deepest view, and the modern one: **the asset
+class is packaging; the primitive is the risk factor.** The factors are surprises in
+growth, surprises in inflation, rates, credit, liquidity — and each class is one
+particular *mix* of them. Equities are long growth and short inflation surprise; nominal
+bonds are short both; commodities are long inflation. Which is why the classes sort
+cleanly by economic state:
+
+| | Inflation rising | Inflation falling |
+| --- | --- | --- |
+| **Growth rising** | Commodities, inflation-linked bonds | **Equities** |
+| **Growth falling** | Gold, inflation-linked bonds | **Nominal bonds** |
+
+**And every long-run return is a risk premium.** You are not buying an asset — you are
+selling insurance against one of these states and collecting the premium.
+
+#### The answer, in one sentence
+
+> Classes differ in the **nature of the claim**, which puts their returns at the mercy of
+> **different macro risks**, which makes them behave **systematically differently across
+> economic states**.
+
+This is why asset allocation works at all: **what you diversify is not names, it is
+underlying risk exposures.** Two things with different labels and the same factor mix
+diversify nothing.
+
+#### The test, and the boundary cases
 
 **The operational test.** Name a shock that moves A up and B down. If you can, they are
-different classes; if you cannot, you have one class with two tickers.
+different classes; if you cannot, you have one class with two tickers. Gold rises on
+inflation and on war; equities fall on both — so they are different classes, and the
+split is about **market behaviour**, not about what the thing is for.
 
-| Shock | Gold | Equities |
-| --- | --- | --- |
-| Inflation | up — the classic hedge | down |
-| War, crisis | up | down |
+The same test settles the arguments people actually have:
 
-Opposite signs under one shock. This is the sense in which the split is about **market
-behaviour** rather than about what the thing is for.
-
-The observable criteria are all proxies for the factor:
-
-| Criterion | Proxies the risk factor because… |
+| Case | Verdict |
 | --- | --- |
-| **Claim type** | What you own determines what can go wrong with it — the causal root |
-| **Carry** | The cash flow comes from the same mechanism the factor moves |
-| **Settlement** | Physical delivery binds the price to a real supply chain. You must deliver the oil unless you sell the contract first; equities settle by book entry at the Depository Trust |
-| **Venue and liquidity** | Where it trades bounds how fast the factor gets repriced. Real estate is the extreme — barely correlated with anything, and illiquid enough to be a problem of its own (§ 5) |
+| **High-yield credit** | Behaves like equity, because credit risk *is* equity risk in another wrapper — not cleanly its own class |
+| **Gold** | Commodity by settlement, currency by behaviour |
+| **Crypto** | A new class only if its return driver is independent of the existing ones — an open empirical question, not a marketing one |
+
+**Note (two mechanical differences that are not about risk).** **Settlement** — you must
+deliver the oil unless you sell the contract first, where equities settle by book entry
+at the Depository Trust. And **venue and liquidity** — where a thing trades bounds how
+fast its factor gets repriced; real estate is the extreme (§ 5). Both matter
+operationally; neither defines the class.
 
 ### 1.2 The roster
 
-| Class | The claim is on | Carry — earned if the price never moves | Risk driver |
-| --- | --- | --- | --- |
-| **Equities** 股票 | A firm's residual cash flows, after debt | Dividend yield | Growth, earnings, risk appetite |
-| **Fixed income** 固定收益 (FI) | A contracted stream of coupons and principal | Coupon, plus roll-down the curve | Policy rates, inflation |
-| **Credit** 信用 | The default risk carved out of a bond | Credit spread | Default probability, risk appetite |
-| **FX** 外汇 | Nothing — it is a *ratio*, the relative price of two currencies | The interest-rate **differential** | Rate differentials, central-bank policy |
-| **Commodities** 大宗商品 | A physical good | **Convenience yield** minus storage and financing | Supply shocks, inflation, geopolitics |
-| **Real estate** 房地产 | Property and the rent it produces | Net rental yield | Rates, local supply and demand |
-| **Cash** 现金 | The currency itself — the unit everything else is priced in | The risk-free rate | The policy rate |
+One row per class, read across the three layers:
 
-**Derivatives are not on this list, and that is the point.** An option, a future, a swap
-is a payoff *derived* from something else, so it cuts **across** every row: equity
-futures, bond futures, FX forwards, commodity futures. The right question about a
-derivative is always *on what?* — the wrapper is the derivative, the class is what sits
-underneath.
+| Class | Claim (L1) | Return driver (L2) | Factor mix (L3) | Carry |
+| --- | --- | --- | --- | --- |
+| **Equities** 股票 | Residual — profit after debt | Growth, earnings, risk appetite | Long growth, short inflation | Dividend yield |
+| **Fixed income** 固定收益 (FI) | Contractual — coupons and principal | Policy rates, inflation | Short growth, short inflation | Coupon, plus roll-down |
+| **Credit** 信用 | Contractual, minus default risk | Default probability, risk appetite | Long growth (equity-like) | Credit spread |
+| **FX** 外汇 | None — a *ratio* of two currencies | Rate differentials, central-bank policy | Relative rates and policy | The rate **differential** |
+| **Commodities** 大宗商品 | None — the physical good | Supply shocks, inflation | Long inflation | **Convenience yield** minus storage |
+| **Real estate** 房地产 | Rent stream, plus land scarcity | Rates, local supply and demand | Rent bond-like, appreciation equity-like | Net rental yield |
+| **Cash** 现金 | Pure time value — the unit of account | The policy rate | Short everything; the numeraire | The risk-free rate |
+
+**Derivatives are a column of this table, not a row.** An option, a future, a swap is a
+payoff *derived* from something else, so it cuts **across** every row: equity futures,
+bond futures, FX forwards, commodity futures. Class and contract form are orthogonal
+axes. The right question about a derivative is always *on what?* — the wrapper is the
+derivative, the class is the risk factor underneath.
+
+**The one real exception.** Options carry a factor the underlying lacks: **volatility**.
+A delta-hedged option has zero exposure to the price and still earns or loses on realized
+versus implied vol. But by Layer 3 that makes *volatility* a class in its own right — it
+does not make *derivatives* one.
 
 ### 1.3 A second question: can the class pay anyone?
 
@@ -576,6 +615,9 @@ $$E[M] = \frac{1}{(100)(102)} = \frac{1}{10200} \approx 0.000098$$
 | carry | 持有收益 | What the position earns if the price never moves |
 | convenience yield | 便利收益 | The benefit of holding the physical good rather than a claim on it |
 | net supply | 净供给 | Positive if the asset exists untraded; zero if every long has a matching short |
+| residual claim | 剩余求偿权 | Equity — paid last, so unbounded upside and a floor at zero |
+| contractual claim | 合同求偿权 | Fixed income — cash flows agreed in advance, capped upside, default risk |
+| risk factor | 风险因子 | Growth surprise, inflation surprise, rates, credit, liquidity — the primitives a class is built from |
 | risk premium | 风险溢价 | Compensation for bearing risk nobody can diversify away |
 | delivery | 交割 | Physical settlement obligation — what separates a commodity from a stock |
 | liquidity | 流动性 | Executable **quickly** *and* at a **good price**, at a stated size |
