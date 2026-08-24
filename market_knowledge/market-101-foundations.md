@@ -132,11 +132,9 @@ Classify by the risk factor that dominates its P&L.
 
 ## 2. Why trades happen
 
-A trade is two parties taking **opposite sides** — one buys, one sells. Each side acts on
-one of the four motives below, and **the two motives need not match**: a speculator buys
-from a switcher, a dividend buyer buys from someone who needs cash. That asymmetry is
-what keeps a market alive — at any moment some pairing of motives is there to clear the
-other side, which is why a trade happens at all.
+A trade is two parties on **opposite sides** — one buys, one sells — and their motives
+need not match: a speculator buys from a switcher, a dividend buyer from someone needing
+cash. That asymmetry is what keeps a market clearing.
 
 ### 2.1 The four motives
 
@@ -147,35 +145,16 @@ other side, which is why a trade happens at all.
 | **Ownership** | Own a piece of a company you believe in; collect **dividends** | Believe the business has turned bad |
 | **Switching** | Rotate into a better idea | Fund that rotation — money is finite |
 
-**Speculation is what people picture, and it is not the bulk of the flow.** The classic
-buy-and-hold style — Buffett's — is owning a piece of a company and taking dividends.
-Coca-Cola pays a steady dividend every quarter precisely because it has nothing left to
-invest in: everyone on Earth who could have a Coke already has one, so absent colonising
-Mars there is no market left to expand into, and the profit goes to shareholders.
-
-Pension funds and mutual funds buy for this reason, not for the speculative one. What
-they want is **capital preservation** — first, do not lose the money.
-
-Selling to switch is likelier than it looks: buying Tesla may mean selling Apple, and
-that says nothing about Apple.
+**Speculation is not the bulk of the flow.** Most buying is ownership — hold a company
+and collect dividends (Buffett), or pension and mutual funds preserving capital. Selling
+to switch is common too: buying Tesla may mean selling Apple, and that says nothing about
+Apple.
 
 ### 2.2 When a trade needs no opinion at all
 
-The four motives all require *some* opinion. A trade can also happen with none: rules
-force it — the index changes, the unwind hits a leverage limit. This is the part worth
-carrying into signal work.
-
-SPY is an ETF run by State Street holding the S&P 500 constituents at index weights. When
-a company drops out of the index:
-
-- State Street **must** liquidate its entire position in that name — not because anyone
-  judged it, but because the index says so.
-- It **must** buy the replacement, at size.
-- Every other fund tracking a similar basket does the same thing, on the same day.
-
-The result is an enormous buying or selling flow **unrelated to the balance sheet or the
-cash-flow statement**. These are huge capital movements, and they are what people mean by
-"institutional clients control the flow of the market."
+A trade can also happen with **no opinion** — rules force it. When a name leaves the S&P
+500, every index-tracking fund (led by SPY) must dump the whole position and buy the
+replacement on the same day: enormous flow unrelated to any balance sheet.
 
 → The same lesson from the other direction — forced flow from levered funds unwinding:
 [Leverage, Deleveraging, and the Time-Horizon Lesson](leverage-deleveraging-and-horizons.md).
