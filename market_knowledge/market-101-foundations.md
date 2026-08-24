@@ -22,64 +22,52 @@ different *classes* rather than being two tickers?
 Textbooks hand you the list and skip the logic. The separation works on three levels,
 each one **causing** the next.
 
-**Layer 1 — Claim structure.** The hardest, most legal distinction: *what right do you
-actually hold?* Equity is a **residual** claim — you get what is left after everyone else
-is paid, so the upside is unbounded and the floor is zero. A bond is a **contractual**
-claim — the cash flows are agreed in advance, so the upside is locked and the risk is
-default. A commodity carries **no cash-flow claim at all**; you own the physical thing,
-and the return can only come from price. Cash is pure time value.
+**Layer 1 — Claim structure.** *What right do you actually hold?* Equity is a **residual**
+claim — what is left after everyone else is paid, so unbounded upside and a floor at zero.
+A bond is a **contractual** claim — cash flows agreed in advance, so upside locked and the
+risk is default. A commodity carries **no cash-flow claim at all**: you own the thing, and
+return can only come from price. Cash is pure time value.
 
-**Layer 2 — Return driver.** Those claim structures put returns at the mercy of different
-economic variables: growth and earnings for equities, the level of rates and credit
-compensation for bonds, supply-demand and inflation for commodities. **This is why the
-correlations are low** — not because the labels differ, but because the macro variables
-behind them do.
+**Layer 2 — Return driver.** Those structures put returns at the mercy of different
+economic variables — growth and earnings for equities, rates and credit for bonds,
+supply-demand and inflation for commodities. **This is why correlations are low:** not
+because the labels differ, but because the macro variables behind them do.
 
-**Layer 3 — Risk factor exposure.** The deepest view, and the modern one: **the asset
-class is packaging; the primitive is the risk factor.** The factors are surprises in
-growth, surprises in inflation, rates, credit, liquidity — and each class is one
-particular *mix* of them. Equities are long growth and short inflation surprise; nominal
-bonds are short both; commodities are long inflation. Which is why the classes sort
-cleanly by economic state:
+**Layer 3 — Risk factor exposure.** The deepest view: **the class is packaging; the
+primitive is the risk factor** — surprises in growth, surprises in inflation, rates,
+credit, liquidity. Each class is one *mix* of them, which is why they sort by economic
+state:
 
 | | Inflation rising | Inflation falling |
 | --- | --- | --- |
 | **Growth rising** | Commodities, inflation-linked bonds | **Equities** |
 | **Growth falling** | Gold, inflation-linked bonds | **Nominal bonds** |
 
-**And every long-run return is a risk premium.** You are not buying an asset — you are
-selling insurance against one of these states and collecting the premium.
+**Every long-run return is a risk premium.** You are not buying an asset — you are selling
+insurance against one of these states and collecting the premium.
 
-#### The answer, in one sentence
+**In one sentence.**
 
 > Classes differ in the **nature of the claim**, which puts their returns at the mercy of
 > **different macro risks**, which makes them behave **systematically differently across
 > economic states**.
 
-This is why asset allocation works at all: **what you diversify is not names, it is
-underlying risk exposures.** Two things with different labels and the same factor mix
-diversify nothing.
+So **what you diversify is not names, it is risk exposures** — two labels with the same
+factor mix diversify nothing.
 
-#### The test, and the boundary cases
-
-**The operational test.** Name a shock that moves A up and B down. If you can, they are
-different classes; if you cannot, you have one class with two tickers. Gold rises on
-inflation and on war; equities fall on both — so they are different classes, and the
-split is about **market behaviour**, not about what the thing is for.
-
-The same test settles the arguments people actually have:
+**The test.** Name a shock that moves A up and B down: if you can, different classes; if
+you cannot, one class with two tickers. Gold rises on inflation and on war, equities fall
+on both. The same test settles the real arguments:
 
 | Case | Verdict |
 | --- | --- |
-| **High-yield credit** | Behaves like equity, because credit risk *is* equity risk in another wrapper — not cleanly its own class |
-| **Gold** | Commodity by settlement, currency by behaviour |
+| **High-yield credit** | Behaves like equity — credit risk *is* equity risk in another wrapper |
+| **Gold** | Commodity by settlement, currency by behaviour — classify by whichever dominates its P&L |
 | **Crypto** | A new class only if its return driver is independent of the existing ones — an open empirical question, not a marketing one |
 
-**Note (two mechanical differences that are not about risk).** **Settlement** — you must
-deliver the oil unless you sell the contract first, where equities settle by book entry
-at the Depository Trust. And **venue and liquidity** — where a thing trades bounds how
-fast its factor gets repriced; real estate is the extreme (§ 5). Both matter
-operationally; neither defines the class.
+**Note.** Two mechanical differences are *not* about risk: **settlement** (deliver the oil,
+versus book entry at the Depository Trust) and **venue** (where it trades bounds how fast
+the factor reprices — § 5). Both matter operationally; neither defines the class.
 
 ### 1.2 The roster
 
@@ -96,37 +84,29 @@ One row per class, read across the three layers:
 | **Cash** 现金 | Pure time value — the unit of account | The policy rate | Short everything; the numeraire | The risk-free rate |
 
 **Derivatives are a column of this table, not a row.** An option, a future, a swap is a
-payoff *derived* from something else, so it cuts **across** every row: equity futures,
-bond futures, FX forwards, commodity futures. Class and contract form are orthogonal
-axes. The right question about a derivative is always *on what?* — the wrapper is the
-derivative, the class is the risk factor underneath.
+payoff *derived* from something else, so it cuts across every row. Class and contract form
+are orthogonal axes, and the right question about a derivative is always *on what?*
 
-**The one real exception.** Options carry a factor the underlying lacks: **volatility**.
-A delta-hedged option has zero exposure to the price and still earns or loses on realized
-versus implied vol. But by Layer 3 that makes *volatility* a class in its own right — it
-does not make *derivatives* one.
+**The one exception.** Options carry a factor the underlying lacks: **volatility**. A
+delta-hedged option has zero price exposure and still earns or loses on realized versus
+implied vol — but by Layer 3 that makes *volatility* a class, not *derivatives*.
 
-### 1.3 A second question: can the class pay anyone?
+### 1.3 Can the class pay anyone?
 
-The risk factor says what *moves* a class. **Net supply** says whether the class can pay
-its holders anything in aggregate — ask whether the thing exists when nobody trades it.
+The risk factor says what *moves* a class. **Net supply** says whether it can pay its
+holders anything in aggregate — does the thing exist when nobody trades it?
 
 | | Positive net supply | Zero net supply |
 | --- | --- | --- |
 | **Which** | Equities, FI, credit, commodities, real estate | FX positions, and **every derivative** |
-| **Why** | Shares, bonds and barrels exist regardless; in aggregate someone must hold all of them | Every long is matched by an offsetting short — you cannot be long EURUSD without being short USD |
-| **Consequence** | The aggregate holder bears risk and can be paid for it: a **risk premium** available to everyone at once | Aggregate P&L is **exactly zero** before costs. Any premium is a *transfer* between participants, not a payment from the asset |
+| **Why** | Shares, bonds and barrels exist regardless; someone must hold all of them | Every long has an offsetting short — long EURUSD *is* short USD |
+| **So** | The aggregate holder bears risk and is paid for it: a **risk premium** available to everyone at once | Aggregate P&L is **exactly zero** before costs; any premium is a *transfer*, not a payment from the asset |
 
-This is why a fund can be short crude without anyone burning less oil: the futures
-contract is a zero-net-supply **wrapper** on a positive-net-supply good, and the two need
-not agree in size.
+Which is why a fund can be short crude without anyone burning less oil: the contract is a
+zero-net-supply **wrapper** on a positive-net-supply good, and the two need not agree in
+size.
 
 → The same zero-sum arithmetic, and why it does not mean a trade has a loser: § 7.
-
-**Note (an instrument can sit in two classes at once).** Gold is a commodity by
-settlement and a monetary asset by behaviour; a convertible bond is fixed income until
-the equity rallies; a REIT is real estate by claim and a listed equity by venue.
-Classify by the risk factor that dominates its P&L.
 
 ---
 
@@ -170,13 +150,13 @@ already**. Three beats, and the third exists because the second is slow.
 
 ### 3.1 Finding each other — the platform
 
-Two people who do not know the other exists need a venue: Amazon, Etsy or Craigslist for
-a pen; an exchange for a stock. **This is the easy half.** Matching *who* is solved by
-listing everyone in one place. Agreeing *at what price* is the hard half.
+A venue lists everyone in one place: Amazon or Craigslist for a pen, an exchange for a
+stock. **This is the easy half** — matching *who*. Agreeing *at what price* is the hard
+half.
 
 ### 3.2 Agreeing a price
 
-There is no canonical answer — four candidates, each with a defect:
+No canonical answer — four candidates, each with a defect:
 
 | Candidate | Definition | Weakness |
 | --- | --- | --- |
@@ -185,31 +165,23 @@ There is no canonical answer — four candidates, each with a defect:
 | **Fundamental price** | What the thing is worth — manufacturing cost for a pen, a DCF or multiples for a stock | A judgement, not an observation |
 | **Bid or ask** | One side's standing quote | Not fair by construction — it is one side only |
 
-So the price is **negotiated**, and it can land anywhere in the gap: a \$7 bid against a
-\$10 ask may settle at \$8 or at \$9, and nothing forces the midpoint.
+So the price is **negotiated**, and can land anywhere in the gap: a \$7 bid against a
+\$10 ask may settle at \$8 or \$9, and nothing forces the midpoint.
 
 ### 3.3 When there is no price to agree on
 
-Replace the pen with a **mystery box** and the fundamental price vanishes — nobody knows
-what it is worth. The only way to learn it is **to trade**, which is what *price
-discovery* means.
-
-- Some participants are **informed** (they know the box is worth \$10), others **naive**
-  (they think \$5).
-- The informed keep buying at \$5; more buyers push the price up; it converges to \$10,
-  and they stop.
-- **The informed traders are the mechanism** by which the price becomes right. Price
-  discovery is not a poll — it is the informed being paid to correct the naive.
+Replace the pen with a **mystery box** and the fundamental price vanishes. The only way to
+learn the price is **to trade** — that is *price discovery*. The **informed** know the box
+is worth \$10, the **naive** think \$5; the informed keep buying at \$5, buying pushes the
+price up, and it converges to \$10, where they stop. **Price discovery is not a poll — it
+is the informed being paid to correct the naive.**
 
 ### 3.4 Why it takes a market maker
 
-Even with the platform solving *who*, negotiating every single trade is far too slow. It
-is enormously better if **someone is always standing there** with a price already on the
-board — you take it or you leave it, and the trade is done in one step instead of a
-haggle.
-
-That standing willingness to buy **and** sell is the service. It is not free, and § 8 is
-what it is being paid for.
+Negotiating every single trade is far too slow. It is enormously better if **someone is
+always standing there** with a price already on the board — take it or leave it, one step
+instead of a haggle. That standing willingness to buy **and** sell is the service, and
+§ 8 is what it is being paid for.
 
 ---
 
@@ -237,10 +209,8 @@ on Robinhood with your own cash, that is the buy side.
 | **Liquidity** | Illiquid — all-or-nothing withdrawals, penalties for withdrawing early, and the fund can force capital back to you | Liquid — must create and redeem shares on demand |
 | **Fees** | High | Low |
 
-Pension funds sit further along the same axis: even more risk-averse, saving for
-retirement over decades.
-
-Prop shops and HFT firms trade **their own capital**, usually structured as partnerships.
+Pension funds sit further along the same axis — more risk-averse still, saving over
+decades. Prop shops and HFT firms trade **their own capital**, usually as partnerships.
 
 ### 4.3 Broker vs dealer — agent and principal capacity
 
