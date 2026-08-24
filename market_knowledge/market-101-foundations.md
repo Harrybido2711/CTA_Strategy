@@ -13,17 +13,72 @@
 
 ## 1. Asset classes
 
-### 1.1 What actually separates them
+### 1.1 The roster
 
-The naive answer is "different real-life uses" — commodities are goods needed in the
-physical economy (crude, wheat, cattle, gas, gold, silver), stocks are ownership,
-derivatives are functions of an underlying, real estate is real estate.
+The classes people actually name, and what each one is a claim on. **The first two columns
+are the definition; the last two are what makes the split worth having.**
 
-That answer is not wrong, but it is not the one finance cares about. **The classes are
-separated by how they behave in the market**, and the real-life differences are mostly
-upstream of that.
+| Class | The claim is on | Typical instruments | Return if nothing moves (**carry**) | Primary risk driver |
+| --- | --- | --- | --- | --- |
+| **Equities** 股票 | The residual cash flows of a firm, after debt is paid | Common stock, ETFs, index futures, single-stock options | Dividend yield | Growth, earnings, risk appetite |
+| **Fixed income / rates** 固定收益 (FI) | A contractual stream of coupons and principal | Treasuries, bond futures, interest-rate swaps | Coupon, plus roll-down the curve | Policy rates, inflation expectations |
+| **Credit** 信用 | The *default risk* carved out of a bond | Corporate bonds, CDS, credit indices | Credit spread over the risk-free rate | Default probability, risk appetite |
+| **FX** 外汇 | Nothing — it is the **relative price of two currencies** | Spot, forwards, FX futures, NDFs | The interest-rate **differential** between the two legs | Rate differentials, capital flows, central-bank policy |
+| **Commodities** 大宗商品 | A physical good | Crude, natural gas, gold, copper, wheat, cattle — spot and futures | **Convenience yield** minus storage and financing cost | Supply and demand shocks, inflation, geopolitics |
+| **Real estate** 房地产 | Physical property and the rent it produces | Direct property, REITs, mortgage securities | Net rental yield | Rates, local supply and demand |
+| **Cash / money market** 现金 | A claim on the currency itself — the unit everything else is priced in | T-bills, repo, bank deposits | The risk-free rate | The policy rate |
 
-### 1.2 The concrete difference: delivery
+**Derivatives are not a class on this list, and that is the point.** A derivative is a
+payoff *derived* from something else — an option, a future, a swap. It cuts **across**
+every row above: there are equity futures, bond futures, FX forwards, commodity futures.
+Naming "derivatives" alongside "stocks" and "commodities" as if they were peers is the
+common slip. The right question about a derivative is always *on what?* — the wrapper is
+the derivative, the asset class is what sits underneath it.
+
+### 1.2 How to tell them apart
+
+**The naive answer is "different real-life uses"** — commodities are goods the physical
+economy needs, stocks are ownership, real estate is real estate. That answer is not wrong,
+but it is downstream of the one finance cares about: **the classes are separated by how
+they behave in the market.** Gold has industrial uses and is also a monetary hedge, and
+the industrial use tells you nothing about how it trades.
+
+Six criteria do the actual separating. None is decisive alone — a class is a **cluster**
+in this space, not a definition:
+
+| Criterion | The question | What it separates cleanly |
+| --- | --- | --- |
+| **Underlying claim** | What do you actually own? | Equity (residual) vs bond (contractual) vs commodity (physical) |
+| **Carry** | What do you earn if the price never moves? | Dividend vs coupon vs convenience yield vs rate differential — sharply different in each row |
+| **Net supply** | Must *someone* hold it? | Equity, FI, commodities (positive) vs FX and derivatives (zero) — see below |
+| **Settlement** | Physical, cash, or book-entry? | Commodities vs everything else (§ 1.3) |
+| **Risk driver** | Which macro variable moves it? | **The criterion finance actually uses** (§ 1.4) |
+| **Venue and liquidity** | Exchange or OTC, and how fast can you exit? | Listed equities vs real estate and OTC credit (§ 5) |
+
+#### Net supply is the sharpest formal test
+
+Ask whether the thing exists when nobody trades it.
+
+| | Positive net supply | Zero net supply |
+| --- | --- | --- |
+| **Which** | Equities, fixed income, credit, commodities, real estate | FX positions, and **every derivative** |
+| **Why** | The shares, bonds and barrels exist regardless; in aggregate someone must hold all of them | Every long is matched by an exactly offsetting short. You cannot be long EURUSD without being short USD; every futures contract has two sides summing to zero |
+| **Consequence** | The aggregate holder bears risk and can be paid for it — a **risk premium** that exists for everyone at once | Aggregate P&L is **exactly zero** before costs. Any premium here is a *transfer* between participants, not a payment from the asset |
+
+This is also why a fund can be short crude oil without anyone burning less of it: the
+futures contract is a zero-net-supply **wrapper** on a positive-net-supply good, and the
+two need not agree in size.
+
+→ The same zero-sum arithmetic, and why it does not mean a trade has a loser: § 7.
+
+**Note (an instrument can sit in two classes at once).** Gold is a commodity by
+settlement and a monetary asset by behaviour. A convertible bond is fixed income until
+the equity rallies and then it is equity. A REIT is real estate by claim and a listed
+equity by venue. The classification is a tool for reasoning about risk, not a partition
+of the world — when an instrument straddles two rows, **classify it by the risk driver
+that dominates its P&L**.
+
+### 1.3 The concrete difference: delivery
 
 | | Commodity | Stock |
 | --- | --- | --- |
@@ -34,7 +89,7 @@ upstream of that.
 This delivery requirement is what makes a commodity intrinsically a different instrument,
 not merely a different ticker.
 
-### 1.3 The difference that matters: risk characteristics
+### 1.4 The difference that matters: risk characteristics
 
 The first thing a standard finance class teaches is that asset classes carry **different
 risk profiles** — they respond to the same shock in opposite directions.
@@ -528,6 +583,14 @@ $$E[M] = \frac{1}{(100)(102)} = \frac{1}{10200} \approx 0.000098$$
 | English | 中文 | Meaning here |
 | --- | --- | --- |
 | asset class | 资产类别 | A group of instruments sharing market behaviour and risk characteristics |
+| fixed income | 固定收益 | A contractual stream of coupons and principal — FI |
+| foreign exchange | 外汇 | FX — the relative price of two currencies, not a claim on anything |
+| credit | 信用 | The default-risk component carved out of a bond |
+| derivative | 衍生品 | A payoff derived from an underlying — a wrapper across classes, not a class |
+| carry | 持有收益 | What the position earns if the price never moves |
+| convenience yield | 便利收益 | The benefit of holding the physical good rather than a claim on it |
+| net supply | 净供给 | Positive if the asset exists untraded; zero if every long has a matching short |
+| risk premium | 风险溢价 | Compensation for bearing risk nobody can diversify away |
 | delivery | 交割 | Physical settlement obligation — what separates a commodity from a stock |
 | liquidity | 流动性 | Executable **quickly** *and* at a **good price**, at a stated size |
 | price discovery | 价格发现 | Learning the right price through trading, driven by informed participants |
