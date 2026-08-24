@@ -30,6 +30,9 @@ genuine risk exposure, hedge or size against it.
 *(outline)* — Arithmetic vs geometric return, and why compounding matters for a leveraged book.
 Volatility, and why annualizing by `√252` assumes something usually false.
 
+→ The definition being annualized, and why it is the sample sd of *log* returns rather than of
+prices: [Market 101 § 9](../market_knowledge/market-101-foundations.md).
+
 ## 3. Sharpe ratio
 
 *(outline)* — Definition, the risk-free term, the annualization convention. What it cannot see:

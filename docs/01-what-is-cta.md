@@ -146,6 +146,10 @@ A short is not selling out of thin air — the shares are borrowed before they a
 - **The broker sits in the middle,** matching the two sides and holding margin. The market for
   this is **securities lending**.
 
+→ The full mechanics beneath this — who holds the shares mid-loan, who receives the dividend,
+hard-to-borrow rates, and how a short squeeze runs away:
+[Market 101 § 10](../market_knowledge/market-101-foundations.md).
+
 ### Why the short leg is the fragile one
 
 **Claim.** For a static position, a long's loss is bounded by its outlay; a short's is not.

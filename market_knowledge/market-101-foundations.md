@@ -1,31 +1,19 @@
 # Market 101 — Structure, Volatility, and Short Selling
 
-> - **Source:** lecture transcript `GMT20260816-005926_Recording.cc.vtt`, session 1 of a
->   quant-interview preparation course. A *different* course from this repo's CTA series.
-> - **What it is:** an introductory markets session — asset classes, why people trade,
->   price discovery, buy side vs sell side, liquidity, market-maker economics — then the
->   precise definition of volatility, short-selling mechanics, and a probability review
->   closing on two interview problems.
-> - **Filed under:** market knowledge — general finance background, not part of the
->   course spine. Where a topic already has a home chapter in `docs/`, this note links
->   there rather than restating it.
+> - **Source:** lecture transcript `GMT20260816-005926_Recording.cc.vtt`, 2026-08-16.
+> - **What it is:** the foundations of how a market works — asset classes, why people
+>   trade, price discovery, buy side vs sell side, liquidity, market-maker economics —
+>   then the precise definition of volatility, short-selling mechanics, and a
+>   probability review closing on three interview problems.
+> - **Filed under:** market knowledge — general finance that holds regardless of any
+>   particular strategy.
+> - **See also:** [Leverage, Deleveraging, and the Time-Horizon Lesson](leverage-deleveraging-and-horizons.md).
 
 ---
 
-## 1. The course frame
+## 1. Asset classes
 
-| | |
-| --- | --- |
-| **Goal** | A comprehensive plan for quant-trading interviews — cover what actually appears in them |
-| **Weighting** | Heavily technical: statistics, game theory, decision-making. Some finance, for intuition and so you can hold a room with finance people |
-| **Format** | Discussion-led, not lecture-led. Lecturing reserved for the mathematical parts — you remember what you said yourself |
-| **Homework** | Optional worksheets after each session or two: recall of key definitions and formulas, then practice questions. Solutions exist but are handed out on submission, not published |
-
----
-
-## 2. Asset classes
-
-### 2.1 What actually separates them
+### 1.1 What actually separates them
 
 The naive answer is "different real-life uses" — commodities are goods needed in the
 physical economy (crude, wheat, cattle, gas, gold, silver), stocks are ownership,
@@ -35,7 +23,7 @@ That answer is not wrong, but it is not the one finance cares about. **The class
 separated by how they behave in the market**, and the real-life differences are mostly
 upstream of that.
 
-### 2.2 The concrete difference: delivery
+### 1.2 The concrete difference: delivery
 
 | | Commodity | Stock |
 | --- | --- | --- |
@@ -46,10 +34,7 @@ upstream of that.
 This delivery requirement is what makes a commodity intrinsically a different instrument,
 not merely a different ticker.
 
-→ How futures wrap this for a CTA, and why a CTA never takes delivery:
-[01 § Background](../docs/01-what-is-cta.md).
-
-### 2.3 The difference that matters: risk characteristics
+### 1.3 The difference that matters: risk characteristics
 
 The first thing a standard finance class teaches is that asset classes carry **different
 risk profiles** — they respond to the same shock in opposite directions.
@@ -60,14 +45,14 @@ risk profiles** — they respond to the same shock in opposite directions.
 | War / crisis | up | down |
 
 Real estate is the odd one: barely correlated with anything else, but **illiquid**, which
-is a separate problem entirely (§ 6). A \$65 million penthouse may take two years to sell
+is a separate problem entirely (§ 5). A \$65 million penthouse may take two years to sell
 at \$65 million; an Nvidia share sells on Robinhood in a second.
 
 ---
 
-## 3. Why anyone buys or sells
+## 2. Why anyone buys or sells
 
-### 3.1 The four motives
+### 2.1 The four motives
 
 | Motive | Buy side of it | Sell side of it |
 | --- | --- | --- |
@@ -88,7 +73,7 @@ they want is **capital preservation** — first, do not lose the money.
 Selling to switch is likelier than it looks: buying Tesla may mean selling Apple, and
 that says nothing about Apple.
 
-### 3.2 Flow that has nothing to do with the company
+### 2.2 Flow that has nothing to do with the company
 
 This is the part worth carrying into signal work.
 
@@ -109,15 +94,15 @@ cash-flow statement**. These are huge capital movements, and they are what peopl
 
 ---
 
-## 4. Price discovery
+## 3. Price discovery
 
-### 4.1 Finding a counterparty
+### 3.1 Finding a counterparty
 
 If A wants to buy and B wants to sell and neither knows the other exists, they need a
 **platform** — Amazon, Etsy, Craigslist for a pen; an exchange for a stock. That part is
 easy. Agreeing a price is the hard part.
 
-### 4.2 Which price is "the" price
+### 3.2 Which price is "the" price
 
 Four candidates, none of them canonical:
 
@@ -131,7 +116,7 @@ Four candidates, none of them canonical:
 A negotiated trade can land anywhere in between: a \$7 bid against a \$10 ask may settle
 at \$8 or \$9, and nothing forces the midpoint.
 
-### 4.3 The mystery box
+### 3.3 The mystery box
 
 Change the pen to a **mystery box** and the fundamental price disappears. The only way to
 learn the price is **to trade** — that is what *price discovery* means.
@@ -142,18 +127,18 @@ learn the price is **to trade** — that is what *price discovery* means.
   and it converges to \$10, where they stop.
 - The informed traders are the mechanism by which the price becomes right.
 
-### 4.4 Why a market maker exists
+### 3.4 Why a market maker exists
 
 Negotiating every trade is slow, even once the platform solves discovery. It is far
 better if **someone is always standing there** with a price already written on the board
 — you either take it or you don't. That standing willingness to buy and sell is the
-service; § 9 is why it gets paid for.
+service; § 8 is why it gets paid for.
 
 ---
 
-## 5. Buy side and sell side
+## 4. Buy side and sell side
 
-### 5.1 The split
+### 4.1 The split
 
 | | Buy side | Sell side |
 | --- | --- | --- |
@@ -165,10 +150,7 @@ service; § 9 is why it gets paid for.
 **Retail is on the buy side** — the point people forget. If you have ever bought a stock
 on Robinhood with your own cash, that is the buy side.
 
-→ Who else is in a CTA's market, and what each is optimising for:
-[01 § 4](../docs/01-what-is-cta.md).
-
-### 5.2 Hedge fund vs mutual fund
+### 4.2 Hedge fund vs mutual fund
 
 | | Hedge fund | Mutual fund |
 | --- | --- | --- |
@@ -183,7 +165,7 @@ retirement over decades.
 
 Prop shops and HFT firms trade **their own capital**, usually structured as partnerships.
 
-### 5.3 Broker vs dealer — agent and principal capacity
+### 4.3 Broker vs dealer — agent and principal capacity
 
 A market maker sits in the middle of the buy/sell split because which side it is on
 depends on the **capacity** it is acting in:
@@ -200,9 +182,9 @@ buy-side desks inside it.
 
 ---
 
-## 6. Liquidity
+## 5. Liquidity
 
-### 6.1 Two conditions, not one
+### 5.1 Two conditions, not one
 
 **An asset is liquid when you can execute quickly *and* at a good price.** People
 remember the first half and drop the second, and the definition collapses without it:
@@ -213,7 +195,7 @@ remember the first half and drop the second, and the definition collapses withou
 "Good price" means relative to a fair price — the last traded price, the mid, or the
 fundamental value. A bid or an ask alone is not fair; it is one-sided.
 
-### 6.2 Size is part of the definition
+### 5.2 Size is part of the definition
 
 Liquidity is stated **at a size**. Anything is liquid for one dollar of it; \$10 million
 of the same thing is a different question. Comparisons only mean something at matched
@@ -227,7 +209,7 @@ size.
 
 ---
 
-## 7. Market plumbing
+## 6. Market plumbing
 
 **Primary vs secondary market.** Primary is the first issuance of the stock — where
 investment bankers work. Secondary is every change of ownership after that — where sales
@@ -244,7 +226,7 @@ irrelevant, including for interviews.
 
 ---
 
-## 8. Motivations, and whether trading is zero-sum
+## 7. Motivations, and whether trading is zero-sum
 
 | Participant | Horizon | Objective |
 | --- | --- | --- |
@@ -269,7 +251,7 @@ objectives mean a trade need not have a winner and a loser.
 
 ---
 
-## 9. Why a market maker deserves the spread
+## 8. Why a market maker deserves the spread
 
 The challenge: if this is a no-brainer, competition should drive the price of the service
 to zero and the spread would vanish. It does not. Why?
@@ -290,13 +272,13 @@ cost of being on the wrong side of an informed trade.
 
 ---
 
-## 10. Volatility, defined correctly
+## 9. Volatility, defined correctly
 
 Everyone believes they know this one, so it is worth stating exactly. The common answer —
 "the sample standard deviation of the asset price" — is **wrong on both counts that
 matter**.
 
-### 10.1 The formula
+### 9.1 The formula
 
 Given a sample of prices $P_t$, first compute the **log return**, then take the *sample*
 standard deviation of the returns:
@@ -306,7 +288,7 @@ $$r_t = \ln \frac{P_t}{P_{t-1}}, \qquad \sigma = \text{sd}\left( \{ r_t \} \righ
 where $P_t$ is the price at $t$ and $r_t$ the log return over one period. Sample, not
 population — in Excel, `STDEV.S`.
 
-### 10.2 Why returns and not prices
+### 9.2 Why returns and not prices
 
 Take a stock priced near \$1 and one priced near \$1,000. Measured on prices the
 \$1,000 stock will *always* have the larger standard deviation, but it is not more
@@ -316,7 +298,7 @@ thousand shares and nothing about the stock changed.
 Returns put every asset on the same scale: **comparing apples to apples**. You can then
 state a stock's volatility without knowing what it costs.
 
-### 10.3 Why *log* returns
+### 9.3 Why *log* returns
 
 Simple returns do not add up. Take a stock going \$100 → \$101 → \$102:
 
@@ -326,10 +308,10 @@ Simple returns do not add up. Take a stock going \$100 → \$101 → \$102:
 | **Log** | $\ln(101/100)$ | $\ln(102/101)$ | $\ln(102/100)$ | $\ln(102/100)$ ✓ |
 
 Log returns are **additive** — the two-day return is the sum of the daily returns, with
-no change-of-base arithmetic. That additivity is the whole reason, and § 10.5 depends on
+no change-of-base arithmetic. That additivity is the whole reason, and § 9.5 depends on
 it.
 
-### 10.4 Why log-normal, and where the model breaks
+### 9.4 Why log-normal, and where the model breaks
 
 A naive model says the **price** is normally distributed — which permits a negative price.
 The fix is to model the price as **log-normal**, which cannot go negative, and that is
@@ -341,7 +323,7 @@ three-sigma moves happen far more often than that — every time a politician sa
 something. The normal distribution **heavily underestimates the tails**, so a
 heavier-tailed model is needed: Student's t, or a generalised Pareto (GPD).
 
-### 10.5 Annualizing
+### 9.5 Annualizing
 
 Volatility is quoted annualized unless stated otherwise, and the sample frequency has to
 be scaled up. Treat each day as a random variable $X_i$ and **assume IID**:
@@ -350,7 +332,7 @@ $$\text{Var}\left( \sum X_i \right) = n \text{Var}(X_i) \quad \Longrightarrow \q
 
 where $n$ is the number of periods per year. The step from the sum to $n$ times the
 variance is exactly the independence assumption — and it is only legitimate because log
-returns are additive (§ 10.3).
+returns are additive (§ 9.3).
 
 - $n \approx 252$ trading days.
 - **Mental shortcut:** use $256$ instead, since $256^{1/2} = 16$. So annual vol is
@@ -360,18 +342,14 @@ returns are additive (§ 10.3).
 *annualized* rather than *yearly*. It is a convention for putting things on one scale, not
 a claim about the year.
 
-→ The same caveat, and what it costs in practice:
-[06 § 2](../docs/06-evaluating-performance.md). Volatility clustering is the concrete
-violation: [03 § 4](../docs/03-shaping-the-lookback.md).
-
 ---
 
-## 11. Short selling
+## 10. Short selling
 
 **Definition.** Speculating on a stock without owning it — the way to profit from a fall
 rather than merely avoid a loss.
 
-### 11.1 The mechanics, step by step
+### 10.1 The mechanics, step by step
 
 Label the short seller **A**, the lender **B**, the buyer **C**.
 
@@ -387,10 +365,7 @@ Label the short seller **A**, the lender **B**, the buyer **C**.
 If the stock **rises** instead, A must buy back at \$11 or \$12 — and the loss has no
 upper bound, because a price can rise forever.
 
-→ The same mechanics in the CTA setting, and why the short leg is the fragile one:
-[01 § 3](../docs/01-what-is-cta.md).
-
-### 11.2 Who owns the stock mid-short?
+### 10.2 Who owns the stock mid-short?
 
 Between steps 3 and 5, **C owns it** — defining the owner as whoever receives the
 dividend. C bought it on the open market and is the holder of record.
@@ -398,7 +373,7 @@ dividend. C bought it on the open market and is the holder of record.
 But B's brokerage statement still shows one share, and B has no idea it was lent out. So
 the position looks like **dual ownership** of a single share.
 
-### 11.3 The dividend, and why it is a wash
+### 10.3 The dividend, and why it is a wash
 
 Only one share exists, so the company pays only one dividend — to C. B, who wants the
 dividend and did nothing wrong, does not get it.
@@ -418,7 +393,7 @@ The mechanism exists so that neither party is harmed or enriched by a dividend f
 inside a loan: the short seller would otherwise get a free \$1 from the price drop, and
 the lender would otherwise lose the \$1 for having lent.
 
-### 11.4 Short squeeze
+### 10.4 Short squeeze
 
 The feedback loop, and why it runs away:
 
@@ -442,7 +417,7 @@ share again — to person D, who shorts it again. One real share, shorted twice.
 
 That gap between shares owed and shares available is the upward pressure.
 
-### 11.5 Why short selling matters
+### 10.5 Why short selling matters
 
 - It lets people profit from a fall, rather than merely step aside.
 - It **aids price discovery** — if only holders can express a view, the price is less
@@ -451,14 +426,14 @@ That gap between shares owed and shares available is the upward pressure.
 
 ---
 
-## 12. Probability and statistics review
+## 11. Probability and statistics review
 
 Covered rapidly as a level-set. Only the points the instructor flagged as commonly
 misunderstood are recorded here; the rest is standard.
 
 | Topic | The trap flagged |
 | --- | --- |
-| **Counting principle** | Counting outcomes only works when the outcomes are **equally likely**. Textbook problems always are; interview problems often look like they are and are not — see § 13.1 |
+| **Counting principle** | Counting outcomes only works when the outcomes are **equally likely**. Textbook problems always are; interview problems often look like they are and are not — see § 12.1 |
 | **Independence of events** | $P(A \cap B) = P(A) P(B)$ is the definition |
 | **Independence of random variables** | $E[XY] = E[X] E[Y]$ is **necessary, not sufficient**. True independence needs $E[g(X) h(Y)] = E[g(X)] E[h(Y)]$ for *all* bounded continuous $g, h$ |
 | **Continuous random variables** | A continuous variable has probability **zero** of taking any particular value. A variable need be neither discrete nor continuous |
@@ -470,9 +445,9 @@ misunderstood are recorded here; the rest is standard.
 
 ---
 
-## 13. The interview problems
+## 12. The interview problems
 
-### 13.1 Grid paths, and the counting trap
+### 12.1 Grid paths, and the counting trap
 
 A 4 by 4 grid. Walk from corner A to corner B, one step per second, **right or up only**.
 
@@ -501,10 +476,10 @@ edge early spends its remaining moves on forced steps, which cost no probability
 boundary-hugging path is *more* likely than an interior one. The counting argument
 survives here only because the meeting happens at step 4, before any forcing can occur.
 
-This is the concrete case of the § 12 warning: you may only count outcomes when the
+This is the concrete case of the § 11 warning: you may only count outcomes when the
 outcomes are equally likely.
 
-### 13.2 Rolling until a six
+### 12.2 Rolling until a six
 
 **Roll a die until a 6 appears. What is the probability the sum of all rolls, including
 the 6, is even?**
@@ -519,7 +494,7 @@ Let $p$ be that probability, and condition on the first roll:
 
 $$p = \frac{1}{6} + \frac{2}{6} p + \frac{3}{6} \left( 1 - p \right) \quad \Longrightarrow \quad \frac{7}{6} p = \frac{2}{3} \quad \Longrightarrow \quad p = \frac{4}{7}$$
 
-### 13.3 Minimum spacing of 101 uniform points
+### 12.3 Minimum spacing of 101 uniform points
 
 **Sample 101 points independently from Uniform(0, 1). (a) What is the probability the
 minimum distance between any two points does not exceed 1/1000? (b) What is the expected
