@@ -6,6 +6,8 @@
 >   MACD signal works and fails.
 > - **Filed under:** market knowledge and insights — commentary on market behaviour, not
 >   a formal chapter of the course spine.
+> - **See also:** [Market 101 — Structure, Volatility, and Short Selling](market-101-foundations.md)
+>   for the underlying market structure — leverage, margin calls, and forced covering.
 
 ---
 
