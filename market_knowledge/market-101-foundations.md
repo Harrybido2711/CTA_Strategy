@@ -67,17 +67,20 @@ venue (§ 5) matter operationally, but neither is a risk factor and neither defi
 
 ### 1.2 The roster
 
-One row per class, read across the three layers:
+One row per class, read across the three layers. **The factor column is a signed
+exposure, not a verdict** — *long X* gains when X surprises upward, *short X* loses. Every
+"short" in it is a source of premium, not a defect: you are paid for holding the thing
+that hurts in the state people most fear.
 
 | Class | Claim (L1) | Return driver (L2) | Factor mix (L3) | Carry |
 | --- | --- | --- | --- | --- |
 | **Equities** 股票 | Residual — profit after debt | Growth, earnings, risk appetite | Long growth, short inflation | Dividend yield |
 | **Fixed income** 固定收益 (FI) | Contractual — coupons and principal | Policy rates, inflation | Short growth, short inflation | Coupon, plus roll-down |
 | **Credit** 信用 | Contractual, minus default risk | Default probability, risk appetite | Long growth (equity-like) | Credit spread |
-| **FX** 外汇 | None — a *ratio* of two currencies | Rate differentials, central-bank policy | Relative rates and policy | The rate **differential** |
+| **FX** 外汇 | None — a *ratio* of two currencies | Rate differentials, central-bank policy | No standalone factor — a *relative* bet; carry is short crash risk | The rate **differential** |
 | **Commodities** 大宗商品 | None — the physical good | Supply shocks, inflation | Long inflation | **Convenience yield** minus storage |
 | **Real estate** 房地产 | Rent stream, plus land scarcity | Rates, local supply and demand | Rent bond-like, appreciation equity-like | Net rental yield |
-| **Cash** 现金 | Pure time value — the unit of account | The policy rate | Short everything; the numeraire | The risk-free rate |
+| **Cash** 现金 | Pure time value — the unit of account | The policy rate | Short inflation, flat to growth — the numeraire | The risk-free rate |
 
 **Derivatives are a column of this table, not a row.** An option, a future, a swap is a
 payoff *derived* from something else, so it cuts across every row — class and contract
