@@ -14,24 +14,29 @@
 ## 1. Asset classes
 
 The names are everywhere — **equities, fixed income, FX, commodities, real estate,
-derivatives**. Naming them is not separating them. What makes two instruments belong to
-different *classes* rather than being two tickers?
+derivatives**. Naming them is not separating them. What makes two instruments different
+*classes* rather than two tickers?
 
-### 1.1 What separates them: three layers
+### 1.1 What separates them
 
-Textbooks hand you the list and skip the logic. The separation works on three levels,
-each one **causing** the next.
+Textbooks hand you the list and skip the logic. The logic is this:
 
-**Layer 1 — Claim structure.** *What right do you actually hold?* Equity is a **residual**
-claim — what is left after everyone else is paid, so unbounded upside and a floor at zero.
-A bond is a **contractual** claim — cash flows agreed in advance, so upside locked and the
-risk is default. A commodity carries **no cash-flow claim at all**: you own the thing, and
-return can only come from price. Cash is pure time value.
+> Classes differ in the **nature of the claim**, which puts their returns at the mercy of
+> **different macro risks**, which makes them behave **systematically differently across
+> economic states**.
+
+Three layers, each one causing the next.
+
+**Layer 1 — Claim structure.** *What right do you hold?* Equity is a **residual** claim —
+what is left after everyone else is paid, so unbounded upside and a floor at zero. A bond
+is **contractual** — cash flows fixed in advance, so upside locked and the risk is
+default. A commodity has **no cash-flow claim at all**: you own the thing, and return can
+only come from price.
 
 **Layer 2 — Return driver.** Those structures put returns at the mercy of different
 economic variables — growth and earnings for equities, rates and credit for bonds,
-supply-demand and inflation for commodities. **This is why correlations are low:** not
-because the labels differ, but because the macro variables behind them do.
+supply-demand and inflation for commodities. **This is why correlations are low:** not the
+labels, the macro variables behind them.
 
 **Layer 3 — Risk factor exposure.** The deepest view: **the class is packaging; the
 primitive is the risk factor** — surprises in growth, surprises in inflation, rates,
@@ -43,20 +48,12 @@ state:
 | **Growth rising** | Commodities, inflation-linked bonds | **Equities** |
 | **Growth falling** | Gold, inflation-linked bonds | **Nominal bonds** |
 
-**Every long-run return is a risk premium.** You are not buying an asset — you are selling
-insurance against one of these states and collecting the premium.
+**Every long-run return is a risk premium** — you are not buying an asset, you are selling
+insurance against one of these states and collecting the premium. So what you diversify is
+**not names but risk exposures**: two labels with the same factor mix diversify nothing.
 
-**In one sentence.**
-
-> Classes differ in the **nature of the claim**, which puts their returns at the mercy of
-> **different macro risks**, which makes them behave **systematically differently across
-> economic states**.
-
-So **what you diversify is not names, it is risk exposures** — two labels with the same
-factor mix diversify nothing.
-
-**The test.** Name a shock that moves A up and B down: if you can, different classes; if
-you cannot, one class with two tickers. Gold rises on inflation and on war, equities fall
+**The test.** Name a shock that moves A up and B down — if you can, different classes; if
+you cannot, one class with two tickers. Gold rises on inflation and on war; equities fall
 on both. The same test settles the real arguments:
 
 | Case | Verdict |
@@ -65,9 +62,8 @@ on both. The same test settles the real arguments:
 | **Gold** | Commodity by settlement, currency by behaviour — classify by whichever dominates its P&L |
 | **Crypto** | A new class only if its return driver is independent of the existing ones — an open empirical question, not a marketing one |
 
-**Note.** Two mechanical differences are *not* about risk: **settlement** (deliver the oil,
-versus book entry at the Depository Trust) and **venue** (where it trades bounds how fast
-the factor reprices — § 5). Both matter operationally; neither defines the class.
+**Note.** Settlement (deliver the oil, versus book entry at the Depository Trust) and
+venue (§ 5) matter operationally, but neither is a risk factor and neither defines a class.
 
 ### 1.2 The roster
 
@@ -84,12 +80,11 @@ One row per class, read across the three layers:
 | **Cash** 现金 | Pure time value — the unit of account | The policy rate | Short everything; the numeraire | The risk-free rate |
 
 **Derivatives are a column of this table, not a row.** An option, a future, a swap is a
-payoff *derived* from something else, so it cuts across every row. Class and contract form
-are orthogonal axes, and the right question about a derivative is always *on what?*
-
-**The one exception.** Options carry a factor the underlying lacks: **volatility**. A
+payoff *derived* from something else, so it cuts across every row — class and contract
+form are orthogonal axes, and the question about a derivative is always *on what?* The one
+exception: options carry a factor the underlying lacks, **volatility**, since a
 delta-hedged option has zero price exposure and still earns or loses on realized versus
-implied vol — but by Layer 3 that makes *volatility* a class, not *derivatives*.
+implied vol. By Layer 3 that makes *volatility* a class, not *derivatives*.
 
 ### 1.3 Can the class pay anyone?
 
@@ -103,8 +98,7 @@ holders anything in aggregate — does the thing exist when nobody trades it?
 | **So** | The aggregate holder bears risk and is paid for it: a **risk premium** available to everyone at once | Aggregate P&L is **exactly zero** before costs; any premium is a *transfer*, not a payment from the asset |
 
 Which is why a fund can be short crude without anyone burning less oil: the contract is a
-zero-net-supply **wrapper** on a positive-net-supply good, and the two need not agree in
-size.
+zero-net-supply **wrapper** on a positive-net-supply good.
 
 → The same zero-sum arithmetic, and why it does not mean a trade has a loser: § 7.
 
