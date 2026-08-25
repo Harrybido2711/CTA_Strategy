@@ -84,23 +84,8 @@ payoff *derived* from something else, so it cuts across every row — class and 
 form are orthogonal axes, and the question about a derivative is always *on what?* The one
 exception: options carry a factor the underlying lacks, **volatility**, since a
 delta-hedged option has zero price exposure and still earns or loses on realized versus
-implied vol. By Layer 3 that makes *volatility* a class, not *derivatives*.
-
-### 1.3 Can the class pay anyone?
-
-The risk factor says what *moves* a class. **Net supply** says whether it can pay its
-holders anything in aggregate — does the thing exist when nobody trades it?
-
-| | Positive net supply | Zero net supply |
-| --- | --- | --- |
-| **Which** | Equities, FI, credit, commodities, real estate | FX positions, and **every derivative** |
-| **Why** | Shares, bonds and barrels exist regardless; someone must hold all of them | Every long has an offsetting short — long EURUSD *is* short USD |
-| **So** | The aggregate holder bears risk and is paid for it: a **risk premium** available to everyone at once | Aggregate P&L is **exactly zero** before costs; any premium is a *transfer*, not a payment from the asset |
-
-Which is why a fund can be short crude without anyone burning less oil: the contract is a
-zero-net-supply **wrapper** on a positive-net-supply good.
-
-→ The same zero-sum arithmetic, and why it does not mean a trade has a loser: § 7.
+implied vol. By Layer 3 that makes *volatility* a class, not *derivatives*. A wrapper is also in
+**zero net supply**, which is the arithmetic behind § 7.
 
 ---
 
@@ -276,8 +261,26 @@ irrelevant, including for interviews.
 | Retail | Long — mostly buy and hold, despite the headlines | Wealth over decades |
 | Mutual and pension funds | Ten years | Retirement funding; capital preservation |
 
-**Is trading zero-sum?** In dollars, yes — strictly negative-sum once exchange fees are
-counted. In **utility**, no:
+**Is trading zero-sum?** Three answers, and they do not conflict.
+
+**Trading, yes** — strictly negative-sum once exchange fees are counted. Every dollar you
+make exchanging an asset that already exists is a dollar the counterparty did not make.
+
+**Holding, it depends on net supply** — does the thing exist when nobody trades it?
+
+| | Positive net supply | Zero net supply |
+| --- | --- | --- |
+| **Which** | Equities, FI, credit, commodities, real estate | FX positions, and **every derivative** |
+| **Why** | Shares, bonds and barrels exist regardless; someone must hold all of them | Every long has an offsetting short — long EURUSD *is* short USD |
+| **So** | The aggregate holder bears risk and is paid for it: a **risk premium** available to everyone at once | Aggregate P&L is **exactly zero** before costs; any premium is a *transfer*, not a payment from the asset |
+
+A positive-net-supply class is paid from **outside** the market — corporate profits,
+coupons, rent — so all its holders can be paid at once. A zero-net-supply one has no
+outside payer, so it is zero-sum by construction. This is also why a fund can be short
+crude without anyone burning less oil: the contract is a zero-net-supply **wrapper** on a
+positive-net-supply good.
+
+**In utility, no:**
 
 > You are an HFT firm and I am a long-term investor. You are happy because you captured
 > two cents of edge. I am happy because in ten years my wealth doubles. Are you happy?
