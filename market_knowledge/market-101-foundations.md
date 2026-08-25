@@ -5,6 +5,8 @@
 >   trade, price discovery, buy side vs sell side, liquidity, market-maker economics —
 >   then the precise definition of volatility, short-selling mechanics, and a
 >   probability review closing on three interview problems.
+> - **Provenance:** content is from the lecture unless a passage says otherwise. A block
+>   opening with *Added* was worked out afterwards and was **not** said in class.
 > - **Filed under:** market knowledge — general finance that holds regardless of any
 >   particular strategy.
 > - **See also:** [Leverage, Deleveraging, and the Time-Horizon Lesson](leverage-deleveraging-and-horizons.md).
@@ -18,6 +20,10 @@ derivatives**. Naming them is not separating them. What makes two instruments di
 *classes* rather than two tickers?
 
 ### 1.1 What separates them
+
+*Added, apart from the gold-versus-equities contrast below. The lecture said the classes
+behave differently and gave that one example; the three-layer frame, the state grid and
+the boundary cases are worked out here.*
 
 Textbooks hand you the list and skip the logic. The logic is this:
 
@@ -66,6 +72,9 @@ on both. The same test settles the real arguments:
 venue (§ 5) matter operationally, but neither is a risk factor and neither defines a class.
 
 ### 1.2 The roster
+
+*Added. The lecture named only commodities, stocks, derivatives and real estate, and did
+not separate the wrapper from the class.*
 
 One row per class, read across the three layers. **The factor column is a signed
 exposure, not a verdict** — *long X* gains when X surprises upward, *short X* loses. Every
@@ -270,6 +279,7 @@ irrelevant, including for interviews.
 make exchanging an asset that already exists is a dollar the counterparty did not make.
 
 **Holding, it depends on net supply** — does the thing exist when nobody trades it?
+*(Added: the lecture asserted the zero-sum answer without this argument.)*
 
 | | Positive net supply | Zero net supply |
 | --- | --- | --- |
@@ -547,8 +557,7 @@ $$p = \frac{1}{6} + \frac{2}{6} p + \frac{3}{6} \left( 1 - p \right) \quad \Long
 minimum distance between any two points does not exceed 1/1000? (b) What is the expected
 shortest distance?**
 
-*Posed in class and left unanswered — the derivation below is added here, not from the
-lecture.*
+*Added. Posed in class and left unanswered; the derivation below is worked out here.*
 
 Let $M$ be the smallest gap between adjacent order statistics. For $n$ uniform points the
 standard spacings result gives, for $0 \leq d \leq 1 / (n-1)$:
