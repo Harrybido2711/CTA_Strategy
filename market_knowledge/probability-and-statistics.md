@@ -15,64 +15,47 @@
 
 ### 1.1 The probability space
 
-A **probability space** is the triple $(\Omega, F, P)$. Four objects, one role each:
+A **probability space** is the triple $(\Omega, F, P)$ — four objects, one role each:
 
 | Symbol | What it is | Die example |
 | --- | --- | --- |
 | $\Omega$ | Every possible **outcome** | $\{1, 2, 3, 4, 5, 6\}$ |
 | $E$ | One **event** — a subset of $\Omega$ | "even" $= \{2, 4, 6\}$ |
-| $F$ | The **list of every event you may talk about** | The collection of all 64 subsets |
-| $P$ | The function that puts a number on an event | $P(\{2, 4, 6\}) = 1/2$ |
-
-The whole relationship is two lines of notation:
+| $F$ | The **list of events you may talk about** | All 64 subsets |
+| $P$ | The function putting a number on an event | $P(\{2, 4, 6\}) = 1/2$ |
 
 $$E \in F, \qquad P : F \to [0, 1]$$
 
-An event must be **on the list** before it can be given a probability, and $P$ takes its
-input **from** that list.
+**The menu.** $F$ is the menu, $E$ a dish on it, $P$ the price list. An event must be on
+the list before it can be priced, and asking the price of something off-menu is not
+expensive — it is **meaningless**. A set outside $F$ has no $P$, not a small one.
 
-**The menu.** $F$ is the menu, $E$ is a dish on it, $P$ is the price list. You can only
-order what the menu carries, and the price list only prices what the menu carries. Asking
-the price of something not on the menu is not expensive — it is **meaningless**, and a set
-outside $F$ is the same: $P$ of it is undefined, not small.
-
-So the triple reads left to right: **$\Omega$ says what can happen, $F$ says which events
-may be asked about, $P$ says how likely each of those is.** All three are needed before
-the game is specified — which faces exist, which bets are allowed, what each bet pays.
-
-**Why $F$ is not simply every subset.** When $\Omega$ is countable it can be, and you never
-think about it again. When it is uncountable it cannot: no countably-additive,
-translation-invariant probability exists on *all* subsets of $[0,1]$, so the
-non-measurable sets have to be left off the menu.
-
-**The axioms are the three questions probability has to keep askable.**
+**Why $F$ is not simply every subset.** For countable $\Omega$ it can be. For uncountable
+$\Omega$ it cannot: no countably-additive, translation-invariant probability exists on all
+subsets of $[0,1]$, so non-measurable sets stay off the menu. Its three axioms are the
+three questions probability must keep askable:
 
 | Axiom on $F$ | Keeps this askable |
 | --- | --- |
 | $\Omega \in F$ | Did **anything** happen? |
 | Closed under complement | Did $E$ **not** happen? |
-| Closed under countable union | Did **at least one** of $E_1, E_2, \ldots$ happen? |
+| Closed under **countable** union | Did **at least one** of $E_1, E_2, \ldots$ happen? Countable rather than finite, because events like "the sequence converges" need infinitely many |
 
-Countable rather than merely finite, because events like "the sequence converges" are
-built from countably many operations. $P$ carries the matching three — it lands in
-$[0,1]$, gives $\Omega$ probability 1, and is additive on disjoint events, so
-$P(A) = \sum_{\omega \in A} P(\omega)$ and two events are **mutually exclusive** when
-$A \cap B = \emptyset$.
+$P$ carries the matching three — range $[0,1]$, $P(\Omega) = 1$, additive on disjoint
+events — so $P(A) = \sum_{\omega \in A} P(\omega)$, and $A$, $B$ are **mutually exclusive**
+when $A \cap B = \emptyset$.
 
-*Added.* **$F$ is information, and that is the part that matters.** Same $\Omega$,
-different $F$:
+*Added.* **$F$ is information.** Same $\Omega$, different $F$:
 
-| What you observe of a die roll | $F$ | Can you ask "was it a 3?" |
+| You observe | $F$ | "Was it a 3?" |
 | --- | --- | --- |
 | The face | All 64 subsets | Yes |
-| Only the parity | $\emptyset$, $\{1,3,5\}$, $\{2,4,6\}$, $\Omega$ — four events | **No** — that set is not in $F$ |
+| Only the parity | $\emptyset$, $\{1,3,5\}$, $\{2,4,6\}$, $\Omega$ | **No** — that set is not in $F$ |
 
-A smaller $F$ means you know less. A **filtration** $F_t$ is a family of sigma-algebras
-growing with time — the information available at $t$ — and saying $X$ is
-$F_t$-**measurable** says exactly that $X$ is knowable at $t$. That is the formal
-statement of no look-ahead: a signal computed at $t$ must be measurable with respect to
-what was known at $t$. The lecture waved the sigma-algebra away as bookkeeping, which is
-fair for an interview and not fair for anyone working on time series.
+A smaller $F$ means you know less. A **filtration** $F_t$ grows with time — the information
+available at $t$ — and "$X$ is $F_t$-measurable" says exactly that $X$ is knowable at $t$.
+That is the formal statement of no look-ahead, and the reason the sigma-algebra is worth
+more than the bookkeeping the lecture waved it away as.
 
 ### 1.2 Counting
 
