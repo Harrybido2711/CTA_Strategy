@@ -15,21 +15,49 @@
 
 ### 1.1 The probability space
 
-A triple $(\Omega, F, P)$ is a **probability space** when:
+A **probability space** is the triple $(\Omega, F, P)$. Four objects, one role each:
 
-| Object | Is | Satisfying |
+| Symbol | What it is | Die example |
 | --- | --- | --- |
-| $\Omega$ | The **sample space** — the set of all outcomes $\omega$ | — |
-| $F$ | A **sigma-algebra** on $\Omega$ — a collection of subsets | $\Omega \in F$; closed under complement; closed under countable union |
-| $P$ | A function on $F$ | $0 \leq P(E) \leq 1$; $P(\Omega) = 1$; countably additive on disjoint sets |
+| $\Omega$ | Every possible **outcome** | $\{1, 2, 3, 4, 5, 6\}$ |
+| $E$ | One **event** — a subset of $\Omega$ | "even" $= \{2, 4, 6\}$ |
+| $F$ | The **list of every event you may talk about** | The collection of all 64 subsets |
+| $P$ | The function that puts a number on an event | $P(\{2, 4, 6\}) = 1/2$ |
 
-**What $F$ is for.** It is the collection of subsets you are *allowed* to assign a
-probability to — $\Omega$ holds outcomes, $F$ holds **events**. When $\Omega$ is countable
-you can take every subset and never think about it again. When it is uncountable you
-cannot: no countably-additive, translation-invariant probability exists on *all* subsets
-of $[0,1]$, so non-measurable sets have to be excluded. The three axioms are exactly the
-operations probability needs — ask whether anything happened, ask whether an event did
-**not** happen, ask whether **at least one** of countably many happened.
+The whole relationship is two lines of notation:
+
+$$E \in F, \qquad P : F \to [0, 1]$$
+
+An event must be **on the list** before it can be given a probability, and $P$ takes its
+input **from** that list.
+
+**The menu.** $F$ is the menu, $E$ is a dish on it, $P$ is the price list. You can only
+order what the menu carries, and the price list only prices what the menu carries. Asking
+the price of something not on the menu is not expensive — it is **meaningless**, and a set
+outside $F$ is the same: $P$ of it is undefined, not small.
+
+So the triple reads left to right: **$\Omega$ says what can happen, $F$ says which events
+may be asked about, $P$ says how likely each of those is.** All three are needed before
+the game is specified — which faces exist, which bets are allowed, what each bet pays.
+
+**Why $F$ is not simply every subset.** When $\Omega$ is countable it can be, and you never
+think about it again. When it is uncountable it cannot: no countably-additive,
+translation-invariant probability exists on *all* subsets of $[0,1]$, so the
+non-measurable sets have to be left off the menu.
+
+**The axioms are the three questions probability has to keep askable.**
+
+| Axiom on $F$ | Keeps this askable |
+| --- | --- |
+| $\Omega \in F$ | Did **anything** happen? |
+| Closed under complement | Did $E$ **not** happen? |
+| Closed under countable union | Did **at least one** of $E_1, E_2, \ldots$ happen? |
+
+Countable rather than merely finite, because events like "the sequence converges" are
+built from countably many operations. $P$ carries the matching three — it lands in
+$[0,1]$, gives $\Omega$ probability 1, and is additive on disjoint events, so
+$P(A) = \sum_{\omega \in A} P(\omega)$ and two events are **mutually exclusive** when
+$A \cap B = \emptyset$.
 
 *Added.* **$F$ is information, and that is the part that matters.** Same $\Omega$,
 different $F$:
@@ -45,13 +73,6 @@ $F_t$-**measurable** says exactly that $X$ is knowable at $t$. That is the forma
 statement of no look-ahead: a signal computed at $t$ must be measurable with respect to
 what was known at $t$. The lecture waved the sigma-algebra away as bookkeeping, which is
 fair for an interview and not fair for anyone working on time series.
-
-An **event** is a subset of $\Omega$, and $P(A) = \sum_{\omega \in A} P(\omega)$. Two
-events are **mutually exclusive** when $A \cap B = \emptyset$.
-
-**Outcome versus event.** Rolling a 1 and rolling a 2 are both outcomes *and* events.
-Rolling an even number is an event with three outcomes — 2, 4 and 6 — and it is mutually
-exclusive with the event of rolling an odd number.
 
 ### 1.2 Counting
 
