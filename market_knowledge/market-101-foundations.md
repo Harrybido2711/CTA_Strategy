@@ -3,13 +3,14 @@
 > - **Source:** lecture transcript `GMT20260816-005926_Recording.cc.vtt`, 2026-08-16.
 > - **What it is:** the foundations of how a market works — asset classes, why people
 >   trade, price discovery, buy side vs sell side, liquidity, market-maker economics —
->   then the precise definition of volatility, short-selling mechanics, and a
->   probability review closing on three interview problems.
+>   then the precise definition of volatility and short-selling mechanics. The same
+>   session's probability review lives in its own note.
 > - **Provenance:** content is from the lecture unless a passage says otherwise. A block
 >   opening with *Added* was worked out afterwards and was **not** said in class.
 > - **Filed under:** market knowledge — general finance that holds regardless of any
 >   particular strategy.
-> - **See also:** [Leverage, Deleveraging, and the Time-Horizon Lesson](leverage-deleveraging-and-horizons.md).
+> - **See also:** [Probability and Statistics for Quant Interviews](probability-and-statistics.md)
+>   for the rest of the session · [Leverage, Deleveraging, and the Time-Horizon Lesson](leverage-deleveraging-and-horizons.md).
 
 ---
 
@@ -357,28 +358,77 @@ state a stock's volatility without knowing what it costs.
 
 ### 9.3 Why *log* returns
 
-Simple returns do not add up. Take a stock going \$100 → \$101 → \$102:
+*Added. The lecture stated that log returns are additive; the base mismatch, the
+multiplication recombination, the telescoping identity and the understatement note are
+worked out here.*
+
+Simple returns do not add up — each day's return is measured against a **different
+base**. Take a stock going \$100 → \$101 → \$102:
 
 | | Day 1 → 2 | Day 2 → 3 | Sum | Actual total |
 | --- | --- | --- | --- | --- |
 | **Simple** | 1% | 0.99009% | 1.99009% | 2% ✗ |
 | **Log** | $\ln(101/100)$ | $\ln(102/101)$ | $\ln(102/100)$ | $\ln(102/100)$ ✓ |
 
-Log returns are **additive** — the two-day return is the sum of the daily returns, with
-no change-of-base arithmetic. That additivity is the whole reason, and § 9.5 depends on
-it.
+Day 1's 1% is 1% of \$100; day 2's 0.99009% is 0.99009% of \$101. Different bases, so
+the sum means nothing. The only correct way to recombine simple returns is to multiply:
+$(1 + 0.01)(1 + 0.0099009) - 1 = 0.02$ — the 2% the stock actually earned.
+
+Log returns turn that multiplication into addition. Since $\ln(ab) = \ln a + \ln b$, the
+two-day log return telescopes:
+
+$$\ln\frac{P_2}{P_0} = \ln\frac{P_2}{P_1} + \ln\frac{P_1}{P_0}$$
+
+so the multi-period return **is** the sum of the daily returns — no base to track, no
+compounding term to carry. Numerically $\ln(101/100) \approx 0.00995$ and
+$\ln(102/101) \approx 0.00985$, summing to $\approx 0.01980 = \ln(102/100)$.
+
+**Note (Additivity costs a second-order understatement).** The true two-day return is 2%,
+the log return 1.9803%. The gap is second-order: for small $r$, $\ln(1+r) \approx r$.
+The cost is negligible for daily returns, and the payoff is that § 9.5's annualization
+becomes one multiplication.
 
 ### 9.4 Why log-normal, and where the model breaks
 
-A naive model says the **price** is normally distributed — which permits a negative price.
-The fix is to model the price as **log-normal**, which cannot go negative, and that is
-exactly equivalent to saying the **return** is normal.
+*Added. The lecture gave the log-normal fix and the fat-tail objection; the
+equivalence chain, the empirical-rule numbers and the model comparison are worked
+out here.*
 
-**Then that model is wrong too.** Under a normal distribution the empirical rule
-(68 / 95 / 99.7) puts under half a percent beyond three standard deviations. In markets,
-three-sigma moves happen far more often than that — every time a politician says
-something. The normal distribution **heavily underestimates the tails**, so a
-heavier-tailed model is needed: Student's t, or a generalised Pareto (GPD).
+A naive model says the **price** is normally distributed. A normal distribution ranges
+over $(-\infty, \infty)$, so it assigns positive probability to a **negative price** —
+impossible. The fix is to model the **log price** as normal instead. Since
+$P = e^{\ln P}$ and the exponential is always positive, the price stays positive by
+construction. A random variable whose log is normal is called **log-normal**.
+
+This move is exactly equivalent to saying the **return** is normal: the log return
+$r_t = \ln P_t - \ln P_{t-1}$ is the difference of two normal log prices, hence normal
+itself — and conversely, normal returns make log price a normal random walk. One
+assumption, seen from two sides.
+
+**Then that model is wrong too.** Under a normal return the empirical rule promises:
+
+| Range | Probability |
+| --- | --- |
+| within 1σ | 68% |
+| within 2σ | 95% |
+| within 3σ | 99.7% |
+
+so a move **beyond three standard deviations** arrives under half a percent of the time
+(0.3% in total, split across both tails). In markets, three-sigma moves happen far more
+often than that — every time a politician says something. Real returns are
+**fat-tailed**: there is more mass in the extremes than a normal predicts, and the
+normal **heavily underestimates** how often the extremes arrive. A heavier-tailed model
+is needed:
+
+| Model | What it adds | What it is for |
+| --- | --- | --- |
+| **Student's t** | one extra parameter, the degrees of freedom ν | the whole return distribution — small ν means fat tails |
+| **Generalised Pareto (GPD)** | a shape parameter fitted to excesses over a threshold | only the tail, per extreme-value theory |
+
+**Note (The two remedies answer different questions).** Student's t replaces the normal
+for the **entire** distribution and is the practical workhorse. GPD deliberately throws
+away the middle and models only **how far a return exceeds a threshold** — the right
+tool when the size of the tail is all that matters, as in margin or drawdown design.
 
 ### 9.5 Annualizing
 
@@ -480,102 +530,6 @@ That gap between shares owed and shares available is the upward pressure.
 - It **aids price discovery** — if only holders can express a view, the price is less
   efficient. Negative information reaches the price through shorts.
 - It adds **liquidity** and enables **hedging**.
-
----
-
-## 11. Probability and statistics review
-
-Covered rapidly as a level-set. Only the points the instructor flagged as commonly
-misunderstood are recorded here; the rest is standard.
-
-| Topic | The trap flagged |
-| --- | --- |
-| **Counting principle** | Counting outcomes only works when the outcomes are **equally likely**. Textbook problems always are; interview problems often look like they are and are not — see § 12.1 |
-| **Independence of events** | $P(A \cap B) = P(A) P(B)$ is the definition |
-| **Independence of random variables** | $E[XY] = E[X] E[Y]$ is **necessary, not sufficient**. True independence needs $E[g(X) h(Y)] = E[g(X)] E[h(Y)]$ for *all* bounded continuous $g, h$ |
-| **Continuous random variables** | A continuous variable has probability **zero** of taking any particular value. A variable need be neither discrete nor continuous |
-| **CDF vs PDF** | The CDF always exists, for any random variable. The PDF only exists where the CDF is differentiable |
-| **Linearity of expectation** | Holds with **no** assumption about dependence or structure — the reason it is so powerful, and underrated |
-| **Iterated expectation** | $E[X] = E[E[X \mid Y]]$. Often the conditional is far easier — but the $Y$ is usually **not given in the problem**; inventing the right one is the difficulty |
-| **Conditional probability** | Tested heavily in interviews because trading *is* conditional: as information arrives, the distribution changes |
-| **Order statistics** | The CDF is in every textbook, hard to memorise, easy to re-derive on the spot — don't bother memorising |
-
----
-
-## 12. The interview problems
-
-### 12.1 Grid paths, and the counting trap
-
-A 4 by 4 grid. Walk from corner A to corner B, one step per second, **right or up only**.
-
-**Part A — how many paths?** Every path is exactly 8 steps: 4 right and 4 up. Choosing
-which 4 of the 8 are "up" fixes the path.
-
-$$\text{paths} = \left( \frac{8!}{4! 4!} \right) = 70$$
-
-**Part B — two walkers.** A second walker starts at B and moves **left or down only**.
-Each walker picks between its available moves with probability one half, and has no choice
-when only one move is legal. What is the probability they meet?
-
-- They move in lockstep, so they can only meet after **4 steps each** — on the
-  anti-diagonal. Any other square is the wrong number of moves away.
-- When they meet, their two half-paths **join into one complete A-to-B path**. So the
-  number of meeting configurations is exactly Part A's answer, 70.
-- Within its first 4 moves neither walker can be forced: forcing only begins once a
-  walker reaches an edge, which takes 4 moves, so the constraint bites on move 5 and
-  never arrives. Every one of the 8 moves is a genuine coin flip.
-
-$$P(\text{meet}) = \frac{70}{2^8} = \frac{70}{256} = \frac{35}{128}$$
-
-**The trap.** Having computed 70 in Part A, it is tempting to treat those 70 complete
-paths as equally likely under the random walk. **They are not.** A path that reaches an
-edge early spends its remaining moves on forced steps, which cost no probability — so a
-boundary-hugging path is *more* likely than an interior one. The counting argument
-survives here only because the meeting happens at step 4, before any forcing can occur.
-
-This is the concrete case of the § 11 warning: you may only count outcomes when the
-outcomes are equally likely.
-
-### 12.2 Rolling until a six
-
-**Roll a die until a 6 appears. What is the probability the sum of all rolls, including
-the 6, is even?**
-
-Let $p$ be that probability, and condition on the first roll:
-
-| First roll | Probability | Effect |
-| --- | --- | --- |
-| 6 | 1/6 | Stop. Sum is 6 — even. Success |
-| 2 or 4 | 2/6 | Even; parity unchanged; continue needing even → contributes $p$ |
-| 1, 3, or 5 | 3/6 | Odd; parity flips; continue needing **odd** → contributes $1 - p$ |
-
-$$p = \frac{1}{6} + \frac{2}{6} p + \frac{3}{6} \left( 1 - p \right) \quad \Longrightarrow \quad \frac{7}{6} p = \frac{2}{3} \quad \Longrightarrow \quad p = \frac{4}{7}$$
-
-### 12.3 Minimum spacing of 101 uniform points
-
-**Sample 101 points independently from Uniform(0, 1). (a) What is the probability the
-minimum distance between any two points does not exceed 1/1000? (b) What is the expected
-shortest distance?**
-
-*Added. Posed in class and left unanswered; the derivation below is worked out here.*
-
-Let $M$ be the smallest gap between adjacent order statistics. For $n$ uniform points the
-standard spacings result gives, for $0 \leq d \leq 1 / (n-1)$:
-
-$$P(M > d) = \left( 1 - (n-1) d \right)^n$$
-
-**(a)** With $n = 101$ and $d = 1/1000$:
-
-$$P(M > 0.001) = \left( 1 - 0.1 \right)^{101} = 0.9^{101} \approx 0.0000239$$
-
-$$P(M \leq 0.001) \approx 0.99998$$
-
-Nearly certain — with 101 points the average gap is only about 1/100, so gaps an order of
-magnitude tighter are commonplace.
-
-**(b)** Integrating the survival function over $0 \leq d \leq 1/100$:
-
-$$E[M] = \frac{1}{(100)(102)} = \frac{1}{10200} \approx 0.000098$$
 
 ---
 
