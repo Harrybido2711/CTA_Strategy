@@ -246,6 +246,23 @@ $p_X(x) = P(X = x)$, the "point probabilities". Apply the same definition to a c
 variable and it returns **0 everywhere**, which is not a defect of the variable but a
 statement that point probabilities carry no information there.
 
+#### 2.2.4 PMF and PDF are the same role on opposite sides
+
+*Added.* Both answer the one question the CDF cannot: **how is the probability spread
+across the values?** The CDF only ever gives a running total, so both are the finer-grained
+description — one for each kind of variable.
+
+| | Discrete | Continuous |
+| --- | --- | --- |
+| **Coarse view** | CDF $F(x) = P(X \leq x)$ | CDF $F(x) = P(X \leq x)$ |
+| **Fine-grained view** | **PMF** $p_X(x) = P(X = x)$ | **PDF** $f_X(x)$ |
+| **Rebuilding $F$ from it** | $F(x) = \sum_{x_i \leq x} p_X(x_i)$ | $F(x) = \int_{-\infty}^{x} f_X(t) dt$ |
+| **Relation to the derivative** | None — the CDF is a staircase, so it is not differentiable | $f_X$ **is** the derivative of the CDF |
+
+The last row is the asymmetry worth carrying: on the continuous side the fine view is
+recovered from the coarse one by differentiating, and on the discrete side it is not — the
+staircase has no slope to read, only jumps, and the jump heights *are* the PMF.
+
 ---
 
 ## 3. Expectation and variance
