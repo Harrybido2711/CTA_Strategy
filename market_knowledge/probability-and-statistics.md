@@ -86,10 +86,31 @@ fair for an interview and not fair for anyone working on time series.
 A permutation is a combination followed by an ordering: $nPk = nCk \cdot k!$, because
 there are $k!$ ways to permute the chosen $k$.
 
-**Inclusion-exclusion** alternates: add the singles, subtract the pairs, add the triples,
-and so on, with $\left( \frac{N!}{r! (N-r)!} \right)$ terms at order $r$. It is worth
-knowing and rarely worth using — most interview problems have a shorter route through
-complementary counting or symmetry.
+**Inclusion-exclusion.** Add the singles, subtract the pairs, add the triples, and so on:
+
+$$P \left( E_1 \cup E_2 \cup \ldots \cup E_N \right) = \sum_{r=1}^{N} (-1)^{r+1} \sum_{i_1 < i_2 < \ldots < i_r} P \left( E_{i_1} \cap E_{i_2} \cap \ldots \cap E_{i_r} \right)$$
+
+where the inner sum at order $r$ runs over every way of choosing $r$ of the $N$ events, so
+it has $\frac{N!}{r! (N-r)!}$ terms. Written out, the first two cases are the ones you
+actually use:
+
+| $N$ | Expansion |
+| --- | --- |
+| 2 | $P(A) + P(B) - P(A \cap B)$ |
+| 3 | $P(A) + P(B) + P(C) - P(A \cap B) - P(A \cap C) - P(B \cap C) + P(A \cap B \cap C)$ |
+
+**Why the signs alternate.** Take an outcome lying in exactly $k$ of the events. Order $r$
+counts it once for each of the $\frac{k!}{r! (k-r)!}$ subsets of those $k$ it belongs to,
+so across all orders it is counted
+
+$$\sum_{r=1}^{k} (-1)^{r+1} \frac{k!}{r! (k-r)!} = 1 - (1 - 1)^k = 1$$
+
+by the binomial theorem — exactly once, which is what a probability of a union requires.
+
+**When to reach for it.** Only when the events genuinely overlap *and* the intersections
+are easy to compute — the flush-or-straight problem in § 6.1 is the case it is built for,
+since a straight flush is in both. Otherwise complementary counting or a symmetry argument
+is almost always shorter.
 
 **Counting only works when the outcomes are equally likely.** If $\Omega$ is finite and
 every outcome has probability $1 / |\Omega|$, then
