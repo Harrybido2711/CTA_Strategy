@@ -76,7 +76,7 @@ more than the bookkeeping the lecture waved it away as.
 
 | Tool                      | Count                                                                              | For                                                              |
 | ------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| **Basic principle** | $n_1 n_2 \ldots n_k$ | Length-$k$ sequences with $n_i$ choices at step $i$ |                                                                  |
+| **Basic principle**     | $n_1 n_2 \ldots n_k$                                                              | Length-$k$ sequences with $n_i$ choices at step $i$              |
 | **Combination**     | $\frac{n!}{(n-k)! k!}$                                                           | Choosing $k$ of $n$, order **irrelevant** — committees |
 | **Permutation**     | $\frac{n!}{(n-k)!}$                                                              | Arranging $k$ of $n$, order **matters**                 |
 | **With repeats**    | $\frac{n!}{n_1! n_2! \ldots n_k!}$                                               | Permuting $n$ objects of which $n_1$ are alike, etc.          |
