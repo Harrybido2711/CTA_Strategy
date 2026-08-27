@@ -1,0 +1,11 @@
+{
+  // The markdown table formatter reflows pipe alignment on save. On these notes it
+  // deletes the space before inline markers ("possible **outcome**" -> "possible**outcome**",
+  // which renders as "possibleoutcome") and appends stray empty cells that break the
+  // column count. Leave markdown alone.
+  "[markdown]": {
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false
+  }
+}
