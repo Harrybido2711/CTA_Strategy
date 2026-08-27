@@ -23,8 +23,28 @@ A triple $(\Omega, F, P)$ is a **probability space** when:
 | $F$ | A **sigma-algebra** on $\Omega$ — a collection of subsets | $\Omega \in F$; closed under complement; closed under countable union |
 | $P$ | A function on $F$ | $0 \leq P(E) \leq 1$; $P(\Omega) = 1$; countably additive on disjoint sets |
 
-The sigma-algebra "does not have to mean anything" for interview purposes — it is the
-bookkeeping that makes the measure well defined.
+**What $F$ is for.** It is the collection of subsets you are *allowed* to assign a
+probability to — $\Omega$ holds outcomes, $F$ holds **events**. When $\Omega$ is countable
+you can take every subset and never think about it again. When it is uncountable you
+cannot: no countably-additive, translation-invariant probability exists on *all* subsets
+of $[0,1]$, so non-measurable sets have to be excluded. The three axioms are exactly the
+operations probability needs — ask whether anything happened, ask whether an event did
+**not** happen, ask whether **at least one** of countably many happened.
+
+*Added.* **$F$ is information, and that is the part that matters.** Same $\Omega$,
+different $F$:
+
+| What you observe of a die roll | $F$ | Can you ask "was it a 3?" |
+| --- | --- | --- |
+| The face | All 64 subsets | Yes |
+| Only the parity | $\emptyset$, $\{1,3,5\}$, $\{2,4,6\}$, $\Omega$ — four events | **No** — that set is not in $F$ |
+
+A smaller $F$ means you know less. A **filtration** $F_t$ is a family of sigma-algebras
+growing with time — the information available at $t$ — and saying $X$ is
+$F_t$-**measurable** says exactly that $X$ is knowable at $t$. That is the formal
+statement of no look-ahead: a signal computed at $t$ must be measurable with respect to
+what was known at $t$. The lecture waved the sigma-algebra away as bookkeeping, which is
+fair for an interview and not fair for anyone working on time series.
 
 An **event** is a subset of $\Omega$, and $P(A) = \sum_{\omega \in A} P(\omega)$. Two
 events are **mutually exclusive** when $A \cap B = \emptyset$.
