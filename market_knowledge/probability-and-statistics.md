@@ -172,6 +172,17 @@ the other out.
 A **random variable** is nothing more than a function $X : \Omega \to R$. Its
 **distribution** is the collection of $P(X \in S)$ over subsets $S$ of the real line.
 
+*Added.* **Note ($P(X \leq x)$ is not a composition).** $X$ eats an outcome and returns a
+number; $P$ eats a **set**. The types do not connect, so the notation hides a step that
+pulls the condition back into $\Omega$:
+
+$$P(X \leq x) := P \left( \{ \omega \in \Omega : X(\omega) \leq x \} \right)$$
+
+Roll a die for money — $\Omega = \{1, \ldots, 6\}$ and $X(\omega)$ is **the payout**: win
+10 on an even roll, lose 5 on an odd one. Then $\{X \leq 0\}$ pulls back to the subset
+$\{1, 3, 5\}$, and it is that **set**, never the number, that $P$ is handed:
+$P(X \leq 0) = P(\{1, 3, 5\}) = 1/2$.
+
 | Type                 | When                                                                                | Example                                                         |
 | -------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | **Discrete**   | A finite or countably infinite set $S$ carries all the probability                 | A die roll; the count in the St Petersburg paradox              |
