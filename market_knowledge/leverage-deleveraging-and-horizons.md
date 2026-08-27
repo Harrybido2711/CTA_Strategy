@@ -70,7 +70,7 @@ as told in class, not audited against a specific fund's filings.
 
 - Do not act on someone else's "it's high / it's low": **their horizon is not yours**.
 - Decide your own holding period and what you can actually forecast, then act.
-- This is why the rule "**never short America**" (Buffett) exists: the same stock looks
+- This is why the rule " **never short America**" (Buffett) exists: the same stock looks
   different through a one-week lens and a twenty-year lens. Long-term strategies are a
   different strategy, not a contradiction of the short-term one.
 
