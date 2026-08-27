@@ -17,14 +17,16 @@
 
 A **probability space** is the triple $(\Omega, F, P)$ — four objects, one role each:
 
-| Symbol | What it is | Die example |
-| --- | --- | --- |
-| $\Omega$ | Every possible **outcome** | $\{1, 2, 3, 4, 5, 6\}$ |
-| $E$ | One **event** — a subset of $\Omega$ | "even" $= \{2, 4, 6\}$ |
-| $F$ | The **list of events you may talk about** | All 64 subsets |
-| $P$ | The function putting a number on an event | $P(\{2, 4, 6\}) = 1/2$ |
+| Symbol     | What it is                                     | Die example              |
+| ---------- | ---------------------------------------------- | ------------------------ |
+| $\Omega$ | Every possible**outcome**                | $\{1, 2, 3, 4, 5, 6\}$ |
+| $E$      | One**event** — a subset of $\Omega$   | "even"$= \{2, 4, 6\}$  |
+| $F$      | The**list of events you may talk about** | All 64 subsets           |
+| $P$      | The function putting a number on an event      | $P(\{2, 4, 6\}) = 1/2$ |
 
-$$E \in F, \qquad P : F \to [0, 1]$$
+$$
+E \in F, \qquad P : F \to [0, 1]
+$$
 
 **The menu.** $F$ is the menu, $E$ a dish on it, $P$ the price list. An event must be on
 the list before it can be priced, and asking the price of something off-menu is not
@@ -35,11 +37,11 @@ $\Omega$ it cannot: no countably-additive, translation-invariant probability exi
 subsets of $[0,1]$, so non-measurable sets stay off the menu. Its three axioms are the
 three questions probability must keep askable:
 
-| Axiom on $F$ | Keeps this askable |
-| --- | --- |
-| $\Omega \in F$ | Did **anything** happen? |
-| Closed under complement | Did $E$ **not** happen? |
-| Closed under **countable** union | Did **at least one** of $E_1, E_2, \ldots$ happen? Countable rather than finite, because events like "the sequence converges" need infinitely many |
+| Axiom on$F$                         | Keeps this askable                                                                                                                                        |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| $\Omega \in F$                      | Did**anything** happen?                                                                                                                             |
+| Closed under complement               | Did$E$ **not** happen?                                                                                                                            |
+| Closed under**countable** union | Did**at least one** of $E_1, E_2, \ldots$ happen? Countable rather than finite, because events like "the sequence converges" need infinitely many |
 
 $P$ carries the matching three — range $[0,1]$, $P(\Omega) = 1$, additive on disjoint
 events — so $P(A) = \sum_{\omega \in A} P(\omega)$, and $A$, $B$ are **mutually exclusive**
@@ -47,9 +49,9 @@ when $A \cap B = \emptyset$.
 
 *Added.* **$F$ is information.** Same $\Omega$, different $F$:
 
-| You observe | $F$ | "Was it a 3?" |
-| --- | --- | --- |
-| The face | All 64 subsets | Yes |
+| You observe     | $F$                                                   | "Was it a 3?"                            |
+| --------------- | ------------------------------------------------------- | ---------------------------------------- |
+| The face        | All 64 subsets                                          | Yes                                      |
 | Only the parity | $\emptyset$, $\{1,3,5\}$, $\{2,4,6\}$, $\Omega$ | **No** — that set is not in $F$ |
 
 A smaller $F$ means you know less. A **filtration** $F_t$ grows with time — the information
@@ -59,34 +61,38 @@ more than the bookkeeping the lecture waved it away as.
 
 ### 1.2 Counting
 
-| Tool | Count | For |
-| --- | --- | --- |
-| **Basic principle** | $n_1 n_2 \ldots n_k$ | Length-$k$ sequences with $n_i$ choices at step $i$ |
-| **Combination** | $\frac{n!}{(n-k)! k!}$ | Choosing $k$ of $n$, order **irrelevant** — committees |
-| **Permutation** | $\frac{n!}{(n-k)!}$ | Arranging $k$ of $n$, order **matters** |
-| **With repeats** | $\frac{n!}{n_1! n_2! \ldots n_k!}$ | Permuting $n$ objects of which $n_1$ are alike, etc. |
+| Tool                      | Count                                                                              | For                                                              |
+| ------------------------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **Basic principle** | $n_1 n_2 \ldots n_k$ | Length-$k$ sequences with $n_i$ choices at step $i$ |                                                                  |
+| **Combination**     | $\frac{n!}{(n-k)! k!}$                                                           | Choosing$k$ of $n$, order **irrelevant** — committees |
+| **Permutation**     | $\frac{n!}{(n-k)!}$                                                              | Arranging$k$ of $n$, order **matters**                 |
+| **With repeats**    | $\frac{n!}{n_1! n_2! \ldots n_k!}$                                               | Permuting$n$ objects of which $n_1$ are alike, etc.          |
 
 A permutation is a combination followed by an ordering: $nPk = nCk \cdot k!$, because
 there are $k!$ ways to permute the chosen $k$.
 
 **Inclusion-exclusion.** Add the singles, subtract the pairs, add the triples, and so on:
 
-$$P \left( E_1 \cup E_2 \cup \ldots \cup E_N \right) = \sum_{r=1}^{N} (-1)^{r+1} \sum_{i_1 < i_2 < \ldots < i_r} P \left( E_{i_1} \cap E_{i_2} \cap \ldots \cap E_{i_r} \right)$$
+$$
+P \left( E_1 \cup E_2 \cup \ldots \cup E_N \right) = \sum_{r=1}^{N} (-1)^{r+1} \sum_{i_1 < i_2 < \ldots < i_r} P \left( E_{i_1} \cap E_{i_2} \cap \ldots \cap E_{i_r} \right)
+$$
 
 where the inner sum at order $r$ runs over every way of choosing $r$ of the $N$ events, so
 it has $\frac{N!}{r! (N-r)!}$ terms. Written out, the first two cases are the ones you
 actually use:
 
-| $N$ | Expansion |
-| --- | --- |
-| 2 | $P(A) + P(B) - P(A \cap B)$ |
-| 3 | $P(A) + P(B) + P(C) - P(A \cap B) - P(A \cap C) - P(B \cap C) + P(A \cap B \cap C)$ |
+| $N$ | Expansion                                                                             |
+| ----- | ------------------------------------------------------------------------------------- |
+| 2     | $P(A) + P(B) - P(A \cap B)$                                                         |
+| 3     | $P(A) + P(B) + P(C) - P(A \cap B) - P(A \cap C) - P(B \cap C) + P(A \cap B \cap C)$ |
 
 **Why the signs alternate.** Take an outcome lying in exactly $k$ of the events. Order $r$
 counts it once for each of the $\frac{k!}{r! (k-r)!}$ subsets of those $k$ it belongs to,
 so across all orders it is counted
 
-$$\sum_{r=1}^{k} (-1)^{r+1} \frac{k!}{r! (k-r)!} = 1 - (1 - 1)^k = 1$$
+$$
+\sum_{r=1}^{k} (-1)^{r+1} \frac{k!}{r! (k-r)!} = 1 - (1 - 1)^k = 1
+$$
 
 by the binomial theorem — exactly once, which is what a probability of a union requires.
 
@@ -98,7 +104,9 @@ is almost always shorter.
 **Counting only works when the outcomes are equally likely.** If $\Omega$ is finite and
 every outcome has probability $1 / |\Omega|$, then
 
-$$P(E) = \frac{|E|}{|\Omega|}$$
+$$
+P(E) = \frac{|E|}{|\Omega|}
+$$
 
 and you may replace probability with a count. **This is the single most reliable trap in
 the set.** Textbook problems are always constructed to satisfy it; interview problems
@@ -107,7 +115,9 @@ turn out to carry unequal probabilities.
 
 ### 1.3 Conditional probability
 
-$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}$$
+$$
+P(A \mid B) = \frac{P(A \cap B)}{P(B)}
+$$
 
 Read backwards it is the more useful form: $P(A \cap B) = P(A \mid B) P(B)$ computes an
 intersection from a conditional.
@@ -115,11 +125,15 @@ intersection from a conditional.
 **Law of total probability.** For mutually exclusive $F_1, \ldots, F_n$ whose union is
 $\Omega$:
 
-$$P(E) = \sum_{i=1}^{n} P(E \mid F_i) P(F_i)$$
+$$
+P(E) = \sum_{i=1}^{n} P(E \mid F_i) P(F_i)
+$$
 
 **Bayes.** Rearranging the same two facts:
 
-$$P(F_j \mid E) = \frac{P(E \mid F_j) P(F_j)}{\sum_{i=1}^{n} P(E \mid F_i) P(F_i)}$$
+$$
+P(F_j \mid E) = \frac{P(E \mid F_j) P(F_j)}{\sum_{i=1}^{n} P(E \mid F_i) P(F_i)}
+$$
 
 **Why this is tested so heavily.** Trading is conditional in its entirety — you always
 know *something*, and the question is what that does to the distribution of everything
@@ -128,7 +142,9 @@ conditional probability is testing the shape of the job.
 
 ### 1.4 Independence of events
 
-$$P(E \cap F) = P(E) P(F) \quad \Longleftrightarrow \quad P(E \mid F) = P(E)$$
+$$
+P(E \cap F) = P(E) P(F) \quad \Longleftrightarrow \quad P(E \mid F) = P(E)
+$$
 
 Independence is symmetric. Do not confuse it with mutual exclusivity — mutually exclusive
 events with positive probability are **maximally dependent**, since one occurring rules
@@ -143,11 +159,11 @@ the other out.
 A **random variable** is nothing more than a function $X : \Omega \to R$. Its
 **distribution** is the collection of $P(X \in S)$ over subsets $S$ of the real line.
 
-| Type | When | Example |
-| --- | --- | --- |
-| **Discrete** | A finite or countably infinite set $S$ carries all the probability | A die roll; the count in the St Petersburg paradox |
-| **Continuous** | A nonnegative density $f$ exists with $P(a \leq X \leq b)$ equal to its integral | Uniform, normal |
-| **Neither** | — | Flip a coin: heads, draw from Uniform(0,1); tails, return $-1$ |
+| Type                 | When                                                                                | Example                                                         |
+| -------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| **Discrete**   | A finite or countably infinite set$S$ carries all the probability                 | A die roll; the count in the St Petersburg paradox              |
+| **Continuous** | A nonnegative density$f$ exists with $P(a \leq X \leq b)$ equal to its integral | Uniform, normal                                                 |
+| **Neither**    | —                                                                                  | Flip a coin: heads, draw from Uniform(0,1); tails, return$-1$ |
 
 **A random variable need not be one or the other.** People forget the third row.
 
@@ -159,11 +175,11 @@ interview purposes the loose version is fine.
 
 ### 2.2 CDF, PDF, PMF
 
-| | Definition | Exists when |
-| --- | --- | --- |
-| **CDF** $F_X(x)$ | $P(X \leq x)$ | **Always**, for any random variable |
-| **PDF** $p_X(x)$ | The derivative of the CDF | Only where the CDF is differentiable — for us, iff $X$ is continuous |
-| **PMF** $p_X(x)$ | $P(X = x)$ | Discrete $X$. Applied to a continuous variable it returns 0 everywhere |
+|                          | Definition                | Exists when                                                             |
+| ------------------------ | ------------------------- | ----------------------------------------------------------------------- |
+| **CDF** $F_X(x)$ | $P(X \leq x)$           | **Always**, for any random variable                               |
+| **PDF** $p_X(x)$ | The derivative of the CDF | Only where the CDF is differentiable — for us, iff$X$ is continuous  |
+| **PMF** $p_X(x)$ | $P(X = x)$              | Discrete$X$. Applied to a continuous variable it returns 0 everywhere |
 
 Every property of the CDF follows from the definition rather than being an extra
 assumption: non-decreasing, right-continuous, limit 0 at $-\infty$ and 1 at $+\infty$.
@@ -178,7 +194,9 @@ put $g(x)$ where $x$ stood.
 
 **Expectation is linear**, and this is the most underrated fact in the subject:
 
-$$E[aX + bY] = a E[X] + b E[Y]$$
+$$
+E[aX + bY] = a E[X] + b E[Y]
+$$
 
 It needs **no assumption whatsoever** — not independence, not any knowledge of the joint
 structure, not even that the variables are related. Most expectation problems that look
@@ -186,13 +204,17 @@ hard are linearity applied to a well-chosen decomposition.
 
 **Variance** and standard deviation:
 
-$$\text{Var}[X] = E \left[ (X - E[X])^2 \right] = E[X^2] - \left( E[X] \right)^2$$
+$$
+\text{Var}[X] = E \left[ (X - E[X])^2 \right] = E[X^2] - \left( E[X] \right)^2
+$$
 
 The second form is the one you compute with; the first is the one that says what it means.
 
 **Iterated expectation.**
 
-$$E[X] = E \left[ E[X \mid Y] \right]$$
+$$
+E[X] = E \left[ E[X \mid Y] \right]
+$$
 
 where the outer expectation is over $Y$. Often the conditional is far easier than the
 thing itself, and this is the whole trick. **The difficulty is that $Y$ is usually not in
@@ -206,18 +228,20 @@ $P(A) = E[P(A \mid Y)]$.
 
 **Joint, marginal, conditional.**
 
-| | What it answers |
-| --- | --- |
-| **Joint** $p_{X,Y}(x,y)$ | The probability of the pair — where the co-structure lives |
-| **Marginal** $p_X(x)$ | The distribution of $X$ alone, summing or integrating $Y$ away |
-| **Conditional** $p_{X \mid Y}(x \mid y)$ | The distribution of $X$ once $Y$ is known — the joint divided by the marginal |
+|                                                  | What it answers                                                                   |
+| ------------------------------------------------ | --------------------------------------------------------------------------------- |
+| **Joint** $p_{X,Y}(x,y)$                 | The probability of the pair — where the co-structure lives                       |
+| **Marginal** $p_X(x)$                    | The distribution of$X$ alone, summing or integrating $Y$ away                 |
+| **Conditional** $p_{X \mid Y}(x \mid y)$ | The distribution of$X$ once $Y$ is known — the joint divided by the marginal |
 
 The conditional is the one that matters for trading: information arrives, and the question
 is how the view of $X$ changes.
 
 **Covariance and correlation.**
 
-$$\text{Cov}[X,Y] = E[XY] - E[X] E[Y], \qquad \rho_{X,Y} = \frac{\text{Cov}[X,Y]}{\sigma_X \sigma_Y}$$
+$$
+\text{Cov}[X,Y] = E[XY] - E[X] E[Y], \qquad \rho_{X,Y} = \frac{\text{Cov}[X,Y]}{\sigma_X \sigma_Y}
+$$
 
 **Independence of random variables.** Four equivalent characterizations:
 
@@ -234,7 +258,9 @@ continuous pair. Zero correlation is necessary, not sufficient.
 **Order statistics.** $X_{(k)}$ is the $k$-th smallest of a sample. It is itself a random
 variable. For i.i.d. draws the maximum has CDF
 
-$$F_{X_{(n)}}(x) = \left( F_X(x) \right)^n$$
+$$
+F_{X_{(n)}}(x) = \left( F_X(x) \right)^n
+$$
 
 because all $n$ must fall below $x$. Do not memorise the general formula — it appears
 rarely and is quicker to re-derive on the spot than to recall.
@@ -252,7 +278,9 @@ A 4 by 4 grid. Walk from corner A to corner B, one step per second, **right or u
 **Part A — how many paths?** Every path is exactly 8 steps: 4 right and 4 up. Choosing
 which 4 of the 8 are "up" fixes the path.
 
-$$\text{paths} = \left( \frac{8!}{4! 4!} \right) = 70$$
+$$
+\text{paths} = \left( \frac{8!}{4! 4!} \right) = 70
+$$
 
 **Part B — two walkers.** A second walker starts at B and moves **left or down only**.
 Each walker picks between its available moves with probability one half, and has no choice
@@ -266,7 +294,9 @@ when only one move is legal. What is the probability they meet?
   walker reaches an edge, which takes 4 moves, so the constraint bites on move 5 and
   never arrives. Every one of the 8 moves is a genuine coin flip.
 
-$$P(\text{meet}) = \frac{70}{2^8} = \frac{70}{256} = \frac{35}{128}$$
+$$
+P(\text{meet}) = \frac{70}{2^8} = \frac{70}{256} = \frac{35}{128}
+$$
 
 **The trap.** Having computed 70 in Part A, it is tempting to treat those 70 complete
 paths as equally likely under the random walk. **They are not.** A path that reaches an
@@ -284,13 +314,15 @@ the 6, is even?** (Worksheet § 2, Problem 9.)
 
 Let $p$ be that probability, and condition on the first roll:
 
-| First roll | Probability | Effect |
-| --- | --- | --- |
-| 6 | 1/6 | Stop. Sum is 6 — even. Success |
-| 2 or 4 | 2/6 | Even; parity unchanged; continue needing even → contributes $p$ |
-| 1, 3, or 5 | 3/6 | Odd; parity flips; continue needing **odd** → contributes $1 - p$ |
+| First roll | Probability | Effect                                                                    |
+| ---------- | ----------- | ------------------------------------------------------------------------- |
+| 6          | 1/6         | Stop. Sum is 6 — even. Success                                           |
+| 2 or 4     | 2/6         | Even; parity unchanged; continue needing even → contributes$p$         |
+| 1, 3, or 5 | 3/6         | Odd; parity flips; continue needing**odd** → contributes $1 - p$ |
 
-$$p = \frac{1}{6} + \frac{2}{6} p + \frac{3}{6} \left( 1 - p \right) \quad \Longrightarrow \quad \frac{7}{6} p = \frac{2}{3} \quad \Longrightarrow \quad p = \frac{4}{7}$$
+$$
+p = \frac{1}{6} + \frac{2}{6} p + \frac{3}{6} \left( 1 - p \right) \quad \Longrightarrow \quad \frac{7}{6} p = \frac{2}{3} \quad \Longrightarrow \quad p = \frac{4}{7}
+$$
 
 ### 5.3 Minimum spacing of 101 uniform points
 
@@ -303,20 +335,28 @@ shortest distance?** (Worksheet § 3, Problem 10.)
 Let $M$ be the smallest gap between adjacent order statistics. For $n$ uniform points the
 standard spacings result gives, for $0 \leq d \leq 1 / (n-1)$:
 
-$$P(M > d) = \left( 1 - (n-1) d \right)^n$$
+$$
+P(M > d) = \left( 1 - (n-1) d \right)^n
+$$
 
 **(a)** With $n = 101$ and $d = 1/1000$:
 
-$$P(M > 0.001) = \left( 1 - 0.1 \right)^{101} = 0.9^{101} \approx 0.0000239$$
+$$
+P(M > 0.001) = \left( 1 - 0.1 \right)^{101} = 0.9^{101} \approx 0.0000239
+$$
 
-$$P(M \leq 0.001) \approx 0.99998$$
+$$
+P(M \leq 0.001) \approx 0.99998
+$$
 
 Nearly certain — with 101 points the average gap is only about 1/100, so gaps an order of
 magnitude tighter are commonplace.
 
 **(b)** Integrating the survival function over $0 \leq d \leq 1/100$:
 
-$$E[M] = \frac{1}{(100)(102)} = \frac{1}{10200} \approx 0.000098$$
+$$
+E[M] = \frac{1}{(100)(102)} = \frac{1}{10200} \approx 0.000098
+$$
 
 ---
 
@@ -328,55 +368,55 @@ the point. Each row names the tool the problem wants and where the difficulty si
 
 ### 6.1 Probability (worksheet § 2)
 
-| # | Problem | Wants | Where it bites |
-| --- | --- | --- | --- |
-| 1 | Poker: 8♥9♥ on a 2♥ 7♦ 10♥ flop — P(flush or straight by the river) | Counting outs over two cards, inclusion-exclusion | The flush and straight events **overlap** (straight flush); subtract once |
-| 2 | 10 people, choose 3 — P(Alice is on the committee) | Symmetry | Do not count committees; every person is equally likely |
-| 3 | Deal 4 cards — P(at least one pair), P(exactly one pair) | Complementary counting | "At least" is easy by complement; "exactly one" must exclude two pair and trips |
-| 4 | Claw machine, 4 slots from 1–5 — wild in slot 1 or slot 3? | Symmetry | The position is irrelevant. The trap is believing it is not |
-| 5 | 1000 coins, one two-headed, 10 heads in a row | **Bayes** | The prior is tiny and the likelihood ratio is $2^{10}$ — they fight |
-| 6 | Flip until the first Ace — next card A♠ or 2♠? | Symmetry | A♠ must not already have *been* the first Ace; 2♠ has no such constraint |
-| 7 | Coin with $P(H) = 0.3$ — simulate a fair coin, then a 1/3 coin | Von Neumann trick | Pair the flips: HT and TH are equally likely. The 1/3 case needs a different construction |
-| 8 | Russian roulette, **two adjacent** bullets, spin once | Conditioning on chamber position | Adjacency changes the conditional after a survived first pull. Generalise to $k$ of $n$ |
-| 9 | Roll until a 6 — P(sum even) | First-step recursion | **Worked in § 5.2** |
-| 10 | 50 good and 50 bad jelly beans, two identical boxes | Optimisation over an asymmetric split | The even split is not optimal; make one box near-certain |
-| 11 | 100 passengers, first one drunk — P(you get seat 100) | Symmetry, or recursion | The state collapses to a two-way symmetry between seat 1 and seat 100 |
-| 12 | 10 red, 20 blue, 30 green — P(≥1 blue and ≥1 green left when the reds run out) | Complementary counting on relative order | Only the **order of the last of each colour** matters; the counts of draws do not |
+| #  | Problem                                                                           | Wants                                             | Where it bites                                                                             |
+| -- | --------------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| 1  | Poker: 8♥9♥ on a 2♥ 7♦ 10♥ flop — P(flush or straight by the river)         | Counting outs over two cards, inclusion-exclusion | The flush and straight events**overlap** (straight flush); subtract once             |
+| 2  | 10 people, choose 3 — P(Alice is on the committee)                               | Symmetry                                          | Do not count committees; every person is equally likely                                    |
+| 3  | Deal 4 cards — P(at least one pair), P(exactly one pair)                         | Complementary counting                            | "At least" is easy by complement; "exactly one" must exclude two pair and trips            |
+| 4  | Claw machine, 4 slots from 1–5 — wild in slot 1 or slot 3?                      | Symmetry                                          | The position is irrelevant. The trap is believing it is not                                |
+| 5  | 1000 coins, one two-headed, 10 heads in a row                                     | **Bayes**                                   | The prior is tiny and the likelihood ratio is$2^{10}$ — they fight                      |
+| 6  | Flip until the first Ace — next card A♠ or 2♠?                                 | Symmetry                                          | A♠ must not already have*been* the first Ace; 2♠ has no such constraint                |
+| 7  | Coin with$P(H) = 0.3$ — simulate a fair coin, then a 1/3 coin                  | Von Neumann trick                                 | Pair the flips: HT and TH are equally likely. The 1/3 case needs a different construction  |
+| 8  | Russian roulette,**two adjacent** bullets, spin once                        | Conditioning on chamber position                  | Adjacency changes the conditional after a survived first pull. Generalise to$k$ of $n$ |
+| 9  | Roll until a 6 — P(sum even)                                                     | First-step recursion                              | **Worked in § 5.2**                                                                 |
+| 10 | 50 good and 50 bad jelly beans, two identical boxes                               | Optimisation over an asymmetric split             | The even split is not optimal; make one box near-certain                                   |
+| 11 | 100 passengers, first one drunk — P(you get seat 100)                            | Symmetry, or recursion                            | The state collapses to a two-way symmetry between seat 1 and seat 100                      |
+| 12 | 10 red, 20 blue, 30 green — P(≥1 blue and ≥1 green left when the reds run out) | Complementary counting on relative order          | Only the**order of the last of each colour** matters; the counts of draws do not     |
 
 ### 6.2 Statistics (worksheet § 3)
 
-| # | Problem | Wants | Where it bites |
-| --- | --- | --- | --- |
-| 1 | U[0,100] difference game — value a redraw gadget vs a swap gadget | Order statistics, expectation | Answer the "which is worth more" part by argument before computing either |
-| 2 | Die with one optional re-roll — EV of the final roll; EV of the max | Optimal stopping | The two questions have **different optimal policies** |
-| 3 | 10 balls into 10 bins — E[bins with exactly 2] | **Linearity** + binomial | Indicator per bin. The bins are dependent and linearity does not care |
-| 4 | 5 marbles, 10-step staircase, step probability $p$ — E[stopping on level 3] | Linearity + geometric | Per-marble probability first, then multiply by 5 |
-| 5 | Coin $P(H) = 0.7$, first flip T — E[flips until #H = #T] | Random-walk hitting time | The walk is **biased**, so the answer is finite; the fair-coin version is not |
-| 6 | E[rolls to get two sixes in a row] | First-step analysis / Markov chain | Two states — "no six yet" and "one six" — set up and solve |
-| 7 | Urn with $m$ red and $n$ blue, draw till one colour is gone — E[remaining] | Symmetry + linearity | Indicator on each ball being after the last of the other colour |
-| 8 | Village coin flips — expected **frequency** of tails per household | Ratio versus expectation | E[ratio] is **not** ratio of expectations. That gap is the whole problem |
-| 9 | $X_1, X_2, X_3$ i.i.d. U[0,1] — P(max > sum of the other two) | Geometric probability | Volume of a region in the unit cube |
-| 10 | 101 points from U[0,1] — min spacing | Spacings / order statistics | **Worked in § 5.3** |
-| 11 | Stick cut twice — P(the three pieces form a triangle) | Geometric probability | Triangle inequality gives three constraints on the unit square |
-| 12 | Die paying face value, re-roll on 4/5/6 | Self-referential expectation | One equation in $E$; it solves in a line |
+| #  | Problem                                                                        | Wants                              | Where it bites                                                                     |
+| -- | ------------------------------------------------------------------------------ | ---------------------------------- | ---------------------------------------------------------------------------------- |
+| 1  | U[0,100] difference game — value a redraw gadget vs a swap gadget             | Order statistics, expectation      | Answer the "which is worth more" part by argument before computing either          |
+| 2  | Die with one optional re-roll — EV of the final roll; EV of the max           | Optimal stopping                   | The two questions have**different optimal policies**                         |
+| 3  | 10 balls into 10 bins — E[bins with exactly 2]                                | **Linearity** + binomial     | Indicator per bin. The bins are dependent and linearity does not care              |
+| 4  | 5 marbles, 10-step staircase, step probability$p$ — E[stopping on level 3]  | Linearity + geometric              | Per-marble probability first, then multiply by 5                                   |
+| 5  | Coin$P(H) = 0.7$, first flip T — E[flips until #H = #T]                     | Random-walk hitting time           | The walk is**biased**, so the answer is finite; the fair-coin version is not |
+| 6  | E[rolls to get two sixes in a row]                                             | First-step analysis / Markov chain | Two states — "no six yet" and "one six" — set up and solve                       |
+| 7  | Urn with$m$ red and $n$ blue, draw till one colour is gone — E[remaining] | Symmetry + linearity               | Indicator on each ball being after the last of the other colour                    |
+| 8  | Village coin flips — expected**frequency** of tails per household       | Ratio versus expectation           | E[ratio] is**not** ratio of expectations. That gap is the whole problem      |
+| 9  | $X_1, X_2, X_3$ i.i.d. U[0,1] — P(max > sum of the other two)               | Geometric probability              | Volume of a region in the unit cube                                                |
+| 10 | 101 points from U[0,1] — min spacing                                          | Spacings / order statistics        | **Worked in § 5.3**                                                         |
+| 11 | Stick cut twice — P(the three pieces form a triangle)                         | Geometric probability              | Triangle inequality gives three constraints on the unit square                     |
+| 12 | Die paying face value, re-roll on 4/5/6                                        | Self-referential expectation       | One equation in$E$; it solves in a line                                          |
 
 ---
 
 ## Key terms (EN ↔ ZH)
 
-| English | 中文 | Meaning here |
-| --- | --- | --- |
-| sample space | 样本空间 | The set of all outcomes $\Omega$ |
-| event | 事件 | A subset of the sample space |
-| mutually exclusive | 互斥 | Empty intersection — **not** the same as independent |
-| combination / permutation | 组合 / 排列 | Order irrelevant vs order matters |
-| inclusion-exclusion | 容斥原理 | Alternating sum over intersections |
-| conditional probability | 条件概率 | The distribution once something is known |
-| law of total probability | 全概率公式 | Split by a partition and recombine |
-| Bayes' formula | 贝叶斯公式 | Invert a conditional using the prior |
-| independence | 独立 | Joint factorises for **all** bounded continuous test functions |
-| CDF / PDF / PMF | 分布函数 / 密度函数 / 概率质量函数 | Always exists / continuous only / discrete only |
-| expectation | 期望 | Probability-weighted average; **linear with no assumptions** |
-| iterated expectation | 全期望公式 | $E[X] = E[E[X \mid Y]]$ — the hard part is choosing $Y$ |
-| covariance / correlation | 协方差 / 相关系数 | Zero correlation does **not** imply independence |
-| order statistic | 次序统计量 | The $k$-th smallest of a sample; itself a random variable |
+| English                   | 中文                               | Meaning here                                                        |
+| ------------------------- | ---------------------------------- | ------------------------------------------------------------------- |
+| sample space              | 样本空间                           | The set of all outcomes$\Omega$                                   |
+| event                     | 事件                               | A subset of the sample space                                        |
+| mutually exclusive        | 互斥                               | Empty intersection —**not** the same as independent          |
+| combination / permutation | 组合 / 排列                        | Order irrelevant vs order matters                                   |
+| inclusion-exclusion       | 容斥原理                           | Alternating sum over intersections                                  |
+| conditional probability   | 条件概率                           | The distribution once something is known                            |
+| law of total probability  | 全概率公式                         | Split by a partition and recombine                                  |
+| Bayes' formula            | 贝叶斯公式                         | Invert a conditional using the prior                                |
+| independence              | 独立                               | Joint factorises for**all** bounded continuous test functions |
+| CDF / PDF / PMF           | 分布函数 / 密度函数 / 概率质量函数 | Always exists / continuous only / discrete only                     |
+| expectation               | 期望                               | Probability-weighted average;**linear with no assumptions**   |
+| iterated expectation      | 全期望公式                         | $E[X] = E[E[X \mid Y]]$ — the hard part is choosing $Y$        |
+| covariance / correlation  | 协方差 / 相关系数                  | Zero correlation does**not** imply independence               |
+| order statistic           | 次序统计量                         | The$k$-th smallest of a sample; itself a random variable          |
