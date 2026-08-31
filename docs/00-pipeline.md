@@ -1,175 +1,39 @@
 # 00 · How a Strategy Is Built
 
-This series is the record of one project: an execution-aware trend-following CTA, built from
-momentum and MACD signals over 37 daily ETF series, and then rebuilt once it became clear what the
-first version had been measuring. §1 tells that as a story — what was built, what execution took
-away, what the diagnosis was, and what the rebuild bought. §2 onward states the same journey as
-machinery: the layers, the stages, and the question each one has to answer before the next is worth
-starting.
-
 ## 1. The Story
 
-The project ran in four acts. Each was provoked by the failure of the one before it, which is why
-the order matters more than any single result in it.
+I wanted to know whether a documented edge survives the part of trading that no paper reports, so I
+built the most ordinary trend follower I could: a 21-day momentum signal and a MACD fast-minus-slow
+leg over 37 daily ETF series, sized cross-sectionally long against short, held five days as
+overlapping tranches, and run through a backtester I wrote myself so that every assumption in it was
+one I had chosen. The first version was frictionless — it traded at the same close that produced the
+signal — and its equity curve rose.
 
-| Act | What was done | What came back |
-| --- | --- | --- |
-| **I · Build it** | Momentum and MACD on 37 ETFs, sized long/short, held five days, backtested | A curve that looked like an edge |
-| **II · Cost it** | Transaction costs, slippage, one-day execution delay, turnover | Over a quarter of the return, gone |
-| **III · Diagnose it** | Rolling volume and volatility, cut into regimes, the signal re-tested inside each | The edge lived in liquid, calm markets |
-| **IV · Rebuild it** | Regime-aware features, volatility scaling, turnover control | Out-of-sample Sharpe +8 percent, annual turnover −14 percent |
+Then I charged it for trading. Transaction costs, slippage, and an execution delay that stops a
+signal dated `t` from trading before `t+1` removed **over a quarter** of the naïve return between
+them. The next question was where the surviving return had come from, so I built rolling volume and
+rolling realized volatility per asset, cut both into terciles, and re-ran the signal test inside each
+of the nine regime cells. The edge was not spread evenly: it concentrated in the high-volume,
+low-volatility cells and was close to nothing in the opposite corner — the same fact as the cost
+finding seen from the other side, since thin, violent markets are exactly where a trend signal flips
+most often and where each flip costs most.
 
-### 1.1 The question the project was built to answer
-
-Not *can I find a signal* — cross-sectional momentum has been in the public literature for thirty
-years, and finding it again proves nothing. The question was narrower and harder:
-
-**Does a documented edge survive the part of trading that no paper reports?**
-
-A published result is measured on returns. A traded result is measured on returns *minus* what it
-cost to obtain them — the commission, the spread, the price that moved between the decision and the
-fill, and the fact that a decision made at today's close cannot be acted on until tomorrow. None of
-that is exotic; all of it is left out of a first backtest, and the size of what it removes is the
-whole subject.
-
-### 1.2 Act I — a trend follower that looked like it worked
-
-**Definition (The naïve backtest).** A simulation that applies the signal to history with no
-friction: it trades at the same close that produced the signal, pays no commission and no spread,
-and assumes its own order moved no price.
-
-The strategy underneath it is ordinary, and deliberately so:
-
-| Piece | Choice |
-| --- | --- |
-| Signal | Trailing 21-day mean daily return, and a MACD fast-minus-slow leg → [03](03-shaping-the-lookback.md) |
-| Universe | 37 daily ETF series standing in for futures → [100](100-dataset.md) |
-| Sizing | Cross-sectional long/short, 150 percent long against 50 percent short → [04](04-from-signal-to-position.md) |
-| Holding period | Five days, implemented as five overlapping daily tranches |
-
-Run that way, the equity curve rises. It is the curve every naïve backtest produces, and nobody can
-trade.
-
-**Note.** A naïve backtest is not a lie; it is a question badly posed. It measures the *signal* —
-does a higher signal precede a higher return — and answers it honestly. It says nothing about the
-*strategy*, because a strategy is a signal plus the cost of acting on it, and the second term has
-been set to zero.
-
-### 1.3 Act II — execution took over a quarter of it
-
-Three assumptions were added, each modelling one way reality charges for a trade.
-
-| Assumption | What it models | Where it bites hardest |
-| --- | --- | --- |
-| **Transaction cost** | Commission plus half the bid-ask spread, per dollar traded | Anything that trades often |
-| **Slippage** | The gap between the price on the screen and the price on the fill | Thin, fast-moving markets |
-| **Execution delay** | A signal known at the close of `t` cannot trade before `t+1` | Signals whose edge decays within days |
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/execution-haircut-dark.png">
-  <img alt="A waterfall chart. The naïve backtest's cumulative return is indexed to 100; transaction costs remove 11, slippage 7 and execution delay 8, leaving 74 as traded. A bracket spans the gap between the first and last bars, marking that over a quarter of the naïve return disappears before any judgement about the market is involved" src="figures/execution-haircut-light.png">
-</picture>
-
-The measured total was **over 25 percent of the naïve return**. The split between the three is
-illustrative; the total is not.
-
-**Claim.** The drag is not a fixed haircut on the result — it is proportional to how much the book
-trades, so the faster the signal, the more of its own edge it spends.
-
-**Proof.** Write the strategy's turnover over the sample as the total absolute weight change,
-
-$$\text{TO} = \sum_t \sum_s | w_{s,t} - w_{s,t-1} |$$
-
-where $s$ indexes the asset, $t$ the date, and $w_{s,t}$ is the target weight of asset $s$ on date
-$t$ as a fraction of capital. If each dollar traded costs $\gamma$ — commission, spread and
-slippage combined — then
-
-$$\text{PnL}_{\text{net}} = \text{PnL}_{\text{gross}} - \gamma \text{TO}$$
-
-$\text{PnL}_{\text{gross}}$ is a property of the signal alone; $\gamma \text{TO}$ is a property of
-how the signal is traded. Two strategies with the same gross return and different turnover keep
-different amounts of it, and nothing about the signal's quality enters the second term.
-
-**Note (Delay is a different mechanism from cost).** Cost subtracts a known quantity. Delay does
-not subtract anything — it *changes which trade happens*, replacing the return from `t` with the
-return from `t+1`. For a signal whose edge decays over weeks the difference is small; for one that
-decays over days it can remove most of it. That is why the delay is written into the simulation as
-an explicit parameter rather than assumed away.
-
-### 1.4 Act III — the edge has an address
-
-The obvious response to Act II is to trade less. The better response is to find out *where* the
-surviving return came from, because a strategy that earns in one kind of market and bleeds in
-another has a single average return that describes neither.
-
-Two rolling measures were computed per asset and cut into terciles: 21-day mean volume $V_{s,t}$,
-standing for liquidity, and 21-day realized volatility $\sigma_{s,t}$, standing for how violent the
-tape is. That gives nine regime cells, and the signal was re-tested inside each.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/regime-map-dark.png">
-  <img alt="A three-by-three grid of regime cells: rolling volume in terciles across, rolling realized volatility in terciles up. Each cell holds the top-minus-bottom bucket spread the momentum signal delivered inside that regime, in basis points. The values rise from plus 2 in the high-volatility, low-volume cell to plus 38 in the low-volatility, high-volume cell, which is ringed and annotated as where the signal kept working" src="figures/regime-map-light.png">
-</picture>
-
-The result was monotone in both directions: the edge concentrated in **high-volume, low-volatility**
-cells and was close to nothing in the opposite corner. Two mechanisms explain it, and they are the
-same fact seen from two sides:
-
-- **Trend needs persistence.** A trend signal earns when a drift continues. High realized volatility
-  is the regime where price direction reverses inside the holding period, so the signal flips, and
-  every flip is a round trip paid for at $\gamma$ per dollar.
-- **Thin markets charge more.** Slippage and spread are widest exactly where volume is lowest, so
-  the low-volume cells carry the largest $\gamma$ *and* the least reliable drift.
-
-Act II and Act III are therefore one finding: the naïve backtest was being paid, on paper, for
-holding risk in conditions where the strategy could not actually have collected.
-
-**Note (A conditional finding is a hypothesis, not a licence).** Two axes at three buckets each is
-nine cells, and the best of nine is the one most likely to be luck. The conditional result has to
-survive the same attack as the unconditional one — out of sample, across sub-periods, and with the
-Sharpe deflated for the number of cells that were looked at. → [07](07-overfitting-and-robustness.md)
-
-### 1.5 Act IV — rebuild against the diagnosis
-
-Each change answers one line of the diagnosis. None of them is a new signal; all of them are ways
-of spending the existing signal where it works and not where it does not.
-
-| Change | The line of the diagnosis it answers | Mechanism |
-| --- | --- | --- |
-| **Regime-aware features** | The edge is concentrated in liquid, calm cells | Let the regime enter the signal — scale or condition on $V_{s,t}$ and $\sigma_{s,t}$ — rather than deleting the other days |
-| **Volatility scaling** | One weight means different risk on different days | Size on $w_{s,t} \propto \frac{x_{s,t}}{\sigma_{s,t}}$, where $x_{s,t}$ is the raw signal, so each position contributes comparable risk |
-| **Turnover control** | The drag is $\gamma \text{TO}$, and it was the turnover doing the damage | Rebalance only when the target weight has moved by at least a deadband $\eta$; a drift smaller than that cannot pay for its own round trip |
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/rebuild-scorecard-dark.png">
-  <img alt="Two panels comparing the baseline strategy with the rebuilt one. Left: out-of-sample Sharpe ratio, higher after the rebuild, marked plus 8 percent. Right: annual turnover as a multiple of book value, lower after the rebuild, marked minus 14 percent" src="figures/rebuild-scorecard-light.png">
-</picture>
-
-The rebuild raised out-of-sample Sharpe by **8 percent** and cut annual turnover by **14 percent**
-against the same baseline.
-
-**Note (Why a small number is the credible one).** An 8 percent Sharpe improvement is modest, and it
-should be. The changes did not find new information — they stopped paying for the information
-already there in the regimes where it was not worth the cost. A rebuild of that kind buys a few
-percent. A rebuild that doubles the Sharpe has almost always found a leak instead, and the turnover
-number is what makes the claim checkable: the strategy trades *less* and earns *slightly more*,
+So I rebuilt against that diagnosis rather than going looking for a new signal: regime-aware
+features, volatility scaling so each position contributes comparable risk, and a turnover control
+that rebalances only when the target has moved far enough to pay for the trade. Out-of-sample Sharpe
+rose 8 percent and annual turnover fell 14 percent against the same baseline. Both are small
+numbers, and they are the right kind of small — the strategy trades *less* and earns *slightly more*,
 which is the signature of removing cost rather than adding fit.
 
-### 1.6 What the story claims, and what it does not
-
-- **The percentages are this project's, measured on this sample.** They are not a property of trend
-  following. The chapters teach the method that produced them; they do not promise the number.
-- **The prototype in the repository is deliberately behind the story.** It runs a plain five-day
-  cross-sectional momentum and posts a near-zero Sharpe, because its job is the mechanics of the
-  chain, not the result. Measured output and its caveats live with the code, in
-  [Implementation Notes](../Backtest_prototype/Backtests.md).
-- **Five tickers still carry an unadjusted split.** Any conclusion spanning 2025-12-05 is suspect
-  until they are fixed. → [100](100-dataset.md)
+**Note.** The percentages are this project's, measured on this sample; the chapters teach the method,
+not the number. The prototype in this repository is deliberately behind the story — it runs a plain
+five-day cross-sectional momentum and posts a near-zero Sharpe, because its job is the mechanics.
+→ [Implementation Notes](../Backtest_prototype/Backtests.md)
 
 ## 2. The Chain, End to End
 
 The story above used *signal*, *prediction*, *position* and *strategy* as though they were near
-enough the same thing. They are not, and the rest of the series depends on keeping them apart.
+enough the same thing. They are not, and everything downstream depends on keeping them apart.
 
 In one line: **a model finds the pattern, a prediction states the judgement, a signal picks the
 direction, a position sizes the bet, and the backtest asks whether any of it survives.**
@@ -184,179 +48,184 @@ direction, a position sizes the bet, and the backtest asks whether any of it sur
 | **Backtest** | Apply it all to history under real constraints | A PnL series | After costs, slippage and delay |
 | **Metrics** | Judge the PnL | Sharpe, drawdown, turnover, hit rate | Sharpe 0.4, −18 percent |
 
-**Note.** Act II is entirely a statement about the *backtest* row: nothing about the prediction
-changed, and a quarter of the return went. Act IV is mostly a statement about the *position* row —
-volatility scaling and turnover control are sizing decisions, and only the regime-aware features
-reach back into the signal. That so much can be lost, and some of it won back, while the prediction
-stands almost still is the reason these layers are worth separating at all.
+**Note.** The quarter of the return that vanished was lost entirely in the *backtest* row, and most
+of what the rebuild won back was won in the *position* row. The prediction barely moved. That is the
+reason these layers are worth separating at all.
 
 ## 3. The Build Order, Step by Step
 
-Each stage does one thing, asks one question, and hands one object to the next. Read a row as: do
-the work, answer the question, and only then pass the handoff on — the question is the gate, and a
-stage that fails it is not repaired by anything downstream.
+Each stage does one thing, answers one question, and hands one object to the next. The question is
+the gate: a stage that fails it is not repaired by anything downstream.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/build-order-dark.png">
   <img alt="Eight build stages in a vertical chain, each a labelled card carrying the question it must answer, with the object it hands to the next stage named on the arrow between them — trusted data, edge confirmed, sized book, honest PnL, verdict, a diagnosis, a better signal. Stages 0 and 2 are blue as building the strategy, stages 3 to 5 green as measuring it, stages 1 and 6 violet as the signal and the rebuild, stage 7 a lighter blue as an optional extension. A violet return path runs from stage 6 back into stage 1, labelled as the second lap: regime-aware features, volatility scaling, turnover control. A right-hand column names what judges each stage" src="figures/build-order-light.png">
 </picture>
 
-| # | Stage | Act | The question it asks |
+| # | Stage | The question it asks | Hands on |
 | - | --- | --- | --- |
-| 0 | **Validate the data** | I | Can I trust a single number in this dataset? |
-| 1 | **Compute a signal** | I | Is a higher signal followed by a higher forward return? |
-| 2 | **Size the positions** | I | How much do I bet, and is the exposure what I think it is? |
-| 3 | **Simulate under execution** | II | How much of it survives costs, slippage and delay? |
-| 4 | **Evaluate** | II | Is it any good, and where exactly does it fail? |
-| 5 | **Attack the result** | III | How much is edge, and how much is search? |
-| 6 | **Rebuild against the diagnosis** | IV | Does the edge improve where the diagnosis said it would? |
-| 7 | **Try a model** | — | Does a learned prediction beat the rule? |
+| 0 | **Validate the data** | Can I trust a single number in this dataset? | Trusted data |
+| 1 | **Compute a signal** | Is a higher signal followed by a higher forward return? | Edge confirmed |
+| 2 | **Size the positions** | How much do I bet, and is the exposure what I think it is? | A sized book |
+| 3 | **Simulate under execution** | How much of it survives costs, slippage and delay? | An honest PnL |
+| 4 | **Evaluate** | Is it any good, and where exactly does it fail? | A verdict |
+| 5 | **Attack the result** | How much is edge, and how much is search? | A diagnosis |
+| 6 | **Rebuild against the diagnosis** | Does the edge improve where the diagnosis said it would? | A better signal |
+| 7 | **Try a model** | Does a learned prediction beat the rule? | — |
 
-Stage 6 is not the end of the chain but a return to its start: the diagnosis re-enters at stage 1 as
-a better signal and at stage 2 as a better-sized one, and stages 3 to 5 then run again untouched.
-That is what makes the comparison in §1.5 meaningful — what was measured moved, the measurement did
+Stage 6 is a return to the start, not an end: the diagnosis re-enters at stage 1 as a better signal
+and at stage 2 as a better-sized one, and stages 3 to 5 then run again untouched. That is what makes
+the baseline-versus-rebuild comparison mean anything — what was measured moved, the measurement did
 not.
 
-### 3.1 Stage 0 — Validate the data
+### 3.1 Stage 0 · Validate the data
 
-**What it does.** Check that the price series are continuous and corporate actions are adjusted,
-and that the forward-return target is aligned with the signal that labels it — verify a handful of
-rows by hand before trusting anything downstream. Five sector SPDRs (XLB, XLE, XLK, XLU, XLY) still
-carry an unadjusted 2-for-1 split effective 2025-12-05, so any result spanning that date is suspect
-until the split is adjusted.
+**Does.** Confirm the price series are continuous, adjust corporate actions, and hand-check that the
+forward return is aligned with the signal that labels it.
 
-**What judges it.** Continuity — no gaps, zeros or negative prices — split-adjusted consistency, and
-a hand-checked alignment between the signal at `t` and the return it labels.
+**Judged by.** No gaps, zeros or negative prices; split-adjusted consistency; an alignment verified
+on a handful of rows by eye.
 
-**What it hands on.** A record every downstream statistic can be read against. An unadjusted split
-is the largest move in the sample by construction, so a trend follower reads it as its strongest
-signal ever — and the equity curve looks *better*, not worse.
+**Note.** An unadjusted split is the largest move in the sample by construction, so a trend follower
+reads it as its strongest signal ever — and the equity curve looks *better*, not worse. Five sector
+SPDRs still carry one, effective 2025-12-05.
 
 → [100 · The Dataset](100-dataset.md)
 
-### 3.2 Stage 1 — Compute a signal
+### 3.2 Stage 1 · Compute a signal
 
-**What it does.** Turn the intuition into a number — a momentum signal is the trailing 21-day mean
-of daily returns, a MACD signal is a fast average minus a slow one — then ask whether that number
-carries information. The test is the bucket plot: rank dates by signal, file them into five ordered
-buckets G1 … G5, and plot the mean forward return each bucket went on to deliver, with the standard
-error of that mean as the error bar.
+**Does.** Turn the intuition into a number — momentum is the trailing 21-day mean of daily returns,
+MACD a fast average minus a slow one — then test whether that number carries information. The test
+is the bucket plot: rank dates by signal, file them into G1 … G5, and plot the mean forward return
+each bucket delivered with the standard error of that mean as the error bar.
 
-**What judges it.** Bucket monotonicity (G1 < G2 < … < G5), the G5 − G1 spread measured against the
-error bars, and a two-sample t-score on the head against the tail — past ±2 the separation is
-significant at the 5 percent level. Turnover matters here too, before any cost has been modelled: a
-signal you cannot act on cheaply costs more than it earns.
+**Judged by.** Bucket monotonicity, the G5 − G1 spread against its error bars, a two-sample t-score
+on head against tail, and the turnover the signal implies before any cost is modelled.
 
-**What it hands on.** Permission to size positions. This is the cheapest test in the chain, and a
-signal that fails here is rescued by nothing downstream. It is also the one place Sharpe must not
-appear: Sharpe folds the mean, the volatility and the risk-free rate into a single number you cannot
-decompose.
+**Note.** This is the cheapest test in the chain and the one place a Sharpe must not appear — it
+folds mean, volatility and financing rate into a number you cannot decompose. A signal that fails
+here is rescued by nothing downstream.
 
-→ [02 § 3.2](02-testing-a-signal.md) for the test, [03](03-shaping-the-lookback.md) for the lookback
+→ [02 § 3.2](02-testing-a-signal.md) for the test · [03](03-shaping-the-lookback.md) for the lookback
 
-### 3.3 Stage 2 — Size the positions
+### 3.3 Stage 2 · Size the positions
 
-**What it does.** Convert the signal into target weights, weights into dollar exposure, dollars into
-shares, and apply risk limits — carrying the position as a signed quantity, long or short. The two
-portfolios here size differently: Portfolio 1 longs 150 percent of the positive-momentum assets
-(equal weight) and shorts 50 percent of the negative ones; Portfolio 2 sizes by whether momentum is
-above or below the cross-sectional median, so an asset can be shorted even with positive momentum. A
-five-day holding period is implemented as overlapping portfolios, so the weights evolve smoothly as
-old signals roll off rather than jumping every fifth day.
+**Does.** Signal → target weights → dollar exposure → shares, with risk limits, carrying the
+position as a signed quantity. Portfolio 1 longs 150 percent of the positive-momentum assets and
+shorts 50 percent of the negative ones; Portfolio 2 sorts on the cross-sectional median instead, so
+an asset can be shorted with positive momentum. The five-day hold is implemented as overlapping
+tranches, so weights evolve smoothly rather than jumping every fifth day.
 
-**What judges it.** Gross exposure (about 2.0), net exposure (Portfolio 1 about +1.0, Portfolio 2
-about 0), and turnover — the $\text{TO}$ that stage 3 will charge for.
+**Judged by.** Gross exposure (about 2.0), net exposure (about +1.0 and about 0 respectively), and
+turnover — the $\text{TO}$ that stage 3 will charge for.
 
-**What it hands on.** A PnL path with a real gross and net exposure and a real cost of acting. It is
-here, at a 150/50 book, that the risk-free-rate question becomes concrete — a question the signal
-stage never had to answer.
+**Note.** At a 150/50 book the risk-free-rate question becomes concrete, which the signal stage never
+had to answer.
 
 → [04 · From Signal to Position](04-from-signal-to-position.md)
 
-### 3.4 Stage 3 — Simulate under execution
+### 3.4 Stage 3 · Simulate under execution
 
-**What it does.** Apply the sized positions to history under the constraints a real book faces: an
-execution delay (a signal dated `t` trades a day later), an approximate execution price, transaction
-costs, slippage, and the turnover the rebalancing implies. This is Act II, and it is the stage that
-separates a signal from a strategy.
+**Does.** Apply the sized positions to history under the constraints a real book faces: an execution
+delay (a signal dated `t` trades a day later), an approximate execution price, transaction costs,
+slippage, and the turnover the rebalancing implies.
 
-**What judges it.** Honesty, not goodness: check for look-ahead bias — its single entry point is the
-alignment of the forward return with the signal — and measure the drag each assumption puts on the
-raw result, separately, so you can say which one did the damage.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/execution-haircut-dark.png">
+  <img alt="A waterfall chart. The naïve backtest's cumulative return is indexed to 100; transaction costs remove 11, slippage 7 and execution delay 8, leaving 74 as traded. A bracket spans the gap between the first and last bars, marking that over a quarter of the naïve return disappears before any judgement about the market is involved" src="figures/execution-haircut-light.png">
+</picture>
 
-**What it hands on.** A PnL series that can be reduced to metrics. This is the first stage at which
-a Sharpe is even meaningful, and the first at which a leak announces itself: as an implausibly
-smooth, high-Sharpe curve.
+**Claim.** The drag is not a fixed haircut on the result — it scales with how much the book trades,
+so the faster the signal, the more of its own edge it spends.
+
+**Proof.** Write turnover as the total absolute weight change, $\text{TO} = \sum_t \sum_s | w_{s,t} - w_{s,t-1} |$,
+where $s$ indexes the asset, $t$ the date, and $w_{s,t}$ is asset $s$'s target weight on date $t$ as
+a fraction of capital. With a round-trip cost $\gamma$ per dollar traded,
+$\text{PnL}_{\text{net}} = \text{PnL}_{\text{gross}} - \gamma \text{TO}$. The first term is a
+property of the signal alone; the second is a property of how the signal is traded, and no measure
+of signal quality enters it.
+
+**Judged by.** Honesty rather than goodness: the drag from each assumption measured separately, and
+a look-ahead check whose single entry point is the alignment of the forward return with the signal.
+
+**Note (Delay is a different mechanism from cost).** Cost subtracts a known quantity. Delay
+subtracts nothing — it *changes which trade happens*, swapping the return from `t` for the return
+from `t+1`. Small for a signal that decays over weeks, most of the edge for one that decays over
+days.
 
 → [05 · Understanding Backtesting](05-understanding-backtesting.md)
 
-### 3.5 Stage 4 — Evaluate
+### 3.5 Stage 4 · Evaluate
 
-**What it does.** Reduce the PnL series to the numbers a practitioner quotes — annualized return,
-Sharpe, maximum drawdown, hit rate, turnover — and read them beside the equity curve, not instead of
-it, so a number is never separated from the path that produced it.
+**Does.** Reduce the PnL series to the numbers a practitioner quotes — annualized return, Sharpe,
+maximum drawdown, hit rate, turnover — and read them *beside* the equity curve, never instead of it.
 
-**What judges it.** The headline statistics and the drawdowns they hide: a Sharpe of 0.2 could be
-steady earnings or one great quarter followed by five years of bleeding. One number hides the time
-dimension, so the curve and its worst drawdowns are part of the judgement.
+**Judged by.** The headline statistics and the drawdowns they hide: a Sharpe of 0.2 is either steady
+earnings or one great quarter followed by five years of bleeding, and one number cannot tell you
+which.
 
-**What it hands on.** A verdict that the strategy *might* work, and — more useful — a list of the
-periods where it did not. That list is what stage 5 conditions on.
+**Note.** The useful output here is not the verdict but the list of periods where the strategy did
+not work. That list is what stage 5 conditions on.
 
 → [06 · Evaluating Performance](06-evaluating-performance.md)
 
-### 3.6 Stage 5 — Attack the result
+### 3.6 Stage 5 · Attack the result
 
-**What it does.** Ask how much of the result survives once you stop believing it: across years,
-across markets, across the parameters you searched, and — this is Act III — across regimes. Cut the
-sample by rolling volume and rolling volatility and re-run the stage 1 test inside each cell. Split
-the sample out of sample, with a purge and sometimes an embargo so the target of the last training
-rows cannot leak into validation, and deflate the Sharpe for the number of variants tried.
+**Does.** Ask how much survives once you stop believing it — across years, markets, searched
+parameters, and regimes. Cut the sample by rolling volume $V_{s,t}$ and rolling realized volatility
+$\sigma_{s,t}$, re-run the stage 1 test inside each cell, split out of sample with a purge and
+sometimes an embargo, and deflate the Sharpe for the number of variants tried.
 
-**What judges it.** Out-of-sample performance, the deflated Sharpe, parameter sensitivity — a broad
-plateau of neighbouring good parameters is more believable than a single bright cell — and whether
-the regime split is monotone rather than one lucky corner.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/regime-map-dark.png">
+  <img alt="A three-by-three grid of regime cells: rolling volume in terciles across, rolling realized volatility in terciles up. Each cell holds the top-minus-bottom bucket spread the momentum signal delivered inside that regime, in basis points. The values rise from plus 2 in the high-volatility, low-volume cell to plus 38 in the low-volatility, high-volume cell, which is ringed and annotated as where the signal kept working" src="figures/regime-map-light.png">
+</picture>
 
-**What it hands on.** Two things, and the second is the point: a baseline that has survived attack,
-and a *diagnosis* naming the conditions under which the edge exists.
+**Judged by.** Out-of-sample performance, the deflated Sharpe, parameter sensitivity — a broad
+plateau of neighbouring good parameters is more believable than one bright cell — and whether the
+regime split is monotone rather than a single lucky corner.
 
-→ [07 · Overfitting &amp; Robustness](07-overfitting-and-robustness.md),
+**Note.** A conditional finding is a hypothesis, not a licence. Two axes at three buckets each is
+nine cells, and the best of nine is the one most likely to be luck; the conditional result has to
+survive the same attack as the unconditional one.
+
+→ [07 · Overfitting &amp; Robustness](07-overfitting-and-robustness.md) ·
 [04 · Volatility Regimes](04-volatility-regimes.md)
 
-### 3.7 Stage 6 — Rebuild against the diagnosis
+### 3.7 Stage 6 · Rebuild against the diagnosis
 
-**What it does.** Spend the diagnosis. Feed the regime measures into the signal, scale positions by
-the inverse of forecast volatility, and add a deadband so a small change in the target does not
-trigger a trade that cannot pay for itself. Then run stages 2 through 5 again with nothing else
-altered.
+**Does.** Spend the diagnosis. Feed the regime measures into the signal, size on
+$w_{s,t} \propto \frac{x_{s,t}}{\sigma_{s,t}}$ so each position contributes comparable risk, and add
+a deadband $\eta$ so a target that has barely moved does not trigger a trade that cannot pay for
+itself. Then re-run stages 2 to 5 with nothing else altered.
 
-**What judges it.** Out-of-sample Sharpe and annual turnover, measured against the *same* baseline
-on the *same* split. Any comparison against a re-tuned baseline is not a comparison.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/rebuild-scorecard-dark.png">
+  <img alt="Two panels comparing the baseline strategy with the rebuilt one. Left: out-of-sample Sharpe ratio, higher after the rebuild, marked plus 8 percent. Right: annual turnover as a multiple of book value, lower after the rebuild, marked minus 14 percent" src="figures/rebuild-scorecard-light.png">
+</picture>
 
-**What it hands on.** A strategy whose improvement can be attributed to a named cause. If the Sharpe
-rises and the turnover does not fall, the diagnosis was probably not what fixed it.
+**Judged by.** Out-of-sample Sharpe and annual turnover against the *same* baseline on the *same*
+split. A comparison against a re-tuned baseline is not a comparison.
 
-**Note.** The temptation at this stage is to re-open stage 1 and search for a better signal while
-the regime work is still fresh. Every parameter tried here is a parameter stage 5 must deflate for.
-Change one thing per lap.
+**Note.** If the Sharpe rises and the turnover does not fall, the diagnosis was probably not what
+fixed it. And every extra parameter tried here is one stage 5 must deflate for — change one thing
+per lap.
 
 → [04 § 5](04-volatility-regimes.md)
 
-### 3.8 Stage 7 — Try a model
+### 3.8 Stage 7 · Try a model
 
-**What it does.** Replace the rule with a learned prediction — a regression on the same features —
-and run it through the *same* sizing, the *same* backtest, the *same* metrics. Keep prediction and
-signal apart: a **prediction** is the model's estimate of a future quantity, a **signal** is the
-long/short/flat decision made from it, and the conversion needs a trading rule — a threshold, a
-sign, a ranking. A model replaces the rule, not the chain.
+**Does.** Replace the rule with a learned prediction on the same features, then run the *same*
+sizing, backtest and metrics. Keep the two objects apart: a **prediction** estimates a future
+quantity, a **signal** is the long/short/flat decision made from it, and converting one to the other
+needs a trading rule — a threshold, a sign, a ranking. A model replaces the rule, not the chain.
 
-**What judges it.** The test IC — rank correlation between prediction and forward return, per date —
-its mean, and its stability, the mean divided by its own standard deviation. Expect predictions far
-narrower than reality: at tiny $R^2$ a 2.5 percent spread of returns yields predictions inside ±0.5
-percent, so an absolute threshold never fires. Threshold on the prediction's own quantiles instead.
+**Judged by.** The test IC — rank correlation between prediction and forward return, per date — its
+mean, and its mean divided by its own standard deviation.
 
-**What it hands on.** Closure: the model is judged exactly as the rule was, which is why the whole
-chain had to be built rule-first.
+**Note.** Expect predictions far narrower than reality: at tiny $R^2$ a 2.5 percent spread of returns
+yields predictions inside ±0.5 percent, so an absolute threshold never fires. Threshold on the
+prediction's own quantiles instead.
 
 → [09 · IC and R²](09-ic-and-r-squared.md)
 
@@ -372,10 +241,9 @@ Each layer is tested on its own terms, and passing one says nothing about the ne
 | **Robustness** | Does it persist? | Across years, markets, regimes, parameters | [07](07-overfitting-and-robustness.md), [04](04-volatility-regimes.md) |
 
 **Note (Each arrow loses candidates).** High test accuracy is not economic value; economic value is
-not profit after costs; profit after costs is not stability out of sample. A model can predict
-direction 55 percent of the time and still lose money, because the 45 percent it gets wrong are the
-larger moves, or because acting on it every day costs more than the edge — which is Act II stated as
-a general fact rather than a measurement.
+not profit after costs; profit after costs is not stability out of sample. A model can call direction
+55 percent of the time and still lose money, because the 45 percent it gets wrong are the larger
+moves — or because acting on it every day costs more than the edge.
 
 ## 5. Where Each Stage Fails
 
@@ -389,27 +257,27 @@ mistake is reading a data defect as a code bug.
 | Sizing | Exposure not what you think | Gross or net drifts from target | [04](04-from-signal-to-position.md) |
 | Simulation | Look-ahead bias | Implausibly smooth, high Sharpe | [05](05-understanding-backtesting.md) |
 | Evaluation | One number hides the path | Good Sharpe, unlivable drawdown | [06](06-evaluating-performance.md) |
-| Robustness | Parameters were searched | Result vanishes out of sample | [07](07-overfitting-and-robustness.md) |
+| Robustness | Parameters were searched | The result vanishes out of sample | [07](07-overfitting-and-robustness.md) |
 | Rebuild | The fix was fitted to the diagnosis | Sharpe rises but turnover does not fall | [07](07-overfitting-and-robustness.md) |
 | Model | Fitted to the sample | Good IC in train, none in test | Out-of-sample split |
 
 **Note.** The order is forced in one direction — you cannot evaluate before simulating, or simulate
-before sizing. There are two shortcuts. Stage 1 can be validated *without* stages 2–4, and should
-be, because it is the cheapest test in the chain. And stage 6 re-enters at stage 1 rather than
-continuing forward, which is why the second lap costs a fraction of the first.
+before sizing. Two things cut across it: stage 1 can be validated *without* stages 2–4 and should
+be, since it is the cheapest test available; and stage 6 re-enters at stage 1 rather than continuing
+forward, which is why the second lap costs a fraction of the first.
 
 ## Appendix · Notation
 
 | Symbol | Meaning | First used |
 | --- | --- | --- |
-| $s$, $t$ | The asset, and the date — as in [02](02-testing-a-signal.md) | § 1.3 |
-| $w_{s,t}$ | Target weight of asset $s$ on date $t$, as a fraction of capital | § 1.3 |
-| $x_{s,t}$ | The raw signal value for that asset on that date | § 1.5 |
-| $\text{TO}$ | Turnover — total absolute weight change over the sample | § 1.3 |
-| $\gamma$ | Round-trip cost per dollar traded: commission, spread and slippage | § 1.3 |
-| $V_{s,t}$ | Rolling 21-day mean volume, standing for liquidity | § 1.4 |
-| $\sigma_{s,t}$ | Rolling 21-day realized volatility for that asset | § 1.4 |
-| $\eta$ | Deadband — the weight change below which no trade is placed | § 1.5 |
+| $s$, $t$ | The asset, and the date — as in [02](02-testing-a-signal.md) | § 3.4 |
+| $w_{s,t}$ | Target weight of asset $s$ on date $t$, as a fraction of capital | § 3.4 |
+| $x_{s,t}$ | The raw signal value for that asset on that date | § 3.7 |
+| $\text{TO}$ | Turnover — total absolute weight change over the sample | § 3.3 |
+| $\gamma$ | Round-trip cost per dollar traded: commission, spread and slippage | § 3.4 |
+| $V_{s,t}$ | Rolling 21-day mean volume, standing for liquidity | § 3.6 |
+| $\sigma_{s,t}$ | Rolling 21-day realized volatility for that asset | § 3.6 |
+| $\eta$ | Deadband — the weight change below which no trade is placed | § 3.7 |
 | $R^2$ | Fraction of return variance a model explains | § 3.8 |
 
 **Note (Collisions avoided).** Three symbols are deliberately not the obvious ones.
