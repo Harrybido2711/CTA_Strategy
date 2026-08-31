@@ -1,29 +1,29 @@
 # 03 · Shaping the Lookback
 
-> - **Answers:** two methods that replace a boxcar average — EWMA reshapes its weights, MACD pairs it with a second window — and why a market that suddenly gets loud breaks both, no matter how either is tuned.
+> - **Answers:** how a boxcar average's two flaws get fixed — EWMA reshapes its weights, MACD then carries that fix through two windows at once — and why a market that suddenly gets loud breaks the result regardless of how it is tuned.
 > - **Prerequisites:** [02 · Testing a Signal](02-testing-a-signal.md) — every section here hands you a knob, and 02's bar plot is the only gauge that reads one.
-> - **After reading:** replace a boxcar average with an EWMA, pair a fast horizon with a slow one and read MACD as a weighted sum of past returns, and say why volatility clustering defeats both.
+> - **After reading:** replace a boxcar average with an EWMA, pair a fast horizon with a slow one, read MACD as the two combined and stated as a weighted sum of past returns, and say why volatility clustering defeats it.
 
 ---
 
 [02](02-testing-a-signal.md) left two blanks inside its own definition. Writing momentum as
 $\text{Avg}(r_{s,t-i})$, $i = 1 \ldots N$ fixes neither the length of the window nor the weight each
-return carries inside it — the average is a boxcar only because nobody said otherwise.
+return carries inside it — a flat average gives every return in the window an equal vote regardless
+of age, and commits to one window that cannot be both stable and timely.
 
-Two methods fill those blanks, each in a different place. **EWMA** (§ 1) keeps one window and
-reshapes the weights inside it, so the newest return counts for the most and the average never quite
-forgets. **MACD** (§ 2) keeps flat weights but carries two windows instead of one, a fast lookback
-and a slow one, and trades the gap between them. The two are not really independent — § 2.4 shows
-MACD is literally a fast EWMA minus a slow one — but as *methods*, as the two things a practitioner
-actually reaches for, they solve the boxcar problem in different places, which is why each earns its
-own section before that overlap is pointed out.
+An **exponentially weighted moving average (EWMA)** answers the first blank: replace the flat
+weights with a decay, so the newest return counts for the most and the average never quite forgets
+(§ 1). **Moving average convergence/divergence (MACD)** answers the second blank on top of that
+fix — instead of one EWMA it carries two, a fast one and a slow one, and trades the gap between them
+(§§ 2–3). MACD is therefore not a third technique standing beside EWMA; it is EWMA's own decay run
+twice, at two speeds, and read as a difference.
 
-Both run into the same wall regardless of how they are tuned, and § 3 is that wall: **a failure mode
-that survives every setting of either method**, because it belongs to the market rather than to the
-parameters. The repair § 3 can offer is local; the repair it cannot offer is
+Both pieces run into the same wall no matter how they are tuned, and § 4 is that wall: **a failure
+mode that survives every setting of either**, because it belongs to the market rather than to the
+parameters. The repair § 4 can offer is local; the repair it cannot offer is
 [04](04-volatility-regimes.md).
 
-Every answer in §§ 1–2 is a **parameter**, and no parameter here is settled by convention. MACD's
+Every answer in §§ 1–3 is a **parameter**, and no parameter here is settled by convention. MACD's
 26/12/9 fit somebody's historical data once; the fast/slow ratio and the half-life are grid-searched.
 What settles them is 02's bar plot, which is why that chapter comes first.
 
@@ -83,7 +83,7 @@ somewhere; run it long enough and that seam washes out.
 Tune the **half-life** $H$ — the lag at which a return's weight has decayed to half the weight given
 to the newest one. Candidates are fractions of the lookback (1/2, 1/3, 1/5, 1/8), and — like every
 free parameter in this chapter — they are grid-searched rather than chosen; § 2.2 grid-searches the
-analogous ratio for MACD's pairing.
+analogous ratio for the fast/slow pairing § 2 builds.
 
 ```python
 signal = returns.ewm(halflife=H).mean()
@@ -94,10 +94,10 @@ solution** — a number that fit somebody's historical data once. Every paramete
 that status, which is [07](07-overfitting-and-robustness.md)'s subject rather than something to
 accept on authority.
 
-## 2. MACD: combining a fast and a slow horizon
+## 2. Combining a fast and a slow horizon
 
-§ 1 reshaped the weights inside one window. This method leaves the weights flat and instead carries
-two windows at once — a fast lookback and a slow one — and trades the gap between them.
+§ 1 fixed the weight-shape blank with a decay. This section fixes the other one — not by finding a
+better single window, but by refusing to settle for just one.
 
 ### 2.1 Why two windows beat one
 
@@ -159,10 +159,12 @@ participants are in the market at all, and it is far too large for one fund to p
 a move that starts tends to be everyone moving together. Equities second. **Bonds** weakest: lean
 on one hard enough and someone takes the other side and presses it back.
 
-### 2.4 Stated precisely
+## 3. MACD, stated precisely
 
-§ 1's decay and §§ 2.1–2.3's pairing are not really two different things. Put them together — take
-the difference of a fast EWMA and a slow one — and the result already has a name.
+§ 1 gave a window a decay; § 2 gave the signal two windows instead of one. Put a fast EWMA against a
+slow one and the result already has a name.
+
+### 3.1 The three series
 
 Written out, MACD is three series built from two exponential moving averages of the **price**.
 
@@ -185,7 +187,7 @@ Conventionally $n_f = 12$, $n_s = 26$, and 9 for the signal line.
 | **Signal line** | a smoothed MACD                          | the level MACD is crossing |
 | **Histogram**   | MACD minus its own smoothing             | trend acceleration         |
 
-### 2.5 Why it is momentum, not a separate indicator
+### 3.2 Why it is momentum, not a separate indicator
 
 **Claim.** MACD is a momentum signal. It is a weighted sum of past returns, differing from a
 lookback mean only in the shape of the weights.
@@ -233,7 +235,7 @@ asset is in, and it is also the one carrying the most reversal
 ([02](02-testing-a-signal.md)'s Background). Which wins is an empirical question settled by the bar
 plot, not a matter of taste — which is why § 1.1 was written as a preference rather than a result.
 
-### 2.6 From a value to a rule
+### 3.3 From a value to a rule
 
 Three common rules, in increasing order of information kept. All three still have to pass
 [02 § 3.2](02-testing-a-signal.md)'s bar plot before they earn a backtest.
@@ -241,7 +243,7 @@ Three common rules, in increasing order of information kept. All three still hav
 | Rule         | Go long when                            | Costs                                                            |
 | ------------ | --------------------------------------- | ---------------------------------------------------------------- |
 | Zero-line    | MACD is above zero                      | a slow trend filter, late                                        |
-| Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 3's subject                  |
+| Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 4's subject                  |
 | Proportional | always, sized by the standardized value | none of the magnitude, but see [02 § 4](02-testing-a-signal.md) |
 
 The three differ in how much of the signal's magnitude they keep. They also differ in how *often*
@@ -249,7 +251,7 @@ they trade, and that second axis is not a property of the rule alone: a crossove
 two legs touch, and how often they touch is set by how large the market's moves happen to be this
 month. Every parameter above is now chosen, and that count is still not under their control.
 
-## 3. Volatility clustering breaks both
+## 4. Volatility clustering breaks both
 
 **Definition (Volatility clustering).** Large moves are followed by large moves and small by small,
 **regardless of sign**. Returns themselves are close to uncorrelated from one day to the next, but
@@ -257,7 +259,7 @@ their *absolute* values are strongly and persistently autocorrelated. Direction 
 **amplitude is not** — a market has stretches, days to months, where everything is simply bigger,
 without the underlying trend having changed at all.
 
-**Neither method survives it.** A short EWMA half-life and a fast MACD leg are the same object under
+**Neither piece survives it.** A short EWMA half-life and MACD's fast leg are the same object under
 two names — a short average of recent returns — and a short average's swings scale with the
 amplitude around it. Enter a cluster and the sign starts flipping repeatedly, not because the trend
 turned but because the noise grew.
@@ -279,7 +281,7 @@ trip, that is 200 bp of annual drag against a gross edge that might be four hund
 **The local fix is a shorter second average, or a margin.** A **smoother** — a second average applied
 to the signal after it is computed, shorter than the signal's own period or it becomes another slow
 leg — stops a single day's noise from moving the sign on its own; MACD's 9-day signal line is one
-(§ 2.4). A **deadband**, which requires a crossing to clear some margin before the position flips
+(§ 3.1). A **deadband**, which requires a crossing to clear some margin before the position flips
 rather than acting on the exact touch, is the other. Both read the signal and nothing else, so both
 are local: neither knows the tape has turned violent, each damps every date alike, and both pay on
 the quiet days to protect the loud ones. Going further means measuring the state of the market
@@ -296,10 +298,10 @@ asset subscript $s$ of [02](02-testing-a-signal.md) is dropped.
 | $a_t$, $\lambda$ | the newest observation, and the EWMA decay that keeps $\lambda$ of the old average | § 1.2 |
 | $H$ | EWMA half-life, in periods | § 1.3 |
 | $N_f$, $N_s$ | fast and slow lookback lengths, in periods | § 2.2 |
-| $P_t$, $\Delta_{t-j}$ | price on that date, and the one-period change at that lag | § 2.4 |
-| $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 2.4 |
-| $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one | § 2.4 |
-| $c_i$, $k_j$ | MACD's net weight on the price at that lag, and its kernel weight on the price change | § 2.5 |
+| $P_t$, $\Delta_{t-j}$ | price on that date, and the one-period change at that lag | § 3.1 |
+| $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 3.1 |
+| $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one | § 3.1 |
+| $c_i$, $k_j$ | MACD's net weight on the price at that lag, and its kernel weight on the price change | § 3.2 |
 
 **Note (Collisions to watch).** $N_f, N_s$ are plain lookback lengths and $n_f, n_s$ are the EMA
 spans that play the same two roles — case is the tell. $k_j$ is a kernel weight, not a portfolio weight — [02](02-testing-a-signal.md)
@@ -312,7 +314,7 @@ regression intercept; code font against maths is the tell.
 ## Next → [04 · Volatility Regimes](04-volatility-regimes.md)
 
 Before moving on, **count your fast/slow rule's crossings month by month, and plot that count
-against the same month's realized volatility.** The upward slope is § 3 measured on your own data —
+against the same month's realized volatility.** The upward slope is § 4 measured on your own data —
 and the number on that axis is known only once the month is over, which is the problem Chapter 04
 opens with.
 
