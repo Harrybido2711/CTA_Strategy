@@ -2,7 +2,7 @@
 
 > - **Answers:** why one correlation is the only number deciding whether a strategy makes money, and how to measure it long before a backtest.
 > - **Prerequisites:** [01 · What Is a CTA Strategy](01-what-is-cta.md); the data it runs on is [100 · The Dataset](100-dataset.md).
-> - **After reading:** state a signal as a hypothesis, measure whether it carries information with a bar plot, and say what that plot cannot tell you.
+> - **After reading:** state a signal as a hypothesis, measure whether it carries information with a bar plot, test whether the gap that plot shows is real, and say what the plot cannot tell you.
 
 ---
 
@@ -22,7 +22,7 @@ Everything in this chapter is built from three numbers, one of each per asset pe
 carrying that asset's own signal and its own forward return. That restriction is not a
 simplification — assets have different volatilities, so their raw signals are not on one scale and
 cannot be compared until § 4 puts them there. Combining several assets into one book comes after
-that, in [04](04-from-signal-to-position.md).
+that, in [the position-construction chapter](04-from-signal-to-position.md).
 
 **Definition (Binary momentum).** The simplest member of the family — the sign of last period's
 return, and nothing else:
@@ -118,8 +118,8 @@ $\rho_s$ decides whether the portfolio makes money or loses it.**
 the signal until the net lands right and **scaling** until the gross does — both affine with a
 positive scale, under which correlation is unchanged: $\rho(a + bx, y) = \rho(x, y)$ for $b > 0$. The
 $\rho$ measured on the raw signal is therefore the $\rho$ governing the constrained portfolio, which
-is what lets the rest of the chapter ignore weights altogether; [04](04-from-signal-to-position.md)
-carries out both operations.
+is what lets the rest of the chapter ignore weights altogether; [the position-construction
+chapter](04-from-signal-to-position.md) carries out both operations.
 
 Everything collapses to that one number, and it is a number about the signal alone:
 
@@ -315,7 +315,7 @@ Two further readings carry information, and nothing else on the chart does:
 
 | Read                                                | What it establishes                                                                                                         |
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **G5 − G1, measured against the error bars** | the size of the edge next to what noise alone would draw. A rise that fits inside one error bar is not evidence of anything |
+| **G5 − G1, measured against the error bars** | the size of the edge next to what noise alone would draw. A rise that fits inside one error bar is not evidence of anything, and § 3.2.3 turns that comparison into a test |
 | **The direction of the slope**                | a*descending* staircase is not a dead signal — it is the same edge carrying the opposite sign                            |
 
 A scrambled middle does not disqualify a signal: clean tails around a muddled G2–G4 is a common
@@ -362,7 +362,76 @@ cluster in time, so consecutive observations are near-copies rather than indepen
 push the effective count well below $m$, and the noise does not really reach 7 bp. The logic
 survives: averaging cancels noise and leaves systematic signal.
 
-#### 3.2.3 What the bar plot cannot show
+#### 3.2.3 Is the staircase real?
+
+§ 3.2.2 read the rise against the error bars by eye. That comparison is a hypothesis test, and it is
+worth writing down, because the eyeball version and the arithmetic version do not agree.
+
+**Definition (Standard error of a bucket).** For bucket $g$ holding $m_g$ observations whose
+forward returns have sample standard deviation $\sigma_g$,
+
+$$
+\text{SE}_g = \frac{\sigma_g}{m_g^{1/2}}
+$$
+
+the spread of that bucket's **mean**, not of the observations inside it — which is why it shrinks
+with $m_g$ while $\sigma_g$ does not. Bars here are drawn at $\pm 2 \text{SE}_g$.
+
+**The hypothesis on trial is § 1's, narrowed to the two buckets that carry the positions.** A long
+book buys G5 and sells G1, so what has to be non-zero is the difference between those two means:
+
+$$
+H_0: \mu_{G5} = \mu_{G1}
+$$
+
+against the alternative that they differ, where $\mu_g$ is bucket $g$'s true mean forward return.
+The statistic is the observed difference in units of its own noise:
+
+$$
+z = \frac{\mu_{G5} - \mu_{G1}}{\left( \text{SE}_{G5}^2 + \text{SE}_{G1}^2 \right)^{1/2}}
+$$
+
+the denominator adding **variances** rather than standard errors, because the two bucket means are
+computed from disjoint sets of dates.
+
+**Note (Why it is a $t$ and gets called a $z$).** Both $\mu_g$ and $\sigma_g$ are estimated from the
+same sample, so the exact null distribution is Student's $t$ rather than the normal. It stops
+mattering quickly: at § 3.2.2's bucket sizes — hundreds to thousands of dates — the two are
+indistinguishable, and the number is conventionally quoted as a **z-score**. Derive it as a $t$ and
+report it as a $z$; at $m_g$ in the tens, use the $t$ and mean it.
+
+**Claim.** $|z| \geq 2$ rejects $H_0$ at the 5 percent level.
+
+**Proof.** Under $H_0$ the statistic is standard normal in the large-sample limit, and a standard
+normal places 0.0455 of its mass outside $\pm 2$. Since $0.0455 < 0.05$, an observed $|z| \geq 2$
+lies inside the rejection region of the two-sided test at $\alpha = 0.05$.
+
+**Example.** § 3.2.2's numbers, at $m_g = 300$: G1 comes in at −20 bp and G5 at +20 bp, each with a
+standard error of 6.9 bp. Then
+
+$$
+z = \frac{40}{\left( 6.9^2 + 6.9^2 \right)^{1/2}} = \frac{40}{9.8} \approx 4.1
+$$
+
+well past 2, and the bars at $\pm 13.8$ bp clear each other with room to spare.
+
+**Note (Non-overlap is sufficient, not necessary).** The two readings differ, and in the direction
+that costs you signals. Bars of half-width $2\text{SE}$ fail to touch when the difference exceeds
+$2 \left( \text{SE}_{G5} + \text{SE}_{G1} \right)$, while the test rejects when it exceeds
+$2 \left( \text{SE}_{G5}^2 + \text{SE}_{G1}^2 \right)^{1/2}$ — and a sum is never smaller than the
+root of the sum of squares. On the example's numbers the eye demands 27.6 bp and the test demands
+19.5 bp, so a difference between those two is one the picture calls inconclusive and the arithmetic
+calls significant. **Bars that clear each other are always significant; bars that touch may still
+be.** Use the chart to accept and compute $z$ before rejecting.
+
+**Note (What the test does not license).** Two things sit outside it. The $m_g^{1/2}$ in every
+standard error assumes independent observations, and § 3.2.2's closing Note explains why one asset's
+overlapping windows are nothing of the kind — the effective count is well below $m_g$, so every $z$
+here is optimistic. And a threshold of 5 percent means one signal in twenty passes on noise, which
+is a fact about *one* test: running twenty variants and reporting the one that cleared 2 is not a
+test at all, and is [07](07-overfitting-and-robustness.md)'s subject.
+
+#### 3.2.4 What the bar plot cannot show
 
 Every date contributes one observation — its signal's score, and the return that followed. Step 5
 flattens all of them onto one picture, five slots wide.
@@ -379,7 +448,7 @@ that held throughout and with one that worked for five years and was flat for fi
 | Not on the chart                                                  | Where to look instead                                   |
 | ----------------------------------------------------------------- | ------------------------------------------------------- |
 | **When** the edge happened                                  | the equity curve of[05](05-understanding-backtesting.md) |
-| **Who** is inside a bucket — which dates, which regime      | the dates behind each bar, tabulated rather than averaged         |
+| **Who** is inside a bucket — which dates, which regime      | the dates behind each bar, tabulated rather than averaged → [04](04-volatility-regimes.md) |
 | **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean          |
 | **How independent** the observations are                    | overlapping windows, per the Note above                 |
 
@@ -410,7 +479,7 @@ MOM^{\text{risk-adj}}_{s,t}  =  \text{Avg}\left(\frac{r_{s,t-i}}{\sigma_{s,t}}\r
 $$
 
 where $\sigma_{s,t}$ is that asset's volatility, estimated on data strictly before $t$ — a
-denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 5).
+denominator that peeks at the future contaminates the signal as surely as a numerator would (§ 6).
 
 Every date, and later every asset, now lands on one scale, so § 3.2's slots compare like with
 like — two students both scoring 80 on different exams against different cohorts have not achieved
@@ -443,11 +512,67 @@ its own past** before it is compared to anything. A raw momentum value is never 
 another date, and never against another asset — the comparison is meaningless in both directions,
 and the resulting bar plot reports volatility while wearing the signal's name.
 
-## 5. Information availability
+## 5. What to report — and why it is not a Sharpe ratio
+
+Every chart in § 3 reports one quantity: **the mean forward return of a bucket, with its standard
+error.** The instinct at this point is to reach for something that sounds more like a result, and
+the one everybody reaches for is the wrong tool for this stage.
+
+**Definition (Sharpe ratio).** A portfolio's average return in excess of what financing it costs,
+per unit of the volatility it ran:
+
+$$
+\text{SR} = \frac{E[R_p] - r_f}{\sigma_p}
+$$
+
+with $R_p$ the portfolio's return over a period, $r_f$ the risk-free rate charged on the capital it
+used, and $\sigma_p$ the standard deviation of $R_p$. It is the right measurement for a finished
+portfolio and the wrong one here, for four separate reasons.
+
+**There is no portfolio yet.** § 1.1's argument is precisely that the signal can be judged *without*
+building one, and nothing in § 3 has chosen a weight. A Sharpe ratio scores the output of a
+construction step that has not happened; computing one on a bucket's returns scores a portfolio
+nobody would run — equal weight on every date that fell into one fifth of the sample.
+
+**The financing rate is not zero here, and it is not constant.** The numerator subtracts $r_f$, and
+which rate that is depends on the book's **net exposure** (§ 1.1):
+
+| Book | Net exposure | Correct $r_f$ |
+| --- | --- | --- |
+| Dollar-neutral long/short — \$1 long against \$1 short | $\approx 0$ | **zero.** The short leg's proceeds fund the long leg, so no capital is being borrowed |
+| A 150/50 CTA book | 100% | **the actual financing rate**, on the capital the net exposure represents |
+
+Statistical-arbitrage books are the first row, which is where the habit of setting $r_f = 0$ comes
+from and where it is correct. A CTA book is the second row, and the rate belonging in it is a
+**time series**, not a constant: the policy rate this sample spans moved from near zero to above
+five percent. Carrying over "we always used 2 percent" from a book that was dollar-neutral puts an
+invented series into the numerator of every number reported.
+
+**It folds three estimates into one number.** Mean, volatility, and financing rate — and with a
+time-varying rate, three estimates each carrying their own error. When the ratio moves you cannot
+say which of them moved. That is the exact opposite of § 3.2's method, where one chart carries one
+quantity so that a change has one cause: a Sharpe that falls because the edge died and a Sharpe that
+falls because the tape got noisier are the same number.
+
+**A Sharpe means nothing without the market it was earned in.** Two books, and the smaller number is
+the better strategy:
+
+| The tape | Market's own Sharpe | The book's Sharpe | Reading |
+| --- | --- | --- | --- |
+| Violent throughout | 0.4 | **0.8** | held together through amplitude that should have wrecked it, at twice the market's own risk-adjusted return — an excellent result |
+| Calm and rising | 0.8 | **0.9** | barely beat holding the index. The extra 0.1 is within what one lucky bet would produce |
+
+**The mean return is the quantity you can actually trade.** It is what the book delivers, it is what
+§ 1.1's algebra is written in, and it is denominated in the same basis points as the costs that will
+be subtracted from it later. A Sharpe ratio is a score attached afterwards, useful for comparing
+**finished** portfolios against each other — which is [06](06-evaluating-performance.md)'s subject,
+after an optimization step has given it something to measure.
+
+## 6. Information availability
 
 Everything above assumes the signal at `t` uses only data knowable at `t`. Look-ahead bias is born
 here; the execution offsets in [05](05-understanding-backtesting.md) are the second line of defense
-and cannot rescue a signal contaminated at construction. The rolling-quantile rule (§5) and the
+and cannot rescue a signal contaminated at construction. The rolling-quantile rule (§ 4) and the
 train/validation/test split ([07](07-overfitting-and-robustness.md)) are the same discipline.
 
 ## Background
@@ -542,23 +667,33 @@ ranked against each other.
 | $x$, $y$, $\beta$, $\epsilon$                                                                             | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
 | $\rho$, $R^2$                                                                                                 | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
 | $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$                                                                   | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
-| $m$                                                                                                             | observations sharing a bucket                                                                                                 | § 3.2     |
+| $m$, $m_g$                                                                                                      | observations sharing a bucket, and the count in bucket $g$                                                                    | § 3.2     |
+| $\mu_g$, $\sigma_g$, $\text{SE}_g$                                                                              | one bucket's true mean forward return, the sample standard deviation of the returns in it, and the standard error of its mean | § 3.2.3   |
+| $H_0$, $z$, $\alpha$                                                                                            | the null that two buckets share a mean, the standardized G5 − G1 difference testing it, and the level it is tested at         | § 3.2.3   |
 | G1 … G5                                                                                                          | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
 | $\sigma_{s,t}$                                                                                                  | one asset's volatility, estimated on data before that date                                                                    | § 4       |
+| $R_p$, $r_f$, $\sigma_p$                                                                                        | a portfolio's return over a period, the financing rate subtracted from it, and its return volatility                          | § 5       |
 | $g$                                                                                                             | gap length — periods between the end of the signal's window and the return it is scored on                                   | Background |
 
 **Note (Collisions to watch).** $R_t$ is the portfolio's return on a date (§ 1.1) and $R^2$ a share
 of variance (§ 2); they share a letter and nothing else.
 
-Three quantities wear a $\sigma$ and are not interchangeable: $\sigma_y$ is the spread of forward
+Five quantities wear a $\sigma$ and are not interchangeable: $\sigma_y$ is the spread of forward
 return across the pooled cloud (§ 2) — the sample-wide version of § 1.1's per-date $\sigma_{r,s}$ —
-$\sigma_\epsilon$ is the part of it the signal cannot reach (§ 2), and $\sigma_{s,t}$ is one asset's
-trailing volatility on one date (§ 4).
+$\sigma_\epsilon$ is the part of it the signal cannot reach (§ 2), $\sigma_{s,t}$ is one asset's
+trailing volatility on one date (§ 4), $\sigma_g$ is the spread of returns inside one bucket
+(§ 3.2.3), and $\sigma_p$ is a portfolio's return volatility (§ 5).
+
+Lowercase $g$ is also overloaded and deliberately kept apart from its subscript use: standing alone
+it is the gap (Background), and as a subscript in $\mu_g$, $\sigma_g$, $m_g$ it indexes a bucket
+G1 … G5 (§ 3.2.3). [04](04-volatility-regimes.md) gives $g_t$ a third meaning — a regime label —
+which is why it carries a date subscript there.
 
 Lowercase $g$ is the gap, unrelated to the buckets G1 … G5, and lowercase $\delta$ is the tolerance
 on net exposure (§ 1.1), unrelated to [03](03-shaping-the-lookback.md)'s $\Delta$. Section 3.1's
-`alpha` is a plotting keyword, not a smoothing constant and not a regression intercept — code font
-against maths is the tell. Chapter [01](01-what-is-cta.md) uses $s$ for a signed share count; here it
+`alpha` is a plotting keyword; $\alpha$ in § 3.2.3 is a significance level; neither is a smoothing
+constant or a regression intercept — code font against maths is the first tell, and the section is
+the second. Chapter [01](01-what-is-cta.md) uses $s$ for a signed share count; here it
 is always the asset.
 
 ---
@@ -576,5 +711,7 @@ You should be able to explain:
 - [ ] Why a gap sits between the signal's window and the return it is scored on, and what that gap costs
 - [ ] Why a bucket holds dates rather than assets, and that the time axis is what pooling costs
 - [ ] Why a raw signal is never compared to anything, across dates or across assets
+- [ ] Why the gap between the top and bottom bars is a hypothesis test, and why bars that touch can still be significant
+- [ ] Why a Sharpe ratio cannot judge a signal, and what its risk-free rate would have to be on a 150/50 book
 
 [← 01](01-what-is-cta.md) · [Index](00-index.md) · reference: [08 · Toolbox](08-toolbox-pandas.md)
