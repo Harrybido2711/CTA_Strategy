@@ -78,17 +78,15 @@ $$
 \textbf{gross:}\quad \sum_s |w_{s,t}| = G
 $$
 
-$G$ is the gross target; the net holds at 1 only to within a tolerance $\delta$, since rebalancing
-is discrete and the book drifts between trades. The two sums are independent:
+| Sum | What it fixes | Typical value |
+| --- | --- | --- |
+| **Net**, $\sum_s w_{s,t}$ | how much *market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased, $\approx 0$ market-neutral |
+| **Gross**, the same sum over absolute weights | how much *leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
 
-| Sum                                                                                                                                                                                                  | What it fixes                                                                    | Typical value                |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------- |
-| **Net**, $\sum_s w_{s,t}$                   | how much*market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased,$\approx 0$ market-neutral |                                                                                  |                              |
-| **Gross**, the same sum over absolute weights                                                                                                                                                  | how much*leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
-
-A book holding one asset at 100% and a book long 200% / short 100% carry the same net and three
-times the position — which is why both sums have to be stated, and why gross is never free
-([01](01-what-is-cta.md)).
+$G$ is the gross target, and the net holds at 1 only to within a tolerance $\delta$ since
+rebalancing is discrete. The two are independent: one asset at 100% and a book long 200% / short
+100% carry the same net and three times the position, which is why both have to be stated and why
+gross is never free ([01](01-what-is-cta.md)).
 
 **The weights are where the signal enters.** You want weight where the forward return is about to be
 high, and that is precisely the number you do not have. The signal is the stand-in you put in its
@@ -150,27 +148,28 @@ the other. The picture you had in mind is the leftmost panel below. What comes b
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/scatter-ladder-dark.png">
-  <img alt="Four scatter panels of forward return against a signal, the same 1,500 points redrawn at correlations of 80, 45, 30 and 12 percent. The 80 percent panel, labelled what you pictured, is a clear diagonal band; by 30 percent, labelled the eye's floor, the tilt is barely arguable; the 12 percent panel, underlined and labelled what you observe, is a formless round cloud" src="figures/scatter-ladder-light.png">
+  <img alt="Four scatter panels of forward return against a signal, both axes in standard deviations. The first three are drawn at correlations of 80, 45 and 30 percent from 1,500 synthetic points: the 80 percent panel, labelled what you pictured, is a clear diagonal band, and by 30 percent, labelled the eye's floor, the tilt is barely arguable. The fourth is underlined and labelled measured, CTA_data at minus 1.9 percent — a formless round cloud with a denser core than the drawn panels, being real returns with fatter tails" src="figures/scatter-ladder-light.png">
 </picture>
 
 ### Why the real one is a cloud
 
 **Claim.** The scatter can neither confirm nor refute a signal, because the correlation a working
-signal carries sits below the threshold at which the eye resolves a trend.
+signal carries sits far below the threshold at which the eye resolves a trend.
 
 **Proof.** Both numbers are readable off the panels above: the eye stops resolving a tilt somewhere
-around 30%, and a working signal carries 10–15%. Since 15% < 30%, a signal that works and a signal
-that does not produce the same picture — **the absence of a visible trend is not evidence of
-anything.**
+around 30%, and the fourth panel — 21-day risk-adjusted momentum against the next session's return,
+measured over the 37 ETFs of [100 · The Dataset](100-dataset.md) — comes in at **−1.9%**. Since
+1.9% < 30%, a signal that works and a signal that does not produce the same picture — **the absence
+of a visible trend is not evidence of anything.**
 
-So why is the correlation only 10–15%? Because the quantity being plotted is mostly not the signal.
+So why is the correlation so small? Because the quantity being plotted is mostly not the signal.
 
 **Claim.** Split the forward return into the part the signal reaches and the part it does not,
 $y = \beta x + \epsilon$. If $\epsilon$ is uncorrelated with $x$, the signal owns exactly
 $\rho^2$ of the return's variance, where $\rho$ is their correlation.
 
 <details>
-<summary><b>Proof.</b> uncorrelated parts add their variances, so the explained share is exactly the squared correlation — 1.44% of it at 12%</summary>
+<summary><b>Proof.</b> uncorrelated parts add their variances, so the explained share is exactly the squared correlation — 0.035% of it here</summary>
 
 Uncorrelated components add their variances,
 
@@ -178,36 +177,41 @@ $$
 \text{Var}(y) = \beta^2 \text{Var}(x) + \text{Var}(\epsilon)
 $$
 
-and on one regressor with an intercept the explained share is $R^2 = \rho^2$. At $\rho = 0.12$,
-$R^2 = 0.0144$ — which does not mean "right 1.4% of the time", but: of the variation in forward
-return from one observation to the next, 1.44% is linear in the signal and 98.56% is not.
+and on one regressor with an intercept the explained share is $R^2 = \rho^2$. At
+$\rho = -0.019$, $R^2 = 0.00035$ — which does not mean "right 0.035% of the time", but: of the
+variation in forward return from one observation to the next, **0.035% is linear in the signal and
+99.965% is not.**
 
 </details>
 
 <details>
-<summary><b>Example.</b> one asset-date's return split into the 14.4 bp the signal moves and the 119 bp it does not</summary>
+<summary><b>Example.</b> one asset-date's return split into the 2.8 bp the signal moves and the 149 bp it does not</summary>
 
-Everything below is **one asset-date's** forward return, never a portfolio's. Take a
-daily return standard deviation of $\sigma_y = 0.012$ — 120 bp, typical for a single equity ETF,
-a **basis point** being 0.01%:
+Everything below is **one asset-date's** forward return, never a portfolio's, and every number is
+measured over the 57,649 asset-dates of the sample. The daily return standard deviation is
+$\sigma_y = 0.0149$ — 149 bp, a **basis point** being 0.01%:
 
-| Component             | Size                            | At 12% correlation |
+| Component             | Size                            | At $\rho = -1.9\%$ |
 | --------------------- | ------------------------------- | ------------------ |
-| Total return          | $\sigma_y$                    | 120 bp             |
-| What the signal moves | $\rho \sigma_y$               | **14.4 bp**  |
-| What it does not      | $\sigma_y (1 - \rho^2)^{1/2}$ | **119 bp**   |
+| Total return          | $\sigma_y$                    | 149 bp             |
+| What the signal moves | $\rho \sigma_y$               | **2.8 bp**   |
+| What it does not      | $\sigma_y (1 - \rho^2)^{1/2}$ | **149 bp**   |
 
-Across an x-axis running from $-2\sigma_x$ to $+2\sigma_x$ the trend line climbs about 58 bp end
-to end, while at every $x$ the points scatter over roughly 476 bp. **A 0.6% slope inside a 4.8%
-cloud** — that ratio *is* the picture.
+The third row is not a rounding slip: at this correlation the signal removes so little that the
+unreachable part is the whole of it to three figures. Across an x-axis running from $-2\sigma_x$ to
+$+2\sigma_x$ the trend line moves about 11 bp end to end, while at every $x$ the points scatter over
+roughly 596 bp. **A 0.11% slope inside a 6% cloud** — that ratio *is* the picture.
 
 </details>
 
-**Note (And it is worse than that).** Part of those 119 bp is not the market's doing: pooling a
-calm 2021 with a violent 2023 adds spread that standardization (§ 4) removes. Nor is a larger
-$\rho$ on offer — a predictor correlating 50% with next month's return would be arbitraged away
-long before you found it in anything liquid. 10–15% is a competitive market's ceiling, not a
-shortfall in craft.
+**Note (Where a larger correlation would come from, and where it would not).** A predictor
+correlating 50% with next period's return would be arbitraged away long before you found it in
+anything liquid, so single digits is a competitive market's ceiling rather than a shortfall in
+craft. Two things do legitimately raise it and neither is on offer here: a **longer horizon**, since
+the signal's edge accumulates while the noise grows only as the square root of time, and
+**combining many signals**, since a composite reaches correlations no ingredient has on its own.
+Quoted numbers near 10% are almost always one of those two. A single signal against a single
+session is the hardest case in the family, and this chapter is deliberately standing in it.
 
 ## 3. Two ways out of the cloud
 
@@ -218,8 +222,7 @@ the second one works.
 
 `alpha` is a marker's opacity. Turn it far enough down — `alpha=0.05` on a few thousand points,
 lower still on more — and a single point becomes nearly invisible, so only *overlap* renders and the
-chart is a density map rather than a mass of ink. Below, the left panel is the before and the other
-two are both the after.
+chart is a density map rather than a mass of ink.
 
 **Note (Not the other alphas).** matplotlib's opacity keyword: not a regression intercept, not the
 excess return a manager is paid for, not [03](03-shaping-the-lookback.md)'s smoothing constant
@@ -227,18 +230,18 @@ $\alpha$. Code font is the tell.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/alpha-opacity-dark.png">
-  <img alt="Three scatter panels of forward return against a signal, drawn from 5,000 pooled asset-date observations. Left, at full opacity, they render as one solid disc with no internal structure. Middle, the same rendering at low opacity on a series where a high signal rules out deep losses: a soft density cloud with the bottom-right corner visibly bitten out, annotated high signal, no deep loss. Right, low opacity on the original points: a smooth round density with no thin region anywhere" src="figures/alpha-opacity-light.png">
+  <img alt="Two scatter panels of forward return against a signal, both plotting the same 6,000 asset-dates measured on CTA_data with both axes standardized. Left, at full opacity, they render as one solid disc with no internal structure. Right, the identical points at an opacity of 0.01: a smooth round density, denser in the core, with no thin region, no empty corner and no visible tilt anywhere" src="figures/alpha-opacity-light.png">
 </picture>
 
-Sometimes it is enough — the middle panel, where high signal against a badly negative return has
-thinned enough to read. A signal that only rules something *out* is still tradeable.
+Sometimes it is enough. A corner bitten out of the cloud — high signal never followed by a bad
+loss — would be a finding, because a signal that only rules something *out* is still tradeable.
+This data has no such corner, and that is the ordinary outcome.
 
-**Why it usually fails.** Three reasons that compound:
+**Why it usually fails.** Two reasons that compound:
 
 - **The density comes back smooth.** Tens of thousands of asset-date cells average into a clean
-  bivariate blob, and opacity renders that faithfully. A smooth density has no feature.
-- **The tilt is finer than the ink.** § 2's band is eight times taller than the trend line's whole
-  rise, so the lean is smaller than the markers drawn over it.
+  bivariate blob, and opacity renders that faithfully — a smooth density has no feature, and § 2's
+  band is fifty times taller than the tilt hiding in it.
 - **It treats the symptom.** The scatter spends its resolution on individual noisy points when the
   claim is about their **average**; no rendering choice changes what is being rendered.
 
@@ -284,7 +287,7 @@ of many with the error on it.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/bucket-construction-dark.png">
-  <img alt="Six panels in two rows, each row running the same steps on a different world. Left column, the population of one asset's dates with fifteen randomly drawn ones marked in the same colour: on a perfect relationship they sit along a line, on the real cloud they sit anywhere. Middle column, six draws of five dates plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle. Right column, the average over 400 draws with error bars: a clean staircase on the line, and on the cloud a shorter staircase from a negative G1 to a positive G5" src="figures/bucket-construction-light.png">
+  <img alt="Six panels in two rows. The upper row is invented and the lower is measured on CTA_data. Left column, the population of dates with fifteen randomly drawn ones marked in the same colour: on a perfect relationship they sit along a line, on the measured cloud they sit anywhere. Middle column, six draws of five dates plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle. Right column, the answer with plus or minus two standard errors: a clean rising staircase on the invented row, and on the measured row the real bucket chart over all 57,649 asset-dates — G1 at plus 11 basis points standing well clear of its error bar, G2 to G5 all within a few basis points of zero, so the staircase descends" src="figures/bucket-construction-light.png">
 </picture>
 
 **The sort key is the signal, never the return.** Step 2 orders by $MOM_{s,t}$, which is known at
@@ -305,7 +308,7 @@ Five dates from one asset's history, invented, filed both ways:
 | $t_5$ | −0.9% | −1.1%         | G2             | G1             |
 
 Read down *slot by signal* and the returns come out unordered — which is exactly what five dates
-look like at 12% correlation. Read down *slot by return* and the ordering is perfect, and would be perfect
+look like at a correlation this small. Read down *slot by return* and the ordering is perfect, and would be perfect
 for **any** signal including one straight out of a random number generator, because each bar is then
 reporting the sort key back to you. **The staircase is evidence only because the thing sorted on and
 the thing measured are different, and the second was not knowable when the first was computed.**
@@ -326,7 +329,7 @@ Two further readings carry information, and nothing else on the chart does:
 | Read                                                | What it establishes                                                                                                                                                         |
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **G5 − G1, measured against the error bars** | the size of the edge next to what noise alone would draw. A rise that fits inside one error bar is not evidence of anything, and § 3.2.3 turns that comparison into a test |
-| **The direction of the slope**                | a*descending* staircase is not a dead signal — it is the same edge carrying the opposite sign                                                                            |
+| **The direction of the slope**                | a *descending* staircase is not a dead signal — it is the same edge carrying the opposite sign                                                                            |
 
 A scrambled middle does not disqualify a signal: clean tails around a muddled G2–G4 is a common
 shape and a perfectly tradeable one, since the tails are where the positions go.
@@ -340,31 +343,33 @@ traded short*, and carry the sign in the strategy rather than in the signal defi
 leaves the signal untouched.
 
 <details>
-<summary><b>Proof.</b> averaging leaves the signal where it was and divides the noise by the square root of m, turning 1 : 8 into 2 : 1</summary>
+<summary><b>Proof.</b> averaging leaves the signal where it was and divides the noise by the square root of m, turning 1 : 14 into 7 : 1</summary>
 
 Take $m$ observations sharing a similar signal value. Their mean return still has expectation
 $\beta$ times their mean signal — they were chosen for having nearly the same signal, so averaging
-them changes it barely at all — while the noise around it falls to $\sigma_\epsilon / m^{1/2}$:
+them changes it barely at all — while the noise around it falls to $\sigma_\epsilon / m^{1/2}$.
+Measured, with the edge taken as the G5 − G1 gap the chart is trying to resolve:
 
-|        | One observation | Mean of 300                        |
-| ------ | --------------- | ---------------------------------- |
-| Signal | 14.4 bp         | 14.4 bp                            |
-| Noise  | 119 bp          | $119 / 300^{1/2} \approx 6.9$ bp |
-| Ratio  | 1 : 8           | **2 : 1**                    |
+|        | One observation | Mean of 11,522                          |
+| ------ | --------------- | --------------------------------------- |
+| Signal | 10.4 bp         | 10.4 bp                                 |
+| Noise  | 149 bp          | $149 / 11522^{1/2} \approx 1.4$ bp     |
+| Ratio  | 1 : 14          | **7 : 1**                         |
 
 The left column is the scatter of § 2 and the right column is one bar of the chart. Nothing was
-added — only the noise was taken away.
+added — only the noise was taken away. It takes eleven thousand observations to do here what the
+table's old arithmetic did with three hundred, and that is the honest price of a 1.9% correlation.
 
 </details>
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/noise-shrinks-dark.png">
-  <img alt="Four bucket charts of the same population at 12 percent correlation, mean forward return in basis points against signal bucket, computed from 5, 30, 300 and 3,000 observations each. At m equals 5 the bars swing between minus 80 and plus 93 basis points and are not monotone; by m equals 300 they have settled into a monotone staircase from about minus 20 to plus 20 basis points, and at m equals 3,000 the error bars are barely visible" src="figures/noise-shrinks-light.png">
+  <img alt="Four bucket charts of the same measured population, mean forward return in basis points against signal bucket, each drawn from 30, 300, 3,000 and all 11,522 observations per bucket. At m equals 30 the bars swing between minus 20 and plus 27 basis points with error bars over fifty points wide and no ordering; by m equals 3,000 the error bars have shrunk to about five points and G1 is visibly the tallest bar; at m equals 11,522 the error bars are a few basis points and G1, at plus 11, stands clear of its own error while G2 to G5 sit near zero" src="figures/noise-shrinks-light.png">
 </picture>
 
-The true bars are identical in all four panels — near −20 bp at G1 and +20 bp at G5. Only the error
-moves, and at $m = 5$ it is larger than the whole staircase. **Sample size is not a detail of the
-recipe; it is the reason the recipe works.**
+The quantity being estimated is identical in all four panels — the real bucket means, +11 bp at G1
+and roughly zero at G5. Only the error moves, and at $m = 30$ it is five times the whole staircase.
+**Sample size is not a detail of the recipe; it is the reason the recipe works.**
 
 **Note (Where that overstates it).** The $m^{1/2}$ assumes independence, and one asset's history
 violates it twice over: overlapping lookback windows share most of their inputs, and returns
@@ -405,28 +410,35 @@ the denominator adding **variances** rather than standard errors, because the tw
 computed from disjoint sets of dates.
 
 **Note (Why it is a $t$ and gets called a $z$).** Both $\mu_g$ and $\sigma_g$ are estimated from the
-same sample, so the exact null distribution is Student's $t$ rather than the normal. It stops
-mattering quickly: at § 3.2.2's bucket sizes — hundreds to thousands of dates — the two are
-indistinguishable, and the number is conventionally quoted as a **z-score**. Derive it as a $t$ and
-report it as a $z$; at $m_g$ in the tens, use the $t$ and mean it.
+same sample, so the exact null distribution is Student's $t$, not the normal. It stops mattering
+fast: at bucket sizes in the thousands the two are indistinguishable and the number is quoted as a
+**z-score**. Derive it as a $t$, report it as a $z$, and at $m_g$ in the tens use the $t$ and mean it.
 
 **Claim.** $|z| \geq 2$ rejects $H_0$ at the 5 percent level.
 
 **Proof.** Under $H_0$ the statistic is standard normal in the large-sample limit, and a standard
-normal places 0.0455 of its mass outside $\pm 2$. Since $0.0455 < 0.05$, an observed $|z| \geq 2$
-lies inside the rejection region of the two-sided test at $\alpha = 0.05$.
+normal places 0.0455 of its mass outside $\pm 2$ — less than $\alpha = 0.05$, so the observation
+lies inside the two-sided rejection region.
 
 <details>
-<summary><b>Example.</b> § 3.2.2's staircase, tested — a z of 4.1, and bars that clear each other</summary>
+<summary><b>Example.</b> the measured buckets, tested — a z of −4.9, and bars that clear each other</summary>
 
-§ 3.2.2's numbers, at $m_g = 300$: G1 comes in at −20 bp and G5 at +20 bp, each with a
-standard error of 6.9 bp. Then
+The whole sample, five buckets, 11,522 dates in the smallest:
+
+| Bucket | $\mu_g$ | $\sigma_g$ | $m_g$ | $\text{SE}_g$ |
+| --- | --- | --- | --- | --- |
+| G1 | **+10.72 bp** | 173 bp | 11,522 | 1.62 bp |
+| G2 | +1.05 bp | 144 bp | 11,523 | 1.34 bp |
+| G3 | +3.48 bp | 136 bp | 11,525 | 1.27 bp |
+| G4 | +2.83 bp | 140 bp | 11,523 | 1.30 bp |
+| G5 | **+0.31 bp** | 149 bp | 11,556 | 1.39 bp |
 
 $$
-z = \frac{40}{\left( 6.9^2 + 6.9^2 \right)^{1/2}} = \frac{40}{9.8} \approx 4.1
+z = \frac{0.31 - 10.72}{\left( 1.39^2 + 1.62^2 \right)^{1/2}} = \frac{-10.41}{2.13} \approx -4.9
 $$
 
-well past 2, and the bars at $\pm 13.8$ bp clear each other with room to spare.
+Well past 2 in absolute value, and the bars — G1 spanning +7.5 to +14.0 bp, G5 spanning −2.5 to
++3.1 — clear each other with room to spare.
 
 </details>
 
@@ -434,10 +446,17 @@ well past 2, and the bars at $\pm 13.8$ bp clear each other with room to spare.
 that costs you signals. Bars of half-width $2\text{SE}$ fail to touch when the difference exceeds
 $2 \left( \text{SE}_{G5} + \text{SE}_{G1} \right)$, while the test rejects when it exceeds
 $2 \left( \text{SE}_{G5}^2 + \text{SE}_{G1}^2 \right)^{1/2}$ — and a sum is never smaller than the
-root of the sum of squares. On the example's numbers the eye demands 27.6 bp and the test demands
-19.5 bp, so a difference between those two is one the picture calls inconclusive and the arithmetic
+root of the sum of squares. On the measured numbers the eye demands 6.0 bp and the test demands
+4.3 bp, so a difference between those two is one the picture calls inconclusive and the arithmetic
 calls significant. **Bars that clear each other are always significant; bars that touch may still
 be.** Use the chart to accept and compute $z$ before rejecting.
+
+**The sign is negative, and that is a result rather than a failure.** $z = -4.9$ says the two
+means differ, decisively; it says nothing about which way round they should be. What was measured is
+that **a high 21-day momentum is followed by a slightly worse next session than a low one** — the
+descending staircase § 3.2.2 told you to expect and to keep. It is not a broken signal, it is
+**reversal**, and the Background section explains where it comes from and what removes it: put a gap
+between the signal's window and the return it is scored on, and the sign comes back.
 
 **Note (What the test does not license).** Two things sit outside it. The $m_g^{1/2}$ in every
 standard error assumes independent observations, and § 3.2.2's closing Note explains why one asset's
@@ -463,7 +482,7 @@ that held throughout and with one that worked for five years and was flat for fi
 | Not on the chart                                                  | Where to look instead                                                                     |
 | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | **When** the edge happened                                  | the equity curve of[05](05-understanding-backtesting.md)                                   |
-| **Who** is inside a bucket — which dates, which regime     | the dates behind each bar, tabulated rather than averaged →[04](04-volatility-regimes.md) |
+| **Who** is inside a bucket — which dates, which regime     | the dates behind each bar, tabulated rather than averaged |
 | **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean                                            |
 | **How independent** the observations are                    | overlapping windows, per the Note above                                                   |
 
@@ -527,10 +546,9 @@ standardized signal is roughly normal, so cutting it at fixed intervals such as 
 almost everything in the middle and starves the two tails you would actually trade. Cut it at its
 quintiles instead.
 
-**The rule this section leaves behind.** Every signal is either **standardized** or **scored against
-its own past** before it is compared to anything. A raw momentum value is never ranked against
-another date, and never against another asset — the comparison is meaningless in both directions,
-and the resulting bar plot reports volatility while wearing the signal's name.
+**The rule this section leaves behind.** Every signal is **standardized** or **scored against its
+own past** before it is compared to anything — otherwise the bar plot reports volatility while
+wearing the signal's name.
 
 ## 5. What to report — and why it is not a Sharpe ratio
 
@@ -568,11 +586,10 @@ from and where it is correct. A CTA book is the second row, and the rate belongi
 five percent. Carrying over "we always used 2 percent" from a book that was dollar-neutral puts an
 invented series into the numerator of every number reported.
 
-**It folds three estimates into one number.** Mean, volatility, and financing rate — and with a
-time-varying rate, three estimates each carrying their own error. When the ratio moves you cannot
-say which of them moved. That is the exact opposite of § 3.2's method, where one chart carries one
-quantity so that a change has one cause: a Sharpe that falls because the edge died and a Sharpe that
-falls because the tape got noisier are the same number.
+**It folds three estimates into one number.** Mean, volatility and financing rate, each with its
+own error. A Sharpe that falls because the edge died and a Sharpe that falls because the tape got
+noisier are the same number — the exact opposite of § 3.2's method, where one chart carries one
+quantity so a change has one cause.
 
 **A Sharpe means nothing without the market it was earned in.** Two books, and the smaller number is
 the better strategy:
@@ -706,8 +723,7 @@ trailing volatility on one date (§ 4), $\sigma_g$ is the spread of returns insi
 
 Lowercase $g$ is also overloaded and deliberately kept apart from its subscript use: standing alone
 it is the gap (Background), and as a subscript in $\mu_g$, $\sigma_g$, $m_g$ it indexes a bucket
-G1 … G5 (§ 3.2.3). [04](04-volatility-regimes.md) gives $g_t$ a third meaning — a regime label —
-which is why it carries a date subscript there.
+G1 … G5 (§ 3.2.3).
 
 Lowercase $g$ is the gap, unrelated to the buckets G1 … G5, and lowercase $\delta$ is the tolerance
 on net exposure (§ 1.1), unrelated to [03](03-shaping-the-lookback.md)'s $\Delta$. Section 3.1's
@@ -726,7 +742,7 @@ each.** Chapter 03 then asks what shape the lookback itself should have.
 
 You should be able to explain:
 
-- [ ] Why a scatter plot proves nothing at a realistic 10–15% correlation
+- [ ] Why a scatter plot proves nothing at the correlation a real signal carries
 - [ ] Why the sort key must be the signal and never the forward return
 - [ ] Why a gap sits between the signal's window and the return it is scored on, and what that gap costs
 - [ ] Why a bucket holds dates rather than assets, and that the time axis is what pooling costs

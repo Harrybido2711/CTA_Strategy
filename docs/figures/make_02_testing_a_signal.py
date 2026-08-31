@@ -18,7 +18,10 @@ Figures produced
     bucket-time-collapse     every date gives one draw; pooling them spends the t axis
     signal-return-alignment  the lookback, the discarded gap, and the paired return
 
-All are schematics drawn from illustrative values.
+scatter-ladder's last panel, alpha-opacity, bucket-construction's lower row and
+all of noise-shrinks are measured on CTA_data/ through _data.py. The rest are
+schematics: they explain a definition or a procedure, where invented numbers
+are clearer than real ones.
 
 Formulas stay in the markdown as LaTeX rather than being rendered here: text in
 an image is neither selectable nor searchable.
@@ -27,7 +30,31 @@ an image is neither selectable nor searchable.
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import FancyBboxPatch, Polygon
+from _data import bucket_stats, momentum_panel, pooled
 from _style import THEMES, rounded_bar, save, style_axes, titles
+
+_PANEL = None
+
+
+def panel():
+    """The chapter's measured panel, loaded once: signal, return in bp, bucket.
+
+    21-day risk-adjusted momentum against the next session's return, every date
+    ranked against its own asset's history. 57,649 asset-dates across the 37
+    ETFs of CTA_data/.
+    """
+    global _PANEL
+    if _PANEL is None:
+        _PANEL = pooled(*momentum_panel(lookback=21, vol_window=63, gap=0))
+    return _PANEL
+
+
+def standardized(rng, n=4000):
+    """A rendering-sized subsample of the panel, both axes in sigma units."""
+    x, y, _ = panel()
+    pick = rng.choice(len(x), size=n, replace=False)
+    x, y = x[pick], y[pick]
+    return (x - x.mean()) / x.std(), (y - y.mean()) / y.std()
 
 
 # -------------------------------------------------- fig: what sign() discards
@@ -84,45 +111,32 @@ def binary_momentum(mode):
 
     save(fig, t, f"binary-momentum-{mode}.png")   # save() already crops tight
 
-# ------------------------------ fig: what turning the opacity down buys you
+
+# ------------- fig: what turning the marker opacity down does and does not buy
 def alpha_opacity(mode):
     """02 s3.1 -- alpha turns ink into density; whether density reads is another matter.
 
-    Schematic. Left and right are the same 5,000 illustrative points at 12%
-    correlation -- one asset's daily observations --
-    drawn opaque and at a low opacity. The middle panel is a different,
-    invented series: what the fix looks like when it works, a corner thin
-    enough to read.
+    Measured. The same 6,000 asset-dates from CTA_data/ drawn opaque and at a
+    low opacity, so the panels differ only in the thing being demonstrated.
+    Nothing appears in the second that was not visible in the first, which is
+    the point.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(23)
-    n = 5000
-    r = 0.12
-    x = rng.standard_normal(n)
-    y = r * x + (1 - r ** 2) ** 0.5 * rng.standard_normal(n)
-
-    # a hypothetical book where a high signal rules out the worst losses: thin
-    # the bottom-right corner smoothly, so it reads as data and not as a mask
-    xs = rng.standard_normal(n)
-    ys = r * xs + (1 - r ** 2) ** 0.5 * rng.standard_normal(n)
-    carve = np.clip((xs + 0.3) / 1.8, 0, 1) * np.clip((-ys + 0.3) / 1.8, 0, 1)
-    keep = rng.random_sample(n) > 0.97 * carve
+    x, y = standardized(rng, n=6000)
 
     panels = (
-        (x, y, 1.00, "alpha = 1", "the default — one solid mass", False),
-        (xs[keep], ys[keep], 0.01, "alpha = 0.01, and it worked",
-         "one corner thin enough to read", True),
-        (x, y, 0.01, "alpha = 0.01, and it did not",
-         "the same points — round, and untilted", False),
+        (1.00, "alpha = 1", "the default — one solid mass"),
+        (0.01, "alpha = 0.01", "the same points, rendered as density"),
     )
 
-    fig, axes = plt.subplots(1, 3, figsize=(11.0, 3.9), sharex=True, sharey=True,
-                             gridspec_kw=dict(wspace=0.12))
+    fig, axes = plt.subplots(1, 2, figsize=(7.6, 3.9), sharex=True, sharey=True,
+                             gridspec_kw=dict(wspace=0.10))
     fig.patch.set_facecolor(t["surface"])
 
-    for ax, (px, py, alpha, head, sub, mark) in zip(axes, panels):
+    for ax, (alpha, head, sub) in zip(axes, panels):
         style_axes(ax, t, grid=False)
-        ax.scatter(px, py, s=8.0, color=t["series"], alpha=alpha, linewidths=0, zorder=3)
+        ax.scatter(x, y, s=8.0, color=t["series"], alpha=alpha, linewidths=0, zorder=3)
         ax.set_xlim(-3.6, 3.6)
         ax.set_ylim(-3.6, 3.6)
         ax.set_xticks([])
@@ -132,31 +146,27 @@ def alpha_opacity(mode):
                 fontsize=10.2, fontweight="600", va="bottom")
         ax.text(0, 1.03, sub, transform=ax.transAxes, color=t["ink_secondary"],
                 fontsize=8.5, va="bottom")
-        if mark:
-            ax.annotate("high signal, no\ndeep loss", xy=(2.0, -2.0), xytext=(-0.4, -3.3),
-                        color=t["ink_secondary"], fontsize=8.4, ha="center",
-                        arrowprops=dict(arrowstyle="-", color=t["muted"], linewidth=1.0,
-                                        connectionstyle="arc3,rad=-0.25"))
 
     axes[0].set_ylabel("forward return $r_{s,t}$   (σ)", color=t["ink_secondary"],
                        fontsize=9, labelpad=8)
     fig.text(0.5, 0.01, "signal $MOM_{s,t}$   (σ)", ha="center", color=t["muted"], fontsize=8.5)
     fig.text(0.5, -0.09,
-             "Illustrative. Outer panels are one asset's 5,000 daily observations at 12% "
-             "correlation, differing only in opacity. The middle is a different, invented series — "
-             "what success would look like, and it would be a result.",
+             "Measured on CTA_data/ — 6,000 asset-dates, both axes standardized. A smooth density "
+             "renders faithfully as a smooth density.",
              ha="center", color=t["ink_secondary"], fontsize=8.6)
     save(fig, t, f"alpha-opacity-{mode}.png")
 
-
 # --------------------- fig: how the bar chart is built, and why averaging is
 def bucket_construction(mode):
-    """02 s3.2 -- draw five, rank them, repeat, average — on a line and on a cloud.
+    """02 s3.2 -- draw five, rank them, repeat, average — invented and measured.
 
-    Schematic. Top row: a perfect relationship, where every draw of five comes
-    out ordered. Bottom row: the real 12%-correlation cloud, where each draw is
-    tangled and the order survives only in the average of 400 of them. Every
-    drawn point is the same colour: any five will do, and no draw is special.
+    Top row invented: a perfect relationship, where every draw of five comes out
+    ordered and 400 of them average into a clean staircase. Bottom row measured
+    on CTA_data/: the same two steps on the real cloud, closing on the actual
+    bucket chart over all 57,649 asset-dates rather than on a resampling device,
+    because with real fat-tailed returns a single 20-sigma session would own the
+    average of 400 draws. Every drawn point is the same colour: any five will
+    do, and no draw is special. Whiskers are +/- 2 SE.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(9)
@@ -164,8 +174,7 @@ def bucket_construction(mode):
 
     lx = rng.uniform(0, 10, n)
     ly = lx.copy()                                   # perfect: return is the signal
-    cx = rng.standard_normal(n)
-    cy = 0.12 * cx + (1 - 0.12 ** 2) ** 0.5 * rng.standard_normal(n)
+    cx, cy = standardized(rng, n=n)                  # measured: CTA_data/
 
     def slots(px, py, k):
         """k draws of five dates, each sorted by signal into rank slots G1..G5"""
@@ -174,17 +183,17 @@ def bucket_construction(mode):
         return np.take_along_axis(py[idx], order, axis=1), idx
 
     rows = (
-        (lx, ly, "If the relationship were perfect", "any five dates, taken at random",
-         "every draw comes out ordered"),
-        (cx, cy, "On the real cloud", "any five dates, taken at random",
-         "every draw comes back tangled"),
+        (lx, ly, False, "If the relationship were perfect",
+         "every draw comes out ordered", f"{total} draws, averaged"),
+        (cx, cy, True, "On the measured cloud",
+         "every draw comes back tangled", "all 57,649, averaged"),
     )
 
     fig, axes = plt.subplots(2, 3, figsize=(10.6, 6.6),
                              gridspec_kw=dict(wspace=0.30, hspace=0.58))
     fig.patch.set_facecolor(t["surface"])
 
-    for (px, py, head, sub, mid_sub), (ax, bx, cxx) in zip(rows, axes):
+    for (px, py, measured, head, mid_sub, right_head), (ax, bx, cxx) in zip(rows, axes):
         ranked, idx = slots(px, py, shown)
         picked = idx[:3].ravel()                     # three draws' worth, one colour
 
@@ -193,9 +202,12 @@ def bucket_construction(mode):
                    xlabel="signal $MOM_{s,t}$", grid=False)
         ax.scatter(px, py, s=3.0, color=t["series"], alpha=0.10, linewidths=0, zorder=2)
         ax.scatter(px[picked], py[picked], s=34, color=t["series"], zorder=4)
+        if measured:                                 # a 20-sigma session would flatten it
+            ax.set_xlim(-4, 4)
+            ax.set_ylim(-4, 4)
         ax.set_xticks([])
         ax.set_yticks([])
-        titles(ax, t, head, sub)
+        titles(ax, t, head, "any five dates, taken at random")
 
         # ---- each draw, at the rank slot its five points fell into
         style_axes(bx, t, ylabel="forward return $r_{s,t}$",
@@ -203,60 +215,76 @@ def bucket_construction(mode):
         for row in ranked:
             bx.plot(range(5), row, color=t["series"], alpha=0.42, linewidth=1.1,
                     marker="o", markersize=4.6, zorder=4)
+        if measured:
+            bx.set_ylim(-4, 4)
         bx.set_xticks(range(5))
         bx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
         bx.set_yticks([])
         titles(bx, t, f"{shown} draws, ranked", mid_sub)
 
-        # ---- and the average of many, with the error on it
-        allr, _ = slots(px, py, total)
-        means, errs = allr.mean(axis=0), allr.std(axis=0) / total ** 0.5
-        style_axes(cxx, t, ylabel="mean forward return $r_{s,t}$",
-                   xlabel="signal bucket ($MOM$)")
+        # ---- and the answer, with the error on it
+        if measured:
+            _, y, g = panel()
+            means, errs, _ = bucket_stats(y, g)
+            errs = 2 * errs
+            right_sub = "bars with ± 2 SE, in basis points"
+            ylab = "mean forward return (bp)"
+        else:
+            allr, _ = slots(px, py, total)
+            means = allr.mean(axis=0)
+            errs = 2 * allr.std(axis=0) / total ** 0.5
+            right_sub = "bars with ± 2 SE"
+            ylab = "mean forward return $r_{s,t}$"
+
+        style_axes(cxx, t, ylabel=ylab, xlabel="signal bucket ($MOM$)")
         for i, v in enumerate(means):
             rounded_bar(cxx, i, v, color=t["series"], width=0.34)
         cxx.errorbar(range(5), means, yerr=errs, fmt="none", ecolor=t["muted"],
                      elinewidth=1.1, capsize=3, capthick=1.1, zorder=5)
         cxx.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
         lo, hi = (means - errs).min(), (means + errs).max()
-        pad = 0.16 * (hi - lo)
+        pad = 0.18 * (hi - lo)
         cxx.set_ylim(min(0, lo) - pad, hi + pad)
         cxx.set_xlim(-0.6, 4.6)
         cxx.set_xticks(range(5))
         cxx.set_xticklabels(["G1", "G2", "G3", "G4", "G5"])
-        cxx.set_yticks([])
-        titles(cxx, t, f"{total} draws, averaged", "bars with their error bars")
+        if not measured:
+            cxx.set_yticks([])
+        titles(cxx, t, right_head, right_sub)
 
     fig.text(0.5, -0.03,
-             "Illustrative. Each row is scaled to its own height — the real staircase has the shape "
-             "of the perfect one and a small fraction of the rise.",
+             "Upper row invented, lower row measured on CTA_data/. Each row is scaled to its own "
+             "height — the measured staircase carries a small fraction of the rise, and it descends.",
              ha="center", color=t["ink_secondary"], fontsize=8.8)
     save(fig, t, f"bucket-construction-{mode}.png")
 
 
 # ------------------ fig: the staircase is an estimate, and m is what sharpens it
 def noise_shrinks(mode):
-    """02 s3.2 -- the same buckets at m = 5, 30, 300 and 3,000 observations each.
+    """02 s3.2 -- the measured buckets at m = 30, 300, 3,000 and every observation.
 
-    Schematic, but the numbers are the chapter's. Population is 12%-correlated
-    with a 120 bp return standard deviation, so the true bucket means sit at
-    roughly -20, -8, 0, +8 and +20 bp in every panel and only the error on them
-    changes: 119 bp over root m, which is 53, 22, 6.9 and 2.2 bp.
+    Measured. Each panel draws m observations from each real bucket, so the
+    quantity being estimated is identical in all four and only the error on it
+    changes -- 149 bp over root m, which is 27, 8.6, 2.7 and 1.4 bp. Bars are
+    the bucket mean; whiskers are +/- 2 SE, as everywhere in the chapter.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(17)
-    rho, sig = 0.12, 120.0
+    _, y, g = panel()
+    full = min((g == k).sum() for k in range(1, 6))
 
     fig, axes = plt.subplots(1, 4, figsize=(11.4, 3.5), sharey=True,
                              gridspec_kw=dict(wspace=0.14))
     fig.patch.set_facecolor(t["surface"])
 
-    for ax, m in zip(axes, (5, 30, 300, 3000)):
-        x = rng.standard_normal(5 * m)
-        y = sig * (rho * x + (1 - rho ** 2) ** 0.5 * rng.standard_normal(5 * m))
-        order = np.argsort(x)
-        groups = y[order].reshape(5, m)
-        means, errs = groups.mean(axis=1), groups.std(axis=1) / m ** 0.5
+    for ax, m in zip(axes, (30, 300, 3000, full)):
+        means, errs = [], []
+        for k in range(1, 6):
+            vals = y[g == k]
+            draw = rng.choice(vals, size=m, replace=False)
+            means.append(draw.mean())
+            errs.append(2 * draw.std(ddof=1) / m ** 0.5)
+        means, errs = np.array(means), np.array(errs)
 
         style_axes(ax, t, ylabel="mean forward return (bp)" if ax is axes[0] else None,
                    xlabel="signal bucket ($MOM$)")
@@ -266,30 +294,39 @@ def noise_shrinks(mode):
                     elinewidth=1.1, capsize=3, capthick=1.1, zorder=5)
         ax.axhline(0, color=t["baseline"], linewidth=0.9, zorder=2)
         ax.set_xlim(-0.62, 4.62)
-        ax.set_ylim(-95, 95)
+        ax.set_ylim(-99, 99)
         ax.set_xticks(range(5))
         ax.set_xticklabels(["G1", "G2", "G3", "G4", "G5"], fontsize=7.6)
-        ax.text(0, 1.14, f"m = {m:,}", transform=ax.transAxes, color=t["ink"],
+        head = f"m = {m:,}" + (" (all)" if m == full else "")
+        ax.text(0, 1.14, head, transform=ax.transAxes, color=t["ink"],
                 fontsize=10.2, fontweight="600", va="bottom")
-        sem = 119 / m ** 0.5
-        ax.text(0, 1.03, f"noise ± {sem:.1f} bp" if sem < 10 else f"noise ± {sem:.0f} bp",
+        half = errs.mean()
+        ax.text(0, 1.03, f"± 2 SE = {half:.1f} bp" if half < 10 else f"± 2 SE = {half:.0f} bp",
                 transform=ax.transAxes, color=t["ink_secondary"], fontsize=8.5, va="bottom")
 
+    axes[-1].annotate("G1 stands clear\nof its own error",
+                      xy=(0.16, 11), xytext=(1.5, 62), color=t["ink_secondary"], fontsize=8.4,
+                      arrowprops=dict(arrowstyle="-", color=t["muted"], linewidth=1.0,
+                                      connectionstyle="arc3,rad=0.24"))
+
     fig.text(0.5, -0.10,
-             "Illustrative. The true bucket means are the same in all four panels — near −20 bp at "
-             "G1 and +20 bp at G5. Only the error on the estimate changes, and it changes as the "
+             "Measured on CTA_data/. The quantity estimated is the same in all four panels — the "
+             "real bucket means, near +11 bp at G1 and 0 at G5. Only the error changes, as the "
              "square root of m.",
              ha="center", color=t["ink_secondary"], fontsize=8.6)
     save(fig, t, f"noise-shrinks-{mode}.png")
 
-
 # ----------------------- fig: the calibration ladder, and where reality sits
 def scatter_ladder(mode):
-    """02 s2 -- what each correlation looks like; the eye's floor is ~30%.
+    """02 s2 -- what each correlation looks like, and which one the data gives.
 
-    Schematic. The same 1,500 illustrative points redrawn at four correlations,
-    so the panels differ only in the quantity being demonstrated. The leftmost
-    is the picture you had in mind; the rightmost is what the data returns.
+    The first three panels are synthetic: no liquid market hands you an 80%
+    correlation, so the only way to show one is to draw it. The fourth is
+    measured: 4,000 asset-dates drawn from CTA_data/ for rendering, both axes
+    standardized so the panel sits on the same scale as the three it is compared
+    against. Its label is the correlation of the whole 57,649-row panel, not of
+    the subsample being drawn -- a subsample's own correlation carries a 1.6
+    point standard error and would print a number the chapter does not use.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(11)
@@ -297,34 +334,37 @@ def scatter_ladder(mode):
     x = rng.standard_normal(n)
     e = rng.standard_normal(n)
 
+    xm, ym = standardized(rng, n=4000)
+    fx, fy, _ = panel()                              # label the population, not the subsample
+    rho = np.corrcoef(fx, fy)[0, 1]
+
     panels = [
-        (0.80, "what you pictured", False),
-        (0.45, "convincing", False),
-        (0.30, "the eye's floor", False),
-        (0.12, "what you observe", True),
+        (0.80, x, 0.80 * x + (1 - 0.80 ** 2) ** 0.5 * e, "what you pictured", False),
+        (0.45, x, 0.45 * x + (1 - 0.45 ** 2) ** 0.5 * e, "convincing", False),
+        (0.30, x, 0.30 * x + (1 - 0.30 ** 2) ** 0.5 * e, "the eye's floor", False),
+        (rho, xm, ym, "measured, CTA_data", True),
     ]
 
     fig, axes = plt.subplots(1, 4, figsize=(9.6, 3.1), sharex=True, sharey=True,
                              gridspec_kw=dict(wspace=0.16))
     fig.patch.set_facecolor(t["surface"])
 
-    for ax, (r, verdict, live) in zip(axes, panels):
+    for ax, (r, px, py, verdict, live) in zip(axes, panels):
         style_axes(ax, t, grid=False)
-        y = r * x + (1 - r ** 2) ** 0.5 * e
-        ax.scatter(x, y, s=3.2, color=t["series"], alpha=0.16, linewidths=0, zorder=3)
+        ax.scatter(px, py, s=3.2, color=t["series"], alpha=0.16, linewidths=0, zorder=3)
         ax.set_xlim(-3.6, 3.6)
         ax.set_ylim(-3.6, 3.6)
         ax.set_xticks([])
         ax.set_yticks([])
         ax.spines["bottom"].set_visible(False)
-        ax.text(0, 1.15, f"corr = {int(r * 100)}%", transform=ax.transAxes,
+        label = f"corr = {r * 100:+.1f}%" if live else f"corr = {int(r * 100)}%"
+        ax.text(0, 1.15, label, transform=ax.transAxes,
                 color=t["ink"], fontsize=10.4, fontweight="600", va="bottom")
         ax.text(0, 1.04, verdict, transform=ax.transAxes,
                 color=t["ink"] if live else t["muted"],
                 fontsize=8.8, fontweight="600" if live else "normal", va="bottom")
-        # underscore the panel the reader will actually meet
         if live:
-            ax.plot([0, 0.62], [1.005, 1.005], transform=ax.transAxes,
+            ax.plot([0, 0.78], [1.005, 1.005], transform=ax.transAxes,
                     color=t["series"], linewidth=1.6, solid_capstyle="butt",
                     clip_on=False, zorder=5)
 
@@ -332,10 +372,11 @@ def scatter_ladder(mode):
                        fontsize=9, labelpad=8)
     fig.text(0.5, 0.01, "signal $MOM_{s,t}$   (σ)", ha="center", color=t["muted"], fontsize=8.5)
     fig.text(0.5, -0.09,
-             "Illustrative. Every panel holds a real relationship — only the first two are "
-             "strong enough for the eye to find it.",
+             "First three panels drawn at a stated correlation. The fourth is measured on "
+             "CTA_data/ — the correlation is the whole panel\'s, rendered from a 4,000-point "
+             "subsample. Every panel holds a real relationship; only the first two show it.",
              ha="center", color=t["ink_secondary"], fontsize=8.6)
-    save(fig, t, f"scatter-ladder-{mode}.png")   # save() already crops tight
+    save(fig, t, f"scatter-ladder-{mode}.png")
 
 
 # ------------------------- fig: how the time axis collapses into five bars
