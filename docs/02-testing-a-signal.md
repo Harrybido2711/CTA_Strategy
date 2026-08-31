@@ -12,11 +12,11 @@
 
 Everything in this chapter is built from three numbers, one of each per asset per date.
 
-| Object                   | Symbol        | What it is                                                                                  | Known at$t$ ?                     |
-| ------------------------ | ------------- | ------------------------------------------------------------------------------------------- | ----------------------------------- |
-| **Weight**         | $w_{s,t}$   | the share of capital held in asset$s$ on date $t$, signed — negative is a short        | **yes**, you choose it        |
-| **Signal**         | $MOM_{s,t}$ | a number computed from data available at$t$, meant to say something about what comes next | **yes**, you compute it       |
-| **Forward return** | $r_{s,t}$   | what the asset then goes on to deliver while the position is held                           | **no** — this is the unknown |
+| Object                   | Symbol                                                                                                      | What it is                                                        | Known at$t$ ?                     |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------- |
+| **Weight**         | $w_{s,t}$   | the share of capital held in asset$s$ on date $t$, signed — negative is a short        | **yes**, you choose it                                      |                                     |
+| **Signal**         | $MOM_{s,t}$ | a number computed from data available at$t$, meant to say something about what comes next | **yes**, you compute it                                     |                                     |
+| **Forward return** | $r_{s,t}$                                                                                                 | what the asset then goes on to deliver while the position is held | **no** — this is the unknown |
 
 **Note (Scope).** This chapter describes **one asset at a time**: a single series of dates, each
 carrying that asset's own signal and its own forward return. That restriction is not a
@@ -81,10 +81,10 @@ $$
 $G$ is the gross target; the net holds at 1 only to within a tolerance $\delta$, since rebalancing
 is discrete and the book drifts between trades. The two sums are independent:
 
-| Sum                                                 | What it fixes                                                                                  | Typical value                                 |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| **Net**, $\sum_s w_{s,t}$                   | how much*market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased,$\approx 0$ market-neutral |
-| **Gross**, the same sum over absolute weights | how much*leverage* is deployed, longs and shorts adding rather than cancelling               | 200% (a 150/50 book) or 300%                  |
+| Sum                                                                                                                                                                                                  | What it fixes                                                                    | Typical value                |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------- |
+| **Net**, $\sum_s w_{s,t}$                   | how much*market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased,$\approx 0$ market-neutral |                                                                                  |                              |
+| **Gross**, the same sum over absolute weights                                                                                                                                                  | how much*leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
 
 A book holding one asset at 100% and a book long 200% / short 100% carry the same net and three
 times the position — which is why both sums have to be stated, and why gross is never free
@@ -310,10 +310,10 @@ for **any** signal including one straight out of a random number generator, beca
 reporting the sort key back to you. **The staircase is evidence only because the thing sorted on and
 the thing measured are different, and the second was not knowable when the first was computed.**
 
-</details>
-
 One bar therefore carries three pieces of information: which fifth of the signal's range it stands
 for, the average return that fifth went on to earn, and how much of that average is sampling noise.
+
+</details>
 
 #### 3.2.2 How the bar plot shows a trend
 
@@ -676,24 +676,24 @@ Throughout, $s$ indexes the asset and $t$ the date. The signal is computed per a
 dropped wherever a formula never leaves one asset; it carries weight everywhere the assets are
 ranked against each other.
 
-| Symbol                                                                                                            | Means                                                                                                                         | First used |
-| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
-| $s$, $t$                                                                                                      | the asset, and the date in periods (days here)                                                                                | § 1       |
-| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$                                                                           | that asset's return in that period, the momentum signal it produces, and the share of capital that signal earns it            | § 1.0     |
-| $R_t$                                          | the portfolio's return on that date,$\sum_s w_{s,t} r_{s,t}$ | § 1.1                                                                                                                        |            |
-| $G$, $\delta$                                                                                                 | the gross-exposure target the weights must sum in absolute value to, and the tolerance allowed on the net                     | § 1.1     |
-| $\rho_s$, $\sigma_{MOM,s}$, $\sigma_{r,s}$                                                                  | one asset's signal-return correlation, and the standard deviations of its signal and its forward return                       | § 1.1     |
-| $N$, $i$                                                                                                      | lookback length, and the lag inside it running 1 to N                                                                         | § 1.0     |
-| $x$, $y$, $\beta$, $\epsilon$                                                                             | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
-| $\rho$, $R^2$                                                                                                 | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
-| $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$                                                                   | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
-| $m$, $m_g$                                                                                                    | observations sharing a bucket, and the count in bucket$g$                                                                   | § 3.2     |
-| $\mu_g$, $\sigma_g$, $\text{SE}_g$                                                                          | one bucket's true mean forward return, the sample standard deviation of the returns in it, and the standard error of its mean | § 3.2.3   |
-| $H_0$, $z$, $\alpha$                                                                                        | the null that two buckets share a mean, the standardized G5 − G1 difference testing it, and the level it is tested at        | § 3.2.3   |
-| G1 … G5                                                                                                          | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
-| $\sigma_{s,t}$                                                                                                  | one asset's volatility, estimated on data before that date                                                                    | § 4       |
-| $R_p$, $r_f$, $\sigma_p$                                                                                    | a portfolio's return over a period, the financing rate subtracted from it, and its return volatility                          | § 5       |
-| $g$                                                                                                             | gap length — periods between the end of the signal's window and the return it is scored on                                   | Background |
+| Symbol                                                                                                                                                                          | Means                                                                                                                         | First used |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| $s$, $t$                                                                                                                                                                    | the asset, and the date in periods (days here)                                                                                | § 1       |
+| $r_{s,t}$, $MOM_{s,t}$, $w_{s,t}$                                                                                                                                         | that asset's return in that period, the momentum signal it produces, and the share of capital that signal earns it            | § 1.0     |
+| $R_t$                                          | the portfolio's return on that date,$\sum_s w_{s,t} r_{s,t}$                                                               | § 1.1                                                                                                                        |            |
+| $G$, $\delta$                                                                                                                                                               | the gross-exposure target the weights must sum in absolute value to, and the tolerance allowed on the net                     | § 1.1     |
+| $\rho_s$, $\sigma_{MOM,s}$, $\sigma_{r,s}$                                                                                                                                | one asset's signal-return correlation, and the standard deviations of its signal and its forward return                       | § 1.1     |
+| $N$, $i$                                                                                                                                                                    | lookback length, and the lag inside it running 1 to N                                                                         | § 1.0     |
+| $x$, $y$, $\beta$, $\epsilon$                                                                                                                                           | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
+| $\rho$, $R^2$                                                                                                                                                               | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
+| $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$                                                                                                                                 | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
+| $m$, $m_g$                                                                                                    | observations sharing a bucket, and the count in bucket$g$ | § 3.2                                                                                                                        |            |
+| $\mu_g$, $\sigma_g$, $\text{SE}_g$                                                                                                                                        | one bucket's true mean forward return, the sample standard deviation of the returns in it, and the standard error of its mean | § 3.2.3   |
+| $H_0$, $z$, $\alpha$                                                                                                                                                      | the null that two buckets share a mean, the standardized G5 − G1 difference testing it, and the level it is tested at        | § 3.2.3   |
+| G1 … G5                                                                                                                                                                        | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
+| $\sigma_{s,t}$                                                                                                                                                                | one asset's volatility, estimated on data before that date                                                                    | § 4       |
+| $R_p$, $r_f$, $\sigma_p$                                                                                                                                                  | a portfolio's return over a period, the financing rate subtracted from it, and its return volatility                          | § 5       |
+| $g$                                                                                                                                                                           | gap length — periods between the end of the signal's window and the return it is scored on                                   | Background |
 
 **Note (Collisions to watch).** $R_t$ is the portfolio's return on a date (§ 1.1) and $R^2$ a share
 of variance (§ 2); they share a letter and nothing else.
