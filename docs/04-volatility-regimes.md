@@ -1,7 +1,7 @@
 # 04 · Volatility Regimes
 
 > - **Answers:** how to tell which market you are standing in before the move is over, and how to fold that answer into a signal without paying twice for information you already have.
-> - **Prerequisites:** [03 · Shaping the Lookback](03-shaping-the-lookback.md) § 4, which names the phenomenon this chapter measures; [02 · Testing a Signal](02-testing-a-signal.md) § 3.2, whose bar plot is still the only gauge.
+> - **Prerequisites:** [03 · Shaping the Lookback](03-shaping-the-lookback.md) § 3, which names the phenomenon this chapter measures; [02 · Testing a Signal](02-testing-a-signal.md) § 3.2, whose bar plot is still the only gauge.
 > - **After reading:** say why a trailing volatility estimate arrives too late to act on, read an implied-volatility index as a forecast, cut one into regime labels, and test whether the label carries anything your trend signals do not already own.
 
 ---
@@ -10,13 +10,13 @@
 
 ### 1.1 The two tapes
 
-[03 § 4.3](03-shaping-the-lookback.md) closed on a smoother and a deadband: two filters that sit on
+[03 § 3](03-shaping-the-lookback.md) closed on a smoother and a deadband: two filters that sit on
 the signal and blunt the churn a violent tape produces. Neither of them knows the tape is violent.
 That is the ceiling on anything reading only the signal, and clearing it means promoting the state
 of the market to a variable — one that is measured, named, and carried alongside the signal rather
 than filtered out of it.
 
-[03](03-shaping-the-lookback.md) § 4.1 established that amplitude is persistent while direction is
+[03](03-shaping-the-lookback.md) § 3 established that amplitude is persistent while direction is
 not: large moves follow large moves regardless of sign. That persistence is what makes the next
 definition possible at all — a property that flickered day to day could not be labelled.
 
@@ -28,12 +28,12 @@ The reason to care is that momentum does not work equally in both of them.
 
 | Tape | What the price does | What a fast/slow pair does |
 | --- | --- | --- |
-| **Slow grind** | a trend that builds over weeks, in either direction | works: the fast leg turns first, the slow leg confirms, and the position is on for the middle of the move ([03 § 1.1](03-shaping-the-lookback.md)) |
-| **Calm, then a burst** | flat for months, then a violent stretch of days, then flat again | fails: the fast leg is too slow to catch the burst and too fast not to be whipsawed by it ([03 § 4.2](03-shaping-the-lookback.md)) |
+| **Slow grind** | a trend that builds over weeks, in either direction | works: the fast leg turns first, the slow leg confirms, and the position is on for the middle of the move ([03 § 2.1](03-shaping-the-lookback.md)) |
+| **Calm, then a burst** | flat for months, then a violent stretch of days, then flat again | fails: the fast leg is too slow to catch the burst and too fast not to be whipsawed by it ([03 § 3](03-shaping-the-lookback.md)) |
 
 **Claim.** The edge a trend signal carries is a property of the regime, not of the signal alone.
 
-The argument is the one [03 § 4.2](03-shaping-the-lookback.md) already made and does not need
+The argument is the one [03 § 3](03-shaping-the-lookback.md) already made and does not need
 repeating in full: inside a burst the fast leg crosses the slow leg on noise rather than on trend,
 and each crossing buys the top of a spike and sells the bottom. What is new here is the
 consequence — if the edge depends on the regime, then the regime is a variable, and a variable you
@@ -73,7 +73,7 @@ periods after a shift, and its full level only after $k$ — so with a monthly w
 burst that has already ended.
 
 **Proof.** Square the definition and it is a flat average of the last $k$ squared returns — the
-boxcar kernel of [03 § 2.1](03-shaping-the-lookback.md), which weights every lag alike. Suppose the
+boxcar kernel of [03 § 1.1](03-shaping-the-lookback.md), which weights every lag alike. Suppose the
 tape jumps from $\sigma_{\text{calm}}$ to $\sigma_{\text{high}}$ at date 0 and stays there. At date
 $t < k$ exactly $t+1$ of the $k$ terms are drawn from the new regime and the rest from the old, so
 
@@ -97,7 +97,7 @@ would be de-risking into the recovery.
 **Note (Shortening the window does not rescue it).** The lag falls with $k$ and the noise rises with
 it: the relative standard error of a variance estimate from $k$ observations runs about
 $\left( 2/k \right)^{1/2}$, so $k = 5$ buys a two-session lag at the price of a 63 percent error on
-the level. Every $k$ is either late or unreliable, and an EWMA ([03 § 2.2](03-shaping-the-lookback.md))
+the level. Every $k$ is either late or unreliable, and an EWMA ([03 § 1.2](03-shaping-the-lookback.md))
 only re-shapes the same trade-off — a short half-life reacts sooner and jitters more. The problem is
 not the window. **It is that a backward-looking estimator has no term for news that has just
 arrived.**
@@ -475,7 +475,7 @@ and § 5.1's grid has both at once. $\epsilon_t$ here is the residual of a signa
 **signals**; [02 § 2](02-testing-a-signal.md)'s $\epsilon$ is the part of the forward **return** no
 signal reaches — same construction, different regression, and § 5.2 would be wrong if they were the
 same object. $k$ is a window length here and $k_j$ is MACD's kernel weight in
-[03 § 3.2](03-shaping-the-lookback.md). Uppercase $S_T$ is a price at expiry and lowercase $s$ is
+[03 § 2.5](03-shaping-the-lookback.md). Uppercase $S_T$ is a price at expiry and lowercase $s$ is
 [02](02-testing-a-signal.md)'s asset index. And $\sigma$ carries a market-wide meaning throughout
 this chapter — the index's own volatility — where [02 § 4](02-testing-a-signal.md)'s
 $\sigma_{s,t}$ is one asset's trailing volatility used to standardize its signal; $N$ is a sample

@@ -112,9 +112,9 @@ Assigned work. The pipeline stays as-is — only the signal changes.
 1. **Re-plot performance** with the risk-adjusted signal bucketed by rolling quantile instead of raw
    value — [02 § 4](../docs/02-testing-a-signal.md).
 2. **Add a MACD-style fast leg** to the grid search; read the heat map, don't pick the maximum —
-   [03 § 1](../docs/03-shaping-the-lookback.md), [07 § 4](../docs/07-overfitting-and-robustness.md).
+   [03 § 2](../docs/03-shaping-the-lookback.md), [07 § 4](../docs/07-overfitting-and-robustness.md).
 3. **Smooth the fast leg** with a window shorter than its own period, or it becomes another slow
-   signal — [03 § 4](../docs/03-shaping-the-lookback.md).
+   signal — [03 § 3](../docs/03-shaping-the-lookback.md).
 4. **Run it through the pipeline** and produce the charts.
 
 Further ahead: a volatility *forecast* rather than trailing realized vol as the noise filter.
