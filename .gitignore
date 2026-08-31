@@ -13,3 +13,6 @@ skills/
 
 # Personal chat records — keep out of the repo
 chat_records/
+
+# Recording transcripts — source material, not notes
+docs/recording_script/
