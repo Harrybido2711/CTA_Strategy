@@ -290,6 +290,14 @@ of many with the error on it.
   <img alt="Six panels in two rows. The upper row is invented and the lower is measured on CTA_data. Left column, the population of dates with fifteen randomly drawn ones marked in the same colour: on a perfect relationship they sit along a line, on the measured cloud they sit anywhere. Middle column, six draws of five dates plotted against rank slots G1 to G5: on the line every draw rises monotonically, on the cloud the six lines cross and tangle. Right column, the answer with plus or minus two standard errors: a clean rising staircase on the invented row, and on the measured row the real bucket chart over all 57,649 asset-dates — G1 at plus 11 basis points standing well clear of its error bar, G2 to G5 all within a few basis points of zero, so the staircase descends" src="figures/bucket-construction-light.png">
 </picture>
 
+**Note (What makes 57,649 dates from 37 assets one pool).** The measured row does not rank raw
+momentum across assets. Every signal entering it is already divided by that asset's own trailing
+volatility and ranked against that asset's own history before it lands in a bucket — the route § 4
+works out in full, with a worked two-asset example. G1 … G5 are therefore **percentile** slots,
+comparable across a Treasury ETF and a semiconductor ETF for the same reason they are comparable
+across 2021 and 2023: nothing but rank survives the trip, so pooling assets costs no more than
+pooling dates already did.
+
 **The sort key is the signal, never the return.** Step 2 orders by $MOM_{s,t}$, which is known at
 $t$; step 3 only *records* what followed. G1 therefore holds the lowest-**signal** observations, not
 the worst performers.
@@ -548,7 +556,8 @@ quintiles instead.
 
 **The rule this section leaves behind.** Every signal is **standardized** or **scored against its
 own past** before it is compared to anything — otherwise the bar plot reports volatility while
-wearing the signal's name.
+wearing the signal's name. The measured chart back in § 3.2 already followed this rule before this
+section stated it: the percentile route is what let 37 assets share one pool of buckets.
 
 ## 5. What to report — and why it is not a Sharpe ratio
 
