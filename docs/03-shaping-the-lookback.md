@@ -85,6 +85,12 @@ on one hard enough and someone takes the other side and presses it back.
 
 ## 2. EWMA instead of a simple moving average
 
+§ 1 answered *how many* returns a lookback should span, and answered it with a pair rather than a
+single number. This section answers the other blank left open by
+[02](02-testing-a-signal.md)'s $\text{Avg}(r_{s,t-i})$ — not how many returns to include, but *how
+much each one inside the window should count.* § 3 shows the two answers are not independent;
+carried this far, each is only half of what a chart package already ships as one indicator.
+
 ### 2.1 Why the newest return should weigh most
 
 A momentum signal is a weighted sum of past returns, and a simple moving average is one particular
@@ -150,6 +156,10 @@ that status, which is [07](07-overfitting-and-robustness.md)'s subject rather th
 accept on authority.
 
 ## 3. MACD, stated precisely
+
+§ 1 paired a fast lookback with a slow one; § 2 replaced either window's flat weights with a decay.
+Put the two together — take the difference of a fast EWMA and a slow one — and the result already
+has a name.
 
 ### 3.1 The three series
 
