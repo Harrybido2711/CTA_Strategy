@@ -12,7 +12,7 @@ flowchart LR
     C01["01<br/>What Is a CTA"]
     C02["02<br/>Testing"]
     C03["03<br/>Lookback"]
-    C04["04<br/>Positions"]
+    C04["04<br/>Vol Regimes"]
     C05["05<br/>Backtesting"]
     C06["06<br/>Performance"]
     C07["07<br/>Robustness"]
@@ -40,7 +40,7 @@ Everything from 08 up is reference, consulted rather than stepped through.
 | — | [How a Strategy Is Built](00-pipeline.md) — orientation | 01 | ✅ |
 | 02 | [Testing a Signal](02-testing-a-signal.md) — is there information in it? | 01 | ✅ |
 | 03 | [Shaping the Lookback](03-shaping-the-lookback.md) — window length, weights, MACD | 02 | ✅ |
-| 04 | [From Signal to Position](04-from-signal-to-position.md) | 03 | ✅ |
+| 04 | [Volatility Regimes](04-volatility-regimes.md) — which market am I in, and does the edge survive it? | 03 | ✅ |
 | 05 | [Understanding Backtesting](05-understanding-backtesting.md) | 04 | ✅ |
 | 06 | [Evaluating Performance](06-evaluating-performance.md) | 05 | 🟡 §1 |
 | 07 | [Overfitting & Robustness](07-overfitting-and-robustness.md) | 06 | 🟡 §§1–2, 4 |
@@ -69,10 +69,15 @@ appended elsewhere.
 | How can you sell a stock you don't own? | [01 § short selling](01-what-is-cta.md) |
 | Why does my equity curve have a vertical jump? | [100 § 1.1](100-dataset.md) |
 | Does my signal carry information? | [02 § 3.2](02-testing-a-signal.md) |
+| Is the gap between my top and bottom bar real? | [02 § 3.2.3](02-testing-a-signal.md) |
+| Why can't I just report a Sharpe ratio? | [02 § 5](02-testing-a-signal.md) |
 | What is MACD actually averaging? | [03 § 3](03-shaping-the-lookback.md) |
 | Why is my R² only 0.005 — is the model useless? | [09](09-ic-and-r-squared.md) |
 | How do I compute and read an IC? | [09 § 2](09-ic-and-r-squared.md) |
-| Why does a 150% long leg not depend on price? | [04 § weights are money](04-from-signal-to-position.md) |
+| Why does my signal stop working in a crash? | [04 § 1](04-volatility-regimes.md) |
+| Why is realized volatility too late to trade on? | [04 § 2](04-volatility-regimes.md) |
+| VIX or MOVE, and is it a variance or a volatility? | [04 § 3](04-volatility-regimes.md) |
+| Is my new signal actually new? | [04 § 5.2](04-volatility-regimes.md) |
 | What does `curr_shrs` mean? | [05 § columns](05-understanding-backtesting.md) |
 | Do I have look-ahead bias? | [05 § offsets](05-understanding-backtesting.md), [07 § 2](07-overfitting-and-robustness.md) |
 | How does `merge_asof` work? | [08](08-toolbox-pandas.md) |

@@ -233,7 +233,7 @@ Suppose the prediction is exactly half the true return:
 
 The ordering is perfect, so IC = 1, while R² is penalised to about 0.72. Yet the model is entirely
 tradeable — double the position size. Sizing is a **separate layer** of the chain
-([04](04-from-signal-to-position.md)), so a scale error is corrected for free downstream while a
+([position construction](04-from-signal-to-position.md)), so a scale error is corrected for free downstream while a
 ranking error cannot be corrected at all. R² penalises both; IC measures only the part that
 survives to the P&L.
 

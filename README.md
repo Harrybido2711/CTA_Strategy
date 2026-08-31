@@ -57,7 +57,7 @@ stages 4–6 → [04](docs/04-from-signal-to-position.md) · stages 8–9 →
 | — | [How a Strategy Is Built](docs/00-pipeline.md) | Orientation: how signal, strategy, backtest and momentum relate, and the order they get built in | ✅ |
 | 02 | [Testing a Signal](docs/02-testing-a-signal.md) | Hypothesis framing, why a scatter proves nothing, the bar plot and how to read it, risk-adjusted momentum | ✅ |
 | 03 | [Shaping the Lookback](docs/03-shaping-the-lookback.md) | Window length, fast/slow combination, EWMA half-life, MACD as a kernel, smoothing the fast leg | ✅ |
-| 04 | [From Signal to Position](docs/04-from-signal-to-position.md) | weight → dollar → shares, holding period, the two portfolios | ✅ |
+| 04 | [Volatility Regimes](docs/04-volatility-regimes.md) | realized vs implied vol, VIX and MOVE, regime buckets, conditioning and residualizing | ✅ |
 | 05 | [Understanding Backtesting](docs/05-understanding-backtesting.md) | Every column, timing offsets, look-ahead bias | ✅ |
 | 06 | [Evaluating Performance](docs/06-evaluating-performance.md) | Why a single number hides the time dimension; Sharpe, drawdown, turnover, attribution | 🟡 partial |
 | 07 | [Overfitting &amp; Robustness](docs/07-overfitting-and-robustness.md) | Train/validation/test, why time series can't be split randomly, heat-map parameter sensitivity | 🟡 partial |
@@ -85,7 +85,10 @@ that owns each concept; there is no parallel per-session record.
 | See what the 37 tickers actually are                 | [100 § 2](docs/100-dataset.md)                                                         |
 | Test whether my signal carries information           | [02 § 3.2](docs/02-testing-a-signal.md)                                                                   |
 | Write down MACD, and see why it is momentum         | [03](docs/03-shaping-the-lookback.md)                                                                   |
-| Know what a bar plot cannot tell me                  | [02 § 3.2.3](docs/02-testing-a-signal.md)                                                                   |
+| Know what a bar plot cannot tell me                  | [02 § 3.2.4](docs/02-testing-a-signal.md)                                                                   |
+| Test whether the gap between my top and bottom bar is real | [02 § 3.2.3](docs/02-testing-a-signal.md)                                                             |
+| Know why a Sharpe ratio cannot judge a signal        | [02 § 5](docs/02-testing-a-signal.md)                                                                       |
+| Tell which volatility regime I am in                 | [04](docs/04-volatility-regimes.md)                                                                         |
 | Make signals comparable across dates and assets      | [02 § 4](docs/02-testing-a-signal.md)                                                              |
 | Combine a fast and slow horizon                      | [03](docs/03-shaping-the-lookback.md)                                                             |
 | Turn a signal into position weights                  | [04](docs/04-from-signal-to-position.md)                                                                 |

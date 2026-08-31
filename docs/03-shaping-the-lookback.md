@@ -224,7 +224,7 @@ Three common rules, in increasing order of information kept. All three still hav
 | ------------ | --------------------------------------- | ---------------------------------------------------------------- |
 | Zero-line    | MACD is above zero                      | a slow trend filter, late                                        |
 | Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 4's subject                  |
-| Proportional | always, sized by the standardized value | none of the magnitude, but see[04](04-from-signal-to-position.md) |
+| Proportional | always, sized by the standardized value | none of the magnitude, but see [02 § 4](02-testing-a-signal.md) |
 
 ## 4. Volatility clustering, and smoothing the fast leg
 
@@ -304,7 +304,7 @@ regression intercept; code font against maths is the tell.
 
 ---
 
-## Next → [04 · From Signal to Position](04-from-signal-to-position.md)
+## Next → [04 · Volatility Regimes](04-volatility-regimes.md)
 
 Before moving on, **plot the kernel of your own signal** — the weight it places on the return at
 each lag — beside a boxcar of the same total. If you cannot draw it, you do not yet know what your
