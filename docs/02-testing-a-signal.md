@@ -12,11 +12,11 @@
 
 Everything in this chapter is built from three numbers, one of each per asset per date.
 
-| Object | Symbol | What it is | Known at $t$ ? |
-| --- | --- | --- | --- |
-| **Weight** | $w_{s,t}$ | the share of capital held in asset $s$ on date $t$, signed — negative is a short | **yes**, you choose it |
-| **Signal** | $MOM_{s,t}$ | a number computed from data available at $t$, meant to say something about what comes next | **yes**, you compute it |
-| **Forward return** | $r_{s,t}$ | what the asset then goes on to deliver while the position is held | **no** — this is the unknown |
+| Object                   | Symbol        | What it is                                                                                  | Known at$t$ ?                     |
+| ------------------------ | ------------- | ------------------------------------------------------------------------------------------- | ----------------------------------- |
+| **Weight**         | $w_{s,t}$   | the share of capital held in asset$s$ on date $t$, signed — negative is a short        | **yes**, you choose it        |
+| **Signal**         | $MOM_{s,t}$ | a number computed from data available at$t$, meant to say something about what comes next | **yes**, you compute it       |
+| **Forward return** | $r_{s,t}$   | what the asset then goes on to deliver while the position is held                           | **no** — this is the unknown |
 
 **Note (Scope).** This chapter describes **one asset at a time**: a single series of dates, each
 carrying that asset's own signal and its own forward return. That restriction is not a
@@ -81,10 +81,10 @@ $$
 $G$ is the gross target; the net holds at 1 only to within a tolerance $\delta$, since rebalancing
 is discrete and the book drifts between trades. The two sums are independent:
 
-| Sum | What it fixes | Typical value |
-| --- | --- | --- |
-| **Net**, $\sum_s w_{s,t}$ | how much *market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased, $\approx 0$ market-neutral |
-| **Gross**, the same sum over absolute weights | how much *leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
+| Sum                                                 | What it fixes                                                                                  | Typical value                                 |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| **Net**, $\sum_s w_{s,t}$                   | how much*market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased,$\approx 0$ market-neutral |
+| **Gross**, the same sum over absolute weights | how much*leverage* is deployed, longs and shorts adding rather than cancelling               | 200% (a 150/50 book) or 300%                  |
 
 A book holding one asset at 100% and a book long 200% / short 100% carry the same net and three
 times the position — which is why both sums have to be stated, and why gross is never free
@@ -184,7 +184,10 @@ return from one observation to the next, 1.44% is linear in the signal and 98.56
 
 </details>
 
-**Example.** Everything below is **one asset-date's** forward return, never a portfolio's. Take a
+<details>
+<summary><b>Example.</b> one asset-date's return split into the 14.4 bp the signal moves and the 119 bp it does not</summary>
+
+Everything below is **one asset-date's** forward return, never a portfolio's. Take a
 daily return standard deviation of $\sigma_y = 0.012$ — 120 bp, typical for a single equity ETF,
 a **basis point** being 0.01%:
 
@@ -197,6 +200,8 @@ a **basis point** being 0.01%:
 Across an x-axis running from $-2\sigma_x$ to $+2\sigma_x$ the trend line climbs about 58 bp end
 to end, while at every $x$ the points scatter over roughly 476 bp. **A 0.6% slope inside a 4.8%
 cloud** — that ratio *is* the picture.
+
+</details>
 
 **Note (And it is worse than that).** Part of those 119 bp is not the market's doing: pooling a
 calm 2021 with a violent 2023 adds spread that standardization (§ 4) removes. Nor is a larger
@@ -286,21 +291,26 @@ of many with the error on it.
 $t$; step 3 only *records* what followed. G1 therefore holds the lowest-**signal** observations, not
 the worst performers.
 
-**Example.** Five dates from one asset's history, invented, filed both ways:
+<details>
+<summary><b>Example.</b> five dates filed by signal and by return, and why sorting on the return would make any signal look perfect</summary>
 
-| Date | Signal | Forward return | Slot by signal | Slot by return |
-| --- | --- | --- | --- | --- |
-| $t_1$ | +2.1% | −0.4% | G4 | G2 |
-| $t_2$ | −1.8% | +0.9% | G1 | G4 |
-| $t_3$ | +0.6% | +1.3% | G3 | G5 |
-| $t_4$ | +3.4% | +0.2% | G5 | G3 |
-| $t_5$ | −0.9% | −1.1% | G2 | G1 |
+Five dates from one asset's history, invented, filed both ways:
+
+| Date    | Signal | Forward return | Slot by signal | Slot by return |
+| ------- | ------ | -------------- | -------------- | -------------- |
+| $t_1$ | +2.1%  | −0.4%         | G4             | G2             |
+| $t_2$ | −1.8% | +0.9%          | G1             | G4             |
+| $t_3$ | +0.6%  | +1.3%          | G3             | G5             |
+| $t_4$ | +3.4%  | +0.2%          | G5             | G3             |
+| $t_5$ | −0.9% | −1.1%         | G2             | G1             |
 
 Read down *slot by signal* and the returns come out unordered — which is exactly what five dates
 look like at 12% correlation. Read down *slot by return* and the ordering is perfect, and would be perfect
 for **any** signal including one straight out of a random number generator, because each bar is then
 reporting the sort key back to you. **The staircase is evidence only because the thing sorted on and
 the thing measured are different, and the second was not knowable when the first was computed.**
+
+</details>
 
 One bar therefore carries three pieces of information: which fifth of the signal's range it stands
 for, the average return that fifth went on to earn, and how much of that average is sampling noise.
@@ -313,10 +323,10 @@ moves with where the boundaries are cut (§ 4) — the ordering is what does not
 
 Two further readings carry information, and nothing else on the chart does:
 
-| Read                                                | What it establishes                                                                                                         |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Read                                                | What it establishes                                                                                                                                                         |
+| --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **G5 − G1, measured against the error bars** | the size of the edge next to what noise alone would draw. A rise that fits inside one error bar is not evidence of anything, and § 3.2.3 turns that comparison into a test |
-| **The direction of the slope**                | a*descending* staircase is not a dead signal — it is the same edge carrying the opposite sign                            |
+| **The direction of the slope**                | a*descending* staircase is not a dead signal — it is the same edge carrying the opposite sign                                                                            |
 
 A scrambled middle does not disqualify a signal: clean tails around a muddled G2–G4 is a common
 shape and a perfectly tradeable one, since the tails are where the positions go.
@@ -406,7 +416,10 @@ report it as a $z$; at $m_g$ in the tens, use the $t$ and mean it.
 normal places 0.0455 of its mass outside $\pm 2$. Since $0.0455 < 0.05$, an observed $|z| \geq 2$
 lies inside the rejection region of the two-sided test at $\alpha = 0.05$.
 
-**Example.** § 3.2.2's numbers, at $m_g = 300$: G1 comes in at −20 bp and G5 at +20 bp, each with a
+<details>
+<summary><b>Example.</b> § 3.2.2's staircase, tested — a z of 4.1, and bars that clear each other</summary>
+
+§ 3.2.2's numbers, at $m_g = 300$: G1 comes in at −20 bp and G5 at +20 bp, each with a
 standard error of 6.9 bp. Then
 
 $$
@@ -414,6 +427,8 @@ z = \frac{40}{\left( 6.9^2 + 6.9^2 \right)^{1/2}} = \frac{40}{9.8} \approx 4.1
 $$
 
 well past 2, and the bars at $\pm 13.8$ bp clear each other with room to spare.
+
+</details>
 
 **Note (Non-overlap is sufficient, not necessary).** The two readings differ, and in the direction
 that costs you signals. Bars of half-width $2\text{SE}$ fail to touch when the difference exceeds
@@ -445,12 +460,12 @@ Step 5 integrates over $t$, and an integral hands back an area, never the shape 
 underneath it. A staircase that is monotone over twenty years is equally consistent with an edge
 that held throughout and with one that worked for five years and was flat for fifteen.
 
-| Not on the chart                                                  | Where to look instead                                   |
-| ----------------------------------------------------------------- | ------------------------------------------------------- |
-| **When** the edge happened                                  | the equity curve of[05](05-understanding-backtesting.md) |
-| **Who** is inside a bucket — which dates, which regime      | the dates behind each bar, tabulated rather than averaged → [04](04-volatility-regimes.md) |
-| **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean          |
-| **How independent** the observations are                    | overlapping windows, per the Note above                 |
+| Not on the chart                                                  | Where to look instead                                                                     |
+| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **When** the edge happened                                  | the equity curve of[05](05-understanding-backtesting.md)                                   |
+| **Who** is inside a bucket — which dates, which regime     | the dates behind each bar, tabulated rather than averaged →[04](04-volatility-regimes.md) |
+| **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean                                            |
+| **How independent** the observations are                    | overlapping windows, per the Note above                                                   |
 
 ## 4. Step 2, corrected — risk-adjusted momentum
 
@@ -490,16 +505,21 @@ also replace the value outright by **its percentile against that asset's own pas
 every date on $[0, 1]$ by construction and needs no volatility estimate at all. Either route hands
 step 2 something it can legitimately rank.
 
-**Example.** Two assets, each with five past signal values and one for today:
+<details>
+<summary><b>Example.</b> two assets whose raw signals cannot be compared, and the percentiles that can</summary>
 
-| Asset | Its own past signals | Today | Beats | Percentile |
-| --- | --- | --- | --- | --- |
-| A | −10, 8, 4, 0, −5 | **+7** | four of five | **80** |
-| B | −100, −80, 90, −60, 20 | **−70** | two of five | **40** |
+Two assets, each with five past signal values and one for today:
+
+| Asset | Its own past signals      | Today          | Beats        | Percentile   |
+| ----- | ------------------------- | -------------- | ------------ | ------------ |
+| A     | −10, 8, 4, 0, −5        | **+7**   | four of five | **80** |
+| B     | −100, −80, 90, −60, 20 | **−70** | two of five  | **40** |
 
 Raw, `+7` against `−70` is not a comparison anybody should make. As percentiles, 80 against 40 is —
 and it says A is the stronger trend *relative to its own history*, which is the only sense in which
 the question has an answer. The cost is the one every rank charges: the magnitudes are gone.
+
+</details>
 
 **Note (Which cut to use once it is scored).** The percentile route hands back a uniform score, so
 cutting at the quintiles gives five equal groups for free. The volatility route does not: a
@@ -537,10 +557,10 @@ nobody would run — equal weight on every date that fell into one fifth of the 
 **The financing rate is not zero here, and it is not constant.** The numerator subtracts $r_f$, and
 which rate that is depends on the book's **net exposure** (§ 1.1):
 
-| Book | Net exposure | Correct $r_f$ |
-| --- | --- | --- |
-| Dollar-neutral long/short — \$1 long against \$1 short | $\approx 0$ | **zero.** The short leg's proceeds fund the long leg, so no capital is being borrowed |
-| A 150/50 CTA book | 100% | **the actual financing rate**, on the capital the net exposure represents |
+| Book                                                   | Net exposure  | Correct$r_f$                                                                              |
+| ------------------------------------------------------ | ------------- | ------------------------------------------------------------------------------------------- |
+| Dollar-neutral long/short —\$1 long against \$1 short | $\approx 0$ | **zero.** The short leg's proceeds fund the long leg, so no capital is being borrowed |
+| A 150/50 CTA book                                      | 100%          | **the actual financing rate**, on the capital the net exposure represents             |
 
 Statistical-arbitrage books are the first row, which is where the habit of setting $r_f = 0$ comes
 from and where it is correct. A CTA book is the second row, and the rate belonging in it is a
@@ -557,10 +577,10 @@ falls because the tape got noisier are the same number.
 **A Sharpe means nothing without the market it was earned in.** Two books, and the smaller number is
 the better strategy:
 
-| The tape | Market's own Sharpe | The book's Sharpe | Reading |
-| --- | --- | --- | --- |
-| Violent throughout | 0.4 | **0.8** | held together through amplitude that should have wrecked it, at twice the market's own risk-adjusted return — an excellent result |
-| Calm and rising | 0.8 | **0.9** | barely beat holding the index. The extra 0.1 is within what one lucky bet would produce |
+| The tape           | Market's own Sharpe | The book's Sharpe | Reading                                                                                                                            |
+| ------------------ | ------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Violent throughout | 0.4                 | **0.8**     | held together through amplitude that should have wrecked it, at twice the market's own risk-adjusted return — an excellent result |
+| Calm and rising    | 0.8                 | **0.9**     | barely beat holding the index. The extra 0.1 is within what one lucky bet would produce                                            |
 
 **The mean return is the quantity you can actually trade.** It is what the book delivers, it is what
 § 1.1's algebra is written in, and it is denominated in the same basis points as the costs that will
@@ -630,11 +650,11 @@ hands a little of it back, and at daily frequency that rebate is large enough to
 outright — which is how a real signal arrives at the bar plot looking flat, or upside down. Three
 mechanisms produce it, and they are not equally fragile:
 
-| Mechanism | What happens | Competed away? |
-| --- | --- | --- |
-| **Bid–ask bounce** | Closes print alternately at the bid and the ask, oscillating around the true mid — negative serial correlation by construction | **No.** A measurement artefact; no price moved |
-| **Paying for liquidity** | An order that must fill now pushes price past fair value, and whoever takes the other side is repaid when it returns | **No.** A fee for a service actually rendered |
-| **Overreaction** | News is over-extrapolated, then partly corrected | **Yes** — the only part that decays |
+| Mechanism                      | What happens                                                                                                                    | Competed away?                                       |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| **Bid–ask bounce**      | Closes print alternately at the bid and the ask, oscillating around the true mid — negative serial correlation by construction | **No.** A measurement artefact; no price moved |
+| **Paying for liquidity** | An order that must fill now pushes price past fair value, and whoever takes the other side is repaid when it returns            | **No.** A fee for a service actually rendered  |
+| **Overreaction**         | News is over-extrapolated, then partly corrected                                                                                | **Yes** — the only part that decays           |
 
 Two of the three are not mistakes, which is why reversal survives competition instead of being
 arbitraged into nothing. It also **strengthens as you sample finer**: the bounce is a roughly fixed
@@ -667,12 +687,12 @@ ranked against each other.
 | $x$, $y$, $\beta$, $\epsilon$                                                                             | one observation's signal value and forward return, the slope between them, and the part of the return the signal cannot reach | § 2       |
 | $\rho$, $R^2$                                                                                                 | their correlation, and its square — the share of the return's variance the signal explains                                   | § 2       |
 | $\sigma_x$, $\sigma_y$, $\sigma_\epsilon$                                                                   | standard deviation of the signal, of the return, and of the unreachable part                                                  | § 2       |
-| $m$, $m_g$                                                                                                      | observations sharing a bucket, and the count in bucket $g$                                                                    | § 3.2     |
-| $\mu_g$, $\sigma_g$, $\text{SE}_g$                                                                              | one bucket's true mean forward return, the sample standard deviation of the returns in it, and the standard error of its mean | § 3.2.3   |
-| $H_0$, $z$, $\alpha$                                                                                            | the null that two buckets share a mean, the standardized G5 − G1 difference testing it, and the level it is tested at         | § 3.2.3   |
+| $m$, $m_g$                                                                                                    | observations sharing a bucket, and the count in bucket$g$                                                                   | § 3.2     |
+| $\mu_g$, $\sigma_g$, $\text{SE}_g$                                                                          | one bucket's true mean forward return, the sample standard deviation of the returns in it, and the standard error of its mean | § 3.2.3   |
+| $H_0$, $z$, $\alpha$                                                                                        | the null that two buckets share a mean, the standardized G5 − G1 difference testing it, and the level it is tested at        | § 3.2.3   |
 | G1 … G5                                                                                                          | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
 | $\sigma_{s,t}$                                                                                                  | one asset's volatility, estimated on data before that date                                                                    | § 4       |
-| $R_p$, $r_f$, $\sigma_p$                                                                                        | a portfolio's return over a period, the financing rate subtracted from it, and its return volatility                          | § 5       |
+| $R_p$, $r_f$, $\sigma_p$                                                                                    | a portfolio's return over a period, the financing rate subtracted from it, and its return volatility                          | § 5       |
 | $g$                                                                                                             | gap length — periods between the end of the signal's window and the return it is scored on                                   | Background |
 
 **Note (Collisions to watch).** $R_t$ is the portfolio's return on a date (§ 1.1) and $R^2$ a share
