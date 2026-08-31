@@ -30,32 +30,18 @@ not the number. The prototype in this repository is deliberately behind the stor
 five-day cross-sectional momentum and posts a near-zero Sharpe, because its job is the mechanics.
 → [Implementation Notes](../Backtest_prototype/Backtests.md)
 
-## 2. The Chain, End to End
+## 2. The Build Order, Step by Step
 
 The story above used *signal*, *prediction*, *position* and *strategy* as though they were near
-enough the same thing. They are not, and everything downstream depends on keeping them apart.
+enough the same thing. They are not: a model finds the pattern, a prediction states the judgement, a
+signal picks the direction, a position sizes the bet, and the backtest asks whether any of it
+survives. Keeping them apart matters because they fail independently — the quarter of the return
+that vanished in Act II was lost entirely at the backtest stage, and most of what the rebuild won
+back in Act IV was won at the position stage, with the prediction itself barely moving.
 
-In one line: **a model finds the pattern, a prediction states the judgement, a signal picks the
-direction, a position sizes the bet, and the backtest asks whether any of it survives.**
-
-| Layer | What it does | Output | Example |
-| --- | --- | --- | --- |
-| **Features** | Describe the market | Prices, volume, volatility | 21-day realized volatility |
-| **Rule** *or* **model** | Encode or learn a regularity | A number | MACD; ridge regression |
-| **Prediction** | State a judgement about the future | Expected return, P(up), expected vol | `+0.8%` next week |
-| **Signal** | Turn that judgement into a direction | `+1` / `−1` / `0` | Long if the prediction is in the top quintile |
-| **Position** | Decide how much to bet | A weight, after risk limits and volatility scaling | 30 percent of capital, long |
-| **Backtest** | Apply it all to history under real constraints | A PnL series | After costs, slippage and delay |
-| **Metrics** | Judge the PnL | Sharpe, drawdown, turnover, hit rate | Sharpe 0.4, −18 percent |
-
-**Note.** The quarter of the return that vanished was lost entirely in the *backtest* row, and most
-of what the rebuild won back was won in the *position* row. The prediction barely moved. That is the
-reason these layers are worth separating at all.
-
-## 3. The Build Order, Step by Step
-
-Each stage does one thing, answers one question, and hands one object to the next. The question is
-the gate: a stage that fails it is not repaired by anything downstream.
+The chain below is those layers made concrete as eight stages. Each does one thing, answers one
+question, and hands one object to the next. The question is the gate: a stage that fails it is not
+repaired by anything downstream.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/build-order-dark.png">
@@ -78,7 +64,7 @@ and at stage 2 as a better-sized one, and stages 3 to 5 then run again untouched
 the baseline-versus-rebuild comparison mean anything — what was measured moved, the measurement did
 not.
 
-### 3.1 Stage 0 · Validate the data
+### 2.1 Stage 0 · Validate the data
 
 **Does.** Confirm the price series are continuous, adjust corporate actions, and hand-check that the
 forward return is aligned with the signal that labels it.
@@ -92,7 +78,7 @@ SPDRs still carry one, effective 2025-12-05.
 
 → [100 · The Dataset](100-dataset.md)
 
-### 3.2 Stage 1 · Compute a signal
+### 2.2 Stage 1 · Compute a signal
 
 **Does.** Turn the intuition into a number — momentum is the trailing 21-day mean of daily returns,
 MACD a fast average minus a slow one — then test whether that number carries information. The test
@@ -108,7 +94,7 @@ here is rescued by nothing downstream.
 
 → [02 § 3.2](02-testing-a-signal.md) for the test · [03](03-shaping-the-lookback.md) for the lookback
 
-### 3.3 Stage 2 · Size the positions
+### 2.3 Stage 2 · Size the positions
 
 **Does.** Signal → target weights → dollar exposure → shares, with risk limits, carrying the
 position as a signed quantity. Portfolio 1 longs 150 percent of the positive-momentum assets and
@@ -124,7 +110,7 @@ had to answer.
 
 → [04 · From Signal to Position](04-from-signal-to-position.md)
 
-### 3.4 Stage 3 · Simulate under execution
+### 2.4 Stage 3 · Simulate under execution
 
 **Does.** Apply the sized positions to history under the constraints a real book faces: an execution
 delay (a signal dated `t` trades a day later), an approximate execution price, transaction costs,
@@ -155,7 +141,7 @@ days.
 
 → [05 · Understanding Backtesting](05-understanding-backtesting.md)
 
-### 3.5 Stage 4 · Evaluate
+### 2.5 Stage 4 · Evaluate
 
 **Does.** Reduce the PnL series to the numbers a practitioner quotes — annualized return, Sharpe,
 maximum drawdown, hit rate, turnover — and read them *beside* the equity curve, never instead of it.
@@ -169,7 +155,7 @@ not work. That list is what stage 5 conditions on.
 
 → [06 · Evaluating Performance](06-evaluating-performance.md)
 
-### 3.6 Stage 5 · Attack the result
+### 2.6 Stage 5 · Attack the result
 
 **Does.** Ask how much survives once you stop believing it — across years, markets, searched
 parameters, and regimes. Cut the sample by rolling volume $V_{s,t}$ and rolling realized volatility
@@ -192,7 +178,7 @@ survive the same attack as the unconditional one.
 → [07 · Overfitting &amp; Robustness](07-overfitting-and-robustness.md) ·
 [04 · Volatility Regimes](04-volatility-regimes.md)
 
-### 3.7 Stage 6 · Rebuild against the diagnosis
+### 2.7 Stage 6 · Rebuild against the diagnosis
 
 **Does.** Spend the diagnosis. Feed the regime measures into the signal, size on
 $w_{s,t} \propto \frac{x_{s,t}}{\sigma_{s,t}}$ so each position contributes comparable risk, and add
@@ -213,7 +199,7 @@ per lap.
 
 → [04 § 5](04-volatility-regimes.md)
 
-### 3.8 Stage 7 · Try a model
+### 2.8 Stage 7 · Try a model
 
 **Does.** Replace the rule with a learned prediction on the same features, then run the *same*
 sizing, backtest and metrics. Keep the two objects apart: a **prediction** estimates a future
@@ -229,23 +215,7 @@ prediction's own quantiles instead.
 
 → [09 · IC and R²](09-ic-and-r-squared.md)
 
-## 4. Four Levels of Validation
-
-Each layer is tested on its own terms, and passing one says nothing about the next.
-
-| Level | Question | Typical measure | Where |
-| --- | --- | --- | --- |
-| **Model** | Does the prediction track the outcome? | Test IC, MSE, accuracy | Out of sample only |
-| **Signal** | Is the direction right, and tradeable? | Bucket monotonicity, turnover | [02 § 3.2](02-testing-a-signal.md) |
-| **Strategy** | Does it survive real constraints? | Sharpe, drawdown, return after costs | [05](05-understanding-backtesting.md), [06](06-evaluating-performance.md) |
-| **Robustness** | Does it persist? | Across years, markets, regimes, parameters | [07](07-overfitting-and-robustness.md), [04](04-volatility-regimes.md) |
-
-**Note (Each arrow loses candidates).** High test accuracy is not economic value; economic value is
-not profit after costs; profit after costs is not stability out of sample. A model can call direction
-55 percent of the time and still lose money, because the 45 percent it gets wrong are the larger
-moves — or because acting on it every day costs more than the edge.
-
-## 5. Where Each Stage Fails
+## 3. Where Each Stage Fails
 
 The stages fail in different ways, and the symptoms are easy to misattribute — the most common
 mistake is reading a data defect as a code bug.
@@ -270,15 +240,15 @@ forward, which is why the second lap costs a fraction of the first.
 
 | Symbol | Meaning | First used |
 | --- | --- | --- |
-| $s$, $t$ | The asset, and the date — as in [02](02-testing-a-signal.md) | § 3.4 |
-| $w_{s,t}$ | Target weight of asset $s$ on date $t$, as a fraction of capital | § 3.4 |
-| $x_{s,t}$ | The raw signal value for that asset on that date | § 3.7 |
-| $\text{TO}$ | Turnover — total absolute weight change over the sample | § 3.3 |
-| $\gamma$ | Round-trip cost per dollar traded: commission, spread and slippage | § 3.4 |
-| $V_{s,t}$ | Rolling 21-day mean volume, standing for liquidity | § 3.6 |
-| $\sigma_{s,t}$ | Rolling 21-day realized volatility for that asset | § 3.6 |
-| $\eta$ | Deadband — the weight change below which no trade is placed | § 3.7 |
-| $R^2$ | Fraction of return variance a model explains | § 3.8 |
+| $s$, $t$ | The asset, and the date — as in [02](02-testing-a-signal.md) | § 2.4 |
+| $w_{s,t}$ | Target weight of asset $s$ on date $t$, as a fraction of capital | § 2.4 |
+| $x_{s,t}$ | The raw signal value for that asset on that date | § 2.7 |
+| $\text{TO}$ | Turnover — total absolute weight change over the sample | § 2.3 |
+| $\gamma$ | Round-trip cost per dollar traded: commission, spread and slippage | § 2.4 |
+| $V_{s,t}$ | Rolling 21-day mean volume, standing for liquidity | § 2.6 |
+| $\sigma_{s,t}$ | Rolling 21-day realized volatility for that asset | § 2.6 |
+| $\eta$ | Deadband — the weight change below which no trade is placed | § 2.7 |
+| $R^2$ | Fraction of return variance a model explains | § 2.8 |
 
 **Note (Collisions avoided).** Three symbols are deliberately not the obvious ones.
 [04](04-volatility-regimes.md) already spends $\tau$ on an option's time to expiry and $c$ on its
