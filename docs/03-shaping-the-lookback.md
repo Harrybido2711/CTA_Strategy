@@ -1,6 +1,6 @@
 # 03 · Shaping the Lookback
 
-> - **Answers:** how long a lookback to use, how to weight the returns inside it, and what MACD is once the chart-package vocabulary is stripped away.
+> - **Answers:** how long a lookback to use, how to weight the returns inside it, what MACD is once the chart-package vocabulary is stripped away, and why no setting of any of them stops the signal churning when the market gets loud.
 > - **Prerequisites:** [02 · Testing a Signal](02-testing-a-signal.md) — every section here hands you a knob, and 02's bar plot is the only gauge that reads one.
 > - **After reading:** pair a fast horizon with a slow one, replace a boxcar average with an EWMA, read MACD as a weighted sum of past returns, and say why the fast leg has to be smoothed.
 
@@ -8,11 +8,16 @@
 
 [02](02-testing-a-signal.md) left two blanks inside its own definition. Writing momentum as
 $\text{Avg}(r_{s,t-i})$, $i = 1 \ldots N$ fixes neither the length of the window nor the weight each
-return carries inside it — the average is a boxcar only because nobody said otherwise. This chapter
-is about both blanks, and about MACD, which turns out to be the same object with the second one
-filled in differently.
+return carries inside it — the average is a boxcar only because nobody said otherwise.
 
-Every answer below is a **parameter**, and no parameter here is settled by convention. MACD's
+This chapter fills both, in that order, and then does two further things with the result. § 1 takes
+the window and answers it with a *pair* rather than a number; § 2 takes the weights and replaces the
+box with a decay. § 3 shows that MACD is those two answers already combined, so the indicator needs
+no theory of its own. § 4 is the one movement that is not a blank: **a failure mode that survives
+every setting of both**, because it belongs to the market rather than to the parameters. The repair
+§ 4 can offer is local; the repair it cannot offer is [04](04-volatility-regimes.md).
+
+Every answer in §§ 1–3 is a **parameter**, and no parameter here is settled by convention. MACD's
 26/12/9 fit somebody's historical data once; the fast/slow ratio and the half-life are grid-searched.
 What settles them is 02's bar plot, which is why that chapter comes first.
 
@@ -139,15 +144,10 @@ grid-searched exactly as § 1.2's ratio is.
 signal = returns.ewm(halflife=H).mean()
 ```
 
-MACD's 9-day signal line is an **empirical solution** — a value that fit historical data, nothing
-more. Every parameter here has that status, which is [07](07-overfitting-and-robustness.md)'s
-subject rather than something to accept on authority.
-
-**Note (Weighting the newest most is a choice, not a theorem).** § 3.2 shows that MACD's weights
-peak around lag 8 rather than at lag 0, so it *discounts* the newest return rather than favouring
-it. Both positions are defensible: the newest return is the most recent evidence, and it is also
-the one carrying the most reversal ([02](02-testing-a-signal.md)'s Background). Which wins is an
-empirical question settled by the bar plot, not a matter of taste.
+No value of $H$ is standard, and whatever a package ships as its default is an **empirical
+solution** — a number that fit somebody's historical data once. Every parameter in this chapter has
+that status, which is [07](07-overfitting-and-robustness.md)'s subject rather than something to
+accept on authority.
 
 ## 3. MACD, stated precisely
 
@@ -215,6 +215,13 @@ week — deliberately, since the newest return is the noisiest — and never ful
   <img alt="Weight given to each past daily return, against lag in trading days, for two signals normalised to the same total. A 21-day momentum is a flat box: equal weight for the last 21 days and zero beyond. MACD with spans 12 and 26 is a hump that starts low at lag zero, peaks around lag 8, then decays slowly and never reaches zero within sixty days" src="figures/signal-kernels-light.png">
 </picture>
 
+**Note (So § 2.1's preference is a choice, not a theorem).** § 2.1 argued that the newest return
+deserves the most weight, and the most widely used trend indicator in the market does the opposite.
+Both positions are defensible: the newest return is the most recent evidence about the state the
+asset is in, and it is also the one carrying the most reversal
+([02](02-testing-a-signal.md)'s Background). Which wins is an empirical question settled by the bar
+plot, not a matter of taste — which is why § 2.1 was written as a preference rather than a result.
+
 ### 3.3 From a value to a rule
 
 Three common rules, in increasing order of information kept. All three still have to pass
@@ -225,6 +232,11 @@ Three common rules, in increasing order of information kept. All three still hav
 | Zero-line    | MACD is above zero                      | a slow trend filter, late                                        |
 | Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 4's subject                  |
 | Proportional | always, sized by the standardized value | none of the magnitude, but see [02 § 4](02-testing-a-signal.md) |
+
+The three differ in how much of the signal's magnitude they keep. They also differ in how *often*
+they trade, and that second axis is not a property of the rule alone: a crossover flips whenever the
+two legs touch, and how often they touch is set by how large the market's moves happen to be this
+month. Every parameter above is now chosen, and that count is still not under their control.
 
 ## 4. Volatility clustering, and smoothing the fast leg
 
@@ -281,6 +293,11 @@ churn, because dividing by a positive number can never change a sign. Comparabil
 separate problems needing separate tools. A **deadband** is the other tool for this one: require the
 crossing to exceed some margin before the position flips, rather than acting on the exact touch.
 
+Both tools read the signal and nothing else, which is exactly what makes them local. Neither one
+knows that the tape has turned violent; each damps every date alike, and pays for the quiet ones to
+protect the loud ones. Going further means measuring the state of the market itself and asking what
+the rule is worth in each of its values — → [04 · Volatility Regimes](04-volatility-regimes.md).
+
 ## Appendix · Notation
 
 Throughout, $t$ is the date. Everything in this chapter is computed one asset at a time, so the
@@ -306,9 +323,14 @@ regression intercept; code font against maths is the tell.
 
 ## Next → [04 · Volatility Regimes](04-volatility-regimes.md)
 
-Before moving on, **plot the kernel of your own signal** — the weight it places on the return at
-each lag — beside a boxcar of the same total. If you cannot draw it, you do not yet know what your
-signal is averaging.
+Before moving on, **count your fast/slow rule's crossings month by month, and plot that count
+against the same month's realized volatility.** The upward slope is § 4 measured on your own data —
+and the number on that axis is known only once the month is over, which is the problem Chapter 04
+opens with.
+
+Then, if you have not already, **plot the kernel of your own signal** — the weight it places on the
+return at each lag — beside a boxcar of the same total. If you cannot draw it, you do not yet know
+what your signal is averaging.
 
 You should be able to explain:
 

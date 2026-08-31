@@ -10,6 +10,12 @@
 
 ### 1.1 The two tapes
 
+[03 § 4.3](03-shaping-the-lookback.md) closed on a smoother and a deadband: two filters that sit on
+the signal and blunt the churn a violent tape produces. Neither of them knows the tape is violent.
+That is the ceiling on anything reading only the signal, and clearing it means promoting the state
+of the market to a variable — one that is measured, named, and carried alongside the signal rather
+than filtered out of it.
+
 [03](03-shaping-the-lookback.md) § 4.1 established that amplitude is persistent while direction is
 not: large moves follow large moves regardless of sign. That persistence is what makes the next
 definition possible at all — a property that flickered day to day could not be labelled.
@@ -44,8 +50,9 @@ and with +40 bp in calm markets against −20 bp in violent ones. Those are not 
 The second one is a position you would size differently, or switch off — and the one-dimensional
 bar plot cannot tell you which you have, because it has already added them together.
 
-The rest of the chapter is the repair, in three steps: find a number that says which regime today
-is (§§ 2–3), turn it into a label (§ 4), and re-run the test one label at a time (§ 5).
+The rest of the chapter is the repair, in three steps — find a number that says which regime today
+is (§§ 2–3), turn it into a label (§ 4), and re-run the test one label at a time (§ 5) — followed by
+the discipline those three steps turn out to be one instance of (§ 6).
 
 ## 2. Why a trailing estimate is too late
 
@@ -366,6 +373,8 @@ than the fifty separate questions of whether it overlaps each ingredient.
 
 ## 6. One increment at a time
 
+### 6.1 The record, and the test it has to pass
+
 Everything above is one instance of a discipline that outlives it: **add one dimension per
 experiment, and record what that dimension bought.**
 
@@ -386,10 +395,12 @@ never exact. **"It moved and I do not know by how much" is not fine**, and it is
 things at once guarantees, because when the book starts losing money there is no way back to which
 piece is doing it.
 
-**Where the regime label finally lands.** Often not as another return signal at all. The natural
-home for § 5.1's grid is the **optimizer** — as a penalty that rises with the regime, an exposure
-cap that binds in the crisis row, a volatility target that scales the whole book — which is why the
-grid earns its place even when § 5.2's residual comes back flat. That is
+### 6.2 Where this chapter's answer goes
+
+**Often not into the return model at all.** The natural home for § 5.1's grid is the
+**optimizer** — as a penalty that rises with the regime, an exposure cap that binds in the crisis
+row, a volatility target that scales the whole book — which is why the grid earns its place even
+when § 5.2's residual comes back flat. That is
 [06](06-evaluating-performance.md)'s subject, not this chapter's.
 
 **And the measurement stays a mean return.** Every chart in § 5 reports mean forward return with an
