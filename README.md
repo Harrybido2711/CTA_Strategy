@@ -54,7 +54,7 @@ stages 4–6 → [04](docs/04-from-signal-to-position.md) · stages 8–9 →
 | -- | ------- | ------ | ------ |
 | 00 | [Index &amp; Learning Path](docs/00-index.md) | How to read this series, prerequisites per chapter | ✅ |
 | 01 | [What Is a CTA Strategy](docs/01-what-is-cta.md) | What a CTA trades, momentum, long/short mechanics, market participants | ✅ |
-| — | [How a Strategy Is Built](docs/00-pipeline.md) | Orientation: how signal, strategy, backtest and momentum relate, and the order they get built in | ✅ |
+| — | [How a Strategy Is Built](docs/00-pipeline.md) | The project as a story — naïve backtest, execution haircut, regime diagnosis, rebuild — then the eight stages that produced it | ✅ |
 | 02 | [Testing a Signal](docs/02-testing-a-signal.md) | Hypothesis framing, why a scatter proves nothing, the bar plot and how to read it, risk-adjusted momentum | ✅ |
 | 03 | [Shaping the Lookback](docs/03-shaping-the-lookback.md) | Window length, fast/slow combination, EWMA half-life, MACD as a kernel, smoothing the fast leg | ✅ |
 | 04 | [Volatility Regimes](docs/04-volatility-regimes.md) | realized vs implied vol, VIX and MOVE, regime buckets, conditioning and residualizing | ✅ |

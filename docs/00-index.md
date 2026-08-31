@@ -37,7 +37,7 @@ Everything from 08 up is reference, consulted rather than stepped through.
 | # | Chapter | Prereq | Status |
 |---|---|---|---|
 | 01 | [What Is a CTA Strategy](01-what-is-cta.md) | — | ✅ |
-| — | [How a Strategy Is Built](00-pipeline.md) — orientation | 01 | ✅ |
+| — | [How a Strategy Is Built](00-pipeline.md) — the project as a story, then as machinery | 01 | ✅ |
 | 02 | [Testing a Signal](02-testing-a-signal.md) — is there information in it? | 01 | ✅ |
 | 03 | [Shaping the Lookback](03-shaping-the-lookback.md) — window length, weights, MACD | 02 | ✅ |
 | 04 | [Volatility Regimes](04-volatility-regimes.md) — which market am I in, and does the edge survive it? | 03 | ✅ |
