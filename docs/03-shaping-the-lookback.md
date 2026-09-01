@@ -23,10 +23,6 @@ mode that survives every setting of either**, because it belongs to the market r
 parameters. The repair § 4 can offer is local; the repair it cannot offer is
 [04](04-volatility-regimes.md).
 
-Every answer in §§ 1–3 is a **parameter**, and no parameter here is settled by convention. MACD's
-26/12/9 fit somebody's historical data once; the fast/slow ratio and the half-life are grid-searched.
-What settles them is 02's bar plot, which is why that chapter comes first.
-
 ## 1. EWMA instead of a simple moving average
 
 ### 1.1 Why the newest return should weigh most
@@ -68,11 +64,11 @@ after a₂ :  (a₁ + a₂) / 2
 after a₃ :  [(a₁ + a₂) / 2] / 2  +  a₃ / 2   =   a₃/2 + a₂/4 + a₁/4
 ```
 
-| Observation | Age | Weight it ends up with |
-| --- | --- | --- |
-| $a_3$ | newest | **1/2** |
-| $a_2$ | one step back | 1/4 |
-| $a_1$ | oldest | 1/4 |
+| Observation | Age           | Weight it ends up with |
+| ----------- | ------------- | ---------------------- |
+| $a_3$     | newest        | **1/2**          |
+| $a_2$     | one step back | 1/4                    |
+| $a_1$     | oldest        | 1/4                    |
 
 The newest observation carries half the total on its own, and each step back halves what is left —
 which is what *exponential* names. The oldest two tie only because the recursion had to start
@@ -111,7 +107,7 @@ nothing else, is what the combination trades on.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/fast-times-slow-dark.png">
-  <img alt="Two stacked panels sharing a trading-day axis. The upper panel plots price rebased to 100 over one path that falls, turns and rolls over, with a 20-day and a 40-day moving average drawn over it, and two horizontal bars underneath showing how long each rule holds. The lower panel plots the momentum each window produces against zero: the 20-day line crosses zero upward 10 days before the 40-day line does, and crosses back down 14 days before it, so the fast rule enters and exits earlier at both ends" src="figures/fast-times-slow-light.png">
+  <img alt="Two stacked panels sharing a trading-day axis. The upper panel plots price rebased to 100 over one path that falls, turns and rolls over, with a 20-day and a 40-day moving average drawn over it, and two horizontal bars underneath showing how long each rule holds. The lower panel plots each of those two averages' own momentum — how far it has moved over its own window — against zero, so it describes the same two lines drawn above: the 20-day line crosses zero upward 14 days before the 40-day line does, and crosses back down 23 days before it, so the fast rule enters and exits earlier at both ends" src="figures/fast-times-slow-light.png">
 </picture>
 
 **What the early signal means.** A fast momentum turning up while the slow one is still negative is
@@ -240,11 +236,11 @@ plot, not a matter of taste — which is why § 1.1 was written as a preference 
 Three common rules, in increasing order of information kept. All three still have to pass
 [02 § 3.2](02-testing-a-signal.md)'s bar plot before they earn a backtest.
 
-| Rule         | Go long when                            | Costs                                                            |
-| ------------ | --------------------------------------- | ---------------------------------------------------------------- |
-| Zero-line    | MACD is above zero                      | a slow trend filter, late                                        |
-| Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 4's subject                  |
-| Proportional | always, sized by the standardized value | none of the magnitude, but see [02 § 4](02-testing-a-signal.md) |
+| Rule         | Go long when                            | Costs                                                          |
+| ------------ | --------------------------------------- | -------------------------------------------------------------- |
+| Zero-line    | MACD is above zero                      | a slow trend filter, late                                      |
+| Crossover    | the histogram is above zero             | earlier, noisier — the churn is § 4's subject                |
+| Proportional | always, sized by the standardized value | none of the magnitude, but see[02 § 4](02-testing-a-signal.md) |
 
 The three differ in how much of the signal's magnitude they keep. They also differ in how *often*
 they trade, and that second axis is not a property of the rule alone: a crossover flips whenever the
@@ -293,15 +289,15 @@ itself and asking what the rule is worth in each of its values —
 Throughout, $t$ is the date. Everything in this chapter is computed one asset at a time, so the
 asset subscript $s$ of [02](02-testing-a-signal.md) is dropped.
 
-| Symbol | Means | First used |
-| --- | --- | --- |
-| $a_t$, $\lambda$ | the newest observation, and the EWMA decay that keeps $\lambda$ of the old average | § 1.2 |
-| $H$ | EWMA half-life, in periods | § 1.3 |
-| $N_f$, $N_s$ | fast and slow lookback lengths, in periods | § 2.2 |
-| $P_t$, $\Delta_{t-j}$ | price on that date, and the one-period change at that lag | § 3.1 |
-| $n_f$, $n_s$ | fast and slow EMA spans, conventionally 12 and 26 | § 3.1 |
-| $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one | § 3.1 |
-| $c_i$, $k_j$ | MACD's net weight on the price at that lag, and its kernel weight on the price change | § 3.2 |
+| Symbol                     | Means                                                                                 | First used |
+| -------------------------- | ------------------------------------------------------------------------------------- | ---------- |
+| $a_t$, $\lambda$       | the newest observation, and the EWMA decay that keeps$\lambda$ of the old average   | § 1.2     |
+| $H$                      | EWMA half-life, in periods                                                            | § 1.3     |
+| $N_f$, $N_s$           | fast and slow lookback lengths, in periods                                            | § 2.2     |
+| $P_t$, $\Delta_{t-j}$  | price on that date, and the one-period change at that lag                             | § 3.1     |
+| $n_f$, $n_s$           | fast and slow EMA spans, conventionally 12 and 26                                     | § 3.1     |
+| $\alpha_f$, $\alpha_s$ | their smoothing constants, two over span plus one                                     | § 3.1     |
+| $c_i$, $k_j$           | MACD's net weight on the price at that lag, and its kernel weight on the price change | § 3.2     |
 
 **Note (Collisions to watch).** $N_f, N_s$ are plain lookback lengths and $n_f, n_s$ are the EMA
 spans that play the same two roles — case is the tell. $k_j$ is a kernel weight, not a portfolio weight — [02](02-testing-a-signal.md)

@@ -32,15 +32,18 @@ def fast_times_the_slow(mode):
     """03 s1 -- the same trend, entered and exited by two different lookbacks.
 
     Schematic. One price path that falls, turns and rolls over, with a fast and
-    a slow moving average drawn over it. The lower panel is the momentum each
-    window produces; each rule fires where its own line crosses zero. The short
-    window crosses first at both ends, and the gap is the reason to carry two.
+    a slow moving average drawn over it. The lower panel is each of those two
+    lines' own momentum -- how far it has travelled over its own window -- so
+    the bottom panel is computed from the lines drawn in the top one rather
+    than from a separate series. Each rule fires where its own line crosses
+    zero; the short window crosses first at both ends, and that gap is the
+    reason to carry two.
     """
     t = THEMES[mode]
     rng = np.random.RandomState(7)
     N_F, N_S = 20, 40                                    # the conventional 2:1
 
-    n = 170
+    n = 210
     kx = [0, 0.13, 0.19, 0.27, 0.34, 0.47, 0.59, 0.67, 0.75, 1.0]
     ky = [101.5, 102, 97, 93, 93.2, 103, 114, 119.5, 118, 111]
     level = np.interp(np.linspace(0, 1, n), kx, ky)
@@ -58,12 +61,14 @@ def fast_times_the_slow(mode):
 
     fast_ma, slow_ma = ewma(price, N_F), ewma(price, N_S)
 
-    def momentum(v, N):                                  # price change over the window
+    def momentum(v, N):                    # how far a line has moved over N days
         m = np.full(n, np.nan)
         m[N:] = v[N:] - v[:-N]
         return m
 
-    fast_m, slow_m = momentum(level, N_F), momentum(level, N_S)
+    # Taken on the two averages drawn above, each over its own window, so the
+    # lower panel is a statement about the lines in the upper one.
+    fast_m, slow_m = momentum(fast_ma, N_F), momentum(slow_ma, N_S)
 
     def cross(m, lo, hi, up):
         for i in range(lo + 1, hi):
@@ -95,9 +100,9 @@ def fast_times_the_slow(mode):
     ax.plot(slow_ma, color=t["ramp"][5], linewidth=2.1, zorder=4)
     ax.plot(fast_ma, color=t["ramp"][2], linewidth=2.1, zorder=3)
 
-    ax.text(86, fast_ma[86] - 2.2, f"fast, {N_F}-day", color=t["ink"],
-            fontsize=8.6, fontweight="600", ha="left", va="top")
-    ax.text(118, slow_ma[118] - 2.2, f"slow, {N_S}-day", color=t["ink"],
+    ax.text(126, fast_ma[126] + 1.4, f"fast, {N_F}-day", color=t["ink"],
+            fontsize=8.6, fontweight="600", ha="right", va="bottom")
+    ax.text(140, slow_ma[140] - 1.4, f"slow, {N_S}-day", color=t["ink"],
             fontsize=8.6, fontweight="600", ha="left", va="top")
     ax.text(5, 97.0, "price", color=t["muted"], fontsize=8.6, ha="left")
 
@@ -140,8 +145,10 @@ def fast_times_the_slow(mode):
         bx.annotate("", xy=(p1, 19.0), xytext=(p0, 19.0),
                     arrowprops=dict(arrowstyle="<->", color=t["ink_secondary"],
                                     linewidth=1.0, shrinkA=0, shrinkB=0))
-        bx.text((p0 + p1) / 2, 20.4, f"{p1 - p0} days\n{note}",
-                color=t["ink_secondary"], fontsize=8.2, ha="center", va="bottom",
+        mid = (p0 + p1) / 2
+        ha = "center" if mid < n * 0.75 else "right"
+        bx.text(mid if ha == "center" else p1 + 6, 20.4, f"{p1 - p0} days\n{note}",
+                color=t["ink_secondary"], fontsize=8.2, ha=ha, va="bottom",
                 linespacing=1.45)
 
     fig.text(0.5, -0.005,
