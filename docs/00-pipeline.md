@@ -100,7 +100,7 @@ Three repairs belong here, before anything is abandoned:
 | Repair | What it corrects | Where |
 | --- | --- | --- |
 | Rank the risk-adjusted signal, not the raw one | The sort key was partly the asset's volatility, so the buckets reported volatility under the signal's name | [02 § 4](02-testing-a-signal.md) |
-| Put a gap between the signal's window and the return it is scored on | Adjacent windows overlap, and at zero gap the measurement picks up reversal rather than trend | [02 § 1.2](02-testing-a-signal.md) |
+| Put a gap between the signal's window and the return it is scored on | Adjacent windows overlap, and at zero gap the measurement picks up reversal rather than trend | [02 § 2.0](02-testing-a-signal.md) |
 | Cut the sample by regime before concluding | An unconditional test averages over the regimes the edge does not live in, and can wash a real one to zero | [04](04-volatility-regimes.md) |
 
 Each is a stated defect being corrected, not a parameter being searched — searching a grid of

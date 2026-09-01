@@ -12,17 +12,16 @@
 
 Everything in this chapter is built from three numbers, one of each per asset per date.
 
-| Object                   | Symbol                                                                                                      | What it is                                                        | Known at$t$ ?                     |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ----------------------------------- |
-| **Weight**         | $w_{s,t}$   | the share of capital held in asset$s$ on date $t$, signed — negative is a short        | **yes**, you choose it                                      |                                     |
-| **Signal**         | $MOM_{s,t}$ | a number computed from data available at$t$, meant to say something about what comes next | **yes**, you compute it                                     |                                     |
-| **Forward return** | $r_{s,t}$                                                                                                 | what the asset then goes on to deliver while the position is held | **no** — this is the unknown |
+| Object | Symbol | What it is | Known at $t$? |
+| --- | --- | --- | --- |
+| **Weight** | $w_{s,t}$ | the share of capital held in asset $s$ on date $t$, signed — negative is a short | **yes**, you choose it |
+| **Signal** | $MOM_{s,t}$ | a number computed from data available at $t$, meant to say something about what comes next | **yes**, you compute it |
+| **Forward return** | $r_{s,t}$ | what the asset then goes on to deliver while the position is held | **no** — this is the unknown |
 
-**Note (Scope).** This chapter describes **one asset at a time**: a single series of dates, each
-carrying that asset's own signal and its own forward return. That restriction is not a
-simplification — assets have different volatilities, so their raw signals are not on one scale and
-cannot be compared until § 4 puts them there. Combining several assets into one book comes after
-that, in [the position-construction chapter](04-from-signal-to-position.md).
+**Note (Scope).** This chapter describes **one asset at a time**. That is not a simplification:
+assets have different volatilities, so their raw signals are not on one scale and cannot be compared
+until § 4 puts them there — and combining several into one book comes after that, in
+[the position-construction chapter](04-from-signal-to-position.md).
 
 **Definition (Binary momentum).** The simplest member of the family — the sign of last period's
 return, and nothing else:
@@ -34,11 +33,9 @@ $$
 where $s$ indexes the asset and $t$ the date, $r_{s,t-1}$ is that asset's return over the period
 just ended, and $MOM_{s,t}$ is either +1 (long) or −1 (short), with nothing in between.
 
-#### Why the sign alone is not enough
-
-A window in which the asset rose 20% and one in which it rose 10% produce the *same* signal, so a
-strategy built on it takes the same size in both. Trend **direction** survives; trend **strength**
-is thrown away.
+**Trend direction survives; trend strength is thrown away.** A window in which the asset rose 20%
+and one in which it rose 10% produce the *same* signal, so a strategy built on it takes the same
+size in both.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/binary-momentum-dark.png">
@@ -49,21 +46,13 @@ is thrown away.
 than its sign:
 
 $$
-MOM_{s,t}  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
+MOM_{s,t}  =  \text{Avg}\left(r_{s,t-i}\right)  =  \frac{1}{N}\sum_{i=1}^{N} r_{s,t-i},\qquad i = 1 \ldots N
 $$
 
 with $N$ the lookback length and $i$ the lag inside it — the average runs over the $N$ returns
-ending yesterday. Spelled out, `Avg` is an ordinary sum over the window:
+ending yesterday, so at $N = 21$ it is last month's average daily move.
 
-$$
-MOM_{s,t} = \frac{1}{N}\sum_{i=1}^{N} r_{s,t-i}
-$$
-
-At $N = 21$ that is last month's average daily move. The two definitions differ by exactly one
-operation — binary momentum wraps the return in `sign()`, plain momentum does not — and that one
-operation is the whole of what magnitude costs.
-
-**Example.** Three assets over a five-day lookback, and what each definition makes of them:
+**Example.** Three assets over a five-day lookback:
 
 | Asset | Last five returns            | Avg → the signal | After `sign()` |
 | ----- | ---------------------------- | ----------------- | --------------- |
@@ -71,21 +60,19 @@ operation is the whole of what magnitude costs.
 | B     | +1%, −0.5%, +1%, 0%, +0.5%  | **+0.004**  | +1              |
 | C     | −2%, −3%, −1%, −2%, −2% | **−0.020** | −1             |
 
-The right column is binary momentum, and it cannot tell A from B. In the left column A is **six
-times** B — that ratio *is* the magnitude, and since § 1.1 sets each weight proportional to its
-signal, A is held six times larger. Nothing is lost: the sign still carries direction, the absolute
-value adds strength on top.
+The right column cannot tell A from B; the left makes A **six times** B, and since § 1.1 sets each
+weight proportional to its signal, A is held six times larger. That ratio is the magnitude, and it
+is all the dropped `sign()` was costing.
 
-**Note (The level is not yet meaningful).** 0.024 means nothing on its own. 2.4% earned in a calm
-year and 2.4% earned in a violent one are not the same trend, so only *relative* sizes are ever
-used — § 4 is what puts them on one scale.
+**Note (The level is not yet meaningful).** 0.024 means nothing on its own — 2.4% in a calm year and
+2.4% in a violent one are not the same trend. Only *relative* sizes are ever used, and § 4 is what
+puts them on one scale.
 
 ### 1.1 Why studying the signal is the same as studying the portfolio
 
 A signal is not a strategy: it earns nothing and cannot be held. The reason to spend a chapter on
-one runs backwards, from what you are actually paid on.
-
-**Start from the portfolio, because that is what you optimize.**
+one runs backwards, from what you are actually paid on — **so start from the portfolio, because
+that is what you optimize.**
 
 $$
 R_t  =  \sum_s w_{s,t} r_{s,t}
@@ -95,7 +82,9 @@ $R_t$ is the portfolio's return on date $t$, summed over every asset in the univ
 factors in each term only one is yours — $r_{s,t}$ is the market's answer, and it arrives after the
 weight is already set. **So the whole of portfolio construction is the choice of $w_{s,t}$.**
 
-**But the weights are not free.** Two sums over the book are fixed before any signal is consulted:
+**But the weights are not free.** Two sums over the book are fixed before any signal is consulted —
+the **net**, fixing how much *market* the book carries since longs and shorts cancel in it, and the
+**gross**, fixing how much *leverage* is deployed since they add:
 
 $$
 \textbf{net:}\quad \sum_s w_{s,t} = 1
@@ -103,15 +92,10 @@ $$
 \textbf{gross:}\quad \sum_s |w_{s,t}| = G
 $$
 
-| Sum                                                                                                                                                                                                | What it fixes                                                                    | Typical value                |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------- |
-| **Net**, $\sum_s w_{s,t}$                 | how much*market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased,$\approx 0$ market-neutral |                                                                                  |                              |
-| **Gross**, the same sum over absolute weights                                                                                                                                                | how much*leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
-
-$G$ is the gross target, and the net holds at 1 only to within a tolerance $\delta$ since
-rebalancing is discrete. The two are independent: one asset at 100% and a book long 200% / short
-100% carry the same net and three times the position, which is why both have to be stated and why
-gross is never free ([01](01-what-is-cta.md)).
+with $G$ the gross target — 200% on a 150/50 book — and the net holding at 1 only to within a
+tolerance $\delta$, since rebalancing is discrete. The two are independent: one asset at 100% and a
+book long 200% / short 100% carry the same net and three times the position, which is why gross is
+never free ([01](01-what-is-cta.md)).
 
 **The weights are where the signal enters.** You want weight where the forward return is about to be
 high, and that is precisely the number you do not have. The signal is the stand-in you put in its
@@ -152,21 +136,22 @@ $$
 \textbf{that is:}\quad \rho > 0
 $$
 
-Three things follow, and between them they set the shape of the rest of the chapter.
+**Write that down before the code** — it names what would falsify the signal, and one you cannot
+falsify is a plot you will rationalize either way. Two things follow from it, and between them they
+set the shape of the rest of the chapter:
 
-| Consequence                                                                                                                                                                                                    | Dealt with in |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| **The portfolio never has to be built to test the signal.** Measure $\rho$ between the signal and the forward return directly, and you have measured the strategy                                      | § 2, § 3    |
-| **Magnitude reaches the position, not just direction.** $w \propto MOM$ means a signal twice as large takes a position twice as large — which is what binary momentum throws away                     | § 1.0        |
-| **At equal $\rho$ a volatile asset contributes more than a quiet one**, since each term carries $\sigma_{MOM,s} \sigma_{r,s}$ alongside $\rho_s$. Ranking raw signals therefore ranks volatilities | § 4          |
+| Consequence | Dealt with in |
+| --- | --- |
+| **The portfolio never has to be built to test the signal.** Measure $\rho$ between the signal and the forward return directly, and you have measured the strategy | § 2, § 3 |
+| **At equal $\rho$ a volatile asset contributes more than a quiet one**, since each term carries $\sigma_{MOM,s} \sigma_{r,s}$ alongside $\rho_s$. Ranking raw signals therefore ranks volatilities | § 4 |
 
-**Write the hypothesis before the code.** It names what would falsify the signal, and one you
-cannot falsify is a plot you will rationalize either way.
+## 2. What you hoped for, and what you get
 
-### 1.2 Which return the signal is scored on
+### 2.0 Which return the signal is scored on
 
-§ 1.1 measures $\rho$ between the signal and *the forward return*, and that phrase is not yet
-precise enough to compute. Three spans sit on the timeline, in this order:
+Before signal and return can be plotted against each other, *the forward return* has to be pinned
+down: § 1.1 measures $\rho$ against it, but the phrase is not yet precise enough to compute. Three
+spans sit on the timeline, in this order:
 
 | Span                    | What it holds                                                                       | Typical size          |
 | ----------------------- | ----------------------------------------------------------------------------------- | --------------------- |
@@ -179,32 +164,28 @@ precise enough to compute. Three spans sit on the timeline, in this order:
   <img alt="Two panels of cells laid on a timeline, one cell per period. The top panel is one observation: eight filled cells bracketed as the lookback the signal averages, then three dashed empty cells bracketed as the discarded gap, then a single filled cell bracketed as the one the signal is scored on, with a dotted vertical line marking that the signal is computed from the cells to its left only. The lower panel repeats the same pattern for dates t, t plus one and t plus two, each shifted one cell right, so the lookbacks overlap in all but one cell while the three scored cells form a descending diagonal, annotated one return per date and no two dates share one" src="figures/signal-return-alignment-light.png">
 </picture>
 
-The gap is the only free choice of the three. The `-1` in **12-1 momentum** is exactly this gap: a
+The gap is the only free choice of the three — the `-1` in **12-1 momentum** is exactly this gap, a
 twelve-month window stopping one month short of today.
 
-**Why leave one at all.** Not executability — § 1.0's window already ends at $t-1$, so $g = 0$ is
+**Why leave one at all.** Not executability: § 1.0's window already ends at $t-1$, so $g = 0$ is
 knowable in time and anything tighter is look-ahead (§ 5). Executability fixes the floor at zero;
 **reversal** decides everything above it. A trend that has just formed hands a little of it back,
 and at daily frequency that rebate is large enough to cancel the edge outright — which is how a
-real signal arrives at the bar plot looking flat, or upside down. Which mechanisms produce it, and
-which of them competition can remove, is this chapter's Background.
+real signal arrives at the bar plot looking flat, or upside down. The mechanisms behind it are this
+chapter's Background.
 
-**Reversal strengthens as the sampling gets finer**, which is what actually sets $g$. The bid–ask
-bounce is a roughly fixed number of ticks per trade while the trend grows with the horizon, so at
-one day the bounce dominates and at one month it is rounding error.
-
-**What the gap costs.** It removes the opening of the trend along with the rebate, so a longer $g$
-is a staler signal. That makes $g$ a **hyperparameter**, and running it at a day, a week and a month
-and keeping whichever bar plot looks best is what [07](07-overfitting-and-robustness.md) warns
-about. Set it from your trading frequency and a prior on how long the rebate lasts.
+**Both directions cost something**, which is what makes $g$ a **hyperparameter** rather than a
+constant. Reversal strengthens as the sampling gets finer — the bid–ask bounce is a roughly fixed
+number of ticks per trade while the trend grows with the horizon — but a wider gap also throws away
+the opening of the trend. Set it from your trading frequency and a prior on how long the rebate
+lasts; running it at a day, a week and a month and keeping whichever bar plot looks best is what
+[07](07-overfitting-and-robustness.md) warns about.
 
 **Note (Neighbouring observations are near-copies).** Step one date forward and the lookback keeps
 all but one of its cells, as the figure's lower panel shows. Consecutive signals are therefore not
 independent draws, which is where § 3.2.2's caveat on the effective sample size comes from.
 
-## 2. What you hoped for, and what you get
-
-### The plot everyone draws first
+### 2.1 The plot everyone draws first
 
 § 1's hypothesis says forward return rises with the signal, so the first move is to plot one against
 the other. The picture you had in mind is the leftmost panel below. What comes back — for well over
@@ -215,7 +196,7 @@ the other. The picture you had in mind is the leftmost panel below. What comes b
   <img alt="Four scatter panels of forward return against a signal, both axes in standard deviations. The first three are drawn at correlations of 80, 45 and 30 percent from 1,500 synthetic points: the 80 percent panel, labelled what you pictured, is a clear diagonal band, and by 30 percent, labelled the eye's floor, the tilt is barely arguable. The fourth is underlined and labelled measured, CTA_data at minus 1.9 percent — a formless round cloud with a denser core than the drawn panels, being real returns with fatter tails" src="figures/scatter-ladder-light.png">
 </picture>
 
-### Why the real one is a cloud
+### 2.2 Why the real one is a cloud
 
 **Claim.** The scatter can neither confirm nor refute a signal, because the correlation a working
 signal carries sits far below the threshold at which the eye resolves a trend.
@@ -708,7 +689,7 @@ train/validation/test split ([07](07-overfitting-and-robustness.md)) are the sam
 
 **Reversal is not an anomaly, it is the normal state of the tape.** A trend that has just formed
 hands a little of it back, and at daily frequency that rebate is large enough to cancel the edge
-outright — which is why § 1.2 leaves a gap $g$ between the signal's window and the return it is
+outright — which is why § 2.0 leaves a gap $g$ between the signal's window and the return it is
 scored on. Three mechanisms produce it, and they are not equally fragile:
 
 | Mechanism                      | What happens                                                                                                                    | Competed away?                                       |
@@ -743,4 +724,4 @@ ranked against each other.
 | G1 … G5                                                                                                                                                                        | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
 | $\sigma_{s,t}$                                                                                                                                                                | one asset's volatility, estimated on data before that date                                                                    | § 4       |
 | $R_p$, $r_f$, $\sigma_p$                                                                                                                                                  | a portfolio's return over a period, the financing rate subtracted from it, and its return volatility                          | § 5       |
-| $g$                                                                                                                                                                           | gap length — periods between the end of the signal's window and the return it is scored on                                   | § 1.2     |
+| $g$                                                                                                                                                                           | gap length — periods between the end of the signal's window and the return it is scored on                                   | § 2.0     |
