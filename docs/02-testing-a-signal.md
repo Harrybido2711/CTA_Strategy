@@ -53,7 +53,32 @@ MOM_{s,t}  =  \text{Avg}\left(r_{s,t-i}\right),\qquad i = 1 \ldots N
 $$
 
 with $N$ the lookback length and $i$ the lag inside it — the average runs over the $N$ returns
-ending yesterday. What it keeps is a magnitude proportional to how strongly the asset trended.
+ending yesterday. Spelled out, `Avg` is an ordinary sum over the window:
+
+$$
+MOM_{s,t} = \frac{1}{N}\sum_{i=1}^{N} r_{s,t-i}
+$$
+
+At $N = 21$ that is last month's average daily move. The two definitions differ by exactly one
+operation — binary momentum wraps the return in `sign()`, plain momentum does not — and that one
+operation is the whole of what magnitude costs.
+
+**Example.** Three assets over a five-day lookback, and what each definition makes of them:
+
+| Asset | Last five returns            | Avg → the signal | After `sign()` |
+| ----- | ---------------------------- | ----------------- | --------------- |
+| A     | +3%, +2%, +4%, +1%, +2%      | **+0.024**  | +1              |
+| B     | +1%, −0.5%, +1%, 0%, +0.5%  | **+0.004**  | +1              |
+| C     | −2%, −3%, −1%, −2%, −2% | **−0.020** | −1             |
+
+The right column is binary momentum, and it cannot tell A from B. In the left column A is **six
+times** B — that ratio *is* the magnitude, and since § 1.1 sets each weight proportional to its
+signal, A is held six times larger. Nothing is lost: the sign still carries direction, the absolute
+value adds strength on top.
+
+**Note (The level is not yet meaningful).** 0.024 means nothing on its own. 2.4% earned in a calm
+year and 2.4% earned in a violent one are not the same trend, so only *relative* sizes are ever
+used — § 4 is what puts them on one scale.
 
 ### 1.1 Why studying the signal is the same as studying the portfolio
 
@@ -78,10 +103,10 @@ $$
 \textbf{gross:}\quad \sum_s |w_{s,t}| = G
 $$
 
-| Sum | What it fixes | Typical value |
-| --- | --- | --- |
-| **Net**, $\sum_s w_{s,t}$ | how much *market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased, $\approx 0$ market-neutral |
-| **Gross**, the same sum over absolute weights | how much *leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
+| Sum                                                                                                                                                                                                | What it fixes                                                                    | Typical value                |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ---------------------------- |
+| **Net**, $\sum_s w_{s,t}$                 | how much*market* the book carries — the directional bet, since longs and shorts cancel here | 100% long-biased,$\approx 0$ market-neutral |                                                                                  |                              |
+| **Gross**, the same sum over absolute weights                                                                                                                                                | how much*leverage* is deployed, longs and shorts adding rather than cancelling | 200% (a 150/50 book) or 300% |
 
 $G$ is the gross target, and the net holds at 1 only to within a tolerance $\delta$ since
 rebalancing is discrete. The two are independent: one asset at 100% and a book long 200% / short
@@ -138,6 +163,45 @@ Three things follow, and between them they set the shape of the rest of the chap
 **Write the hypothesis before the code.** It names what would falsify the signal, and one you
 cannot falsify is a plot you will rationalize either way.
 
+### 1.2 Which return the signal is scored on
+
+§ 1.1 measures $\rho$ between the signal and *the forward return*, and that phrase is not yet
+precise enough to compute. Three spans sit on the timeline, in this order:
+
+| Span                    | What it holds                                                                       | Typical size          |
+| ----------------------- | ----------------------------------------------------------------------------------- | --------------------- |
+| **Lookback**      | the $N$ returns the signal averages, ending at $t-1$                             | 20–250 periods       |
+| **Gap**           | $g$ periods thrown away — neither averaged into the signal nor scored against it | 0, a week, or a month |
+| **Paired return** | $r_{s,t+g}$, the one period the signal is judged on                               | one period            |
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/signal-return-alignment-dark.png">
+  <img alt="Two panels of cells laid on a timeline, one cell per period. The top panel is one observation: eight filled cells bracketed as the lookback the signal averages, then three dashed empty cells bracketed as the discarded gap, then a single filled cell bracketed as the one the signal is scored on, with a dotted vertical line marking that the signal is computed from the cells to its left only. The lower panel repeats the same pattern for dates t, t plus one and t plus two, each shifted one cell right, so the lookbacks overlap in all but one cell while the three scored cells form a descending diagonal, annotated one return per date and no two dates share one" src="figures/signal-return-alignment-light.png">
+</picture>
+
+The gap is the only free choice of the three. The `-1` in **12-1 momentum** is exactly this gap: a
+twelve-month window stopping one month short of today.
+
+**Why leave one at all.** Not executability — § 1.0's window already ends at $t-1$, so $g = 0$ is
+knowable in time and anything tighter is look-ahead (§ 5). Executability fixes the floor at zero;
+**reversal** decides everything above it. A trend that has just formed hands a little of it back,
+and at daily frequency that rebate is large enough to cancel the edge outright — which is how a
+real signal arrives at the bar plot looking flat, or upside down. Which mechanisms produce it, and
+which of them competition can remove, is this chapter's Background.
+
+**Reversal strengthens as the sampling gets finer**, which is what actually sets $g$. The bid–ask
+bounce is a roughly fixed number of ticks per trade while the trend grows with the horizon, so at
+one day the bounce dominates and at one month it is rounding error.
+
+**What the gap costs.** It removes the opening of the trend along with the rebate, so a longer $g$
+is a staler signal. That makes $g$ a **hyperparameter**, and running it at a day, a week and a month
+and keeping whichever bar plot looks best is what [07](07-overfitting-and-robustness.md) warns
+about. Set it from your trading frequency and a prior on how long the rebate lasts.
+
+**Note (Neighbouring observations are near-copies).** Step one date forward and the lookback keeps
+all but one of its cells, as the figure's lower panel shows. Consecutive signals are therefore not
+independent draws, which is where § 3.2.2's caveat on the effective sample size comes from.
+
 ## 2. What you hoped for, and what you get
 
 ### The plot everyone draws first
@@ -191,11 +255,11 @@ Everything below is **one asset-date's** forward return, never a portfolio's, an
 measured over the 57,649 asset-dates of the sample. The daily return standard deviation is
 $\sigma_y = 0.0149$ — 149 bp, a **basis point** being 0.01%:
 
-| Component             | Size                            | At $\rho = -1.9\%$ |
-| --------------------- | ------------------------------- | ------------------ |
-| Total return          | $\sigma_y$                    | 149 bp             |
-| What the signal moves | $\rho \sigma_y$               | **2.8 bp**   |
-| What it does not      | $\sigma_y (1 - \rho^2)^{1/2}$ | **149 bp**   |
+| Component             | Size                            | At$\rho = -1.9\%$ |
+| --------------------- | ------------------------------- | ------------------- |
+| Total return          | $\sigma_y$                    | 149 bp              |
+| What the signal moves | $\rho \sigma_y$               | **2.8 bp**    |
+| What it does not      | $\sigma_y (1 - \rho^2)^{1/2}$ | **149 bp**    |
 
 The third row is not a rounding slip: at this correlation the signal removes so little that the
 unreachable part is the whole of it to three figures. Across an x-axis running from $-2\sigma_x$ to
@@ -337,7 +401,7 @@ Two further readings carry information, and nothing else on the chart does:
 | Read                                                | What it establishes                                                                                                                                                         |
 | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **G5 − G1, measured against the error bars** | the size of the edge next to what noise alone would draw. A rise that fits inside one error bar is not evidence of anything, and § 3.2.3 turns that comparison into a test |
-| **The direction of the slope**                | a *descending* staircase is not a dead signal — it is the same edge carrying the opposite sign                                                                            |
+| **The direction of the slope**                | a*descending* staircase is not a dead signal — it is the same edge carrying the opposite sign                                                                            |
 
 A scrambled middle does not disqualify a signal: clean tails around a muddled G2–G4 is a common
 shape and a perfectly tradeable one, since the tails are where the positions go.
@@ -358,11 +422,11 @@ $\beta$ times their mean signal — they were chosen for having nearly the same 
 them changes it barely at all — while the noise around it falls to $\sigma_\epsilon / m^{1/2}$.
 Measured, with the edge taken as the G5 − G1 gap the chart is trying to resolve:
 
-|        | One observation | Mean of 11,522                          |
-| ------ | --------------- | --------------------------------------- |
-| Signal | 10.4 bp         | 10.4 bp                                 |
-| Noise  | 149 bp          | $149 / 11522^{1/2} \approx 1.4$ bp     |
-| Ratio  | 1 : 14          | **7 : 1**                         |
+|        | One observation | Mean of 11,522                       |
+| ------ | --------------- | ------------------------------------ |
+| Signal | 10.4 bp         | 10.4 bp                              |
+| Noise  | 149 bp          | $149 / 11522^{1/2} \approx 1.4$ bp |
+| Ratio  | 1 : 14          | **7 : 1**                      |
 
 The left column is the scatter of § 2 and the right column is one bar of the chart. Nothing was
 added — only the noise was taken away. It takes eleven thousand observations to do here what the
@@ -433,13 +497,13 @@ lies inside the two-sided rejection region.
 
 The whole sample, five buckets, 11,522 dates in the smallest:
 
-| Bucket | $\mu_g$ | $\sigma_g$ | $m_g$ | $\text{SE}_g$ |
-| --- | --- | --- | --- | --- |
-| G1 | **+10.72 bp** | 173 bp | 11,522 | 1.62 bp |
-| G2 | +1.05 bp | 144 bp | 11,523 | 1.34 bp |
-| G3 | +3.48 bp | 136 bp | 11,525 | 1.27 bp |
-| G4 | +2.83 bp | 140 bp | 11,523 | 1.30 bp |
-| G5 | **+0.31 bp** | 149 bp | 11,556 | 1.39 bp |
+| Bucket | $\mu_g$           | $\sigma_g$ | $m_g$ | $\text{SE}_g$ |
+| ------ | ------------------- | ------------ | ------- | --------------- |
+| G1     | **+10.72 bp** | 173 bp       | 11,522  | 1.62 bp         |
+| G2     | +1.05 bp            | 144 bp       | 11,523  | 1.34 bp         |
+| G3     | +3.48 bp            | 136 bp       | 11,525  | 1.27 bp         |
+| G4     | +2.83 bp            | 140 bp       | 11,523  | 1.30 bp         |
+| G5     | **+0.31 bp**  | 149 bp       | 11,556  | 1.39 bp         |
 
 $$
 z = \frac{0.31 - 10.72}{\left( 1.39^2 + 1.62^2 \right)^{1/2}} = \frac{-10.41}{2.13} \approx -4.9
@@ -479,12 +543,12 @@ were too wide to tell them apart, is a question about $m_g$ — and the two read
 interchangeable. The smallest gap the test could have caught, at the four sample sizes of the figure
 above and a common $\sigma_g$ of 149 bp:
 
-| $m_g$ | $\text{SE}_g$ | Smallest detectable G5 − G1 | What a null result there rules out |
-| --- | --- | --- | --- |
-| 30 | 27 bp | 77 bp | Almost nothing. An edge large enough to build a career on is still consistent with it |
-| 300 | 8.6 bp | 24 bp | Only edges several times larger than anything this chapter measures |
-| 3,000 | 2.7 bp | 7.7 bp | Most of the range that matters, but not the part costs decide |
-| 11,522 | 1.4 bp | 3.9 bp | The effect, down to a gap too small to survive execution anyway |
+| $m_g$ | $\text{SE}_g$ | Smallest detectable G5 − G1 | What a null result there rules out                                                    |
+| ------- | --------------- | ---------------------------- | ------------------------------------------------------------------------------------- |
+| 30      | 27 bp           | 77 bp                        | Almost nothing. An edge large enough to build a career on is still consistent with it |
+| 300     | 8.6 bp          | 24 bp                        | Only edges several times larger than anything this chapter measures                   |
+| 3,000   | 2.7 bp          | 7.7 bp                       | Most of the range that matters, but not the part costs decide                         |
+| 11,522  | 1.4 bp          | 3.9 bp                       | The effect, down to a gap too small to survive execution anyway                       |
 
 Only the bottom row turns a null result into a finding. In the top row the gate has not been failed
 so much as attempted — **the honest report is "not measured yet", and the fix is more observations,
@@ -504,12 +568,12 @@ Step 5 integrates over $t$, and an integral hands back an area, never the shape 
 underneath it. A staircase that is monotone over twenty years is equally consistent with an edge
 that held throughout and with one that worked for five years and was flat for fifteen.
 
-| Not on the chart                                                  | Where to look instead                                                                     |
-| ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| **When** the edge happened                                  | the equity curve of[05](05-understanding-backtesting.md)                                   |
+| Not on the chart                                                  | Where to look instead                                     |
+| ----------------------------------------------------------------- | --------------------------------------------------------- |
+| **When** the edge happened                                  | the equity curve of[05](05-understanding-backtesting.md)   |
 | **Who** is inside a bucket — which dates, which regime     | the dates behind each bar, tabulated rather than averaged |
-| **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean                                            |
-| **How independent** the observations are                    | overlapping windows, per the Note above                                                   |
+| **The spread** of returns behind a bar, as against its mean | the distribution within a bucket, not its mean            |
+| **How independent** the observations are                    | overlapping windows, per the Note above                   |
 
 ## 4. Step 2, corrected — risk-adjusted momentum
 
@@ -640,58 +704,12 @@ train/validation/test split ([07](07-overfitting-and-robustness.md)) are the sam
 
 ## Background
 
-### If momentum averages returns, where is the magnitude — isn't the signal still ±1?
-
-No. The two definitions in § 1 differ by one operation: binary momentum wraps the return in
-`sign()`, plain momentum does not. An average of returns is an ordinary decimal — `Avg` spelled out
-is a sum over the window, the lag $i$ counting backwards from yesterday:
-
-$$
-MOM_{s,t} = \frac{1}{N}\sum_{i=1}^{N} r_{s,t-i}
-$$
-
-At $N = 21$ that is last month's average daily move. Over a five-day lookback:
-
-| Asset | Last five returns            | Avg → the signal | After`sign()` |
-| ----- | ---------------------------- | ----------------- | --------------- |
-| A     | +3%, +2%, +4%, +1%, +2%      | **+0.024**  | +1              |
-| B     | +1%, −0.5%, +1%, 0%, +0.5%  | **+0.004**  | +1              |
-| C     | −2%, −3%, −1%, −2%, −2% | **−0.020** | −1             |
-
-The right column is binary momentum, and it cannot tell A from B. In the left column A is **six
-times** B — that ratio *is* the magnitude, and since the signal is proportional to the weight, A is
-held six times larger. Nothing is lost: the sign still carries direction, the absolute value adds
-strength on top.
-
-One caveat, which is § 4's subject: 0.024 means nothing on its own. 2.4% earned in a calm year and
-2.4% earned in a violent one are not the same trend. Only *relative* sizes are ever used.
-
-### After I compute momentum on day $t$, which return does it get paired with?
-
-Not necessarily the next one. Three spans sit on the timeline, in this order:
-
-| Span                    | What it holds                                                                       | Typical size          |
-| ----------------------- | ----------------------------------------------------------------------------------- | --------------------- |
-| **Lookback**      | the$N$ returns the signal averages, ending at $t-1$                             | 20–250 periods       |
-| **Gap**           | $g$ periods thrown away — neither averaged into the signal nor scored against it | 0, a week, or a month |
-| **Paired return** | $r_{s,t+g}$, the one period the signal is judged on                               | one period            |
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/signal-return-alignment-dark.png">
-  <img alt="Two panels of cells laid on a timeline, one cell per period. The top panel is one observation: eight filled cells bracketed as the lookback the signal averages, then three dashed empty cells bracketed as the discarded gap, then a single filled cell bracketed as the one the signal is scored on, with a dotted vertical line marking that the signal is computed from the cells to its left only. The lower panel repeats the same pattern for dates t, t plus one and t plus two, each shifted one cell right, so the lookbacks overlap in all but one cell while the three scored cells form a descending diagonal, annotated one return per date and no two dates share one" src="figures/signal-return-alignment-light.png">
-</picture>
-
-The gap is the only free choice of the three. The `-1` in **12-1 momentum** is exactly this gap: a
-twelve-month window stopping one month short of today.
-
-**Why leave one at all.** Not executability — § 1's window already ends at $t-1$, so $g = 0$ is
-knowable in time and anything tighter is look-ahead (§ 5). Executability fixes the floor at zero;
-**reversal** decides everything above it.
+### Why does a trend hand part of itself back, and can that be competed away?
 
 **Reversal is not an anomaly, it is the normal state of the tape.** A trend that has just formed
 hands a little of it back, and at daily frequency that rebate is large enough to cancel the edge
-outright — which is how a real signal arrives at the bar plot looking flat, or upside down. Three
-mechanisms produce it, and they are not equally fragile:
+outright — which is why § 1.2 leaves a gap $g$ between the signal's window and the return it is
+scored on. Three mechanisms produce it, and they are not equally fragile:
 
 | Mechanism                      | What happens                                                                                                                    | Competed away?                                       |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
@@ -700,18 +718,7 @@ mechanisms produce it, and they are not equally fragile:
 | **Overreaction**         | News is over-extrapolated, then partly corrected                                                                                | **Yes** — the only part that decays           |
 
 Two of the three are not mistakes, which is why reversal survives competition instead of being
-arbitraged into nothing. It also **strengthens as you sample finer**: the bounce is a roughly fixed
-number of ticks per trade while the trend grows with the horizon, so at one day the bounce dominates
-and at one month it is rounding error. That ratio is what sets $g$.
-
-**What the gap costs.** It removes the opening of the trend along with the rebate, so a longer $g$
-is a staler signal. That makes $g$ a **hyperparameter**, and running it at a day, a week and a month
-and keeping whichever bar plot looks best is what [07](07-overfitting-and-robustness.md) warns
-about. Set it from your trading frequency and a prior on how long the rebate lasts.
-
-The lower panel is also where § 3.2.2's caveat comes from: step one date forward and the lookback
-keeps all but one of its cells, so neighbouring signals are near-copies and the effective sample
-sits well below $m$.
+arbitraged into nothing — only the overreaction row decays as more people trade against it.
 
 ## Appendix · Notation
 
@@ -736,44 +743,4 @@ ranked against each other.
 | G1 … G5                                                                                                                                                                        | the buckets, lowest to highest signal**within a date**                                                                  | § 3.2     |
 | $\sigma_{s,t}$                                                                                                                                                                | one asset's volatility, estimated on data before that date                                                                    | § 4       |
 | $R_p$, $r_f$, $\sigma_p$                                                                                                                                                  | a portfolio's return over a period, the financing rate subtracted from it, and its return volatility                          | § 5       |
-| $g$                                                                                                                                                                           | gap length — periods between the end of the signal's window and the return it is scored on                                   | Background |
-
-**Note (Collisions to watch).** $R_t$ is the portfolio's return on a date (§ 1.1) and $R^2$ a share
-of variance (§ 2); they share a letter and nothing else.
-
-Five quantities wear a $\sigma$ and are not interchangeable: $\sigma_y$ is the spread of forward
-return across the pooled cloud (§ 2) — the sample-wide version of § 1.1's per-date $\sigma_{r,s}$ —
-$\sigma_\epsilon$ is the part of it the signal cannot reach (§ 2), $\sigma_{s,t}$ is one asset's
-trailing volatility on one date (§ 4), $\sigma_g$ is the spread of returns inside one bucket
-(§ 3.2.3), and $\sigma_p$ is a portfolio's return volatility (§ 5).
-
-Lowercase $g$ is also overloaded and deliberately kept apart from its subscript use: standing alone
-it is the gap (Background), and as a subscript in $\mu_g$, $\sigma_g$, $m_g$ it indexes a bucket
-G1 … G5 (§ 3.2.3).
-
-Lowercase $g$ is the gap, unrelated to the buckets G1 … G5, and lowercase $\delta$ is the tolerance
-on net exposure (§ 1.1), unrelated to [03](03-shaping-the-lookback.md)'s $\Delta$. Section 3.1's
-`alpha` is a plotting keyword; $\alpha$ in § 3.2.3 is a significance level; neither is a smoothing
-constant or a regression intercept — code font against maths is the first tell, and the section is
-the second. Chapter [01](01-what-is-cta.md) uses $s$ for a signed share count; here it
-is always the asset.
-
----
-
-## Next → [03 · Shaping the Lookback](03-shaping-the-lookback.md)
-
-Before moving on, **build the 21-day momentum signal on a single ETF, score it both ways — divided
-by trailing volatility, and as a percentile against its own past — and plot the bucket chart for
-each.** Chapter 03 then asks what shape the lookback itself should have.
-
-You should be able to explain:
-
-- [ ] Why a scatter plot proves nothing at the correlation a real signal carries
-- [ ] Why the sort key must be the signal and never the forward return
-- [ ] Why a gap sits between the signal's window and the return it is scored on, and what that gap costs
-- [ ] Why a bucket holds dates rather than assets, and that the time axis is what pooling costs
-- [ ] Why a raw signal is never compared to anything, across dates or across assets
-- [ ] Why the gap between the top and bottom bars is a hypothesis test, and why bars that touch can still be significant
-- [ ] Why a Sharpe ratio cannot judge a signal, and what its risk-free rate would have to be on a 150/50 book
-
-[← 01](01-what-is-cta.md) · [Index](00-index.md) · reference: [08 · Toolbox](08-toolbox-pandas.md)
+| $g$                                                                                                                                                                           | gap length — periods between the end of the signal's window and the return it is scored on                                   | § 1.2     |
