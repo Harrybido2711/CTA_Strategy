@@ -48,16 +48,16 @@ repaired by anything downstream.
   <img alt="Eight build stages in a vertical chain, each a labelled card carrying the question it must answer, with the object it hands to the next stage named on the arrow between them — trusted data, edge confirmed, sized book, honest PnL, verdict, a diagnosis, a better signal. Stages 0 and 2 are blue as building the strategy, stages 3 to 5 green as measuring it, stages 1 and 6 violet as the signal and the rebuild, stage 7 a lighter blue as an optional extension. A violet return path runs from stage 6 back into stage 1, labelled as the second lap: regime-aware features, volatility scaling, turnover control. A right-hand column names what judges each stage" src="figures/build-order-light.png">
 </picture>
 
-| # | Stage | The question it asks | Hands on |
-| - | --- | --- | --- |
-| 0 | **Validate the data** | Can I trust a single number in this dataset? | Trusted data |
-| 1 | **Compute a signal** | Is a higher signal followed by a higher forward return? | Edge confirmed |
-| 2 | **Size the positions** | How much do I bet, and is the exposure what I think it is? | A sized book |
-| 3 | **Simulate under execution** | How much of it survives costs, slippage and delay? | An honest PnL |
-| 4 | **Evaluate** | Is it any good, and where exactly does it fail? | A verdict |
-| 5 | **Attack the result** | How much is edge, and how much is search? | A diagnosis |
-| 6 | **Rebuild against the diagnosis** | Does the edge improve where the diagnosis said it would? | A better signal |
-| 7 | **Try a model** | Does a learned prediction beat the rule? | — |
+| # | Stage                                   | The question it asks                                       | Hands on        |
+| - | --------------------------------------- | ---------------------------------------------------------- | --------------- |
+| 0 | **Validate the data**             | Can I trust a single number in this dataset?               | Trusted data    |
+| 1 | **Compute a signal**              | Is a higher signal followed by a higher forward return?    | Edge confirmed  |
+| 2 | **Size the positions**            | How much do I bet, and is the exposure what I think it is? | A sized book    |
+| 3 | **Simulate under execution**      | How much of it survives costs, slippage and delay?         | An honest PnL   |
+| 4 | **Evaluate**                      | Is it any good, and where exactly does it fail?            | A verdict       |
+| 5 | **Attack the result**             | How much is edge, and how much is search?                  | A diagnosis     |
+| 6 | **Rebuild against the diagnosis** | Does the edge improve where the diagnosis said it would?   | A better signal |
+| 7 | **Try a model**                   | Does a learned prediction beat the rule?                   | —              |
 
 Stage 6 is a return to the start, not an end: the diagnosis re-enters at stage 1 as a better signal
 and at stage 2 as a better-sized one, and stages 3 to 5 then run again untouched. That is what makes
@@ -91,6 +91,21 @@ on head against tail, and the turnover the signal implies before any cost is mod
 **Note.** This is the cheapest test in the chain and the one place a Sharpe must not appear — it
 folds mean, volatility and financing rate into a number you cannot decompose. A signal that fails
 here is rescued by nothing downstream.
+
+**When it fails.** Stop rather than spend the expensive stages on it — that is the whole reason this
+gate is first. But a null result is a verdict only when the error bars were tight enough to return
+one; with a few hundred observations per bucket the gate has not been failed so much as attempted.
+Three repairs belong here, before anything is abandoned:
+
+| Repair | What it corrects | Where |
+| --- | --- | --- |
+| Rank the risk-adjusted signal, not the raw one | The sort key was partly the asset's volatility, so the buckets reported volatility under the signal's name | [02 § 4](02-testing-a-signal.md) |
+| Put a gap between the signal's window and the return it is scored on | Adjacent windows overlap, and at zero gap the measurement picks up reversal rather than trend | [02 Background](02-testing-a-signal.md) |
+| Cut the sample by regime before concluding | An unconditional test averages over the regimes the edge does not live in, and can wash a real one to zero | [04](04-volatility-regimes.md) |
+
+Each is a stated defect being corrected, not a parameter being searched — searching a grid of
+lookbacks until one clears the threshold is the different activity that
+[07](07-overfitting-and-robustness.md) charges for. Exhaust the three, then stop.
 
 → [02 § 3.2](02-testing-a-signal.md) for the test · [03](03-shaping-the-lookback.md) for the lookback
 
@@ -220,16 +235,16 @@ prediction's own quantiles instead.
 The stages fail in different ways, and the symptoms are easy to misattribute — the most common
 mistake is reading a data defect as a code bug.
 
-| Stage | Failure | What you see | Where it is treated |
-| --- | --- | --- | --- |
-| Data | Unadjusted corporate action | A vertical step in the equity curve | [100 § 1.1](100-dataset.md) |
-| Signal | No information | Flat or non-monotone buckets | [02 § 3.2](02-testing-a-signal.md) |
-| Sizing | Exposure not what you think | Gross or net drifts from target | [04](04-from-signal-to-position.md) |
-| Simulation | Look-ahead bias | Implausibly smooth, high Sharpe | [05](05-understanding-backtesting.md) |
-| Evaluation | One number hides the path | Good Sharpe, unlivable drawdown | [06](06-evaluating-performance.md) |
-| Robustness | Parameters were searched | The result vanishes out of sample | [07](07-overfitting-and-robustness.md) |
-| Rebuild | The fix was fitted to the diagnosis | Sharpe rises but turnover does not fall | [07](07-overfitting-and-robustness.md) |
-| Model | Fitted to the sample | Good IC in train, none in test | Out-of-sample split |
+| Stage      | Failure                             | What you see                            | Where it is treated                   |
+| ---------- | ----------------------------------- | --------------------------------------- | ------------------------------------- |
+| Data       | Unadjusted corporate action         | A vertical step in the equity curve     | [100 § 1.1](100-dataset.md)           |
+| Signal     | No information                      | Flat or non-monotone buckets            | [02 § 3.2](02-testing-a-signal.md)    |
+| Sizing     | Exposure not what you think         | Gross or net drifts from target         | [04](04-from-signal-to-position.md)    |
+| Simulation | Look-ahead bias                     | Implausibly smooth, high Sharpe         | [05](05-understanding-backtesting.md)  |
+| Evaluation | One number hides the path           | Good Sharpe, unlivable drawdown         | [06](06-evaluating-performance.md)     |
+| Robustness | Parameters were searched            | The result vanishes out of sample       | [07](07-overfitting-and-robustness.md) |
+| Rebuild    | The fix was fitted to the diagnosis | Sharpe rises but turnover does not fall | [07](07-overfitting-and-robustness.md) |
+| Model      | Fitted to the sample                | Good IC in train, none in test          | Out-of-sample split                   |
 
 **Note.** The order is forced in one direction — you cannot evaluate before simulating, or simulate
 before sizing. Two things cut across it: stage 1 can be validated *without* stages 2–4 and should
@@ -238,17 +253,17 @@ forward, which is why the second lap costs a fraction of the first.
 
 ## Appendix · Notation
 
-| Symbol | Meaning | First used |
-| --- | --- | --- |
-| $s$, $t$ | The asset, and the date — as in [02](02-testing-a-signal.md) | § 2.4 |
-| $w_{s,t}$ | Target weight of asset $s$ on date $t$, as a fraction of capital | § 2.4 |
-| $x_{s,t}$ | The raw signal value for that asset on that date | § 2.7 |
-| $\text{TO}$ | Turnover — total absolute weight change over the sample | § 2.3 |
-| $\gamma$ | Round-trip cost per dollar traded: commission, spread and slippage | § 2.4 |
-| $V_{s,t}$ | Rolling 21-day mean volume, standing for liquidity | § 2.6 |
-| $\sigma_{s,t}$ | Rolling 21-day realized volatility for that asset | § 2.6 |
-| $\eta$ | Deadband — the weight change below which no trade is placed | § 2.7 |
-| $R^2$ | Fraction of return variance a model explains | § 2.8 |
+| Symbol           | Meaning                                                             | First used |
+| ---------------- | ------------------------------------------------------------------- | ---------- |
+| $s$, $t$     | The asset, and the date — as in [02](02-testing-a-signal.md)         | § 2.4     |
+| $w_{s,t}$      | Target weight of asset $s$ on date $t$, as a fraction of capital | § 2.4     |
+| $x_{s,t}$      | The raw signal value for that asset on that date                    | § 2.7     |
+| $\text{TO}$    | Turnover — total absolute weight change over the sample            | § 2.3     |
+| $\gamma$       | Round-trip cost per dollar traded: commission, spread and slippage  | § 2.4     |
+| $V_{s,t}$      | Rolling 21-day mean volume, standing for liquidity                  | § 2.6     |
+| $\sigma_{s,t}$ | Rolling 21-day realized volatility for that asset                   | § 2.6     |
+| $\eta$         | Deadband — the weight change below which no trade is placed        | § 2.7     |
+| $R^2$          | Fraction of return variance a model explains                        | § 2.8     |
 
 **Note (Collisions avoided).** Three symbols are deliberately not the obvious ones.
 [04](04-volatility-regimes.md) already spends $\tau$ on an option's time to expiry and $c$ on its

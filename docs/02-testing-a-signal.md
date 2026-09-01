@@ -473,6 +473,23 @@ here is optimistic. And a threshold of 5 percent means one signal in twenty pass
 is a fact about *one* test: running twenty variants and reporting the one that cleared 2 is not a
 test at all, and is [07](07-overfitting-and-robustness.md)'s subject.
 
+**Failing to reject is a verdict on the measurement, not on the signal.** $|z| < 2$ says the data
+did not separate the two means. Whether that is because they are equal, or because the error bars
+were too wide to tell them apart, is a question about $m_g$ — and the two readings are not
+interchangeable. The smallest gap the test could have caught, at the four sample sizes of the figure
+above and a common $\sigma_g$ of 149 bp:
+
+| $m_g$ | $\text{SE}_g$ | Smallest detectable G5 − G1 | What a null result there rules out |
+| --- | --- | --- | --- |
+| 30 | 27 bp | 77 bp | Almost nothing. An edge large enough to build a career on is still consistent with it |
+| 300 | 8.6 bp | 24 bp | Only edges several times larger than anything this chapter measures |
+| 3,000 | 2.7 bp | 7.7 bp | Most of the range that matters, but not the part costs decide |
+| 11,522 | 1.4 bp | 3.9 bp | The effect, down to a gap too small to survive execution anyway |
+
+Only the bottom row turns a null result into a finding. In the top row the gate has not been failed
+so much as attempted — **the honest report is "not measured yet", and the fix is more observations,
+not a different signal.**
+
 #### 3.2.4 What the bar plot cannot show
 
 Every date contributes one observation — its signal's score, and the return that followed. Step 5
