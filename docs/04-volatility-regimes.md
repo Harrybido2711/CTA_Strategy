@@ -8,25 +8,6 @@ used by conditioning on it, not by adding it to the signal** (§ 3).
 
 ## 1. Why MACD breaks when the tape gets loud
 
-### 1.1 What "loud" means
-
-**Definition (High volatility).** $\sigma$, the amplitude of the period's move without regard to
-its sign, large relative to that market's own ordinary level $\sigma_{\text{calm}}$. A **ratio**,
-never an absolute level: what is unremarkable in one market is a crisis in another.
-
-| A high-volatility state is not | It is                                                       |
-| ------------------------------ | ----------------------------------------------------------- |
-| a fall in price                | a widening of the day's range, in **either** direction |
-| a trend                        | the spread around whatever trend there is                   |
-| one large day                  | a stretch of dates that stays wide                          |
-
-**Definition (Volatility regime).** A stretch of dates over which $\sigma$ is roughly constant and
-materially different from the stretch on either side; a **regime shift** is the boundary between
-two of them. What makes the state nameable is that amplitude persists where direction does not
-([03 § 4](03-shaping-the-lookback.md)).
-
-### 1.2 What a loud tape does to the rule
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/macd-out-of-phase-dark.png">
   <img alt="Two stacked panels sharing a trading-day axis of two hundred sessions. The upper panel plots one price path with a 12-day and a 26-day EMA over it. For the first ninety-five sessions the path drifts steadily upward, the fast average sits clear above the slow one throughout, and the two never cross. The remaining hundred and five sessions are shaded: the path has no net trend and four times the daily amplitude, the two averages stay tangled together, and their difference changes sign ten times, each crossing marked with a violet dot. A dashed pair of guides marks one swing top and the crossing that follows it, labelled the flip lands seven sessions after the turn. The lower panel plots the position the rule holds: one unbroken long through the calm stretch, then a shredded alternation of long and short blocks with a violet line at every flip, captioned each flip is a round trip, paid at the widest spreads of the year" src="figures/macd-out-of-phase-light.png">
@@ -148,8 +129,12 @@ labelled wrongly, and **MOVE** is the same construction run on Treasury options.
 
 ### 2.4 From a level to a label
 
-§ 3 needs a small set of named states, because a continuous variable cannot be a row of a table.
-Write $v_t$ for the index level on date $t$; its distribution is the obstacle.
+**Definition (Volatility regime).** A stretch of dates over which the amplitude of returns is
+roughly constant and materially different from the stretch on either side; a **regime shift** is
+the boundary between two of them.
+
+§ 3 needs a small set of such states, named, because a continuous variable cannot be a row of a
+table. Write $v_t$ for the index level on date $t$; its distribution is the obstacle.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/vix-bucketing-dark.png">
@@ -212,7 +197,7 @@ cell. It is [02 § 3.2](02-testing-a-signal.md)'s bar plot run once per regime �
 </picture>
 
 Read it by rows, and the reading is the finding. A staircase in the calm row that flattens through
-the stressed row and disappears in the crisis row is § 1.2's picture measured on your own data:
+the stressed row and disappears in the crisis row is § 1's picture measured on your own data:
 same rule, same parameters, less and less to show for them. The one-dimensional plot of
 [02](02-testing-a-signal.md) is the sample-weighted average of the three rows — it reports the calm
 row lightly diluted and never mentions that the other two exist.
@@ -319,7 +304,7 @@ so it carries no asset subscript $s$.
 
 | Symbol                                                         | Means                                                                                                        | First used |
 | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------- |
-| $\sigma$, $\sigma_{\text{calm}}$, $\sigma_{\text{high}}$ | the amplitude of the period's move, and its levels either side of a regime shift                             | § 1.1     |
+| $\sigma$, $\sigma_{\text{calm}}$, $\sigma_{\text{high}}$ | the amplitude of the tape — the standard deviation of the period's move, without regard to sign — and its levels either side of a regime shift | § 2.1 |
 | $\sigma^{\text{real}}_t$, $L$                              | realized volatility, and the trailing window in periods it is computed over                                  | § 2.1     |
 | $K$, $S_T$, $\tau$                                       | an option's strike, the underlying's price at expiry, and the time to expiry in days                         | § 2.2     |
 | $v_t$, $g_t$, $c$                                        | the index level on that date, the regime label cut from it, and the multiplier setting how fine the cuts are | § 2.4     |
