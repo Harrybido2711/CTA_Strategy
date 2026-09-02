@@ -1,4 +1,13 @@
 {
+  // LaTeX. docs/05-modelling.tex uses fontspec + unicode-math, so pdflatex —
+  // LaTeX Workshop's default engine — dies at the first \setmainfont. Honour the
+  // "% !TEX program = xelatex" magic comment instead of forcing the default recipe,
+  // and read the PDF back out of the directory docs/.latexmkrc writes it to.
+  "latex-workshop.latex.build.forceRecipeUsage": false,
+  "latex-workshop.latex.outDir": "%DIR%/_pdf",
+  "latex-workshop.latex.recipe.default": "latexmk (xelatex)",
+  "latex-workshop.latex.autoClean.onFailed": true,
+
   // The markdown table formatter reflows pipe alignment on save. On these notes it
   // deletes the space before inline markers ("possible **outcome**" -> "possible**outcome**",
   // which renders as "possibleoutcome") and appends stray empty cells that break the
