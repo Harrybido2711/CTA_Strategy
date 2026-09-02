@@ -10,6 +10,7 @@ reader's theme.
 
 Figures produced
 ----------------
+    option-payoffs      what a call and a put pay at expiry, and where the kink sits
     macd-out-of-phase   the 12/26 rule whipsawed and late once the tape turns loud
     regime-lag          a trailing volatility estimate peaks long after the burst it is measuring
     vix-bucketing       why the raw level will not bucket, and what the log fixes
@@ -38,6 +39,64 @@ def _label_ink(hex_colour):
     """Black or white for text sitting on a filled cell, by the fill's luminance."""
     r, g, b = (int(hex_colour[i:i + 2], 16) / 255 for i in (1, 3, 5))
     return "#0b0b0b" if 0.299 * r + 0.587 * g + 0.114 * b > 0.6 else "#ffffff"
+
+
+# ---------------------------- fig: what a call and a put actually pay at expiry
+def option_payoffs(mode):
+    """04 s2.2 -- the kink, drawn: flat on one side of the strike, one-for-one on the other.
+
+    Schematic. Strike 100, premium 8, both panels on the same axes so the call
+    and the put read as mirror images. The solid line is the payoff the contract
+    makes at expiry; the dashed line is that payoff net of what was paid for it,
+    which is why the loss is flat and capped while the gain is open-ended. That
+    asymmetry is the convexity the chapter inverts for a volatility.
+    """
+    t = THEMES[mode]
+
+    strike, premium = 100.0, 8.0
+    st = np.linspace(62.0, 138.0, 400)
+    panels = (
+        ("Call", np.maximum(st - strike, 0.0), strike + premium),
+        ("Put", np.maximum(strike - st, 0.0), strike - premium),
+    )
+
+    fig, axes = plt.subplots(1, 2, figsize=(8.8, 3.7), sharey=True,
+                             gridspec_kw=dict(wspace=0.08))
+    fig.patch.set_facecolor(t["surface"])
+
+    for ax, (name, payoff, breakeven) in zip(axes, panels):
+        ax.axhline(0, color=t["baseline"], linewidth=1.0, zorder=2)
+        ax.axvline(strike, color=t["accent"], linewidth=1.1, linestyle=(0, (4, 3)), zorder=2)
+        ax.plot(st, payoff - premium, color=t["ramp"][3], linewidth=1.8,
+                linestyle=(0, (5, 3)), zorder=4)
+        ax.plot(st, payoff, color=t["ramp"][5], linewidth=2.4, zorder=5)
+        ax.plot([breakeven], [0.0], marker="o", markersize=5.5, color=t["ramp"][3], zorder=6)
+
+        style_axes(ax, t, xlabel="underlying at expiry,  $S_T$")
+        ax.set_xlim(62, 138)
+        ax.set_ylim(-21, 40)
+        ax.set_xticks([strike])
+        ax.set_xticklabels(["$K$"], fontsize=10)
+        ax.text(0.5, 0.98, name, transform=ax.transAxes, ha="center", va="top",
+                color=t["ink"], fontsize=10.5, fontweight="600", zorder=8,
+                bbox=dict(facecolor=t["surface"], edgecolor="none", pad=2.5))
+
+        flat = 74 if name == "Call" else 126
+        ax.annotate("loss capped\nat the premium", xy=(flat, -premium - 0.6),
+                    xytext=(flat, -20.5), ha="center", va="bottom",
+                    color=t["ink_secondary"], fontsize=8.4,
+                    arrowprops=dict(arrowstyle="->", color=t["ink_secondary"], linewidth=0.9))
+
+    style_axes(axes[0], t, ylabel="value at expiry", xlabel="underlying at expiry,  $S_T$")
+    axes[0].text(64, 37, "payoff at expiry", color=t["ramp"][5], fontsize=9,
+                 fontweight="600", ha="left", va="top")
+    axes[0].text(64, 31, "net of the premium paid", color=t["ramp"][3], fontsize=9,
+                 fontweight="600", ha="left", va="top")
+
+    titles(axes[0], t, "The kink is the instrument",
+           "illustrative — strike 100, premium 8; the flat side truncates the loss, the sloped side leaves the gain open")
+    fig.tight_layout(rect=(0, 0, 1, 0.87))
+    save(fig, t, f"option-payoffs-{mode}.png")
 
 
 def _ema(a, span):
@@ -361,7 +420,7 @@ def regime_signal_grid(mode):
     save(fig, t, f"regime-signal-grid-{mode}.png")
 
 
-FIGURES = (macd_out_of_phase, regime_lag, vix_bucketing, regime_signal_grid)
+FIGURES = (macd_out_of_phase, option_payoffs, regime_lag, vix_bucketing, regime_signal_grid)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

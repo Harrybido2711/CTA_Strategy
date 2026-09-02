@@ -48,9 +48,30 @@ moves the session the news does. Where it comes from is § 2.2.
 
 ### 2.2 How an option hands you a volatility
 
-An option's value depends on how far the underlying might travel before it expires, so anyone
-quoting one is quoting a volatility forecast whether they name it or not. Under Black–Scholes a
-call is worth
+An option fixes a price today for a trade that may happen later, and **the buyer chooses whether it
+happens**. Two of them, defined by which side that choice sits on:
+
+| | **Call** | **Put** |
+| --- | --- | --- |
+| The holder may | **buy** the underlying at $K$ | **sell** the underlying at $K$ |
+| Worth exercising when | $S_T > K$ | $S_T < K$ |
+| Payoff at expiry | $\text{max}(S_T - K, 0)$ | $\text{max}(K - S_T, 0)$ |
+| Pays off when the underlying | rises | falls |
+| The most the buyer can lose | the premium | the premium |
+| The most the buyer can make | unbounded | $K$, less the premium |
+| Bought by someone who | wants upside without owning it | wants a floor under something they own |
+
+with $K$ the **strike** — the price fixed in the contract — and $S_T$ the underlying's price at
+expiry.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/option-payoffs-dark.png">
+  <img alt="Two panels sharing a vertical axis of value at expiry, against the underlying's price at expiry on each horizontal axis, with the strike K marked by a dashed violet line in both. On the left, a call: the payoff is flat at zero for every price below the strike, then rises one-for-one above it, and a dashed line eight points lower is the same shape net of the premium paid, crossing zero at a breakeven above the strike. On the right, a put: the mirror image, falling one-for-one down to the strike and flat at zero above it, with its own dashed net line crossing zero below the strike. Both dashed lines are flat on their far side, annotated loss capped at the premium" src="figures/option-payoffs-light.png">
+</picture>
+
+Both payoffs are **kinked**: flat on one side of the strike, one-for-one on the other. That kink is
+the whole instrument — it truncates the loss and leaves the gain open — and it is why an option is
+worth more when the underlying might travel further. Under Black–Scholes a call is worth
 
 $$
 C = S \Phi(d_1) - K e^{-R \tau} \Phi(d_2) , \qquad
@@ -68,10 +89,10 @@ estimated from history.
 
 **Claim.** The inversion is well defined: one price, one implied volatility.
 
-**Proof.** A call pays $\text{max}(S_T - K, 0)$ at expiry, a convex function of $S_T$. Raising
-$\sigma$ spreads the distribution of $S_T$ while leaving its forward mean where it was, and the
-expectation of a convex function rises under a mean-preserving spread. The price is therefore
-strictly monotone in $\sigma$, and a monotone map is invertible.
+**Proof.** The kink makes both payoffs convex in $S_T$. Raising $\sigma$ spreads the distribution of
+$S_T$ while leaving its forward mean where it was, and the expectation of a convex function rises
+under a mean-preserving spread. The price is therefore strictly monotone in $\sigma$, and a
+monotone map is invertible.
 
 There is no closed form for the inverse, so $\sigma$ is solved numerically — bisection needs about
 twenty steps to reach four decimals, and monotonicity is what guarantees it converges. At the money
@@ -293,23 +314,6 @@ in a year when buying the index and doing nothing paid 0.8. Collapsing the regim
 ratio destroys exactly the context needed to read the ratio.
 
 ## Background
-
-### What is an option, and what does the buyer actually get?
-
-A contract fixing a price today for a trade that may happen later — and the buyer chooses whether it
-happens. That choice is the whole instrument; it is what *option* names.
-
-|                       | **Call**                        | **Put**                          |
-| --------------------- | ------------------------------------- | -------------------------------------- |
-| The holder may        | **buy** the underlying at $K$ | **sell** the underlying at $K$ |
-| Worth exercising when | $S_T > K$                           | $S_T < K$                            |
-| Payoff at expiry      | $\text{max}(S_T - K, 0)$            | $\text{max}(K - S_T, 0)$             |
-| Bought by someone who | wants upside without owning it        | wants a floor under something they own |
-
-with $K$ the **strike**, $S_T$ the underlying's price at expiry, and the expiry the date the choice
-must be made. Hold a call struck at \$100: at \$150 you exercise and it is worth \$50; at \$90 you do
-not, and it expires worthless. So the payoff is **flat at zero up to the strike, then rises
-one-for-one**, and that kink is why the next question has an answer.
 
 ### Why is an option the instrument a volatility forecast comes from?
 
