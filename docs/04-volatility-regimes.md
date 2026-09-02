@@ -1,9 +1,5 @@
 # 04 · Volatility Regimes
 
-> - **Answers:** why MACD gives its edge back when the market turns violent, how the option market hands you a live measure of that violence, and what to do with the measure once you have it.
-> - **Prerequisites:** [03 · Shaping the Lookback](03-shaping-the-lookback.md) § 3 for MACD and § 4 for the volatility clustering this chapter measures; [02 · Testing a Signal](02-testing-a-signal.md) § 3.2, whose bar plot is still the only gauge.
-> - **After reading:** say what a loud tape does to a fast/slow rule's crossings and to their timing, why a trailing volatility estimate arrives too late, how to read VIX as a forecast, how to cut it into regime labels, and how to test whether the label carries anything your signals do not already own.
-
 ---
 
 Three steps, in order. **MACD stops working when the tape gets loud** (§ 1). **The option market
@@ -14,21 +10,20 @@ used by conditioning on it, not by adding it to the signal** (§ 3).
 
 ### 1.1 What "loud" means
 
-**Definition (High volatility).** A state of the market, not a direction of it: $\sigma$, the
-amplitude of the period's move without regard to its sign, large relative to that market's own
-ordinary level $\sigma_{\text{calm}}$. It is a **ratio**, never an absolute level — a daily range
-that is unremarkable for a technology name is a crisis for a two-year note.
+**Definition (High volatility).** $\sigma$, the amplitude of the period's move without regard to
+its sign, large relative to that market's own ordinary level $\sigma_{\text{calm}}$. A **ratio**,
+never an absolute level: what is unremarkable in one market is a crisis in another.
 
-| A high-volatility state is not | It is |
-| --- | --- |
-| a fall in price | a widening of the day's range, in **either** direction |
-| a trend | the spread around whatever trend there is |
-| one large day | a stretch of dates that stays wide |
+| A high-volatility state is not | It is                                                       |
+| ------------------------------ | ----------------------------------------------------------- |
+| a fall in price                | a widening of the day's range, in **either** direction |
+| a trend                        | the spread around whatever trend there is                   |
+| one large day                  | a stretch of dates that stays wide                          |
 
 **Definition (Volatility regime).** A stretch of dates over which $\sigma$ is roughly constant and
 materially different from the stretch on either side; a **regime shift** is the boundary between
-two of them. The state is nameable at all only because [03 § 4](03-shaping-the-lookback.md)'s
-clustering makes amplitude persistent: large moves follow large moves, regardless of sign.
+two of them. What makes the state nameable is that amplitude persists where direction does not
+([03 § 4](03-shaping-the-lookback.md)).
 
 ### 1.2 What a loud tape does to the rule
 
@@ -38,19 +33,16 @@ clustering makes amplitude persistent: large moves follow large moves, regardles
 </picture>
 
 One path, one rule, two regimes. In the calm stretch the fast average pulls clear of the slow one
-and stays there — no crossings, one position, held for the whole move. In the shaded stretch the
-trend is gone and the swings are four times wider, so the two legs stay tangled and noise carries
-one across the other again and again.
+and stays there: no crossings, one position, held. In the shaded stretch the trend is gone and the
+swings are four times wider, so the two legs stay tangled and noise carries one across the other
+again and again.
 
-**And every flip lands after the turn it is chasing**, because an average can only confirm a move
-that has already happened. The rule therefore goes short at the bottom of the spike and long at the
-top of the snap-back: whipsaw is not scatter around the right answer, it is the opposite of it,
-repeated on a schedule the noise sets — and every repetition is a round trip paid at the widest
-spreads of the year.
+**Every flip also lands after the turn it is chasing**, since an average only confirms a move that
+has already happened — so the rule goes short at the bottom of the spike and long at the top of the
+snap-back. Whipsaw is not scatter around the right answer; it is the opposite of it, repeated.
 
-Neither [02 § 4](02-testing-a-signal.md)'s risk-adjustment nor
-[03 § 4](03-shaping-the-lookback.md)'s smoother and deadband repairs this. Standardizing rescales
-the signal without moving a crossing date; the smoother and the deadband damp every date alike,
+Standardizing the signal ([02 § 4](02-testing-a-signal.md)) rescales it without moving a crossing
+date, and [03 § 4](03-shaping-the-lookback.md)'s smoother and deadband damp every date alike
 because neither knows the tape is violent. Clearing that ceiling means promoting the state of the
 market to a **variable**.
 
@@ -144,10 +136,10 @@ cross-asset correlations run toward one. The states in which the label matters m
 states in which one market's fear is every market's fear — an empirical regularity rather than a
 theorem, and better at the extremes than in the middle.
 
-| Sleeve | Regime index | What its spikes are about |
-| --- | --- | --- |
-| Equities, credit, most commodities | **VIX** | growth and earnings shocks, and forced deleveraging |
-| Rates, and anything priced off the curve | **MOVE** | policy surprises, inflation prints, auction stress |
+| Sleeve                                   | Regime index   | What its spikes are about                           |
+| ---------------------------------------- | -------------- | --------------------------------------------------- |
+| Equities, credit, most commodities       | **VIX**  | growth and earnings shocks, and forced deleveraging |
+| Rates, and anything priced off the curve | **MOVE** | policy surprises, inflation prints, auction stress  |
 
 **Note (Rates are the genuine exception).** Treasury volatility is close to unrelated to equity
 volatility, because the two are frightened by different things. A rate sleeve labelled by VIX is
@@ -173,11 +165,11 @@ integer, $g_t = \text{ceil}\left( \ln v_t \right)$, where $g_t$ is the regime la
 Because $\ln$ compresses the sparse upper tail and stretches the crowded lower band, the integer
 cuts land at multiplicatively spaced levels:
 
-| Label $g_t$ | Level range | Reads as |
-| --- | --- | --- |
-| 3 | $v_t \in (7.4, 20.1]$ | calm — the ordinary tape |
-| 4 | $v_t \in (20.1, 54.6]$ | stressed |
-| 5 | $v_t \in (54.6, 148.4]$ | crisis |
+| Label$g_t$ | Level range               | Reads as                  |
+| ------------ | ------------------------- | ------------------------- |
+| 3            | $v_t \in (7.4, 20.1]$   | calm — the ordinary tape |
+| 4            | $v_t \in (20.1, 54.6]$  | stressed                  |
+| 5            | $v_t \in (54.6, 148.4]$ | crisis                    |
 
 The boundaries are $e^3$ and $e^4$, close to where a practitioner would have drawn them by hand.
 That is the construction's virtue: **the cuts use no data, so a date's label means the same thing in
@@ -189,13 +181,13 @@ choosing it by which value produces the best-looking grid is what
 The alternative is [02 § 3.2.1](02-testing-a-signal.md)'s own machinery applied to the index: rank
 the dates by $v_t$ and cut at the quintiles.
 
-| | Log-ceiling | Rolling quantile |
-| --- | --- | --- |
-| **Boundaries** | fixed, the same in every year | move with the window |
-| **Group sizes** | very unequal — crisis may be 3 percent of the sample | equal by construction |
-| **A label means** | an absolute level of market fear | a rank against the recent past |
-| **Comparable across time** | yes | no — the same $v_t$ can be G5 one year and G3 the next |
-| **Look-ahead risk** | none, the cuts use no data | real, if the window is not trailing |
+|                                  | Log-ceiling                                           | Rolling quantile                                         |
+| -------------------------------- | ----------------------------------------------------- | -------------------------------------------------------- |
+| **Boundaries**             | fixed, the same in every year                         | move with the window                                     |
+| **Group sizes**            | very unequal — crisis may be 3 percent of the sample | equal by construction                                    |
+| **A label means**          | an absolute level of market fear                      | a rank against the recent past                           |
+| **Comparable across time** | yes                                                   | no — the same$v_t$ can be G5 one year and G3 the next |
+| **Look-ahead risk**        | none, the cuts use no data                            | real, if the window is not trailing                      |
 
 **Note (The ranking must be rolling, never full-sample).** A quintile computed over the whole
 history uses 2020's levels to label 2015's dates, which is look-ahead bias of the plainest kind
@@ -296,12 +288,12 @@ ratio destroys exactly the context needed to read the ratio.
 A contract fixing a price today for a trade that may happen later — and the buyer chooses whether it
 happens. That choice is the whole instrument; it is what *option* names.
 
-| | **Call** | **Put** |
-| --- | --- | --- |
-| The holder may | **buy** the underlying at $K$ | **sell** the underlying at $K$ |
-| Worth exercising when | $S_T > K$ | $S_T < K$ |
-| Payoff at expiry | $\text{max}(S_T - K, 0)$ | $\text{max}(K - S_T, 0)$ |
-| Bought by someone who | wants upside without owning it | wants a floor under something they own |
+|                       | **Call**                        | **Put**                          |
+| --------------------- | ------------------------------------- | -------------------------------------- |
+| The holder may        | **buy** the underlying at $K$ | **sell** the underlying at $K$ |
+| Worth exercising when | $S_T > K$                           | $S_T < K$                            |
+| Payoff at expiry      | $\text{max}(S_T - K, 0)$            | $\text{max}(K - S_T, 0)$             |
+| Bought by someone who | wants upside without owning it        | wants a floor under something they own |
 
 with $K$ the **strike**, $S_T$ the underlying's price at expiry, and the expiry the date the choice
 must be made. Hold a call struck at \$100: at \$150 you exercise and it is worth \$50; at \$90 you do
@@ -325,14 +317,14 @@ one-for-one**, and that kink is why the next question has an answer.
 Throughout, $t$ is the date. The regime index is a property of the market rather than of one asset,
 so it carries no asset subscript $s$.
 
-| Symbol | Means | First used |
-| --- | --- | --- |
-| $\sigma$, $\sigma_{\text{calm}}$, $\sigma_{\text{high}}$ | the amplitude of the period's move, and its levels either side of a regime shift | § 1.1 |
-| $\sigma^{\text{real}}_t$, $L$ | realized volatility, and the trailing window in periods it is computed over | § 2.1 |
-| $K$, $S_T$, $\tau$ | an option's strike, the underlying's price at expiry, and the time to expiry in days | § 2.2 |
-| $v_t$, $g_t$, $c$ | the index level on that date, the regime label cut from it, and the multiplier setting how fine the cuts are | § 2.4 |
-| $x_t$, $x_{j,t}$, $\beta_j$, $\epsilon_t$ | the candidate signal, the signals already in the book, their fitted coefficients, and the residual | § 3.2 |
-| $p_t$, $N$ | the model's combined prediction, and the number of dates in the sample | § 3 |
+| Symbol                                                         | Means                                                                                                        | First used |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------- |
+| $\sigma$, $\sigma_{\text{calm}}$, $\sigma_{\text{high}}$ | the amplitude of the period's move, and its levels either side of a regime shift                             | § 1.1     |
+| $\sigma^{\text{real}}_t$, $L$                              | realized volatility, and the trailing window in periods it is computed over                                  | § 2.1     |
+| $K$, $S_T$, $\tau$                                       | an option's strike, the underlying's price at expiry, and the time to expiry in days                         | § 2.2     |
+| $v_t$, $g_t$, $c$                                        | the index level on that date, the regime label cut from it, and the multiplier setting how fine the cuts are | § 2.4     |
+| $x_t$, $x_{j,t}$, $\beta_j$, $\epsilon_t$              | the candidate signal, the signals already in the book, their fitted coefficients, and the residual           | § 3.2     |
+| $p_t$, $N$                                                 | the model's combined prediction, and the number of dates in the sample                                       | § 3       |
 
 **Note (Collisions to watch).** $\sigma$ is market-wide here — the amplitude of the tape — where
 [02 § 4](02-testing-a-signal.md)'s $\sigma_{s,t}$ is one asset's trailing volatility. Lowercase
