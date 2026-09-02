@@ -357,7 +357,7 @@ signal reaches.
 
 ---
 
-## Next → [05 · Understanding Backtesting](05-understanding-backtesting.md)
+## Next → [05 · Modelling](05-modelling.md)
 
 Before moving on, **build the log-ceiling regime label on VIX and on MOVE, then draw § 3.1's grid
 twice** — your 21-day risk-adjusted momentum against VIX on the equity ETFs, and against MOVE on the
