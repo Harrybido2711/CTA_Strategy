@@ -14,11 +14,10 @@ used by conditioning on it, not by adding it to the signal** (§ 3).
 
 ### 1.1 What "loud" means
 
-**Definition (High volatility).** A state of the market, not a direction of it. Date $t$ sits in a
-high-volatility state when $\sigma$, the standard deviation of the period's move without regard to
-its sign, is large relative to that market's own ordinary level $\sigma_{\text{calm}}$. It is
-therefore a **ratio**, $\sigma / \sigma_{\text{calm}}$, never an absolute level: 1.2 percent a day
-is unremarkable for a technology name and a crisis for a two-year note.
+**Definition (High volatility).** A state of the market, not a direction of it: $\sigma$, the
+amplitude of the period's move without regard to its sign, large relative to that market's own
+ordinary level $\sigma_{\text{calm}}$. It is a **ratio**, never an absolute level — a daily range
+that is unremarkable for a technology name is a crisis for a two-year note.
 
 | A high-volatility state is not | It is |
 | --- | --- |
@@ -26,16 +25,10 @@ is unremarkable for a technology name and a crisis for a two-year note.
 | a trend | the spread around whatever trend there is |
 | one large day | a stretch of dates that stays wide |
 
-**Example.** An implied-volatility index quotes an annualized percentage, so the daily move it
-implies is roughly $v_t / (252)^{1/2} \approx v_t / 15.9$: a level of 12 is 0.75 percent a day, 20 is
-1.3 percent, 40 is 2.5 percent. A move from 12 to 40 is not "a bad week" — it is the same market
-with its daily range widened by a factor of **three**.
-
 **Definition (Volatility regime).** A stretch of dates over which $\sigma$ is roughly constant and
-materially different from the stretch on either side. A **regime shift** is the boundary between two
-such stretches. The state is nameable at all only because
-[03 § 4](03-shaping-the-lookback.md)'s clustering makes amplitude persistent: large moves follow
-large moves, regardless of sign.
+materially different from the stretch on either side; a **regime shift** is the boundary between
+two of them. The state is nameable at all only because [03 § 4](03-shaping-the-lookback.md)'s
+clustering makes amplitude persistent: large moves follow large moves, regardless of sign.
 
 ### 1.2 What a loud tape does to the rule
 
@@ -44,27 +37,22 @@ large moves, regardless of sign.
   <img alt="Two stacked panels sharing a trading-day axis of two hundred sessions. The upper panel plots one price path with a 12-day and a 26-day EMA over it. For the first ninety-five sessions the path drifts steadily upward, the fast average sits clear above the slow one throughout, and the two never cross. The remaining hundred and five sessions are shaded: the path has no net trend and four times the daily amplitude, the two averages stay tangled together, and their difference changes sign ten times, each crossing marked with a violet dot. A dashed pair of guides marks one swing top and the crossing that follows it, labelled the flip lands seven sessions after the turn. The lower panel plots the position the rule holds: one unbroken long through the calm stretch, then a shredded alternation of long and short blocks with a violet line at every flip, captioned each flip is a round trip, paid at the widest spreads of the year" src="figures/macd-out-of-phase-light.png">
 </picture>
 
-One path, one rule, two regimes. Through the calm stretch the fast average pulls clear of the slow
-one and stays there: **no crossings at all, one position, held for the whole move.** Across the
-shaded stretch the trend is gone and the amplitude is four times larger, so the two legs stay
-tangled and noise carries one across the other **ten times in a hundred sessions** — ten round
-trips bought and sold on nothing.
+One path, one rule, two regimes. In the calm stretch the fast average pulls clear of the slow one
+and stays there — no crossings, one position, held for the whole move. In the shaded stretch the
+trend is gone and the swings are four times wider, so the two legs stay tangled and noise carries
+one across the other again and again.
 
-**And every flip lands after the turn it is chasing.** An average is a summary of the past, so a
-crossing can only confirm a move that has already happened; here the flip arrives seven sessions
-after the swing it responds to. That lag is what makes the trades worse than useless rather than
-merely wasteful: the rule goes short at the bottom of the spike and long at the top of the
-snap-back. **Whipsaw is not scatter around the right answer, it is the opposite of the right
-answer, repeated on a schedule the noise sets.** Forty crossings a year at five basis points a
-round trip is 200 bp of drag against a gross edge that might be four hundred.
+**And every flip lands after the turn it is chasing**, because an average can only confirm a move
+that has already happened. The rule therefore goes short at the bottom of the spike and long at the
+top of the snap-back: whipsaw is not scatter around the right answer, it is the opposite of it,
+repeated on a schedule the noise sets — and every repetition is a round trip paid at the widest
+spreads of the year.
 
-**Note (Standardizing does not repair it).** Dividing the signal by the asset's trailing volatility
-([02 § 4](02-testing-a-signal.md)) rescales it without moving a single crossing date. It fixes the
-**size** of the position; it cannot change **when** the position flips.
-
-Nor can [03 § 4](03-shaping-the-lookback.md)'s smoother and deadband: neither knows the tape is
-violent, so each damps every date alike and pays on the quiet days to protect the loud ones.
-Clearing that ceiling means promoting the state of the market to a **variable**.
+Neither [02 § 4](02-testing-a-signal.md)'s risk-adjustment nor
+[03 § 4](03-shaping-the-lookback.md)'s smoother and deadband repairs this. Standardizing rescales
+the signal without moving a crossing date; the smoother and the deadband damp every date alike,
+because neither knows the tape is violent. Clearing that ceiling means promoting the state of the
+market to a **variable**.
 
 ## 2. What the option market already knows
 
