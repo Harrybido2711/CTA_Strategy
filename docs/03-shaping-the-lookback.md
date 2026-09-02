@@ -99,24 +99,24 @@ better single window, but by refusing to settle for just one.
 
 One lookback forces a choice between stable and timely. A long window rides a trend without being
 shaken out of it but arrives late at both ends; a short one turns on time, and turns on noise too.
-Rather than choose, carry both and let the **fast window time the turns of the slow one**.
+Rather than choose, carry both and trade **the gap between them**.
 
-Each rule is still the sign of its own momentum, so each fires when its own line crosses zero. Draw
-the two over the same price path and the short window crosses first at both ends — that gap, and
-nothing else, is what the combination trades on.
+That gap is a single series — the fast average minus the slow one — and the rule is its sign: long
+while the fast average sits above the slow one, out when it drops back under. Two windows go in and
+one number comes out, which is what makes the pair an indicator rather than two rules run side by
+side.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/fast-times-slow-dark.png">
-  <img alt="Two stacked panels sharing a trading-day axis. The upper panel plots price rebased to 100 over one path that falls, turns and rolls over, with a 20-day and a 40-day moving average drawn over it, and two horizontal bars underneath showing how long each rule holds. The lower panel plots each of those two averages' own momentum — how far it has moved over its own window — against zero, so it describes the same two lines drawn above: the 20-day line crosses zero upward 14 days before the 40-day line does, and crosses back down 23 days before it, so the fast rule enters and exits earlier at both ends" src="figures/fast-times-slow-light.png">
+  <img alt="Two stacked panels sharing a trading-day axis. The upper panel plots price rebased to 100 over one path that falls, turns and rolls over, with a 20-day and a 40-day moving average drawn over it; the fast average crosses above the slow one on day 85 and drops back under it on day 181, and a bar between those two dates marks the stretch the rule is long. The lower panel plots the single series the pair produces — the fast average minus the slow one — against zero, shaded where it is positive. It is negative at both ends and positive in between, and its two zero crossings fall exactly on the two dates the averages cross in the panel above" src="figures/fast-times-slow-light.png">
 </picture>
 
-**What the early signal means.** A fast momentum turning up while the slow one is still negative is
-not only an arithmetic consequence of the shorter window. It is the first evidence that flow has
-changed direction — that whoever was selling has stopped, or something large has started buying —
-while the move is still too small to register over a quarter. The same reading runs the other way
-and matters more there: a fast leg rolling over while the slow one is still positive is what a large
-holder beginning to leave looks like from outside. Waiting for the slow window to agree means
-selling to them on the way out.
+**What the crossing means.** The fast average overtaking the slow one is not only an arithmetic
+consequence of the shorter window. It is the first evidence that flow has changed direction — that
+whoever was selling has stopped, or something large has started buying — while the move is still too
+small to register over a quarter. The same reading runs the other way and matters more there: the
+fast average rolling back under the slow one is what a large holder beginning to leave looks like
+from outside. Waiting for the slow window to turn on its own means selling to them on the way out.
 
 ### 2.2 Finding the pairing
 
@@ -157,8 +157,8 @@ on one hard enough and someone takes the other side and presses it back.
 
 ## 3. MACD, stated precisely
 
-§ 1 gave a window a decay; § 2 gave the signal two windows instead of one. Put a fast EWMA against a
-slow one and the result already has a name.
+§ 1 gave a window a decay; § 2 took the difference of a fast average and a slow one and read its
+sign. That difference already has a name, and two further series conventionally travel with it.
 
 ### 3.1 The three series
 
@@ -321,7 +321,7 @@ what your signal is averaging.
 You should be able to explain:
 
 - [ ] What a half-life is, and why an EWMA never fully forgets
-- [ ] Why a fast leg times the turns of a slow one, and why the ratio is grid-searched rather than assumed
+- [ ] Why a fast/slow pair is one signal — the fast average minus the slow one — and why the ratio is grid-searched rather than assumed
 - [ ] Why MACD is momentum with a hump-shaped kernel rather than a separate indicator
 - [ ] Why the smoothing window must be shorter than the fast signal's own period
 

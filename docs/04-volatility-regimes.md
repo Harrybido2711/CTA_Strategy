@@ -28,7 +28,7 @@ The reason to care is that momentum does not work equally in both of them.
 
 | Tape | What the price does | What a fast/slow pair does |
 | --- | --- | --- |
-| **Slow grind** | a trend that builds over weeks, in either direction | works: the fast leg turns first, the slow leg confirms, and the position is on for the middle of the move ([03 § 2.1](03-shaping-the-lookback.md)) |
+| **Slow grind** | a trend that builds over weeks, in either direction | works: the fast average pulls clear of the slow one and stays there, so the signal holds its sign and the position is on for the middle of the move ([03 § 2.1](03-shaping-the-lookback.md)) |
 | **Calm, then a burst** | flat for months, then a violent stretch of days, then flat again | fails: the fast leg is too slow to catch the burst and too fast not to be whipsawed by it ([03 § 4](03-shaping-the-lookback.md)) |
 
 **Claim.** The edge a trend signal carries is a property of the regime, not of the signal alone.
