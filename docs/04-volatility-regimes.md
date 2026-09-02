@@ -1,8 +1,8 @@
 # 04 · Volatility Regimes
 
 > - **Answers:** why MACD gives its edge back when the market turns violent, how the option market hands you a live measure of that violence, and what to do with the measure once you have it.
-> - **Prerequisites:** [03 · Shaping the Lookback](03-shaping-the-lookback.md) § 3 for MACD's kernel and § 4 for volatility clustering; [02 · Testing a Signal](02-testing-a-signal.md) § 3.2, whose bar plot is still the only gauge.
-> - **After reading:** derive why a fast/slow rule's edge scales with drift over amplitude, say why a trailing volatility estimate arrives too late, read VIX as a forecast, cut it into regime labels, and test whether the label carries anything your signals do not already own.
+> - **Prerequisites:** [03 · Shaping the Lookback](03-shaping-the-lookback.md) § 3 for MACD and § 4 for the volatility clustering this chapter measures; [02 · Testing a Signal](02-testing-a-signal.md) § 3.2, whose bar plot is still the only gauge.
+> - **After reading:** say what a loud tape does to a fast/slow rule's crossings and to their timing, why a trailing volatility estimate arrives too late, how to read VIX as a forecast, how to cut it into regime labels, and how to test whether the label carries anything your signals do not already own.
 
 ---
 
@@ -37,61 +37,30 @@ such stretches. The state is nameable at all only because
 [03 § 4](03-shaping-the-lookback.md)'s clustering makes amplitude persistent: large moves follow
 large moves, regardless of sign.
 
-### 1.2 Why the edge falls with it
-
-**Claim.** A fast/slow rule's ability to identify the direction of the trend scales with
-$\mu / \sigma$ — the drift per period against the amplitude around it — and with nothing else the
-market can move. Tripling $\sigma$ while the drift is unchanged cuts it to a third.
-
-**Proof.** [03 § 3.2](03-shaping-the-lookback.md) showed MACD is a **fixed** weighted sum of
-one-period price changes, $\text{MACD}_t = \sum_j k_j \Delta_{t-j}$, with kernel weights
-$k_j = (1-\alpha_s)^{j+1} - (1-\alpha_f)^{j+1} \geq 0$ set by the two spans. Write each change as a
-drift plus a shock, $\Delta_{t-j} = \mu + \sigma u_{t-j}$, where $u_{t-j}$ has mean zero and unit
-variance and is uncorrelated across lags. Taking the mean and the variance term by term,
-
-$$
-\frac{E\left[ \text{MACD}_t \right]}{\text{SD}\left[ \text{MACD}_t \right]}
-= \frac{\mu \sum_j k_j}{\sigma \left( \sum_j k_j^2 \right)^{1/2}}
-= \frac{\mu}{\sigma} \cdot \frac{\sum_j k_j}{\left( \sum_j k_j^2 \right)^{1/2}}
-$$
-
-The second factor is fixed by $n_f$ and $n_s$ alone; no state of the market touches it. Every effect
-the tape has therefore runs through $\mu / \sigma$, and a burst that leaves the trend where it was
-while tripling $\sigma$ divides the whole ratio by three.
-
-**Example (What that is worth at 12/26).** With $\alpha = 2/(n+1)$ the kernel part is available in
-closed form — $\sum_j k_j = (n_s - 1)/2 - (n_f - 1)/2 = 7$ against
-$\left( \sum_j k_j^2 \right)^{1/2} \approx 1.14$ — so it contributes about **6.1**. Take a trend
-worth an annualized Sharpe near 0.5, which is $\mu / \sigma \approx 0.03$ per day, and read the
-probability that MACD's sign is right as $\Phi$ of the ratio:
-
-| Tape | $\mu / \sigma$ | ratio | $\text{P}\left( \text{sign of MACD} = \text{sign of } \mu \right)$ | edge over a coin |
-| --- | --- | --- | --- | --- |
-| calm | 0.030 | 0.185 | 0.573 | 7.3 points |
-| three times as loud | 0.010 | 0.062 | 0.525 | 2.5 points |
-
-Because $\Phi$ is close to linear near zero, **the edge over a coin falls in almost exact proportion
-to $\sigma$**: 7.3 points becomes 2.5, not 6.
+### 1.2 What a loud tape does to the rule
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="figures/edge-vs-volatility-dark.png">
-  <img alt="Two stacked panels sharing a horizontal axis of volatility relative to calm, running from one to three and a half times. The upper panel plots the probability that MACD's sign matches the drift's sign: it starts at 0.573 in a calm tape and decays toward a dashed line at 0.5 labelled a coin, passing 0.525 at three times the calm amplitude. The lower panel plots two curves in basis points per year: a gross edge falling from four hundred like one over sigma, and a cost rising from one hundred faster than sigma because there are more round trips and each one is dearer. They cross a little below 1.8 times, and the region past the crossing, where cost exceeds gross edge, is shaded violet and the crossing itself is marked net turns negative" src="figures/edge-vs-volatility-light.png">
+  <source media="(prefers-color-scheme: dark)" srcset="figures/macd-out-of-phase-dark.png">
+  <img alt="Two stacked panels sharing a trading-day axis of two hundred sessions. The upper panel plots one price path with a 12-day and a 26-day EMA over it. For the first ninety-five sessions the path drifts steadily upward, the fast average sits clear above the slow one throughout, and the two never cross. The remaining hundred and five sessions are shaded: the path has no net trend and four times the daily amplitude, the two averages stay tangled together, and their difference changes sign ten times, each crossing marked with a violet dot. A dashed pair of guides marks one swing top and the crossing that follows it, labelled the flip lands seven sessions after the turn. The lower panel plots the position the rule holds: one unbroken long through the calm stretch, then a shredded alternation of long and short blocks with a violet line at every flip, captioned each flip is a round trip, paid at the widest spreads of the year" src="figures/macd-out-of-phase-light.png">
 </picture>
 
-The lower panel is the second blade. The same burst that shrinks the edge also makes the two legs
-touch more often, at spreads that are widest exactly then, and in the wrong direction — the spike
-flips the book short at the bottom and the snap-back flips it long at the top
-([03 § 4](03-shaping-the-lookback.md)). A falling curve and a rising one cross, and **past the
-crossing the rule is not merely weak, it pays to trade.**
+One path, one rule, two regimes. Through the calm stretch the fast average pulls clear of the slow
+one and stays there: **no crossings at all, one position, held for the whole move.** Across the
+shaded stretch the trend is gone and the amplitude is four times larger, so the two legs stay
+tangled and noise carries one across the other **ten times in a hundred sessions** — ten round
+trips bought and sold on nothing.
 
-**Note (The drift does not rise with the noise, and that is the whole point).** Clustering is a
-statement about $|r|$ and not about $r$: a burst multiplies the denominator and leaves the numerator
-where it was. If $\mu$ scaled with $\sigma$ the ratio would be invariant and there would be nothing
-to correct.
+**And every flip lands after the turn it is chasing.** An average is a summary of the past, so a
+crossing can only confirm a move that has already happened; here the flip arrives seven sessions
+after the swing it responds to. That lag is what makes the trades worse than useless rather than
+merely wasteful: the rule goes short at the bottom of the spike and long at the top of the
+snap-back. **Whipsaw is not scatter around the right answer, it is the opposite of the right
+answer, repeated on a schedule the noise sets.** Forty crossings a year at five basis points a
+round trip is 200 bp of drag against a gross edge that might be four hundred.
 
-**Note (Standardizing does not repair it).** Dividing $\text{MACD}_t$ by the asset's trailing
-volatility ([02 § 4](02-testing-a-signal.md)) divides its mean and its standard deviation alike. It
-fixes the **size** of the position; it cannot improve the **quality** of the sign.
+**Note (Standardizing does not repair it).** Dividing the signal by the asset's trailing volatility
+([02 § 4](02-testing-a-signal.md)) rescales it without moving a single crossing date. It fixes the
+**size** of the position; it cannot change **when** the position flips.
 
 Nor can [03 § 4](03-shaping-the-lookback.md)'s smoother and deadband: neither knows the tape is
 violent, so each damps every date alike and pays on the quiet days to protect the loud ones.
@@ -263,8 +232,8 @@ cell. It is [02 § 3.2](02-testing-a-signal.md)'s bar plot run once per regime �
 </picture>
 
 Read it by rows, and the reading is the finding. A staircase in the calm row that flattens through
-the stressed row and disappears in the crisis row is § 1.2 measured rather than derived: same rule,
-same parameters, a third of the ratio. The one-dimensional plot of
+the stressed row and disappears in the crisis row is § 1.2's picture measured on your own data:
+same rule, same parameters, less and less to show for them. The one-dimensional plot of
 [02](02-testing-a-signal.md) is the sample-weighted average of the three rows — it reports the calm
 row lightly diluted and never mentions that the other two exist.
 
@@ -300,9 +269,9 @@ return, so weights built on $\epsilon_t$ earn whatever they earn somewhere the b
 
 **Note (Orthogonal is not independent).** Zero *linear* correlation is all least squares buys. A
 residual that is large exactly when MACD is large **in absolute value** is a function of MACD the
-regression cannot see — and that is not a corner case here, since § 1.2's whole mechanism is about
-$\sigma$ and $|\text{MACD}|$ carries $\sigma$. Add the transform you suspect as an extra regressor
-and residualize against that too.
+regression cannot see — and that is not a corner case here, since the candidate is a variable about
+$\sigma$ and $|\text{MACD}|$ widens with $\sigma$ too. Add the transform you suspect as an extra
+regressor and residualize against that too.
 
 **Note (With fifty signals, regress against the model's output).** Fitting a candidate against fifty
 regressors on overlapping daily data fits noise long before it exhausts the information, and fifty
@@ -371,9 +340,6 @@ so it carries no asset subscript $s$.
 | Symbol | Means | First used |
 | --- | --- | --- |
 | $\sigma$, $\sigma_{\text{calm}}$, $\sigma_{\text{high}}$ | the amplitude of the period's move, and its levels either side of a regime shift | § 1.1 |
-| $\mu$, $u_{t-j}$ | the drift — the mean one-period price change — and the standardized shock at lag $j$ | § 1.2 |
-| $k_j$, $\alpha_f$, $\alpha_s$, $n_f$, $n_s$ | MACD's kernel weight at lag $j$, and the smoothing constants and spans that fix it ([03 § 3](03-shaping-the-lookback.md)) | § 1.2 |
-| $\Phi$ | the standard normal cumulative distribution function | § 1.2 |
 | $\sigma^{\text{real}}_t$, $L$ | realized volatility, and the trailing window in periods it is computed over | § 2.1 |
 | $K$, $S_T$, $\tau$ | an option's strike, the underlying's price at expiry, and the time to expiry in days | § 2.2 |
 | $v_t$, $g_t$, $c$ | the index level on that date, the regime label cut from it, and the multiplier setting how fine the cuts are | § 2.4 |
@@ -381,13 +347,13 @@ so it carries no asset subscript $s$.
 | $p_t$, $N$ | the model's combined prediction, and the number of dates in the sample | § 3 |
 
 **Note (Collisions to watch).** $\sigma$ is market-wide here — the amplitude of the tape — where
-[02 § 4](02-testing-a-signal.md)'s $\sigma_{s,t}$ is one asset's trailing volatility, and $\mu$ is a
-per-period drift where its $\mu_g$ is a bucket's mean forward return. Lowercase $g_t$ is a regime
-label on the vertical axis while [02 § 3.2](02-testing-a-signal.md)'s uppercase G1 … G5 are signal
-buckets on the horizontal one, and § 3.1's grid has both at once. $\epsilon_t$ here is a signal
-residual after regressing on other **signals**; [02 § 2](02-testing-a-signal.md)'s $\epsilon$ is the
-part of the forward **return** no signal reaches. The shock is $u$ rather than $z$, and § 2.1's
-window is $L$ rather than $k$, because 02 reserves $z$ and $k_j$ is already MACD's kernel weight.
+[02 § 4](02-testing-a-signal.md)'s $\sigma_{s,t}$ is one asset's trailing volatility. Lowercase
+$g_t$ is a regime label on the vertical axis while [02 § 3.2](02-testing-a-signal.md)'s uppercase
+G1 … G5 are signal buckets on the horizontal one, and § 3.1's grid has both at once. $\epsilon_t$
+here is a signal residual after regressing on other **signals**;
+[02 § 2](02-testing-a-signal.md)'s $\epsilon$ is the part of the forward **return** no signal
+reaches. § 2.1's window is $L$ rather than $k$, which [03 § 3.2](03-shaping-the-lookback.md)
+reserves for MACD's kernel weight.
 
 ---
 
@@ -400,8 +366,8 @@ you have measured it or merely populated it.
 
 You should be able to explain:
 
-- [ ] Why MACD's ratio splits into $\mu / \sigma$ and a kernel factor, and which of the two the tape can move
-- [ ] Why standardizing the signal does not restore the edge a burst takes away
+- [ ] Why a loud tape multiplies a fast/slow rule's crossings, and why each one lands after the turn
+- [ ] Why standardizing the signal moves no crossing date, and why a smoother and a deadband are blind
 - [ ] Why a 21-day realized volatility peaks after the burst it is measuring, and why a shorter window does not fix it
 - [ ] Why an option price can be inverted for a volatility forecast, and when VIX must be squared
 - [ ] Why the log of the level buckets and the level itself does not

@@ -10,7 +10,7 @@ reader's theme.
 
 Figures produced
 ----------------
-    edge-vs-volatility  MACD's sign decaying toward a coin while its bill grows
+    macd-out-of-phase   the 12/26 rule whipsawed and late once the tape turns loud
     regime-lag          a trailing volatility estimate peaks long after the burst it is measuring
     vix-bucketing       why the raw level will not bucket, and what the log fixes
     regime-signal-grid  the same signal, conditioned on the volatility regime
@@ -27,8 +27,6 @@ Formulas stay in the markdown as LaTeX rather than being rendered here: text in
 an image is neither selectable nor searchable.
 """
 
-import math
-
 import matplotlib.pyplot as plt
 import numpy as np
 from _style import THEMES, save, style_axes, titles
@@ -42,85 +40,139 @@ def _label_ink(hex_colour):
     return "#0b0b0b" if 0.299 * r + 0.587 * g + 0.114 * b > 0.6 else "#ffffff"
 
 
-def _norm_cdf(x):
-    """Standard normal CDF, so the script keeps to numpy and matplotlib."""
-    return 0.5 * (1.0 + np.vectorize(math.erf)(x / math.sqrt(2.0)))
+def _ema(a, span):
+    """Exponential moving average by the recursion of 03 s1.2, seeded at a[0]."""
+    alpha = 2.0 / (span + 1.0)
+    out = np.empty_like(a)
+    out[0] = a[0]
+    for i in range(1, a.size):
+        out[i] = alpha * a[i] + (1 - alpha) * out[i - 1]
+    return out
 
 
-# --------------- fig: the edge decays toward a coin while the bill keeps growing
-def edge_vs_volatility(mode):
-    """04 s1.3 -- the two blades of a violent tape, on one shared axis.
+# ------------- fig: the crossings arrive after the turn, once the tape is loud
+def macd_out_of_phase(mode):
+    """04 s1 -- the same 12/26 rule, calm then loud, and what it does to trading.
 
-    Upper panel is the chapter's algebra, not a sketch: MACD's kernel at spans
-    12 and 26 gives a mean-to-standard-deviation ratio of (mu/sigma) * 6.15, and
-    the plotted probability is the normal CDF of that ratio as sigma widens from
-    its calm level. Lower panel is illustrative -- a gross edge falling like
-    1/sigma against a cost rising faster than sigma, because the trade count and
-    the price of each trade climb together. Where they cross, the rule stops
-    being weak and starts being harmful.
+    The price path is synthetic: 95 sessions of a clean drift at half a percent
+    a day, then 105 sessions with no trend left and four times the amplitude.
+    Everything drawn on top of it is computed, not sketched -- the two EMAs, the
+    dates their difference changes sign, and the position below. So the crossing
+    counts and the lag between a turn in the price and the flip that follows it
+    are the rule's own behaviour on that path, which is the point of the figure.
     """
     t = THEMES[mode]
+    rng = np.random.RandomState(18)
 
-    # kernel factor for MACD 12/26: sum(k) / sqrt(sum(k^2)), computed not asserted
-    n_f, n_s = 12, 26
-    a_f, a_s = 2 / (n_f + 1), 2 / (n_s + 1)
-    j = np.arange(3000)
-    k = (1 - a_s) ** (j + 1) - (1 - a_f) ** (j + 1)
-    kernel = k.sum() / np.sqrt((k ** 2).sum())
+    n_calm, n_loud = 95, 105
+    lp = np.empty(n_calm + n_loud)
+    lp[0] = np.log(100.0)
+    for i in range(1, n_calm):                       # calm: a clean drift to ride
+        lp[i] = lp[i - 1] + 0.0013 + 0.0050 * rng.standard_normal()
+    anchor = lp[n_calm - 1]
+    for i in range(n_calm, lp.size):                 # loud: no trend, big swings
+        lp[i] = lp[i - 1] - 0.075 * (lp[i - 1] - anchor) + 0.019 * rng.standard_normal()
 
-    ratio_calm = 0.03            # mu / sigma per day: an annualized Sharpe near 0.5
-    x = np.linspace(1.0, 3.5, 400)
-    p = _norm_cdf(kernel * ratio_calm / x)
+    price = np.exp(lp)
+    days = np.arange(price.size)
+    fast, slow = _ema(price, 12), _ema(price, 26)
 
-    gross = 400.0 / x            # bp/yr, falling like 1/sigma
-    cost = 100.0 * x ** 1.4      # bp/yr, rising faster: more trades, each dearer
-    cross = 4.0 ** (1 / 2.4)
+    warm = 30                                        # let the recursion settle
+    sign = np.sign(fast - slow)
+    sign[:warm] = sign[warm]
+    cross = np.where(np.diff(sign) != 0)[0] + 1
+    n_cross_calm = int(((cross >= warm) & (cross < n_calm)).sum())
+    n_cross_loud = int((cross >= n_calm).sum())
 
-    fig, (ax_p, ax_c) = plt.subplots(
-        2, 1, figsize=(8.6, 6.0), sharex=True,
-        gridspec_kw=dict(height_ratios=[1.0, 1.15], hspace=0.18))
+    # the turn each loud-regime crossing is chasing, found by a 4-percent zigzag so
+    # that a turn means a real swing rather than any one-day wiggle
+    tops, bottoms = [], []
+    pivot, extreme, rising = 0, 0, True
+    for i in range(1, price.size):
+        if rising:
+            if price[i] > price[extreme]:
+                extreme = i
+            elif price[i] < price[extreme] * 0.96:
+                tops.append(extreme)
+                pivot, extreme, rising = extreme, i, False
+        else:
+            if price[i] < price[extreme]:
+                extreme = i
+            elif price[i] > price[extreme] * 1.04:
+                bottoms.append(extreme)
+                pivot, extreme, rising = extreme, i, True
+    turns = []
+    for c in cross[cross >= n_calm]:
+        pool = tops if sign[c] < 0 else bottoms      # a flip to short chases a top
+        prior = [i for i in pool if i < c]
+        if prior:
+            turns.append((prior[-1], int(c)))
+    lags = sorted(c - k for k, c in turns)
+    median_lag = lags[len(lags) // 2]
+
+    fig, (ax, ax_p) = plt.subplots(
+        2, 1, figsize=(9.4, 6.0), sharex=True,
+        gridspec_kw=dict(height_ratios=[2.6, 1.0], hspace=0.14))
     fig.patch.set_facecolor(t["surface"])
 
-    # ---- upper: the sign decaying toward a coin flip
-    ax_p.axhline(0.5, color=t["baseline"], linewidth=1.0, linestyle=(0, (4, 3)), zorder=1)
-    ax_p.plot(x, p, color=t["series"], linewidth=2.4, zorder=4)
-    style_axes(ax_p, t, ylabel=r"P( sign of MACD = sign of $\mu$ )")
-    ax_p.set_ylim(0.4875, 0.5885)
-    ax_p.set_yticks([0.50, 0.52, 0.54, 0.56, 0.58])
-    ax_p.text(3.47, 0.4985, "a coin", ha="right", va="top",
-              color=t["muted"], fontsize=8.6)
+    for a in (ax, ax_p):
+        a.axvspan(n_calm, days[-1], color=t["accent"], alpha=0.07, linewidth=0, zorder=0)
 
-    for xv, note in ((1.0, "calm\n57.3%"), (3.0, "three times as loud\n52.5%")):
-        yv = float(_norm_cdf(kernel * ratio_calm / xv))
-        ax_p.plot([xv], [yv], marker="o", markersize=5.0, color=t["series"], zorder=5)
-        ax_p.text(xv + 0.055, yv - 0.010, note, ha="left", va="top",
-                  color=t["ink_secondary"], fontsize=8.6)
+    ax.plot(days, price, color=t["muted"], linewidth=1.2, zorder=3)
+    ax.plot(days, slow, color=t["ramp"][3], linewidth=2.0, zorder=4)
+    ax.plot(days, fast, color=t["ramp"][5], linewidth=2.0, zorder=5)
+    ax.plot(cross[cross >= warm], price[cross[cross >= warm]], linestyle="none",
+            marker="o", markersize=6.0, color=t["accent"], zorder=7)
+    style_axes(ax, t, ylabel="price, rebased to 100")
 
-    # ---- lower: gross edge against the bill, and where they cross
-    ax_c.fill_between(x, gross, cost, where=(cost >= gross), color=t["accent"],
-                      alpha=0.16, linewidth=0, zorder=2)
-    ax_c.plot(x, gross, color=t["ramp"][5], linewidth=2.4, zorder=4)
-    ax_c.plot(x, cost, color=t["ramp"][3], linewidth=2.4, zorder=4)
-    style_axes(ax_c, t,
-               ylabel="basis points per year",
-               xlabel=r"volatility relative to calm,   $\sigma / \sigma_{\mathrm{calm}}$")
-    ax_c.set_ylim(0, 625)
-    ax_c.set_xlim(1.0, 3.5)
+    lo, hi = price[warm:].min(), price[warm:].max()
+    pad = (hi - lo) * 0.10
+    ax.set_ylim(lo - pad, hi + pad * 3.1)
+    band = hi + pad * 2.5
+    ax.text((warm + n_calm) / 2, band, f"calm: {n_cross_calm} crossings", ha="center",
+            va="center", color=t["ink_secondary"], fontsize=9.2, fontweight="600")
+    ax.text(n_calm + n_loud / 2, band, f"four times as loud: {n_cross_loud} crossings",
+            ha="center", va="center", color=t["accent"], fontsize=9.2, fontweight="600")
 
-    ax_c.axvline(cross, color=t["accent"], linewidth=1.2, linestyle=(0, (4, 3)), zorder=3)
-    ax_c.plot([cross], [400.0 / cross], marker="o", markersize=5.5,
-              color=t["accent"], zorder=6)
-    ax_c.text(cross + 0.06, 560, "net turns negative", ha="left", va="bottom",
-              color=t["accent"], fontsize=9, fontweight="600")
-    ax_c.text(2.02, 103, "gross edge, falling like $1/\\sigma$", ha="left", va="top",
-              color=t["ramp"][5], fontsize=9, fontweight="600")
-    ax_c.text(2.44, 425, "cost: more round trips,\neach one dearer", ha="left", va="bottom",
-              color=t["ramp"][3], fontsize=9, fontweight="600")
+    for i, (colour, name) in enumerate(((t["muted"], "price"),
+                                        (t["ramp"][5], "12-day EMA"),
+                                        (t["ramp"][3], "26-day EMA"))):
+        yk = lo + (hi - lo) * (0.93 - 0.085 * i)
+        ax.plot([warm + 4, warm + 12], [yk, yk], color=colour, linewidth=2.0, zorder=6)
+        ax.text(warm + 14, yk, name, ha="left", va="center",
+                color=t["ink_secondary"], fontsize=8.6)
 
-    titles(ax_p, t, "The edge falls while the bill rises",
-           "upper panel from MACD 12/26 at a daily $\\mu/\\sigma$ of 0.03 — lower panel illustrative")
-    fig.tight_layout(rect=(0, 0, 1, 0.91))
-    save(fig, t, f"edge-vs-volatility-{mode}.png")
+    # one typical lag: the turn in the price, and the flip that arrives after it
+    k, c = min(turns, key=lambda kc: abs((kc[1] - kc[0]) - median_lag))
+    y = hi + pad * 0.85
+    for i in (k, c):
+        ax.plot([i, i], [price[i], y], color=t["ink_secondary"], linewidth=0.9,
+                linestyle=(0, (3, 3)), zorder=6)
+    ax.annotate("", xy=(c, y), xytext=(k, y),
+                arrowprops=dict(arrowstyle="<->", color=t["ink_secondary"], linewidth=1.1))
+    ax.text((k + c) / 2, y + pad * 0.16, f"the flip lands {c - k} sessions after the turn",
+            ha="center", va="bottom", color=t["ink_secondary"], fontsize=8.8)
+    ax.plot([k], [price[k]], marker="o", markersize=5.5, markerfacecolor=t["surface"],
+            markeredgecolor=t["ink_secondary"], markeredgewidth=1.6, zorder=7)
+
+    ax_p.fill_between(days, 0, sign, step="post", color=t["series"], alpha=0.5,
+                      linewidth=0, zorder=3)
+    for c in cross[cross >= warm]:
+        ax_p.plot([c, c], [-1.35, 1.35], color=t["accent"], linewidth=1.1, zorder=5)
+    ax_p.axhline(0, color=t["baseline"], linewidth=1.0, zorder=2)
+    style_axes(ax_p, t, ylabel="position", xlabel="trading day", grid=False)
+    ax_p.set_yticks([-1, 1])
+    ax_p.set_yticklabels(["short", "long"])
+    ax_p.set_ylim(-1.9, 1.9)
+    ax_p.set_xlim(warm, days[-1])
+    ax_p.text(n_calm + 3, -1.82, "each flip is a round trip, paid at the widest spreads of the year",
+              ha="left", va="bottom", color=t["muted"], fontsize=8.4)
+
+    titles(ax, t, "Once the tape is loud, the rule trades on noise and arrives late",
+           "illustrative path — the 12/26 EMAs, the dates their difference changes sign, "
+           "and the position that produces")
+    fig.tight_layout(rect=(0, 0, 1, 0.90))
+    save(fig, t, f"macd-out-of-phase-{mode}.png")
 
 
 # -------------------- fig: a trailing estimate answers after the question is moot
@@ -309,7 +361,7 @@ def regime_signal_grid(mode):
     save(fig, t, f"regime-signal-grid-{mode}.png")
 
 
-FIGURES = (edge_vs_volatility, regime_lag, vix_bucketing, regime_signal_grid)
+FIGURES = (macd_out_of_phase, regime_lag, vix_bucketing, regime_signal_grid)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):
