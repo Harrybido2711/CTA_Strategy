@@ -60,6 +60,7 @@ itself. No index or indirection layer in between. Cross-link both ways: `docs/` 
 | Add or change a figure | § 5 below, then [`docs/figures/_style.py`](docs/figures/_style.py) |
 | Use a repo skill (`colors`, `figures`, …) | [`skills/INDEX.md`](skills/INDEX.md) |
 | Write a formula | § 4.4 — the renderer rejects a lot of ordinary LaTeX |
+| Build or read a local LaTeX PDF | § 4.10, then [`docs/.latexmkrc`](docs/.latexmkrc) |
 | Touch the data | § 6 — there is an unadjusted split in five files |
 | Commit | § 7 |
 
@@ -226,6 +227,45 @@ The test is **repetition, not length**. Ask whether a passage advances the argum
 already made. When a section runs long, compress it into a table rather than cutting the idea, and
 cut restatement before substance. **Never delete a derivation, a worked example or a figure to hit a
 number.**
+
+### 4.10 Local LaTeX PDF workflow
+
+Use **VS Code + LaTeX Workshop + TeX Live** to read a hand-written `.tex` chapter as its typeset
+PDF. The `.tex` file is the editable source; the PDF and TeX build files are generated artefacts.
+
+Before diagnosing a build, verify that the active TeX installation supplies both commands:
+
+```bash
+which xelatex
+xelatex --version
+latexmk --version
+```
+
+This repository's LaTeX edition uses `fontspec` and `unicode-math`, so compile it with **XeLaTeX**,
+not pdfLaTeX. From the repository root, either build through `latexmk`:
+
+```bash
+cd docs
+latexmk 05-modelling.tex
+```
+
+or open the `.tex` file in VS Code and run **LaTeX Workshop: Build LaTeX project**. The magic
+comment at the top of the file, [`.vscode/settings.json`](.vscode/settings.json) and
+[`docs/.latexmkrc`](docs/.latexmkrc) all select XeLaTeX. LaTeX Workshop writes and reads the result
+at `docs/_pdf/<chapter>.pdf`; use **LaTeX Workshop: View LaTeX PDF** for the side-by-side preview.
+`Cmd + Click` in that preview uses SyncTeX to jump back to the corresponding source.
+
+If invoking `xelatex` directly instead, write into `docs/_pdf/` and run it twice so the table of
+contents and cross-references settle:
+
+```bash
+xelatex -output-directory=docs/_pdf docs/05-modelling.tex
+xelatex -output-directory=docs/_pdf docs/05-modelling.tex
+```
+
+Do not commit the generated PDF or TeX auxiliaries (`.aux`, `.log`, `.out`, `.synctex.gz`, `.toc`).
+If the build reports `File 'xxx.sty' not found`, the missing TeX Live package must be installed
+before retrying; do not change the document merely to conceal a machine setup problem.
 
 ---
 
