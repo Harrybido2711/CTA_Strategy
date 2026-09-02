@@ -29,76 +29,102 @@ market to a **variable**.
 
 ## 2. What the option market already knows
 
-### 2.1 Why a trailing estimate is too late
+### 2.1 Volatility cannot be computed from the price
 
-The obvious meter is the volatility you have just lived through.
-
-**Definition (Realized volatility).** The standard deviation of the last $L$ returns, annualized.
-Taking the returns as centred,
-$\sigma^{\text{real}}_t = \left( \frac{1}{L} \sum_{i=0}^{L-1} r_{t-i}^2 \right)^{1/2}$, where $L$ is
-the window length in periods and $r_{t-i}$ the return at lag $i$.
-
-**Claim.** It reaches half of its eventual level about $L/2$ periods after a shift and its full
-level only after $L$ — so a monthly window reports a burst that has already ended.
-
-**Proof.** Squared, it is a flat average of the last $L$ squared returns — the boxcar kernel of
-[03 § 1.1](03-shaping-the-lookback.md). If the tape jumps from $\sigma_{\text{calm}}$ to
-$\sigma_{\text{high}}$ at date 0, then at date $t < L$ exactly $t+1$ of the $L$ terms are drawn from
-the new regime:
-
-$$
-E\left[ \left(\sigma^{\text{real}}_t\right)^2 \right] = \frac{t+1}{L} \sigma_{\text{high}}^2 + \frac{L-t-1}{L} \sigma_{\text{calm}}^2
-$$
-
-The estimate therefore climbs **linearly** from the old level to the new, reaching half the rise at
-$t \approx L/2$ and all of it only at $t = L-1$. At $L = 21$ that is ten sessions to half and
-twenty-one to full.
+There is no way to read today's volatility off the price series. Every estimate built from past
+returns — a rolling standard deviation over a month, an EWMA, any weighting you like — is an
+average of what has already happened, so it only climbs as the new regime's returns accumulate
+inside its window. Shortening the window trades the lag for noise and buys nothing.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="figures/regime-lag-dark.png">
   <img alt="Two stacked panels sharing an axis of trading days since a news event, from minus forty to plus sixty. The upper panel plots the absolute daily return as vertical bars: quiet either side, with a burst of three to four percent moves in the eight sessions after day zero. The lower panel plots annualized volatility. The implied line jumps from about eleven percent to forty-three on the day the news prints and decays smoothly back toward thirteen. The realized twenty-one-day line barely moves on the day, climbs steadily, and does not peak until session twenty-one, an interval marked by a double-headed arrow labelled twenty-one sessions late — by which time the burst in the upper panel has been over for two weeks" src="figures/regime-lag-light.png">
 </picture>
 
-The two lines are also the shape of a regime: entered inside a session and left over weeks. By the
-time the trailing line peaks, the burst it describes has been over for a fortnight, and a position
-sized off it would be de-risking into the recovery.
+The upper panel is the event and the lower panel is two answers to it. The trailing line does not
+peak until three weeks after the burst it is describing. **The other line is not an estimate at
+all** — it is a price, quoted by people who have to take a view on the next thirty days, and it
+moves the session the news does. Where it comes from is § 2.2.
 
-**Note (Shortening the window does not rescue it).** The lag falls with $L$ and the noise rises with
-it — the relative standard error of a variance estimate from $L$ observations runs about
-$\left( 2/L \right)^{1/2}$, so $L = 5$ buys a two-session lag at the price of a 63 percent error on
-the level. An EWMA only re-shapes the same trade-off. **The problem is not the window; it is that a
-backward-looking estimator has no term for news that has just arrived.**
+### 2.2 How an option hands you a volatility
 
-### 2.2 Implied volatility, and the index built from it
+An option's value depends on how far the underlying might travel before it expires, so anyone
+quoting one is quoting a volatility forecast whether they name it or not. Under Black–Scholes a
+call is worth
 
-Somebody does have such a term. An option's value depends on how far the underlying might travel
-before it expires, so anyone quoting one is quoting a volatility forecast whether they name it or
-not.
+$$
+C = S \Phi(d_1) - K e^{-R \tau} \Phi(d_2) , \qquad
+d_1 = \frac{\ln \left( S/K \right) + \left( R + \sigma^2 / 2 \right) \tau}{\sigma \tau^{1/2}} , \qquad
+d_2 = d_1 - \sigma \tau^{1/2}
+$$
 
-**Definition (Implied volatility).** The value of $\sigma$ that makes a pricing model reproduce an
+where $S$ is the spot price, $K$ the strike, $\tau$ the time to expiry in years, $R$ the risk-free
+rate, $\Phi$ the standard normal cumulative distribution function, and $\sigma$ the volatility.
+Everything but $\sigma$ is observable, which is what makes the equation worth inverting.
+
+**Definition (Implied volatility).** The value of $\sigma$ that makes the model reproduce the
 option's traded price — a forecast for the life of the contract, read out of a price rather than
 estimated from history.
 
-**Claim.** An option's price is strictly increasing in $\sigma$, so that inversion is well defined:
-one price, one implied volatility.
+**Claim.** The inversion is well defined: one price, one implied volatility.
 
 **Proof.** A call pays $\text{max}(S_T - K, 0)$ at expiry, a convex function of $S_T$. Raising
 $\sigma$ spreads the distribution of $S_T$ while leaving its forward mean where it was, and the
 expectation of a convex function rises under a mean-preserving spread. The price is therefore
-monotone in $\sigma$, and a monotone map is invertible.
+strictly monotone in $\sigma$, and a monotone map is invertible.
 
-**Definition (VIX).** A constant-30-day implied volatility for the S&P 500. Pick the two expiries
-whose time to expiry $\tau$ falls between **23 and 37 days** — listed contracts do not fall on a
-30-day schedule, so the band is what guarantees one on each side — compute each expiry's implied
-variance from its **whole strip** of out-of-the-money strikes rather than one contract, interpolate
-the two linearly in $\tau$ onto exactly 30 days, then annualize and take the square root.
+There is no closed form for the inverse, so $\sigma$ is solved numerically — bisection needs about
+twenty steps to reach four decimals, and monotonicity is what guarantees it converges. At the money
+the whole thing collapses to something you can do in your head:
+
+$$
+C \approx 0.4 S \sigma \tau^{1/2}
+\qquad \Longrightarrow \qquad
+\sigma \approx \frac{C}{0.4 S \tau^{1/2}}
+$$
+
+**Example.** A 30-day at-the-money call trades at 2 percent of spot. Quote the price as a fraction
+of spot and $S$ cancels, leaving a denominator of $0.4 \tau^{1/2} \approx 0.115$ at
+$\tau = 30/365$, so $\sigma \approx 0.02/0.115 \approx 0.17$ — the
+market is charging for a **17 percent annualized** move over the next month. Read the same contract
+a day later at 3 percent of spot and the forecast is 26 percent: the number moves with the quote,
+which is the entire point.
+
+**Note (One contract is not the market).** That 17 percent is the volatility charged **at that
+strike**. Quotes on other strikes imply different numbers — the smile — so a single contract's
+answer is a property of one contract. § 2.3 reads the whole strip at once to get rid of that
+dependence.
+
+### 2.3 VIX
+
+**Definition (VIX).** A constant-30-day implied volatility for the S&P 500, built from the whole
+strip of out-of-the-money options rather than from any one of them. For a single expiry the strip
+gives the implied **variance** directly, with no model to invert:
+
+$$
+\sigma^2_\tau = \frac{2 e^{R \tau}}{\tau} \sum_i \frac{\Delta K_i}{K_i^2} Q(K_i) - \frac{1}{\tau} \left( \frac{F}{K_0} - 1 \right)^2
+$$
+
+where $Q(K_i)$ is the mid price of the out-of-the-money option struck at $K_i$, $\Delta K_i$ the gap
+between neighbouring strikes, $F$ the forward level implied by put-call parity, and $K_0$ the first
+strike below $F$. Every term is a traded price, so the sum is the market's own variance rather than
+one contract's.
+
+Two steps turn that into the published number. **Take the two expiries with $\tau$ between 23 and
+37 days** — listed contracts do not fall on a 30-day schedule, and the band is what guarantees one
+on each side of the target — and **interpolate their variances linearly in $\tau$** onto exactly 30
+days. Then annualize, take the root, and quote it in percentage points:
+
+$$
+\text{VIX}_t = 100 \left( \sigma^2_{30,t} \right)^{1/2}
+$$
 
 **Note (Decide whether your formula wants the variance or the volatility).** The published level is
-already a volatility in percentage points — a VIX of 20 means an annualized 20 percent — because
-step 2 computes a variance and the last step takes its root. Variance is what is additive, across
-time and across independent sources of risk; volatility is not. Anything that rescales a horizon or
-adds contributions needs $\left( \text{VIX}_t / 100 \right)^2$; anything compared against a return
-in the same units needs the level. The error is invisible when made: a missing square root still
+already a volatility — a VIX of 20 means an annualized 20 percent — because the strip computes a
+variance and the last step takes its root. Variance is what is additive, across time and across
+independent sources of risk; volatility is not. Anything that rescales a horizon or adds
+contributions needs $\left( \text{VIX}_t / 100 \right)^2$; anything compared against a return in
+the same units needs the level. The error is invisible when made: a missing square root still
 leaves a plausible positive number.
 
 **Note (What the forecast is worth is a separate question).** Implied volatility is what the market
@@ -106,7 +132,7 @@ charges, not what will happen — insurance is sold above its expected cost, and
 strategy in its own right. Here the index is only a **state label**, for which a live consensus is
 enough.
 
-### 2.3 One index for equities, another for rates
+### 2.4 One index for equities, another for rates
 
 **Claim.** One equity index's implied volatility labels most sleeves, even though it is computed
 from one market.
@@ -117,17 +143,17 @@ cross-asset correlations run toward one. The states in which the label matters m
 states in which one market's fear is every market's fear — an empirical regularity rather than a
 theorem, and better at the extremes than in the middle.
 
-| Sleeve                                   | Regime index   | What its spikes are about                           |
-| ---------------------------------------- | -------------- | --------------------------------------------------- |
-| Equities, credit, most commodities       | **VIX**  | growth and earnings shocks, and forced deleveraging |
-| Rates, and anything priced off the curve | **MOVE** | policy surprises, inflation prints, auction stress  |
+| Sleeve | Regime index | What its spikes are about |
+| --- | --- | --- |
+| Equities, credit, most commodities | **VIX** | growth and earnings shocks, and forced deleveraging |
+| Rates, and anything priced off the curve | **MOVE** | policy surprises, inflation prints, auction stress |
 
 **Note (Rates are the genuine exception).** Treasury volatility is close to unrelated to equity
 volatility, because the two are frightened by different things. A rate sleeve labelled by VIX is
 labelled wrongly, and **MOVE** is the same construction run on Treasury options. Neither index is in
 `CTA_data/` ([100](100-dataset.md)), so both have to be fetched before § 3 can be run.
 
-### 2.4 From a level to a label
+### 2.5 From a level to a label
 
 **Definition (Volatility regime).** A stretch of dates over which the amplitude of returns is
 roughly constant and materially different from the stretch on either side; a **regime shift** is
@@ -302,23 +328,28 @@ one-for-one**, and that kink is why the next question has an answer.
 Throughout, $t$ is the date. The regime index is a property of the market rather than of one asset,
 so it carries no asset subscript $s$.
 
-| Symbol                                                         | Means                                                                                                        | First used |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ---------- |
-| $\sigma$, $\sigma_{\text{calm}}$, $\sigma_{\text{high}}$ | the amplitude of the tape — the standard deviation of the period's move, without regard to sign — and its levels either side of a regime shift | § 2.1 |
-| $\sigma^{\text{real}}_t$, $L$                              | realized volatility, and the trailing window in periods it is computed over                                  | § 2.1     |
-| $K$, $S_T$, $\tau$                                       | an option's strike, the underlying's price at expiry, and the time to expiry in days                         | § 2.2     |
-| $v_t$, $g_t$, $c$                                        | the index level on that date, the regime label cut from it, and the multiplier setting how fine the cuts are | § 2.4     |
-| $x_t$, $x_{j,t}$, $\beta_j$, $\epsilon_t$              | the candidate signal, the signals already in the book, their fitted coefficients, and the residual           | § 3.2     |
-| $p_t$, $N$                                                 | the model's combined prediction, and the number of dates in the sample                                       | § 3       |
+| Symbol | Means | First used |
+| --- | --- | --- |
+| $\sigma$ | the volatility of the underlying — the amplitude of its move, without regard to sign | § 2.2 |
+| $C$, $S$, $K$, $\tau$, $R$ | a call's price, the spot price, the strike, the time to expiry in years, and the risk-free rate | § 2.2 |
+| $\Phi$, $d_1$, $d_2$ | the standard normal cumulative distribution function and the two arguments Black–Scholes feeds it | § 2.2 |
+| $S_T$ | the underlying's price at expiry | § 2.2 |
+| $Q(K_i)$, $\Delta K_i$, $F$, $K_0$ | one out-of-the-money option's mid price, the gap between neighbouring strikes, the forward level, and the first strike below it | § 2.3 |
+| $\sigma^2_\tau$, $\sigma^2_{30,t}$ | the implied variance the strip gives for one expiry, and the same interpolated onto 30 days | § 2.3 |
+| $v_t$, $g_t$, $c$ | the index level on that date, the regime label cut from it, and the multiplier setting how fine the cuts are | § 2.5 |
+| $x_t$, $x_{j,t}$, $\beta_j$, $\epsilon_t$ | the candidate signal, the signals already in the book, their fitted coefficients, and the residual | § 3.2 |
+| $p_t$, $N$ | the model's combined prediction, and the number of dates in the sample | § 3 |
 
-**Note (Collisions to watch).** $\sigma$ is market-wide here — the amplitude of the tape — where
-[02 § 4](02-testing-a-signal.md)'s $\sigma_{s,t}$ is one asset's trailing volatility. Lowercase
-$g_t$ is a regime label on the vertical axis while [02 § 3.2](02-testing-a-signal.md)'s uppercase
-G1 … G5 are signal buckets on the horizontal one, and § 3.1's grid has both at once. $\epsilon_t$
-here is a signal residual after regressing on other **signals**;
-[02 § 2](02-testing-a-signal.md)'s $\epsilon$ is the part of the forward **return** no signal
-reaches. § 2.1's window is $L$ rather than $k$, which [03 § 3.2](03-shaping-the-lookback.md)
-reserves for MACD's kernel weight.
+**Note (Collisions to watch).** $\sigma$ is a market-wide volatility here where
+[02 § 4](02-testing-a-signal.md)'s $\sigma_{s,t}$ is one asset's trailing estimate, and $R$ is the
+risk-free rate discounting an option where [02 § 5](02-testing-a-signal.md)'s $r_f$ is the same
+rate subtracted from a portfolio return. Uppercase $S$ is a spot price and lowercase $s$ is
+[02](02-testing-a-signal.md)'s asset index; $\Phi$ is a normal CDF and $N$ a sample size, which is
+why the CDF is written $\Phi$ rather than $N$. Lowercase $g_t$ is a regime label on the vertical axis while
+[02 § 3.2](02-testing-a-signal.md)'s uppercase G1 … G5 are signal buckets on the horizontal one,
+and § 3.1's grid has both at once. $\epsilon_t$ here is a signal residual after regressing on other
+**signals**; [02 § 2](02-testing-a-signal.md)'s $\epsilon$ is the part of the forward **return** no
+signal reaches.
 
 ---
 
@@ -333,8 +364,8 @@ You should be able to explain:
 
 - [ ] Why a loud tape multiplies a fast/slow rule's crossings, and why each one lands after the turn
 - [ ] Why standardizing the signal moves no crossing date, and why a smoother and a deadband are blind
-- [ ] Why a 21-day realized volatility peaks after the burst it is measuring, and why a shorter window does not fix it
-- [ ] Why an option price can be inverted for a volatility forecast, and when VIX must be squared
+- [ ] Why no estimate built from past returns can tell you today's volatility
+- [ ] How a single option quote becomes a volatility, why one quote is not the market, and when VIX must be squared
 - [ ] Why the log of the level buckets and the level itself does not
 - [ ] Why a flat crisis row may mean no edge or may mean no data, and what to print to tell them apart
 
