@@ -10,18 +10,24 @@ reader's theme.
 
 Figures produced
 ----------------
+    edge-vs-volatility  MACD's sign decaying toward a coin while its bill grows
     regime-lag          a trailing volatility estimate peaks long after the burst it is measuring
     vix-bucketing       why the raw level will not bucket, and what the log fixes
     regime-signal-grid  the same signal, conditioned on the volatility regime
 
-All are schematics drawn from illustrative values. regime-lag is the one
-exception worth naming: the realized-volatility line really is a rolling
-standard deviation of the synthetic return path drawn beneath it, so the lag
-shown is the estimator's own lag rather than a hand-drawn curve.
+All are schematics drawn from illustrative values. Two exceptions are worth
+naming. regime-lag's realized-volatility line really is a rolling standard
+deviation of the synthetic return path drawn beneath it, so the lag shown is the
+estimator's own lag rather than a hand-drawn curve. edge-vs-volatility's upper
+panel is the chapter's own algebra evaluated -- the normal CDF of MACD's
+mean-to-standard-deviation ratio at spans 12 and 26 -- rather than a sketched
+decay; only its lower panel's two levels are invented.
 
 Formulas stay in the markdown as LaTeX rather than being rendered here: text in
 an image is neither selectable nor searchable.
 """
+
+import math
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -34,6 +40,87 @@ def _label_ink(hex_colour):
     """Black or white for text sitting on a filled cell, by the fill's luminance."""
     r, g, b = (int(hex_colour[i:i + 2], 16) / 255 for i in (1, 3, 5))
     return "#0b0b0b" if 0.299 * r + 0.587 * g + 0.114 * b > 0.6 else "#ffffff"
+
+
+def _norm_cdf(x):
+    """Standard normal CDF, so the script keeps to numpy and matplotlib."""
+    return 0.5 * (1.0 + np.vectorize(math.erf)(x / math.sqrt(2.0)))
+
+
+# --------------- fig: the edge decays toward a coin while the bill keeps growing
+def edge_vs_volatility(mode):
+    """04 s1.3 -- the two blades of a violent tape, on one shared axis.
+
+    Upper panel is the chapter's algebra, not a sketch: MACD's kernel at spans
+    12 and 26 gives a mean-to-standard-deviation ratio of (mu/sigma) * 6.15, and
+    the plotted probability is the normal CDF of that ratio as sigma widens from
+    its calm level. Lower panel is illustrative -- a gross edge falling like
+    1/sigma against a cost rising faster than sigma, because the trade count and
+    the price of each trade climb together. Where they cross, the rule stops
+    being weak and starts being harmful.
+    """
+    t = THEMES[mode]
+
+    # kernel factor for MACD 12/26: sum(k) / sqrt(sum(k^2)), computed not asserted
+    n_f, n_s = 12, 26
+    a_f, a_s = 2 / (n_f + 1), 2 / (n_s + 1)
+    j = np.arange(3000)
+    k = (1 - a_s) ** (j + 1) - (1 - a_f) ** (j + 1)
+    kernel = k.sum() / np.sqrt((k ** 2).sum())
+
+    ratio_calm = 0.03            # mu / sigma per day: an annualized Sharpe near 0.5
+    x = np.linspace(1.0, 3.5, 400)
+    p = _norm_cdf(kernel * ratio_calm / x)
+
+    gross = 400.0 / x            # bp/yr, falling like 1/sigma
+    cost = 100.0 * x ** 1.4      # bp/yr, rising faster: more trades, each dearer
+    cross = 4.0 ** (1 / 2.4)
+
+    fig, (ax_p, ax_c) = plt.subplots(
+        2, 1, figsize=(8.6, 6.0), sharex=True,
+        gridspec_kw=dict(height_ratios=[1.0, 1.15], hspace=0.18))
+    fig.patch.set_facecolor(t["surface"])
+
+    # ---- upper: the sign decaying toward a coin flip
+    ax_p.axhline(0.5, color=t["baseline"], linewidth=1.0, linestyle=(0, (4, 3)), zorder=1)
+    ax_p.plot(x, p, color=t["series"], linewidth=2.4, zorder=4)
+    style_axes(ax_p, t, ylabel=r"P( sign of MACD = sign of $\mu$ )")
+    ax_p.set_ylim(0.4875, 0.5885)
+    ax_p.set_yticks([0.50, 0.52, 0.54, 0.56, 0.58])
+    ax_p.text(3.47, 0.4985, "a coin", ha="right", va="top",
+              color=t["muted"], fontsize=8.6)
+
+    for xv, note in ((1.0, "calm\n57.3%"), (3.0, "three times as loud\n52.5%")):
+        yv = float(_norm_cdf(kernel * ratio_calm / xv))
+        ax_p.plot([xv], [yv], marker="o", markersize=5.0, color=t["series"], zorder=5)
+        ax_p.text(xv + 0.055, yv - 0.010, note, ha="left", va="top",
+                  color=t["ink_secondary"], fontsize=8.6)
+
+    # ---- lower: gross edge against the bill, and where they cross
+    ax_c.fill_between(x, gross, cost, where=(cost >= gross), color=t["accent"],
+                      alpha=0.16, linewidth=0, zorder=2)
+    ax_c.plot(x, gross, color=t["ramp"][5], linewidth=2.4, zorder=4)
+    ax_c.plot(x, cost, color=t["ramp"][3], linewidth=2.4, zorder=4)
+    style_axes(ax_c, t,
+               ylabel="basis points per year",
+               xlabel=r"volatility relative to calm,   $\sigma / \sigma_{\mathrm{calm}}$")
+    ax_c.set_ylim(0, 625)
+    ax_c.set_xlim(1.0, 3.5)
+
+    ax_c.axvline(cross, color=t["accent"], linewidth=1.2, linestyle=(0, (4, 3)), zorder=3)
+    ax_c.plot([cross], [400.0 / cross], marker="o", markersize=5.5,
+              color=t["accent"], zorder=6)
+    ax_c.text(cross + 0.06, 560, "net turns negative", ha="left", va="bottom",
+              color=t["accent"], fontsize=9, fontweight="600")
+    ax_c.text(2.02, 103, "gross edge, falling like $1/\\sigma$", ha="left", va="top",
+              color=t["ramp"][5], fontsize=9, fontweight="600")
+    ax_c.text(2.44, 425, "cost: more round trips,\neach one dearer", ha="left", va="bottom",
+              color=t["ramp"][3], fontsize=9, fontweight="600")
+
+    titles(ax_p, t, "The edge falls while the bill rises",
+           "upper panel from MACD 12/26 at a daily $\\mu/\\sigma$ of 0.03 — lower panel illustrative")
+    fig.tight_layout(rect=(0, 0, 1, 0.91))
+    save(fig, t, f"edge-vs-volatility-{mode}.png")
 
 
 # -------------------- fig: a trailing estimate answers after the question is moot
@@ -222,7 +309,7 @@ def regime_signal_grid(mode):
     save(fig, t, f"regime-signal-grid-{mode}.png")
 
 
-FIGURES = (regime_lag, vix_bucketing, regime_signal_grid)
+FIGURES = (edge_vs_volatility, regime_lag, vix_bucketing, regime_signal_grid)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):
