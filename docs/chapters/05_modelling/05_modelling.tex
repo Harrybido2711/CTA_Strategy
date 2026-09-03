@@ -64,13 +64,13 @@ It produces a number. It also has three defects, and they compound.
 \end{xltabular}
 
 
-\subsection{The fix: stop fitting once}\label{sec:the-fix}
+\section{The walk-forward ladder}\label{sec:ladder}
 
-All three defects trace to the same decision---fitting a single time---so the repair is to stop
-fitting a single time. Cut the training history into short segments, put the same
-train--validation--test frame on the first few of them, and slide that frame forward one segment
-per iteration until it reaches the end of the training set. Each rung is a complete
-train--validation--test cycle in miniature, and there are as many of them as the history allows.
+The three defects of \secref{sec:split-costs} share one cause: the model is fitted once. So fit it
+many times. Cut the training history into short segments, put the same train--validation--test
+frame on the first few of them, and slide that frame forward one segment per iteration until it
+reaches the end of the training set. Each rung is a complete train--validation--test cycle in
+miniature, and there are as many of them as the history allows.
 
 \fig{walk-forward-ladder}{The ladder that replaces the single split: the frame advances one segment
 per iteration, so each row's test segment is the next row's validation segment. Schematic---the
@@ -81,9 +81,6 @@ segmented.}{fig:walk-forward-ladder}
 The ruler ends where the training set ends. What lies beyond it---the held-out block that never
 enters the ladder---is a different object with different powers; that is \secref{sec:two-layers}.
 \end{note}
-
-
-\section{The walk-forward ladder}\label{sec:ladder}
 
 \subsection{How long a segment should be}\label{sec:segment-length}
 
@@ -101,7 +98,7 @@ and long enough to hold a usable sample.
 
 \subsection{The slide}\label{sec:slide}
 
-Cut the history into segments $1, 2, 3, \ldots$ and slide a frame across them:
+Number the segments $1, 2, 3, \ldots$ and the frame moves like this:
 
 \begin{center}
 \begin{tabular}{|c|c|c|c|}
