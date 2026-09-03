@@ -217,11 +217,17 @@
 % Book: a chapter heading inside the running document.
 %
 % Either way the chapter number is carried into every counter below it:
-% sections print as "05.1", subsections as "05.1.2", and the shared theorem
-% counter restarts too, so Definition 3 of chapter 05 reads "Definition 05.3"
-% and cannot collide with chapter 02's. A section number therefore means the
+% sections print as "5.1", subsections as "5.1.1", and the shared theorem
+% counter restarts too, so Definition 3 of chapter 5 reads "Definition 5.3"
+% and cannot collide with chapter 2's. A section number therefore means the
 % same thing in the standalone PDF and in the bound edition, and \secref
-% prints "§ 05.4.3" in both.
+% prints "\S 5.4.3" in both.
+%
+% #1 is written the way the folder writes it -- \chapterhead{05}{...} -- and
+% {\number#1} strips the leading zero at the point of printing, so the body
+% still names its own folder and "05" never reaches the page. The braces are
+% load-bearing: \number swallows a space that terminates it, so
+% "\number#1 \midot" would set "5-dot" with no space at all.
 \newcommand{\chapterhead}[3]{%
   \ifbook
     \clearpage
