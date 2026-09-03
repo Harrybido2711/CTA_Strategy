@@ -209,10 +209,10 @@
   \ifbook
     \clearpage
     \phantomsection\label{chap:#3}%
-    \addcontentsline{toc}{part}{#1 \midot{} #2}%
-    {\huge\bfseries #1 \midot{} #2\par}\vspace{0.4em}%
+    \addcontentsline{toc}{part}{{\number#1} \midot{} #2}%
+    {\huge\bfseries {\number#1} \midot{} #2\par}\vspace{0.4em}%
   \else
-    \title{#1 \midot{} #2}%
+    \title{{\number#1} \midot{} #2}%
     \author{Harry Chen}%
     \date{}%
     \maketitle
@@ -220,11 +220,11 @@
     \newpage
   \fi
   \setcounter{section}{0}%
-  \renewcommand{\thesection}{#1.\arabic{section}}%
+  \renewcommand{\thesection}{\number#1.\arabic{section}}%
   \setcounter{definition}{0}%
-  \renewcommand{\thedefinition}{#1.\arabic{definition}}%
+  \renewcommand{\thedefinition}{\number#1.\arabic{definition}}%
   \setcounter{figure}{0}%
-  \renewcommand{\thefigure}{#1.\arabic{figure}}%
+  \renewcommand{\thefigure}{\number#1.\arabic{figure}}%
 }
 
 % \chapref{text}{stem} -- a cross-chapter reference.
@@ -251,7 +251,7 @@
 \newenvironment{checklist}{\begin{itemize}\setlength{\itemsep}{0pt}}{\end{itemize}}
 \newcommand{\checkitem}{\item[$\square$]}
 
-% Interpunct, for titles like "05 · Modelling".
+% Interpunct, for titles like "5 · Modelling".
 \newcommand{\midot}{\textperiodcentered}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -274,11 +274,12 @@
 \renewcommand{\arraystretch}{1.25}
 
 % article sizes the table-of-contents number columns for "1" and "1.2".
-% \chapterhead prints "05.1" and "05.4.3", which overrun them and collide
-% with the title text, so each column is widened and the entries re-indented.
+% \chapterhead prints "5.1" and "5.4.3" -- and "100.4.3" once the dataset
+% chapter converts -- which overrun them and collide with the title text, so
+% each column is widened and the entries re-indented.
 \makeatletter
-\renewcommand*\l@section{\@dottedtocline{1}{1.5em}{3.2em}}
-\renewcommand*\l@subsection{\@dottedtocline{2}{4.7em}{4.0em}}
-\renewcommand*\l@subsubsection{\@dottedtocline{3}{8.7em}{4.8em}}
+\renewcommand*\l@section{\@dottedtocline{1}{1.5em}{2.6em}}
+\renewcommand*\l@subsection{\@dottedtocline{2}{4.1em}{3.4em}}
+\renewcommand*\l@subsubsection{\@dottedtocline{3}{7.5em}{4.2em}}
 \makeatother
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

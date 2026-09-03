@@ -50,7 +50,7 @@ Three defects, and they compound.
 \textbf{The sample is small and the signal is faint}
   & A school dataset with a thousand points and an $R^2$ of 0.5 is ordinary, and in physics 0.9 is
     ordinary. In finance \textbf{0.1 to 0.2 is already a good $R^2$}---see
-    \chapref{09}{09_ic_and_r_squared}. Weak true dependence plus few observations is precisely the
+    \chapref{9}{09_ic_and_r_squared}. Weak true dependence plus few observations is precisely the
     regime in which a fit lands on noise: a line through ten points drawn from a cloud reaches
     $R^2$ 0.8 easily. \\ \hline
 \end{tabularx}
@@ -294,7 +294,7 @@ rolling one releases it as soon as the surrounding distribution catches up.
 \end{note}
 
 \pointer{\texttt{rolling}, \texttt{quantile} and \texttt{clip} as pandas calls:
-\chapref{08 \midot{} Toolbox}{08_toolbox_pandas}.}
+\chapref{8 \midot{} Toolbox}{08_toolbox_pandas}.}
 
 \subsection{Standardizing: put every signal on one scale}\label{sec:standardizing}
 
@@ -422,13 +422,13 @@ $w_i$, $\gamma$, $E[r_p]$
 
 \begin{note}[Collisions to watch]
 $\sigma_j$ here is one \textbf{signal's} dispersion, used only to rescale it---not
-\chapref{02 \midot{} \S 4}{02_testing_a_signal}'s $\sigma_{s,t}$, an asset's trailing volatility,
-and not \chapref{04 \midot{} \S 1.1}{04_volatility_regimes}'s $\sigma$, the amplitude of the tape.
+\chapref{2 \midot{} \S 4}{02_testing_a_signal}'s $\sigma_{s,t}$, an asset's trailing volatility,
+and not \chapref{4 \midot{} \S 1.1}{04_volatility_regimes}'s $\sigma$, the amplitude of the tape.
 $\beta_j$ is a coefficient on a \textbf{signal}, as in
-\chapref{04 \midot{} \S 3.2}{04_volatility_regimes}, never a market beta. $\lambda$ is the penalty
+\chapref{4 \midot{} \S 3.2}{04_volatility_regimes}, never a market beta. $\lambda$ is the penalty
 and $\gamma$ the risk aversion: the lecture wrote both as $\lambda$ and then renamed the second,
 and they are unrelated. $L$ is a trailing window as in
-\chapref{04 \midot{} \S 2.1}{04_volatility_regimes}, here over a signal rather than over returns.
+\chapref{4 \midot{} \S 2.1}{04_volatility_regimes}, here over a signal rather than over returns.
 \end{note}
 
 
@@ -506,6 +506,6 @@ You should be able to explain:
 \end{checklist}
 
 \vspace{1em}
-\noindent\chapref{$\leftarrow$ 04}{04_volatility_regimes} \midot{}
+\noindent\chapref{$\leftarrow$ 4}{04_volatility_regimes} \midot{}
 \chapref{How a Strategy Is Built}{00_pipeline} \midot{} reference:
-\chapref{08 \midot{} Toolbox}{08_toolbox_pandas}
+\chapref{8 \midot{} Toolbox}{08_toolbox_pandas}
