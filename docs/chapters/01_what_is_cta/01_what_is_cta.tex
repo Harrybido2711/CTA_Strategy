@@ -1,0 +1,370 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 01_what_is_cta.tex --- 正文层 (BODY LAYER)
+%%
+%% 这里只有内容。字体、边距、颜色、定理环境长什么样，全在
+%% ../../preamble.tex 里；改版式不用碰这个文件。
+%%
+%% 这是正文片段，没有 \documentclass 也没有 document 环境：
+%% ../../build.sh 单独编译它，all_chapters.tex 把它 \input 进合订本。
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterhead{01}{What Is a CTA Strategy}{01_what_is_cta}
+
+
+\section{What a CTA Trades}\label{sec:what-a-cta-trades}
+
+\begin{definition}[CTA strategy]\label{def:cta}
+A \emph{CTA (Commodity Trading Advisor) strategy} is a rule-based strategy that trades
+\textbf{futures} systematically across asset classes---equities, fixed income, commodities,
+currencies---targeting \textbf{absolute return}, independent of market direction.
+\end{definition}
+
+\begin{note}
+The name is a historical artifact. Modern CTAs are not commodity-only; typical markets are
+equity-index futures, Treasuries, FX, energy, metals, and agriculture.
+\end{note}
+
+\subsection{Index, ETF, or future}\label{sec:index-etf-future}
+
+``S\&P 500'' names three different objects. Only two of them can be traded.
+
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.14\linewidth}|>{\raggedright\arraybackslash}p{0.18\linewidth}|X|>{\raggedright\arraybackslash}p{0.13\linewidth}|}
+\hline
+\textbf{Layer} & \textbf{Example} & \textbf{What it is} & \textbf{Tradeable} \\ \hline
+\textbf{Index}  & SPX, NDX      & A published number computed from its constituents & No  \\ \hline
+\textbf{ETF}    & SPY, VOO, QQQ & A fund holding the constituents; its own shares trade & Yes \\ \hline
+\textbf{Future} & ES, NQ        & A contract to settle at a future date; holds nothing & Yes \\ \hline
+\end{tabularx}
+
+\begin{definition}[Index]\label{def:index}
+\[
+  I_t = \frac{M_t}{D_t}, \qquad\qquad M_t = \sum_i N_i P_{it}
+\]
+where $P_{it}$ is the price of constituent $i$, $N_i$ its float-adjusted share count, $M_t$ the
+total float capitalisation, and $D_t > 0$ the \emph{divisor}.
+\end{definition}
+
+\begin{claim}\label{clm:index-returns}
+Index returns are the capitalisation-weighted average of constituent returns; the divisor sets only
+the level.
+\end{claim}
+
+\begin{proof}
+Both halves follow from $I_t$ being a \emph{sum divided by a constant}. A constituent's dollar move
+is $N_i$ times its price change, so its share of the index move is its share of total
+capitalisation:
+\[
+  r_I = \sum_i w_{it} r_i, \qquad w_{it} = \frac{N_i P_{it}}{M_t}, \qquad \sum_i w_{it} = 1 .
+\]
+And $D_t$ divides $I_t$ at both dates, so it cancels from the ratio---it can shift the level
+anywhere without touching a single return.
+\end{proof}
+
+\begin{note}[Two consequences]
+\textbf{The top names dominate.} At $w \approx 0.07$ against $w \approx 0.0002$, the largest
+constituent carries roughly \textbf{350 times} the index impact of the smallest; this is not an
+average of 500 \emph{prices}. \textbf{And the level is arbitrary.} $D_t$ cancels from returns, so
+the scale is whatever the base period set it to---for the S\&P 500, 1941--43 $=$ 10.
+\textbf{Compare returns, never levels.}
+\end{note}
+
+A price level is meaningful only against that same series' own history. Across tickers it carries no
+information at all---what each ETF's share price happens to be was fixed by how the fund was
+structured at inception. Dividing every series by its own first observation removes that
+arbitrariness:
+
+\begin{center}
+\begin{tabular}{|l|r|r|r|r|}
+\hline
+\textbf{Ticker} & \textbf{Raw close, start} & \textbf{Raw close, end} & \textbf{Rebased} & \textbf{Return} \\ \hline
+SPY & 325.05 & 740.83 & 227.9 & \textbf{$+127.9\%$} \\ \hline
+TLT & 137.10 &  87.35 &  63.7 & \textbf{$-36.3\%$}  \\ \hline
+GLD & 143.97 & 368.49 & 255.9 & \textbf{$+155.9\%$} \\ \hline
+\end{tabular}
+\end{center}
+
+SPY has the highest closing price on every single day of the sample, yet GLD returned more. The end
+level alone cannot tell you this; you need the start it is measured against.
+
+\fig{levels-vs-rebased}{The same three ETFs, twice. Left, raw closing prices: SPY runs highest for
+the entire sample. Right, each series divided by its own first value and multiplied by 100: GLD now
+finishes highest and TLT ends below the line it started on. The ordering of the levels and the
+ordering of the returns are different orderings.}{fig:levels-vs-rebased}
+
+\subsection{Why futures rather than ETFs}\label{sec:why-futures}
+
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.20\linewidth}|X|X|}
+\hline
+\textbf{Reason} & \textbf{Futures} & \textbf{ETFs} \\ \hline
+\textbf{Symmetry}
+  & Shorting costs nothing extra
+  & Shorting needs borrowed shares, a fee, availability \\ \hline
+\textbf{Coverage}
+  & Deep markets in all four asset classes
+  & Poor in commodities and FX \\ \hline
+\textbf{Capital efficiency}
+  & Margin is roughly 5 to 10 percent of notional; spare cash earns \textbf{collateral yield}
+  & Full notional tied up \\ \hline
+\end{tabularx}
+
+Symmetry is decisive: a strategy that must go short as freely as long cannot tolerate the
+asymmetry, and \secref{sec:short-fragile} shows why the short leg is the fragile one. The cost is
+that futures expire, so a continuous series has to be stitched together from
+contracts---see \chapref{100 \midot{} The Dataset}{100_dataset}.
+
+
+\section{Momentum, the Source of the Return}\label{sec:momentum}
+
+\subsection{What momentum is}\label{sec:what-momentum-is}
+
+\begin{definition}[Momentum]\label{def:momentum}
+\emph{Momentum} is the empirical tendency for recent relative performance to persist: assets that
+outperformed over the past one to twelve months tend to keep outperforming, and recent laggards tend
+to keep lagging.
+\end{definition}
+
+\begin{note}
+The claim is about \emph{returns}, not price levels---it concerns the ordering of performance across
+assets and across time. That is why one momentum rule can be applied to markets with nothing else
+in common, from Treasury futures to natural gas.
+\end{note}
+
+Turning this into a number---a lookback window, a normalization, a test that it carries
+information---is \chapref{2 \midot{} Testing a Signal}{02_testing_a_signal}'s subject. Here it is
+only the premise.
+
+\subsection{Why momentum might work}\label{sec:why-momentum-works}
+
+Two contested explanations, no proof. Momentum has been durably profitable regardless.
+
+\begin{itemize}
+  \item \textbf{Information diffusion.} Unglamorous macro news spreads gradually, creating sustained
+        pressure. Possibly weakened since 2008, as computing and data distribution got faster.
+  \item \textbf{Selective momentum capture.} Winners keep winning and losers keep losing, because
+        large positions take time to build and unwind, investors chase winners, and major events do
+        not resolve in a single day.
+\end{itemize}
+
+\chapref{2 \midot{} Testing a Signal}{02_testing_a_signal} turns this from a story into something
+testable.
+
+
+\section{Long and Short, the Two Sides of a Position}\label{sec:long-and-short}
+
+\subsection{What the two sides mean}\label{sec:two-sides}
+
+\begin{definition}[Long]\label{def:long}
+Buy first, sell later. Profit is the sell price minus the buy price.
+\end{definition}
+
+\begin{definition}[Short]\label{def:short}
+Borrow and sell first, buy back and return later. Profit is the sell price minus the buy-back price.
+\end{definition}
+
+\begin{note}
+Running both deploys capital fully---a 150/50 or 200/100 book rather than idle cash---and lets the
+strategy express a negative view, which a long-only book cannot.
+\end{note}
+
+\subsection{How a short is borrowed}\label{sec:how-a-short-is-borrowed}
+
+A short is not selling out of thin air---the shares are borrowed before they are sold:
+
+\begin{enumerate}
+  \item \textbf{Borrow} $N$ shares from a lender---a broker, or a long-term holder.
+  \item \textbf{Sell} them now, and receive cash.
+  \item \textbf{Buy back} $N$ shares later, from the market.
+  \item \textbf{Return} the $N$ shares, closing the position.
+\end{enumerate}
+
+\begin{note}
+\textbf{You never create shares.} They are fungible, so returning ``$N$ shares of SPY''---not
+specific certificates---settles the debt. \textbf{Lenders are paid.} Long-term holders earn a
+\textbf{lending fee} on stock they were going to sit on anyway. \textbf{And the broker sits in the
+middle}, matching the two sides and holding margin; the market for this is \textbf{securities
+lending}.
+\end{note}
+
+\pointer{The full mechanics beneath this---who holds the shares mid-loan, who receives the dividend,
+hard-to-borrow rates, and how a short squeeze runs away: \S 10 of the
+\texttt{market-101-foundations} note in \texttt{market\_knowledge/}.}
+
+\subsection{Why the short leg is the fragile one}\label{sec:short-fragile}
+
+\begin{claim}\label{clm:short-unbounded}
+For a static position, a long's loss is bounded by its outlay; a short's is not.
+\end{claim}
+
+\begin{proof}
+With signed share count $s$, entry price $P_0 > 0$ and exit price $P_T$, the payoff is
+\[
+  \mathrm{PnL}(P_T) = s \left( P_T - P_0 \right), \qquad P_T \in [0, \infty)
+\]
+the domain being half-open because a price cannot go negative.
+
+For a \textbf{long}, $s > 0$: $\mathrm{PnL}$ is increasing in $P_T$, so its infimum is at the left
+endpoint, $\mathrm{PnL} \geq s(0 - P_0) = -s P_0$---exactly the amount paid. For a \textbf{short},
+$s < 0$: $\mathrm{PnL}$ is decreasing in $P_T$, and the domain has no right endpoint, so
+$\mathrm{PnL} \to -\infty$ as $P_T \to \infty$.
+\end{proof}
+
+The asymmetry is in the \textbf{domain}, not the payoff---both are lines of slope $\left| s \right|$.
+The floor exists only because prices are floored at zero.
+
+\fig{payoff-asymmetry}{Profit and loss per dollar of exposure against the terminal price $P_T$. The
+long and short payoffs are lines of equal and opposite slope crossing at the entry price $P_0$; the
+long's line stops at $-100$ percent where the price reaches zero, while the short's continues
+downward without limit as the price rises. Illustrative.}{fig:payoff-asymmetry}
+
+\begin{note}
+Hence margin requirements and forced buy-ins---and why a 150/50 book, 200 percent gross, is
+\textbf{two times leverage} rather than free money.
+\end{note}
+
+\subsection{How a short is represented}\label{sec:how-a-short-is-represented}
+
+A short needs no separate machinery. Carry the position as a \textbf{signed quantity} and let the
+sign do the work: a negative share count valued at the market price is a \textbf{negative position
+value}, which rises exactly when the price falls.
+
+\begin{note}[Sign convention]
+A negative position value is a \textbf{liability}---a debt owed---not a loss already taken.
+\end{note}
+
+\begin{note}[Static versus constant-exposure shorts]
+The proof above holds the share count fixed at entry. A book that instead maintains a constant
+\emph{dollar} exposure buys the short back down as it moves against it, so the unbounded loss is
+never realised. That daily rebalancing is an \textbf{implicit risk control}: the proof is right, but
+a constant-exposure book is not running the position it describes.
+\end{note}
+
+\pointer{How this project implements it, with the accounting derivation and the measured gap between
+the two: \texttt{Backtests.md} in \texttt{Backtest\_prototype/}.}
+
+
+\section{Who Else Is Trading}\label{sec:who-else}
+
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.26\linewidth}|X|>{\raggedright\arraybackslash}p{0.28\linewidth}|}
+\hline
+\textbf{Participant} & \textbf{Examples} & \textbf{Typical hold} \\ \hline
+Index / passive funds & Vanguard, BlackRock & Years to decades \\ \hline
+Active managers & Fidelity, PIMCO & Monthly to quarterly \\ \hline
+Hedge funds & --- & Intraday to several days \\ \hline
+Market makers & Optiver, Citadel Securities, IMC, SIG & Seconds to minutes \\ \hline
+Noise traders & Retail, uninformed flow & No consistent horizon \\ \hline
+\end{tabularx}
+
+
+\section*{Background}
+\addcontentsline{toc}{section}{Background}
+
+General finance knowledge needed to read this chapter, not part of its argument.
+
+\subsection*{What is the relationship between futures/options and asset classes?}
+
+They answer different questions, so they are not alternatives to one another.
+
+\begin{itemize}
+  \item \textbf{Asset class}---\emph{what} underlying market you are exposed to.
+  \item \textbf{Instrument}---\emph{how} you hold that exposure: cash, futures, or options.
+\end{itemize}
+
+Futures are not an asset class, and options are not a rival one. Every asset class trades in every
+instrument:
+
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.20\linewidth}|X|>{\raggedright\arraybackslash}p{0.20\linewidth}|>{\raggedright\arraybackslash}p{0.20\linewidth}|}
+\hline
+\textbf{Asset class} & \textbf{Typical underlying} & \textbf{Futures} & \textbf{Options} \\ \hline
+\textbf{Equities}     & S\&P 500, Nasdaq 100      & ES, NQ                       & options on ES \\ \hline
+\textbf{Fixed income} & US Treasuries, Bunds      & ZN (10-year), ZB (30-year)   & options on ZN \\ \hline
+\textbf{Commodities}  & Crude oil, gold, corn     & CL, GC, ZC                   & options on CL \\ \hline
+\textbf{Currencies (FX)} & EUR/USD, USD/JPY          & 6E, 6J                       & options on 6E \\ \hline
+\end{tabularx}
+
+The same exposure comes in three wrappers: equity exposure is bought in cash as SPY, in futures as
+ES, or in options as an ES call. So in the opening definition---``trades \textbf{futures}
+systematically \textbf{across asset classes}''---the three parts are independent:
+\textbf{futures} is the wrapper, \textbf{across asset classes} is the breadth of underlying markets,
+and \textbf{systematically} means by rule or model rather than discretion.
+
+\subsection*{Which asset class does a bond belong to?}
+
+\textbf{Fixed income.} Treasuries, corporate, municipal and high-yield bonds all sit there.
+
+\begin{itemize}
+  \item ``Fixed'' describes the \textbf{contract}, meaning a scheduled coupon and the return of
+        principal---not a fixed price.
+  \item Bond prices still move, with interest rates, credit risk and time to maturity. That
+        variation is what makes them a trend market at all.
+  \item Treasury futures trade at 2-, 5-, 10- and 30-year maturities, so a CTA picks the
+        \emph{maturity} it wants exposure to.
+\end{itemize}
+
+\subsection*{Why do CTAs use futures rather than options?}
+
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.22\linewidth}|X|X|}
+\hline
+ & \textbf{Futures} & \textbf{Options} \\ \hline
+Exposure
+  & \textbf{Linear}---profit and loss move one-for-one with the underlying
+  & Non-linear; depends on strike and moneyness \\ \hline
+Extra drivers & None & Implied volatility, time decay, strike \\ \hline
+What you are betting on & Direction & Direction \textbf{and} volatility \\ \hline
+\end{tabularx}
+
+An option position is partly a volatility trade whether you intended it or not. Linear exposure is
+what lets one risk framework size 37 positions on the same scale.
+
+\begin{example}\label{ex:four-legs}
+A trend follower might simultaneously hold long ES, short ZN, long GC, short 6J---all four are
+futures, and all four are different asset classes.
+\end{example}
+
+
+\section*{Appendix \midot{} Notation}
+\addcontentsline{toc}{section}{Appendix \midot{} Notation}
+
+Throughout, $t$ is the date and $i$ indexes an index's constituents.
+
+\begin{xltabular}{\linewidth}{|>{\raggedright\arraybackslash}p{0.20\linewidth}|X|>{\raggedright\arraybackslash}p{0.22\linewidth}|}
+\hline
+\textbf{Symbol} & \textbf{Means} & \textbf{First used} \\ \hline
+\endhead
+$I_t$
+  & the index level on date $t$---a published number, not a tradeable object
+  & \secref{sec:index-etf-future} \\ \hline
+$P_{it}$, $N_i$
+  & constituent $i$'s price on date $t$, and its float-adjusted share count
+  & \secref{sec:index-etf-future} \\ \hline
+$M_t$, $D_t$
+  & the total float capitalisation, and the divisor that turns it into the printed level
+  & \secref{sec:index-etf-future} \\ \hline
+$w_{it}$
+  & constituent $i$'s share of total capitalisation---its weight in the index return
+  & \secref{sec:index-etf-future} \\ \hline
+$r_I$, $r_i$
+  & the index's return and constituent $i$'s return, over the same period
+  & \secref{sec:index-etf-future} \\ \hline
+$s$
+  & the \textbf{signed} share count of a position: positive is long, negative is short
+  & \secref{sec:short-fragile} \\ \hline
+$P_0$, $P_T$
+  & the entry and exit price of that position
+  & \secref{sec:short-fragile} \\ \hline
+$\mathrm{PnL}(P_T)$
+  & the position's profit and loss as a function of where the price ends up
+  & \secref{sec:short-fragile} \\ \hline
+$N$
+  & the number of shares borrowed to open a short
+  & \secref{sec:how-a-short-is-borrowed} \\ \hline
+\end{xltabular}
+
+\begin{note}[Collisions to watch]
+$s$ here is a \textbf{signed share count}, not
+\chapref{2}{02_testing_a_signal}'s $s$, which indexes the asset. $w_{it}$ is a
+\textbf{constituent's weight inside an index}, fixed by capitalisation and not chosen by anyone;
+\chapref{2}{02_testing_a_signal}'s $w_{s,t}$ and
+\chapref{5 \midot{} \S 3.3}{05_modelling}'s $w_i$ are \textbf{portfolio} weights, which are decisions.
+$r_i$ is a constituent's return, whereas elsewhere in the course $r$ carries an asset and a date
+subscript and means the forward return being predicted.
+\end{note}
