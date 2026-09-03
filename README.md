@@ -68,6 +68,7 @@ Read 01 → 06 in order. The rest is reference, consulted rather than stepped th
 | -- | -------- | ---------- | ------ |
 | 08 | [Toolbox: pandas](docs/08-toolbox-pandas.md) | How the non-obvious pandas calls behave | ✅ |
 | 09 | [IC and R²](docs/09-ic-and-r-squared.md) | What each measures, and why a signal is judged by the first | ✅ |
+| 10 | [Toolbox: LaTeX → PDF](docs/10-toolbox-latex.md) | What a TeX run does, why it runs twice, and the two build routes in this repo | ✅ |
 | 99 | [Glossary](docs/99-glossary.md) | English–Chinese term reference | ✅ |
 | 100 | [The Dataset](docs/100-dataset.md) | The 37-ticker sample, split adjustment, data-quality checks | ✅ |
 
@@ -97,6 +98,7 @@ that owns each concept; there is no parallel per-session record.
 | Judge an equity curve honestly                       | [06 § 1](docs/06-evaluating-performance.md)                                                             |
 | Tune parameters without fooling myself               | [07 § 4](docs/07-overfitting-and-robustness.md)                                                         |
 | Look up a pandas function                            | [08](docs/08-toolbox-pandas.md)                                                                          |
+| Build a chapter into a PDF, or debug a failed build   | [10](docs/10-toolbox-latex.md)                                                                           |
 | Look up a term                                       | [99 · Glossary](docs/99-glossary.md)                                                                    |
 | See what to build next                               | [Backtests.md § Next Steps](Backtest_prototype/Backtests.md)                                            |
 
