@@ -29,7 +29,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Page formatting.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage[margin=1in]{geometry} % adjust margins
+% A textbook sets 60-75 characters to the line; 1in margins on letter give a
+% 6.5in measure, which is about 90 and long enough that the eye loses the
+% return. 5.6in is about 77. The width goes to the margin, not to the type:
+% the body stays 12pt.
+\usepackage[top=1.1in, bottom=1.25in, left=1.45in, right=1.45in,
+            headheight=15pt, headsep=0.28in]{geometry}
 \setlength\parindent{0em} % never indent a paragraph
 
 % Paragraphs are separated by space rather than by an indent, so the skip has
@@ -108,6 +113,17 @@
 %% on top of that and a heading floats in the middle of its own white band.
 %% These are the totals we actually want.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% A running head is what tells a reader mid-chapter which chapter they are in
+% -- the one piece of furniture every textbook has and lecture notes do not.
+% article's own "myheadings" style already sets it (mark left, folio right),
+% so no package is needed; \chapterhead fills the mark.
+\pagestyle{myheadings}
+
+% The fourth level was \normalsize\bfseries -- the same size and weight as the
+% run-in \textbf{...} labels the body uses inside a paragraph, so a heading and
+% an emphasis were indistinguishable. Italic separates them.
+\titleformat{\subsubsection}{\normalsize\itshape}{\thesubsubsection}{1em}{}
+
 \titlespacing*{\section}      {0pt}{1.1em plus 0.2em minus 0.2em}{0.35em}
 \titlespacing*{\subsection}   {0pt}{0.9em plus 0.2em minus 0.2em}{0.25em}
 \titlespacing*{\subsubsection}{0pt}{0.7em plus 0.2em minus 0.2em}{0.2em}
@@ -210,8 +226,12 @@
     \clearpage
     \phantomsection\label{chap:#3}%
     \addcontentsline{toc}{part}{{\number#1} \midot{} #2}%
-    {\huge\bfseries {\number#1} \midot{} #2\par}\vspace{0.4em}%
+    \markright{{\number#1} \midot{} #2}%
+    \thispagestyle{plain}%
+    {\LARGE\bfseries {\number#1} \midot{} #2\par}%
+    \vspace{0.35em}{\color{rulecol}\rule{\linewidth}{0.8pt}}\par\vspace{0.5em}%
   \else
+    \markright{{\number#1} \midot{} #2}%
     \title{{\number#1} \midot{} #2}%
     \author{Harry Chen}%
     \date{}%
