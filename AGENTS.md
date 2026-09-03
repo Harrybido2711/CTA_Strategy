@@ -56,8 +56,7 @@ published form. The chapters still in Markdown are mid-migration — that is tas
 | `market_knowledge/` | Lecture-sourced notes, each opening with a source blockquote. Not the course spine |
 | `Backtest_prototype/` | `backtest.py`, `analyze_cta_data.py`, `backtester.ipynb` + `Backtests.md`, its write-up |
 | `CTA_data/` | 37 daily OHLCV CSVs — **ETFs**, standing in for futures |
-| `conventions/` | Records of *why* things are set up as they are, committed |
-| `.claude/tasks/` | The playbooks in § 3. Local only — see § 5 |
+| `.claude/tasks/` | Every playbook in § 3 — one file per task. Local only, see § 5 |
 
 **The theory/practice split is strict.** A chapter holds concepts that stay true regardless of this
 repo — definitions, proofs, mechanisms. Measured results, derivations over code variables,
@@ -85,7 +84,7 @@ the `*_ohlcv_1d.csv` glob.
 | **T8** | Build a PDF | [`.claude/tasks/building-pdfs.md`](.claude/tasks/building-pdfs.md) | — | `read_only_chapters/` updated; nothing new outside a `_build/` |
 | **T9** | Move, rename, renumber or delete anything | [`.claude/tasks/repo-hygiene.md`](.claude/tasks/repo-hygiene.md) | `simplify` | Every grep in that file comes back empty |
 | **T10** | Add a glossary term | `docs/chapters/99_glossary/` | — | Bilingual row, linked to the chapter that owns the concept |
-| **T11** | Change the layout — fonts, margins, colours, a new macro | `conventions/latex-formatting.md`, then `docs/preamble.tex` | — | Every chapter still builds; no layout instruction leaked into a body |
+| **T11** | Change the layout — fonts, margins, colours, a new macro | [`.claude/tasks/changing-the-layout.md`](.claude/tasks/changing-the-layout.md) | — | Every chapter still builds in both themes; no layout instruction leaked into a body |
 | **T12** | Skills, settings, permissions, hooks | `.claude/skills/INDEX.md` | `update-config`, `fewer-permission-prompts` | — |
 
 ---
