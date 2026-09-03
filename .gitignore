@@ -22,3 +22,10 @@ docs/recording_script/
 # are what a reader without a TeX install opens.
 docs/_build/
 docs/chapters/*/_build/
+
+# Agent entry points — local only, like .claude/
+AGENTS.md
+
+# LaTeX source — kept out of the repo; the PDFs in read_only_chapters/
+# and all_chapters.pdf are what the repo publishes.
+*.tex
