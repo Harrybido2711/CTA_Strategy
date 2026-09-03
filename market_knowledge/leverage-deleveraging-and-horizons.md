@@ -159,7 +159,7 @@ signal is usable.
   what the lookback choices do to the losses in the spike regime.
 - **The course's own answer came a session later**, and it is not a better lookback: identify
   the regime with a forward-looking volatility index and condition the signal on it — see
-  [04 · Volatility Regimes](../docs/04-volatility-regimes.md).
+  [04 · Volatility Regimes](../docs/chapters/04_volatility_regimes/04_volatility_regimes.md).
 
 ---
 

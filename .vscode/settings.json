@@ -1,11 +1,29 @@
 {
-  // LaTeX. docs/05-modelling.tex uses fontspec + unicode-math, so pdflatex —
-  // LaTeX Workshop's default engine — dies at the first \setmainfont. Honour the
-  // "% !TEX program = xelatex" magic comment instead of forcing the default recipe,
-  // and read the PDF back out of the directory docs/.latexmkrc writes it to.
-  "latex-workshop.latex.build.forceRecipeUsage": false,
-  "latex-workshop.latex.outDir": "%DIR%/_pdf",
-  "latex-workshop.latex.recipe.default": "latexmk (xelatex)",
+  // LaTeX. A chapter under docs/chapters/ is a body-only fragment — no
+  // \documentclass — so LaTeX Workshop cannot compile it directly. Route the
+  // build button through docs/build.sh, which wraps the fragment around
+  // docs/preamble.tex exactly the way a command-line build does, and read the
+  // PDF back out of docs/read_only_chapters/ where that script leaves it.
+  "latex-workshop.latex.tools": [
+    {
+      "name": "notes-build",
+      "command": "./docs/build.sh",
+      "args": ["%DOCFILE%"],
+      "cwd": "%WORKSPACE_FOLDER%"
+    },
+    {
+      "name": "notes-build-book",
+      "command": "./docs/build.sh",
+      "args": ["--book"],
+      "cwd": "%WORKSPACE_FOLDER%"
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    { "name": "chapter", "tools": ["notes-build"] },
+    { "name": "all chapters", "tools": ["notes-build-book"] }
+  ],
+  "latex-workshop.latex.recipe.default": "chapter",
+  "latex-workshop.latex.outDir": "%WORKSPACE_FOLDER%/docs/read_only_chapters",
   "latex-workshop.latex.autoClean.onFailed": true,
 
   // The markdown table formatter reflows pipe alignment on save. On these notes it

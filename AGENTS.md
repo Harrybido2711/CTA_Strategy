@@ -29,7 +29,13 @@ for the reading order.
 | Path | Holds |
 | --- | --- |
 | `docs/` | **Learning theory** — concepts that stay true regardless of this repo |
-| `docs/figures/` | One generator script per chapter, plus shared design tokens, plus the PNGs they emit |
+| `docs/chapters/<stem>/` | One folder per chapter: `<stem>.tex` (the body) and its `_build/` scratch |
+| `docs/figures/<NN>_figures/` | One folder per chapter: that chapter's generator script and the PNGs it emits |
+| `docs/figures/_style.py`, `_data.py` | Shared design tokens, drawing primitives, and dataset access |
+| `docs/preamble.tex` | The layout layer — the only file that decides what a chapter looks like |
+| `docs/build.sh` | The only build entry point |
+| `docs/read_only_chapters/` | The published per-chapter PDFs, one per chapter, light theme |
+| `docs/all_chapters.tex`, `all_chapters.pdf` | Every chapter bound into one document |
 | `Backtest_prototype/` | The first practical part: `Backtests.md` (write-up) + `backtest.py` (code) |
 | `CTA_data/` | 37 daily OHLCV CSVs — **ETFs**, standing in for the futures a real CTA would trade |
 | `analyze_cta_data.py`, `backtester.ipynb` | Exploratory scratch, not part of the course spine |
@@ -56,11 +62,11 @@ itself. No index or indirection layer in between. Cross-link both ways: `docs/` 
 
 | If you are about to… | Read first |
 | --- | --- |
-| Write or revise a `docs/` chapter | § 4 below, then [`docs/01-what-is-cta.md`](docs/01-what-is-cta.md) end to end |
+| Write or revise a `docs/` chapter | § 4 below, then [`docs/chapters/01_what_is_cta/01_what_is_cta.md`](docs/chapters/01_what_is_cta/01_what_is_cta.md) end to end |
 | Add or change a figure | § 5 below, then [`docs/figures/_style.py`](docs/figures/_style.py) |
 | Use a repo skill (`colors`, `figures`, …) | [`skills/INDEX.md`](skills/INDEX.md) |
 | Write a formula | § 4.4 — the renderer rejects a lot of ordinary LaTeX |
-| Build or read a local LaTeX PDF | § 4.10, then [`docs/.latexmkrc`](docs/.latexmkrc) |
+| Build or read a local LaTeX PDF | § 4.10, then [`docs/build.sh`](docs/build.sh) |
 | Touch the data | § 6 — there is an unadjusted split in five files |
 | Commit | § 7 |
 
@@ -68,7 +74,7 @@ itself. No index or indirection layer in between. Cross-link both ways: `docs/` 
 
 ## 4. Writing a `docs/` chapter
 
-> [`docs/01-what-is-cta.md`](docs/01-what-is-cta.md) **is the golden note.** Read it before writing
+> [`docs/chapters/01_what_is_cta/01_what_is_cta.md`](docs/chapters/01_what_is_cta/01_what_is_cta.md) **is the golden note.** Read it before writing
 > or revising any chapter and match its format and logic. The rules below are a summary; ch01 is the
 > worked example and it wins where the two seem to disagree.
 
@@ -184,7 +190,7 @@ chapter's Background covers — do not invent topics for it.
 ### 4.7 Chapter skeleton
 
 **Sub-headings are numbered decimally.** `## 3.` for a section, `### 3.2` for a movement inside it,
-`#### 3.2.1` for a stage inside that — `docs/02-testing-a-signal.md` is the worked example. Split
+`#### 3.2.1` for a stage inside that — `docs/chapters/02_testing_a_signal/02_testing_a_signal.md` is the worked example. Split
 only sections that hold more than one movement; short ones stay flat. `### N.0` is reserved for a
 setup preamble, as in 02's `### 1.0 The three objects`. A bolded lead-in such as `**Ratio.**` marks
 a beat inside a movement — when that beat outgrows a few paragraphs, promote it to `### N.M` and
@@ -215,7 +221,7 @@ Cross-references are relative links: `[04](04-from-signal-to-position.md)`.
 ### 4.8 Language
 
 - `docs/01` – `docs/08`: **English only.** No Chinese.
-- `docs/99-glossary.md`: bilingual EN↔ZH by design — exempt.
+- `docs/chapters/99_glossary/99_glossary.md`: bilingual EN↔ZH by design — exempt.
 - When rewriting content that was in Chinese, translate the idea; do not delete it.
 
 ### 4.9 Length
@@ -233,37 +239,45 @@ number.**
 Use **VS Code + LaTeX Workshop + TeX Live** to read a hand-written `.tex` chapter as its typeset
 PDF. The `.tex` file is the editable source; the PDF and TeX build files are generated artefacts.
 
-Before diagnosing a build, verify that the active TeX installation supplies both commands:
+Before diagnosing a build, verify that the active TeX installation supplies the compiler:
 
 ```bash
-which xelatex
-xelatex --version
-latexmk --version
+which pdflatex
+pdflatex --version
 ```
 
-This repository's LaTeX edition uses `fontspec` and `unicode-math`, so compile it with **XeLaTeX**,
-not pdfLaTeX. From the repository root, either build through `latexmk`:
+Every chapter is built through one script, [`docs/build.sh`](docs/build.sh), from the repository
+root:
 
 ```bash
-cd docs
-latexmk 05-modelling.tex
+./docs/build.sh 05_modelling            # one chapter, light
+./docs/build.sh 05_modelling --dark     # the same chapter, dark page and dark figures
+./docs/build.sh --all                   # every chapter under docs/chapters/
+./docs/build.sh --book                  # docs/all_chapters.pdf, the bound edition
+./docs/build.sh --figures --all         # regenerate the PNGs first, then typeset
 ```
 
-or open the `.tex` file in VS Code and run **LaTeX Workshop: Build LaTeX project**. The magic
-comment at the top of the file, [`.vscode/settings.json`](.vscode/settings.json) and
-[`docs/.latexmkrc`](docs/.latexmkrc) all select XeLaTeX. LaTeX Workshop writes and reads the result
-at `docs/_pdf/<chapter>.pdf`; use **LaTeX Workshop: View LaTeX PDF** for the side-by-side preview.
-`Cmd + Click` in that preview uses SyncTeX to jump back to the corresponding source.
+The script runs `pdflatex` **twice** per target, because pass one writes the `.toc` and the `\ref`
+targets and pass two reads them back; skip the second pass and every cross-reference prints `??`.
 
-If invoking `xelatex` directly instead, write into `docs/_pdf/` and run it twice so the table of
-contents and cross-references settle:
+A chapter `.tex` is a **body-only fragment** — no `\documentclass`, no `document` environment, and
+no layout instruction of any kind. `build.sh` wraps it around
+[`docs/preamble.tex`](docs/preamble.tex) for a standalone build, and
+[`docs/all_chapters.tex`](docs/all_chapters.tex) `\input`s the same fragment for the bound edition.
+That is why swapping the preamble moves every chapter at once, and why the same body renders both
+as its own PDF and as a chapter inside the book.
 
-```bash
-xelatex -output-directory=docs/_pdf docs/05-modelling.tex
-xelatex -output-directory=docs/_pdf docs/05-modelling.tex
-```
+Output lands in exactly two places:
 
-Do not commit the generated PDF or TeX auxiliaries (`.aux`, `.log`, `.out`, `.synctex.gz`, `.toc`).
+| Artefact | Path | In git |
+| --- | --- | --- |
+| Published chapter PDF | `docs/read_only_chapters/<stem>.pdf` | yes |
+| Bound edition | `docs/all_chapters.pdf` | yes |
+| Wrapper, `.aux`, `.log`, `.toc`, dark PDF | `docs/chapters/<stem>/_build/` | no |
+
+A chapter PDF lives in `read_only_chapters/` and nowhere else — never leave a copy beside the
+`.tex`. Never commit a TeX auxiliary.
+
 If the build reports `File 'xxx.sty' not found`, the missing TeX Live package must be installed
 before retrying; do not change the document merely to conceal a machine setup problem.
 
@@ -284,13 +298,20 @@ numbers are fine and preferred. Do not spend effort on pixel accuracy or on sour
 a figure that is explaining a concept. Plot real numbers only when the *claim itself* is about this
 dataset, and label a schematic as illustrative in its subtitle so it is never mistaken for a result.
 
-**One generator script per chapter**, named after the chapter and living in `docs/figures/`:
+**One folder per chapter under `docs/figures/`**, holding that chapter's generator script and the
+PNGs it emits — so a chapter's figures and the code that draws them sit together, and regenerating
+one chapter cannot touch another's:
 
-| Chapter | Script |
-| --- | --- |
-| `01-what-is-cta.md` | `make_01_what_is_cta.py` |
-| `02-testing-a-signal.md` | `make_02_testing_a_signal.py` |
-| … | `make_<chapter-stem>.py` |
+| Chapter | Figure folder | Script |
+| --- | --- | --- |
+| `01_what_is_cta` | `docs/figures/01_figures/` | `make_01_what_is_cta.py` |
+| `02_testing_a_signal` | `docs/figures/02_figures/` | `make_02_testing_a_signal.py` |
+| … | `docs/figures/<NN>_figures/` | `make_<chapter-stem>.py` |
+
+A script announces its own output directory with `set_out(Path(__file__).resolve().parent)` right
+after the imports; `save()` writes there. PNG names are unique across chapters, so `\fig{stem}` in
+a chapter body never has to say which folder its figure is in — `\graphicspath` in the preamble
+searches all of them.
 
 Shared design tokens and drawing primitives (`THEMES`, `rounded_bar`, `style_axes`, `titles`,
 `save`) live in [`docs/figures/_style.py`](docs/figures/_style.py) and are imported by every chapter
@@ -307,10 +328,10 @@ To add a figure:
    script's `FIGURES` tuple.
 2. Emit **both** `-light.png` and `-dark.png`, stepped for their own surface rather than
    colour-flipped.
-3. Reference it from the chapter through a `<picture>` element so GitHub serves the matching
-   variant, with a descriptive `alt` that states what the figure *shows*.
-4. Re-run only that script — `python docs/figures/make_02_testing_a_signal.py` — and commit the
-   regenerated PNGs. Editing one chapter's figure must not churn another's.
+3. Reference it from the chapter body as `\fig{stem}{caption}{label}` — the macro picks the
+   `-light` or `-dark` variant to match the build, so figure and page always agree.
+4. Re-run only that script — `python docs/figures/02_figures/make_02_testing_a_signal.py` — and
+   commit the regenerated PNGs. Editing one chapter's figure must not churn another's.
 
 A new chapter gets a new script; copy an existing docstring's shape, which lists every figure the
 script produces and one line on what each shows.
@@ -324,7 +345,7 @@ home for measured results, reproduction snippets and defects in a particular run
 
 `CTA_data/` holds 37 daily OHLCV CSVs, all **ETFs**, standing in for futures. **Prices are not
 dividend-adjusted.** Five sector SPDRs (XLB, XLE, XLK, XLU, XLY) still carry an **unadjusted
-2-for-1 split** effective 2025-12-05 — see [`docs/100-dataset.md`](docs/100-dataset.md) before
+2-for-1 split** effective 2025-12-05 — see [`docs/chapters/100_dataset/100_dataset.md`](docs/chapters/100_dataset/100_dataset.md) before
 trusting any result that spans that date. Unadjusted originals live in `CTA_data/_unadjusted_raw/`,
 deliberately outside the `*_ohlcv_1d.csv` glob.
 
@@ -366,7 +387,7 @@ Two more, not formatter-related:
 
 ## 9. How to know you are done
 
-- The chapter reads like [`docs/01-what-is-cta.md`](docs/01-what-is-cta.md).
+- The chapter reads like [`docs/chapters/01_what_is_cta/01_what_is_cta.md`](docs/chapters/01_what_is_cta/01_what_is_cta.md).
 - Every claim is discharged, every symbol is glossed twice, every figure exists in both themes.
 - The generator script for that chapter runs clean and the PNGs are committed.
 - No section reference anywhere in the repo points at a heading that no longer exists.

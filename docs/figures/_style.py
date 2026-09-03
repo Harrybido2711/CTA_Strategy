@@ -21,8 +21,17 @@ from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import FancyBboxPatch, PathPatch
 from matplotlib.path import Path as MplPath
 
+# Where the PNGs land. Each chapter's figures live beside their generator in
+# figures/<NN>_figures/, so a chapter script announces its own directory with
+# set_out(Path(__file__).resolve().parent) before it draws anything.
 OUT = Path(__file__).resolve().parent
 DATA = Path(__file__).resolve().parents[2] / "CTA_data"
+
+
+def set_out(path):
+    """Point save() at this chapter's figure directory."""
+    global OUT
+    OUT = Path(path).resolve()
 
 # ---------------------------------------------------------------- design tokens
 THEMES = {

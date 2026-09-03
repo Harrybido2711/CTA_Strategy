@@ -7,7 +7,7 @@ live in the series:
 | --- | --- |
 | Column meanings, timing offsets, look-ahead bias | [05 · Understanding Backtesting](../docs/05-understanding-backtesting.md) |
 | Momentum signal, overlapping holds, portfolio weights | [04 · From Signal to Position](../docs/04-from-signal-to-position.md) |
-| Unadjusted prices, splits, data-quality checks | [100 · The Dataset](../docs/100-dataset.md) |
+| Unadjusted prices, splits, data-quality checks | [100 · The Dataset](../docs/chapters/100_dataset/100_dataset.md) |
 
 Code: [`backtest.py`](backtest.py). Multi-asset adds no trading logic — it loops the single-asset
 backtester over 37 assets and sums the PnL. 用循环把单资产回测跑 37 遍再加总。
@@ -42,7 +42,7 @@ backtester over 37 assets and sums the PnL. 用循环把单资产回测跑 37 �
 ## Shorts as a Negative Share Count
 
 Why insight 7 works, in this code. Concept side — bounded longs, unbounded shorts, borrowing
-mechanics — is [01](../docs/01-what-is-cta.md).
+mechanics — is [01](../docs/chapters/01_what_is_cta/01_what_is_cta.md).
 
 **Claim.** In [`backtester`](backtest.py), a position with `curr_shrs < 0` gains exactly when the
 close falls, with no branch special-casing shorts.
@@ -102,7 +102,7 @@ cross-sectional momentum on 37 ETFs is not supposed to be profitable; the exerci
   split adjustment alone will not repair.
 - Dividends are unadjusted throughout.
 
-Detail: [100](../docs/100-dataset.md). Until those five are fixed, no conclusion
+Detail: [100](../docs/chapters/100_dataset/100_dataset.md). Until those five are fixed, no conclusion
 spanning December 2025 is trustworthy.
 
 ## Next Steps
@@ -110,11 +110,11 @@ spanning December 2025 is trustworthy.
 Assigned work. The pipeline stays as-is — only the signal changes.
 
 1. **Re-plot performance** with the risk-adjusted signal bucketed by rolling quantile instead of raw
-   value — [02 § 4](../docs/02-testing-a-signal.md).
+   value — [02 § 4](../docs/chapters/02_testing_a_signal/02_testing_a_signal.md).
 2. **Add a MACD-style fast leg** to the grid search; read the heat map, don't pick the maximum —
-   [03 § 2](../docs/03-shaping-the-lookback.md), [07 § 4](../docs/07-overfitting-and-robustness.md).
+   [03 § 2](../docs/chapters/03_shaping_the_lookback/03_shaping_the_lookback.md), [07 § 4](../docs/07-overfitting-and-robustness.md).
 3. **Smooth the fast leg** with a window shorter than its own period, or it becomes another slow
-   signal — [03 § 4](../docs/03-shaping-the-lookback.md).
+   signal — [03 § 4](../docs/chapters/03_shaping_the_lookback/03_shaping_the_lookback.md).
 4. **Run it through the pipeline** and produce the charts.
 
 Further ahead: a volatility *forecast* rather than trailing realized vol as the noise filter.

@@ -17,7 +17,7 @@ import pandas as pd
 
 from _style import DATA
 
-# The five sector SPDRs carry an unadjusted 2-for-1 split (docs/100-dataset.md).
+# The five sector SPDRs carry an unadjusted 2-for-1 split (docs/chapters/100_dataset/).
 # Halving every pre-split close makes the series continuous; without it those
 # tickers print a -69% "return" on the day and poison every pooled statistic.
 SPLIT_DATE = pd.Timestamp("2025-12-05", tz="UTC")
@@ -28,7 +28,7 @@ def load_returns():
     """Daily log returns for the 37 ETFs, split-repaired.
 
     One column per ticker, indexed by date. Close-to-close, not
-    dividend-adjusted — see docs/100-dataset.md for what that costs.
+    dividend-adjusted — see docs/chapters/100_dataset/ for what that costs.
     """
     closes = {}
     for path in sorted(glob.glob(str(DATA / "*_ohlcv_1d.csv"))):

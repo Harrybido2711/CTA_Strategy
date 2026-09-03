@@ -1,0 +1,38 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% all_chapters.tex --- 合订本 (THE BOUND EDITION)
+%%
+%% 把 chapters/ 下每一章的正文片段串成一本书：一个总目录，
+%% 章内 § 号自动带上章号 (05.1, 05.2.3)，跨章引用变成书内跳转。
+%%
+%% 加一章 = 在下面的 \input 列表里加一行。还没转成 LaTeX 的章节
+%% 先注释掉；指向它们的 \chapref 会自动退化成纯文本，不会印 "??"。
+%%
+%%   ./docs/build.sh --book
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\def\BOOKMODE{}          % must come before the preamble reads it
+\input{preamble}
+
+\title{CTA Strategy \midot{} Course Notes}
+\author{Harry Chen}
+\date{}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+
+% ------------------------------------------------------------------ chapters
+% \input{chapters/00_pipeline/00_pipeline}
+% \input{chapters/01_what_is_cta/01_what_is_cta}
+% \input{chapters/02_testing_a_signal/02_testing_a_signal}
+% \input{chapters/03_shaping_the_lookback/03_shaping_the_lookback}
+% \input{chapters/04_volatility_regimes/04_volatility_regimes}
+\input{chapters/05_modelling/05_modelling}
+% \input{chapters/08_toolbox_pandas/08_toolbox_pandas}
+% \input{chapters/09_ic_and_r_squared/09_ic_and_r_squared}
+% \input{chapters/10_toolbox_latex/10_toolbox_latex}
+% \input{chapters/99_glossary/99_glossary}
+% \input{chapters/100_dataset/100_dataset}
+
+\end{document}

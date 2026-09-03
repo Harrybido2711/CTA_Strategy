@@ -17,6 +17,8 @@ chat_records/
 # Recording transcripts — source material, not notes
 docs/recording_script/
 
-# Typeset output and LaTeX scratch — regenerate with docs/tex/build.sh
-docs/_pdf/
-docs/tex/_build/
+# LaTeX scratch — wrappers, .aux, .log, .toc. Regenerate with docs/build.sh.
+# The PDFs themselves are committed: read_only_chapters/ and all_chapters.pdf
+# are what a reader without a TeX install opens.
+docs/_build/
+docs/chapters/*/_build/

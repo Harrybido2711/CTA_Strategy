@@ -7,11 +7,11 @@
 > - **Provenance:** content is as taught in class. A block opening with *Added* was worked out
 >   afterwards and was not said in the lecture. The market narrative in § 8.2 is as told in
 >   class and is **not** audited against any fund's filings.
-> - **See also:** [02 · Testing a Signal](../docs/02-testing-a-signal.md) for the bucket and
->   beta tests this chapter now feeds into a model · [04 · Volatility Regimes](../docs/04-volatility-regimes.md)
->   for the VIX conditioning it refers back to · [09 · IC and R²](../docs/09-ic-and-r-squared.md)
+> - **See also:** [02 · Testing a Signal](../docs/chapters/02_testing_a_signal/02_testing_a_signal.md) for the bucket and
+>   beta tests this chapter now feeds into a model · [04 · Volatility Regimes](../docs/chapters/04_volatility_regimes/04_volatility_regimes.md)
+>   for the VIX conditioning it refers back to · [09 · IC and R²](../docs/chapters/09_ic_and_r_squared/09_ic_and_r_squared.md)
 >   for the R² levels quoted in § 8.1 · [Implementation Notes](../Backtest_prototype/Backtests.md).
-> - **Written up as:** [05 · Modelling](../docs/05-modelling.md), which is the course
+> - **Written up as:** [05 · Modelling](../docs/chapters/05_modelling/05_modelling.md), which is the course
 >   chapter built from §§ 1–6 of this note.
 
 ---

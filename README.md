@@ -44,7 +44,7 @@ flowchart LR
     class MARKET venue;
 ```
 
-Stage 2 → [100](docs/100-dataset.md) · stage 3 → [02](docs/02-testing-a-signal.md) ·
+Stage 2 → [100](docs/chapters/100_dataset/100_dataset.md) · stage 3 → [02](docs/chapters/02_testing_a_signal/02_testing_a_signal.md) ·
 stages 4–6 → [04](docs/04-from-signal-to-position.md) · stages 8–9 →
 [05](docs/05-understanding-backtesting.md) and [06](docs/06-evaluating-performance.md).
 
@@ -53,11 +53,11 @@ stages 4–6 → [04](docs/04-from-signal-to-position.md) · stages 8–9 →
 | #  | Chapter | Covers | Status |
 | -- | ------- | ------ | ------ |
 | 00 | [Index &amp; Learning Path](docs/00-index.md) | How to read this series, prerequisites per chapter | ✅ |
-| 01 | [What Is a CTA Strategy](docs/01-what-is-cta.md) | What a CTA trades, momentum, long/short mechanics, market participants | ✅ |
-| — | [How a Strategy Is Built](docs/00-pipeline.md) | The project as a story — naïve backtest, execution haircut, regime diagnosis, rebuild — then the eight stages that produced it | ✅ |
-| 02 | [Testing a Signal](docs/02-testing-a-signal.md) | Hypothesis framing, why a scatter proves nothing, the bar plot and how to read it, risk-adjusted momentum | ✅ |
-| 03 | [Shaping the Lookback](docs/03-shaping-the-lookback.md) | Window length, fast/slow combination, EWMA half-life, MACD as a kernel, smoothing the fast leg | ✅ |
-| 04 | [Volatility Regimes](docs/04-volatility-regimes.md) | realized vs implied vol, VIX and MOVE, regime buckets, conditioning and residualizing | ✅ |
+| 01 | [What Is a CTA Strategy](docs/chapters/01_what_is_cta/01_what_is_cta.md) | What a CTA trades, momentum, long/short mechanics, market participants | ✅ |
+| — | [How a Strategy Is Built](docs/chapters/00_pipeline/00_pipeline.md) | The project as a story — naïve backtest, execution haircut, regime diagnosis, rebuild — then the eight stages that produced it | ✅ |
+| 02 | [Testing a Signal](docs/chapters/02_testing_a_signal/02_testing_a_signal.md) | Hypothesis framing, why a scatter proves nothing, the bar plot and how to read it, risk-adjusted momentum | ✅ |
+| 03 | [Shaping the Lookback](docs/chapters/03_shaping_the_lookback/03_shaping_the_lookback.md) | Window length, fast/slow combination, EWMA half-life, MACD as a kernel, smoothing the fast leg | ✅ |
+| 04 | [Volatility Regimes](docs/chapters/04_volatility_regimes/04_volatility_regimes.md) | realized vs implied vol, VIX and MOVE, regime buckets, conditioning and residualizing | ✅ |
 | 05 | [Understanding Backtesting](docs/05-understanding-backtesting.md) | Every column, timing offsets, look-ahead bias | ✅ |
 | 06 | [Evaluating Performance](docs/06-evaluating-performance.md) | Why a single number hides the time dimension; Sharpe, drawdown, turnover, attribution | 🟡 partial |
 | 07 | [Overfitting &amp; Robustness](docs/07-overfitting-and-robustness.md) | Train/validation/test, why time series can't be split randomly, heat-map parameter sensitivity | 🟡 partial |
@@ -66,11 +66,11 @@ Read 01 → 06 in order. The rest is reference, consulted rather than stepped th
 
 | #  | Document | What it is | Status |
 | -- | -------- | ---------- | ------ |
-| 08 | [Toolbox: pandas](docs/08-toolbox-pandas.md) | How the non-obvious pandas calls behave | ✅ |
-| 09 | [IC and R²](docs/09-ic-and-r-squared.md) | What each measures, and why a signal is judged by the first | ✅ |
-| 10 | [Toolbox: LaTeX → PDF](docs/10-toolbox-latex.md) | What a TeX run does, why it runs twice, and the two build routes in this repo | ✅ |
-| 99 | [Glossary](docs/99-glossary.md) | English–Chinese term reference | ✅ |
-| 100 | [The Dataset](docs/100-dataset.md) | The 37-ticker sample, split adjustment, data-quality checks | ✅ |
+| 08 | [Toolbox: pandas](docs/chapters/08_toolbox_pandas/08_toolbox_pandas.md) | How the non-obvious pandas calls behave | ✅ |
+| 09 | [IC and R²](docs/chapters/09_ic_and_r_squared/09_ic_and_r_squared.md) | What each measures, and why a signal is judged by the first | ✅ |
+| 10 | [Toolbox: LaTeX → PDF](docs/chapters/10_toolbox_latex/10_toolbox_latex.md) | What a TeX run does, why it runs twice, and the two build routes in this repo | ✅ |
+| 99 | [Glossary](docs/chapters/99_glossary/99_glossary.md) | English–Chinese term reference | ✅ |
+| 100 | [The Dataset](docs/chapters/100_dataset/100_dataset.md) | The 37-ticker sample, split adjustment, data-quality checks | ✅ |
 
 Chapters read in order — each ends with a **Next** block: one concrete thing to do before moving on,
 plus a checklist of what you should be able to explain. Class notes are absorbed into the chapter
@@ -80,26 +80,26 @@ that owns each concept; there is no parallel per-session record.
 
 | I want to…                                          | Go to                                                                                                   |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| See how signal, strategy and backtest fit together | [00 · pipeline](docs/00-pipeline.md) |
-| Understand what a CTA trades, and how shorting works | [01](docs/01-what-is-cta.md)                                                                             |
-| Check my price data before trusting it               | [100 § 1.1](docs/100-dataset.md)                                                       |
-| See what the 37 tickers actually are                 | [100 § 2](docs/100-dataset.md)                                                         |
-| Test whether my signal carries information           | [02 § 3.2](docs/02-testing-a-signal.md)                                                                   |
-| Write down MACD, and see why it is momentum         | [03](docs/03-shaping-the-lookback.md)                                                                   |
-| Know what a bar plot cannot tell me                  | [02 § 3.2.4](docs/02-testing-a-signal.md)                                                                   |
-| Test whether the gap between my top and bottom bar is real | [02 § 3.2.3](docs/02-testing-a-signal.md)                                                             |
-| Know why a Sharpe ratio cannot judge a signal        | [02 § 5](docs/02-testing-a-signal.md)                                                                       |
-| Tell which volatility regime I am in                 | [04](docs/04-volatility-regimes.md)                                                                         |
-| Make signals comparable across dates and assets      | [02 § 4](docs/02-testing-a-signal.md)                                                              |
-| Combine a fast and slow horizon                      | [03](docs/03-shaping-the-lookback.md)                                                             |
+| See how signal, strategy and backtest fit together | [00 · pipeline](docs/chapters/00_pipeline/00_pipeline.md) |
+| Understand what a CTA trades, and how shorting works | [01](docs/chapters/01_what_is_cta/01_what_is_cta.md)                                                                             |
+| Check my price data before trusting it               | [100 § 1.1](docs/chapters/100_dataset/100_dataset.md)                                                       |
+| See what the 37 tickers actually are                 | [100 § 2](docs/chapters/100_dataset/100_dataset.md)                                                         |
+| Test whether my signal carries information           | [02 § 3.2](docs/chapters/02_testing_a_signal/02_testing_a_signal.md)                                                                   |
+| Write down MACD, and see why it is momentum         | [03](docs/chapters/03_shaping_the_lookback/03_shaping_the_lookback.md)                                                                   |
+| Know what a bar plot cannot tell me                  | [02 § 3.2.4](docs/chapters/02_testing_a_signal/02_testing_a_signal.md)                                                                   |
+| Test whether the gap between my top and bottom bar is real | [02 § 3.2.3](docs/chapters/02_testing_a_signal/02_testing_a_signal.md)                                                             |
+| Know why a Sharpe ratio cannot judge a signal        | [02 § 5](docs/chapters/02_testing_a_signal/02_testing_a_signal.md)                                                                       |
+| Tell which volatility regime I am in                 | [04](docs/chapters/04_volatility_regimes/04_volatility_regimes.md)                                                                         |
+| Make signals comparable across dates and assets      | [02 § 4](docs/chapters/02_testing_a_signal/02_testing_a_signal.md)                                                              |
+| Combine a fast and slow horizon                      | [03](docs/chapters/03_shaping_the_lookback/03_shaping_the_lookback.md)                                                             |
 | Turn a signal into position weights                  | [04](docs/04-from-signal-to-position.md)                                                                 |
 | Look up what`curr_shrs` means                      | [05 § columns](docs/05-understanding-backtesting.md)                                                    |
 | Work out whether I have look-ahead bias              | [05 § offsets](docs/05-understanding-backtesting.md) · [07 § 2](docs/07-overfitting-and-robustness.md) |
 | Judge an equity curve honestly                       | [06 § 1](docs/06-evaluating-performance.md)                                                             |
 | Tune parameters without fooling myself               | [07 § 4](docs/07-overfitting-and-robustness.md)                                                         |
-| Look up a pandas function                            | [08](docs/08-toolbox-pandas.md)                                                                          |
-| Build a chapter into a PDF, or debug a failed build   | [10](docs/10-toolbox-latex.md)                                                                           |
-| Look up a term                                       | [99 · Glossary](docs/99-glossary.md)                                                                    |
+| Look up a pandas function                            | [08](docs/chapters/08_toolbox_pandas/08_toolbox_pandas.md)                                                                          |
+| Build a chapter into a PDF, or debug a failed build   | [10](docs/chapters/10_toolbox_latex/10_toolbox_latex.md)                                                                           |
+| Look up a term                                       | [99 · Glossary](docs/chapters/99_glossary/99_glossary.md)                                                                    |
 | See what to build next                               | [Backtests.md § Next Steps](Backtest_prototype/Backtests.md)                                            |
 
 ## Layout
