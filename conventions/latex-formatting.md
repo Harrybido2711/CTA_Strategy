@@ -100,7 +100,7 @@ These are habits of the document body rather than preamble settings. They transf
 
 ## 6. What a chapter may say
 
-Everything a chapter body is allowed to use is listed in `AGENTS.md` § 4 — `\chapterhead`, the five
-environments, `\fig`, `\secref`, `\chapref`, `\pointer`, `checklist`. If a chapter needs something
+Everything a chapter body is allowed to use is listed in `.claude/tasks/writing-a-chapter.md` § 1
+— `\chapterhead`, the five environments, `\fig`, `\secref`, `\chapref`, `\pointer`, `checklist`. If a chapter needs something
 that is not on that list, the fix is a new command **in the preamble**, never a raw
 `\usepackage`, `\vspace` or colour in the body.
