@@ -17,5 +17,6 @@ chat_records/
 # Recording transcripts — source material, not notes
 docs/recording_script/
 
-# Typeset output — regenerate with docs/to_pdf.sh
+# Typeset output and LaTeX scratch — regenerate with docs/tex/build.sh
 docs/_pdf/
+docs/tex/_build/
