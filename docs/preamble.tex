@@ -23,7 +23,7 @@
 %%                                        (all_chapters.tex 合订本)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\documentclass[10pt]{article}
+\documentclass[12pt]{article}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -31,7 +31,18 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage[margin=1in]{geometry} % adjust margins
 \setlength\parindent{0em} % never indent a paragraph
-\setlength{\parskip}{1em} %Seperate paragraphs
+
+% Paragraphs are separated by space rather than by an indent, so the skip has
+% to be visible -- but a rigid 1em was a whole blank line between every two
+% paragraphs, and a chapter is mostly paragraphs. 0.65em still reads as a
+% break; the rubber lets a page that is nearly full close up instead of
+% pushing a line over.
+\setlength{\parskip}{0.65em plus 0.15em minus 0.15em}
+
+% Space is added at the bottom of a short page rather than stretched between
+% its paragraphs -- otherwise \parskip's "plus" opens gaps that look
+% deliberate and are not.
+\raggedbottom
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -46,6 +57,8 @@
 \usepackage{xltabular}   % ...and that may break across pages
 \usepackage{array}       % >{...} column prefixes
 \usepackage{caption}
+\usepackage{titlesec}    % heading spacing; article's defaults double up with \parskip
+\usepackage{etoolbox}    % \AtBeginEnvironment, to set table type size in one place
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -84,6 +97,39 @@
   \color{ink}
   \arrayrulecolor{rulecol}
 \fi
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Type scale and vertical rhythm.
+%%
+%% article's section skips (3.5ex before, 2.3ex after) were written for a
+%% document whose paragraphs are marked by an indent and carry no \parskip.
+%% Here every paragraph already brings 0.65em with it, so the defaults land
+%% on top of that and a heading floats in the middle of its own white band.
+%% These are the totals we actually want.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\titlespacing*{\section}      {0pt}{1.1em plus 0.2em minus 0.2em}{0.35em}
+\titlespacing*{\subsection}   {0pt}{0.9em plus 0.2em minus 0.2em}{0.25em}
+\titlespacing*{\subsubsection}{0pt}{0.7em plus 0.2em minus 0.2em}{0.2em}
+
+% Tables carry the reference material -- long cells, many rows. One step down
+% fits more of a comparison on the page without touching the prose size, and
+% the caption goes with it so a figure's label never outweighs its own axis
+% labels.
+\AtBeginEnvironment{tabularx}{\small}
+\AtBeginEnvironment{xltabular}{\small}
+\AtBeginEnvironment{tabular}{\small}
+\captionsetup{font=small, labelfont=bf, skip=0.5em}
+
+% Floats: article will bail a figure out to a page of its own rather than let
+% it take more than 70 percent of a text page. At \linewidth that happens
+% constantly, and the bailed-out page is mostly white.
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.7}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.75}
+\setlength{\intextsep}{0.9em plus 0.2em minus 0.2em}
+\setlength{\textfloatsep}{1.0em plus 0.2em minus 0.2em}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -164,7 +210,7 @@
     \clearpage
     \phantomsection\label{chap:#3}%
     \addcontentsline{toc}{part}{#1 \midot{} #2}%
-    {\Huge\bfseries #1 \midot{} #2\par}\vspace{1.5em}%
+    {\huge\bfseries #1 \midot{} #2\par}\vspace{0.4em}%
   \else
     \title{#1 \midot{} #2}%
     \author{Harry Chen}%
@@ -211,7 +257,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Two consequences of \parskip{1em}, fixed.
+%% Two consequences of \parskip, fixed.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % The table of contents is a list, not a run of paragraphs; at 1em of

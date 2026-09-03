@@ -74,8 +74,8 @@ the `*_ohlcv_1d.csv` glob.
 
 | # | Task | Playbook — read it before acting | Skills | Done when |
 | --- | --- | --- | --- | --- |
-| **T1** | Write a new chapter | [`.claude/tasks/writing-a-chapter.md`](.claude/tasks/writing-a-chapter.md) | — | Chapter and book both build clean; no `??` in the PDF |
-| **T2** | Revise a chapter | [`.claude/tasks/writing-a-chapter.md`](.claude/tasks/writing-a-chapter.md) | — | Same, plus no `\secref` / `\chapref` points at a label that no longer exists |
+| **T1** | Write a new chapter | [`.claude/tasks/writing-a-chapter.md`](.claude/tasks/writing-a-chapter.md) | — | Chapter and book both build clean; no `??` in the PDF; **the chapter PDF is 15 pages or fewer** |
+| **T2** | Revise a chapter | [`.claude/tasks/writing-a-chapter.md`](.claude/tasks/writing-a-chapter.md) | — | Same, including the 15-page cap, plus no `\secref` / `\chapref` points at a label that no longer exists |
 | **T3** | Add or change a figure | skill `figures`, after the `nature-figure` design pass | `nature-figure` → `figures` + `colors` | Both PNGs committed; both themes build; both axes labelled |
 | **T4** | Migrate a chapter `.md` → `.tex` | [`.claude/tasks/md-to-tex-migration.md`](.claude/tasks/md-to-tex-migration.md) | — | PDF verified, `.md` deleted, book rebuilt with it |
 | **T5** | Code / backtest | `Backtest_prototype/Backtests.md`. **Measured numbers go there, never in a chapter** | `run`, `code-review` | The number is reproducible from a snippet in `Backtests.md` |
