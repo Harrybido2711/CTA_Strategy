@@ -42,7 +42,7 @@ backtester over 37 assets and sums the PnL. 用循环把单资产回测跑 37 �
 ## Shorts as a Negative Share Count
 
 Why insight 7 works, in this code. Concept side — bounded longs, unbounded shorts, borrowing
-mechanics — is [01](../docs/chapters/01_what_is_cta/01_what_is_cta.md).
+mechanics — is [01](../docs/read_only_chapters/01_what_is_cta.pdf).
 
 **Claim.** In [`backtester`](backtest.py), a position with `curr_shrs < 0` gains exactly when the
 close falls, with no branch special-casing shorts.
