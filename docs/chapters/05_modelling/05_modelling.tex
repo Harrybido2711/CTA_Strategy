@@ -66,23 +66,12 @@ It produces a number. It also has three defects, and they compound.
 
 \section{The walk-forward ladder}\label{sec:ladder}
 
+\subsection{The method, and why it works}\label{sec:slide}
+
 The three defects of \secref{sec:split-costs} share one cause: the model is fitted once. So fit it
-many times. Cut the training history into short segments, put the same train--validation--test
-frame on the first few of them, and slide that frame forward one segment per iteration until it
-reaches the end of the training set. Each rung is a complete train--validation--test cycle in
-miniature, and there are as many of them as the history allows.
-
-\fig{walk-forward-ladder}{The ladder that replaces the single split: the frame advances one segment
-per iteration, so each row's test segment is the next row's validation segment. Schematic---the
-ruler stops at the end of the training set, since the held-out block beyond it is never
-segmented.}{fig:walk-forward-ladder}
-
-\begin{note}
-The ruler ends where the training set ends. What lies beyond it---the held-out block that never
-enters the ladder---is a different object with different powers; that is \secref{sec:two-layers}.
-\end{note}
-
-\subsection{How long a segment should be}\label{sec:segment-length}
+many times. Cut the training history into short segments, put a train--validation--test frame on the
+first few of them, and slide that frame forward one segment per iteration until it reaches the end
+of the training set.
 
 \begin{definition}[Segment]\label{def:segment}
 A \emph{segment} is a short contiguous block of dates---here \textbf{two to three months}---treated
@@ -96,7 +85,13 @@ there is room for several, because that is enough time for the same participants
 minds repeatedly. So a segment must be short enough that one segment is approximately one regime,
 and long enough to hold a usable sample.
 
-\subsection{The slide}\label{sec:slide}
+\fig{walk-forward-ladder}{The ladder that replaces the single split: the frame advances one segment
+per iteration, so each row's test segment is the next row's validation segment. Schematic---the
+ruler stops at the end of the training set, since the held-out block beyond it is never
+segmented.}{fig:walk-forward-ladder}
+
+The ruler stops where the training set ends. The held-out block beyond it never enters the ladder,
+and what it alone may decide is \secref{sec:two-layers}.
 
 Number the segments $1, 2, 3, \ldots$ and the frame moves like this:
 
@@ -159,8 +154,7 @@ preference, not a correctness question. What is not optional is that the window 
 prediction date---see \secref{sec:which-stats}.
 \end{note}
 
-
-\section{Two validation layers}\label{sec:two-layers}
+\subsection{Two validation layers}\label{sec:two-layers}
 
 The validation \emph{segment} inside each rung and the large held-out validation \emph{block} at
 the end of the history are different objects with different powers.
@@ -183,10 +177,8 @@ parameters.}{fig:outer-validation}
 \textbf{Test} & nothing & everything \\ \hline
 \end{tabularx}
 
-\subsection{Why the inner layer cannot be skipped}\label{sec:inner}
-
-Exploration already looked at which signals worked \emph{in the training period}. Of course the
-fit then describes that period well: momentum was selected partly because it was seen to work
+\textbf{Why the inner layer cannot be skipped.} Exploration already looked at which signals worked
+\emph{in the training period}. Of course the fit then describes that period well: momentum was selected partly because it was seen to work
 there. That says nothing about whether it was useful going in, and the only way to find out is to
 select on dates the selection did not see---which is what the validation segment is for.
 
@@ -196,16 +188,22 @@ starts to fail, momentum should no longer carry the weight it carried alone. Bec
 re-selects at every rung, that adjustment happens on its own rather than being asserted once.
 \end{note}
 
-\subsection{What only the outer block may decide}\label{sec:outer}
-
-$\lambda$ is not fitted, it is searched: run the ladder once per value on a grid---0.1, 0.5, 0.7,
-1---and compare. The same is true of the model class itself (Lasso, Ridge, a decision tree). Both
+\textbf{What only the outer block may decide.} $\lambda$ is not fitted, it is searched: run the
+ladder once per value on a grid---0.1, 0.5, 0.7, 1---and compare. The same is true of the model class itself (Lasso, Ridge, a decision tree). Both
 comparisons need dates that no rung of the ladder consumed, which is exactly what the held-out
 block is.
 
-\subsection{The optimizer's parameters}\label{sec:optimizer}
+\textbf{Side by side, as objectives.} The inner layer solves the penalized fit of
+\secref{sec:one-rung} with $\lambda$ handed to it,
+\[
+  \min_{\beta} \quad \sum_t \left( y_t - \sum_j \beta_j x_{j,t} \right)^{2}
+    + \lambda \sum_j \left| \beta_j \right|,
+\]
+so the only things it may move are the coefficients $\beta_j$ and, through the penalty, the set of
+signals that survive with $\beta_j \neq 0$.
 
-The prediction is not yet a portfolio. Weights come from a mean--variance problem: choose $w$ to
+The outer layer's objective is the book itself, because the prediction is not yet a portfolio.
+Weights come from a mean--variance problem: choose $w$ to
 \[
   \max_w \quad E[r_p] - \gamma \cdot \mathrm{Var}[r_p]
 \]
@@ -234,7 +232,6 @@ All of this tuning belongs in the \textbf{outer} block. Tuning $\gamma$ inside t
 a portfolio parameter be chosen on the same dates the features were chosen on, and the held-out
 block would then be measuring a strategy that had already been fitted to it.
 \end{note}
-
 
 \section{Preparing a signal for a model}\label{sec:preparing}
 
@@ -410,7 +407,7 @@ $\mu_j$, $\sigma_j$
 $w_i$, $\gamma$, $E[r_p]$
   & the portfolio weight on asset $i$, the risk-aversion coefficient, and the portfolio's expected
     return
-  & \secref{sec:optimizer} \\ \hline
+  & \secref{sec:two-layers} \\ \hline
 \end{xltabular}
 
 \begin{note}[Collisions to watch]
