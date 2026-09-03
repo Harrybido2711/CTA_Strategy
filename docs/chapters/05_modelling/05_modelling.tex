@@ -16,23 +16,34 @@
 \subsection{The textbook split}\label{sec:textbook-split}
 
 \begin{definition}[Split]\label{def:split}
-A \emph{split} cuts the sample by date into three contiguous blocks: \textbf{train}, on which
-coefficients are estimated; \textbf{validation}, on which choices between fitted models are made;
-and \textbf{test}, which is scored once and never chosen on.
+A \emph{split} cuts the sample by date into three contiguous blocks---\textbf{train},
+\textbf{validation} and \textbf{test}---each of which is permitted to do exactly one thing to the
+model.
 \end{definition}
 
-\fig{split-vs-ladder}{One split against the walk-forward ladder. Above, a single timeline cut once
-into train, validation and test. Below, the same history divided into twelve equal segments, with
-the train--validation--test frame starting one segment later on each row---so each row's test
-segment is the next row's validation segment.}{fig:split-vs-ladder}
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.17\linewidth}|X|}
+\hline
+\textbf{Block} & \textbf{What it is for} \\ \hline
+\textbf{train}
+  & Where the coefficients are estimated. It is the only block that may move a coefficient, and
+    the only dates the fit ever sees. \\ \hline
+\textbf{validation}
+  & Where the choice \emph{between} fitted models is made---which features survive, which
+    $\lambda$, which model. It scores; it never fits. \\ \hline
+\textbf{test}
+  & Scored once, at the end, and it chooses nothing. The moment any decision is taken on it, it
+    stops being out of sample. \\ \hline
+\end{tabularx}
 
-The order matters and is not a convention: the blocks run forward in time, because a model that
-was fitted on next year and scored on last year has learned something no live book could have
-known.
+\fig{single-split}{The textbook pipeline: one history, cut once, in date order. Illustrative
+proportions---train carries several years, validation and test roughly a year each.}{fig:single-split}
 
-\subsection{What the single split costs}\label{sec:split-costs}
+The order is not a convention. The blocks run forward in time because a model fitted on next year
+and scored on last year has learned something no live book could have known.
 
-Three defects, and they compound.
+\subsection{Why the single split fails}\label{sec:split-costs}
+
+Run that pipeline once and it does produce a number. It also has three defects, and they compound.
 
 \begin{xltabular}{\linewidth}{|>{\raggedright\arraybackslash}p{0.30\linewidth}|X|}
 \hline
@@ -56,31 +67,22 @@ Three defects, and they compound.
     $R^2$ 0.8 easily. \\ \hline
 \end{xltabular}
 
-\subsection{The fix that is not one}\label{sec:not-a-fix}
+\subsection{The fix: stop fitting once}\label{sec:the-fix}
 
-\begin{claim}\label{clm:duplication}
-Duplicating the sample changes no coefficient, and inflates every t-statistic by roughly
-$\sqrt{2}$.
-\end{claim}
+All three defects trace to the same decision---fitting a single time---so the repair is to stop
+fitting a single time. Cut the training history into short segments, put the same
+train--validation--test frame on the first few of them, and slide that frame forward one segment
+per iteration until it reaches the end of the training set. Each rung is a complete
+train--validation--test cycle in miniature, and there are as many of them as the history allows.
 
-\begin{proof}
-Write the fit as $b = (X^{T} X)^{-1} X^{T} y$, with $X$ the $n \times p$ matrix of signal values,
-$y$ the forward returns, and $b$ the estimated coefficients. Stacking the sample twice gives
-$X_2^{T} X_2 = 2\, X^{T} X$ and $X_2^{T} y_2 = 2\, X^{T} y$, so
-\[
-  b_2 = \left(2\, X^{T} X\right)^{-1} 2\, X^{T} y = b.
-\]
-The residuals repeat as well, so the residual sum of squares doubles while the degrees of freedom
-go from $n - p$ to $2n - p$; for $n$ large the variance estimate $s^2$ is therefore essentially
-unchanged. But the reported covariance is $s^2 (X_2^{T} X_2)^{-1} = s^2 (X^{T} X)^{-1} / 2$
----halved. Standard errors fall by $\sqrt{2}$ and t-statistics rise by the same factor, on
-evidence that never arrived.
-\end{proof}
+\fig{walk-forward-ladder}{The ladder that replaces the single split: the frame advances one segment
+per iteration, so each row's test segment is the next row's validation segment. Schematic---the
+ruler stops at the end of the training set, since the held-out block beyond it is never
+segmented.}{fig:walk-forward-ladder}
 
 \begin{note}
-This is the standard interview question, and the reason it is asked is that people reach for it.
-Manufacturing rows is overfitting with extra steps; the answer to too few observations is to score
-more of the ones you have, which is \secref{sec:ladder}.
+The ruler ends where the training set ends. What lies beyond it---the held-out block that never
+enters the ladder---is a different object with different powers; that is \secref{sec:two-layers}.
 \end{note}
 
 
@@ -399,10 +401,6 @@ $x_{j,t}$, $x^{\text{clip}}_{j,t}$, $z_{j,t}$
 $y_t$, $\beta_j$
   & the forward return being predicted, and the coefficient the fit puts on signal $j$
   & \secref{sec:one-rung} \\ \hline
-$X$, $y$, $b$, $n$, $p$, $s^2$
-  & the design matrix, the response, the estimated coefficients, the number of dates, the number
-    of signals, the residual variance estimate
-  & \secref{sec:not-a-fix} \\ \hline
 $\lambda$
   & the $L_1$ penalty strength---searched on a grid, not fitted
   & \secref{sec:one-rung} \\ \hline

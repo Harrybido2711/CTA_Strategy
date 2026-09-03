@@ -10,8 +10,10 @@ reader's theme.
 
 Figures produced
 ----------------
-    split-vs-ladder     one train/validation/test split, and the walk-forward
-                        ladder that replaces it
+    single-split        the textbook pipeline: one cut into train, validation
+                        and test, and one fit
+    walk-forward-ladder the replacement: the same frame slid forward one
+                        segment at a time, to the end of the training set
     fold-anatomy        one rung of the ladder: select on validation, refit up
                         to the prediction date, score once on test
     outer-validation    where the held-out block sits, and what it alone is
@@ -60,69 +62,109 @@ def _caption(ax, x, y, text, t, colour=None, ha="left", fontsize=8.0, weight=Non
             fontsize=fontsize, fontweight=weight, linespacing=1.5, zorder=5)
 
 
-# ------------------------------------------- fig: one split, then the ladder
-def split_vs_ladder(mode):
-    """05 ss 1-2 -- why the textbook split is replaced by a sliding one.
+# ----------------------------------------------- fig: the textbook split
+def single_split(mode):
+    """05 s 1.1 -- the traditional pipeline: one cut, three blocks, one fit.
 
-    Schematic. Above: the whole history cut once, so the model is fitted once
-    and scored once. Below: the same history cut into short segments, with a
-    train / validation / test frame that slides forward one segment at a time.
-    The violet arrow is the structural point -- each iteration's test segment
-    is the next iteration's validation segment, so every segment is eventually
-    scored out of sample.
+    Schematic. The history is cut once, in date order, into train (where the
+    coefficients are estimated), validation (where the choice between fitted
+    models is made) and test (scored once, choosing nothing).
     """
     t = THEMES[mode]
     train, valid, test = t["ramp"][5], t["validation"], t["muted"]
 
-    fig, ax = plt.subplots(figsize=(9.4, 5.2))
+    fig, ax = plt.subplots(figsize=(9.4, 2.45))
     fig.patch.set_facecolor(t["surface"])
     ax.set_facecolor(t["surface"])
-    ax.set_xlim(0, 12.3)
-    ax.set_ylim(0.22, 6.10)
+    ax.set_xlim(0, 10.4)
+    ax.set_ylim(0.10, 2.05)
     ax.axis("off")
 
-    # ---- panel A: the single split
-    yA = 5.55
-    _caption(ax, 0.55, yA + 0.62, "A  ·  one split, one fit", t,
-             colour=t["muted"], fontsize=8.6, weight="600")
-    _block(ax, 0.55, 6.30, yA, train, t, "train")
-    _block(ax, 6.30, 7.95, yA, valid, t, "validation")
-    _block(ax, 7.95, 9.30, yA, test, t, "test")
-    ax.annotate("", xy=(9.85, yA), xytext=(9.30, yA),
+    y = 1.45
+    xa, xb, xc, xd = 0.55, 6.30, 7.95, 9.30
+    _block(ax, xa, xb, y, train, t, "train")
+    _block(ax, xb, xc, y, valid, t, "validation")
+    _block(ax, xc, xd, y, test, t, "test")
+    ax.annotate("", xy=(xd + 0.55, y), xytext=(xd, y),
                 arrowprops=dict(arrowstyle="-|>", color=t["baseline"],
                                 linewidth=1.0, shrinkA=0, shrinkB=0))
-    _caption(ax, 0.55, yA - 0.52,
-             "several years of market, one set of coefficients,\n"
-             "and roughly 250 days of out-of-sample score", t)
 
-    # ---- panel B: the ladder
-    x0, segw, nseg = 0.55, 0.72, 12
-    yruler = 4.05
-    _caption(ax, 0.55, yruler + 0.55, "B  ·  the same history, cut into segments", t,
-             colour=t["muted"], fontsize=8.6, weight="600")
-    ax.plot([x0, x0 + nseg * segw], [yruler] * 2, color=t["baseline"], linewidth=1.0)
+    roles = [((xa + xb) / 2, "the coefficients are\nestimated here"),
+             ((xb + xc) / 2, "chooses between\nfitted models"),
+             ((xc + xd) / 2, "scored once,\nchooses nothing")]
+    for x, label in roles:
+        _caption(ax, x, y - 0.60, label, t, ha="center", fontsize=7.6)
+
+    _caption(ax, xa, 0.35,
+             "date $t$ $\\rightarrow$   —   several years of market, one set of coefficients, "
+             "and roughly 250 days of out-of-sample score", t, fontsize=8.0)
+
+    titles(ax, t, "One split fits once",
+           "schematic — the whole history cut once, in date order")
+    fig.tight_layout(rect=(0, 0, 1, 0.82))
+    save(fig, t, f"single-split-{mode}.png")
+
+
+# ------------------------------------------- fig: the walk-forward ladder
+def walk_forward_ladder(mode):
+    """05 s 1.3 -- the fix: the frame slides forward one segment per iteration.
+
+    Schematic. The training history is cut into segments and the same
+    train / validation / test frame slides across them, one segment at a time,
+    until it reaches the end of the training set -- which is where the ruler
+    stops, because the held-out block beyond it is never segmented. The violet
+    arrow is the structural point: each iteration's test segment is the next
+    iteration's validation segment, so every segment is eventually scored out
+    of sample.
+    """
+    t = THEMES[mode]
+    train, valid, test = t["ramp"][5], t["validation"], t["muted"]
+
+    fig, ax = plt.subplots(figsize=(9.4, 4.55))
+    fig.patch.set_facecolor(t["surface"])
+    ax.set_facecolor(t["surface"])
+    ax.set_xlim(0, 11.4)
+    ax.set_ylim(0.20, 5.05)
+    ax.axis("off")
+
+    x0, segw, nseg = 1.05, 0.72, 9
+    xend = x0 + nseg * segw
+    yruler = 4.30
+
+    # the ruler: the training set, cut into segments -- and it stops where it stops
+    ax.plot([x0, xend], [yruler] * 2, color=t["baseline"], linewidth=1.0)
     for i in range(nseg + 1):
         ax.plot([x0 + i * segw] * 2, [yruler - 0.11, yruler + 0.11],
                 color=t["baseline"], linewidth=1.0)
-    _caption(ax, x0 + nseg * segw + 0.25, yruler,
+    _caption(ax, xend + 0.22, yruler,
              "one segment $\\approx$ two to three months —\nabout one regime's worth of market", t)
+    _caption(ax, x0, yruler - 0.34, "date $t$ $\\rightarrow$", t, fontsize=8.0)
 
     rows = ["1st", "2nd", "3rd"]
-    ys = [3.25, 2.55, 1.85]
-    for i, (name, y) in enumerate(zip(rows, ys)):
+    ys = [3.55, 2.90, 2.25]
+    ylast = 1.35
+    ax.text(0.22, (ys[0] + ylast) / 2, "iteration", rotation=90, ha="center",
+            va="center", color=t["ink_secondary"], fontsize=8.5)
+
+    def _rung(i, y, name, label_first=False):  # noqa: D401 -- one row of the ladder
         a = x0 + i * segw
         _caption(ax, x0 - 0.18, y, name, t, ha="right", fontsize=8.2)
-        _block(ax, a, a + 3 * segw, y, train, t, "train" if i == 0 else None)
+        _block(ax, a, a + 3 * segw, y, train, t, "train" if label_first else None)
         _block(ax, a + 3 * segw, a + 4 * segw, y, valid, t)
         _block(ax, a + 4 * segw, a + 5 * segw, y, test, t)
-        if i == 0:
-            _caption(ax, a + 3.5 * segw, y + 0.42, "validation", t,
-                     ha="center", fontsize=7.6)
-            _caption(ax, a + 4.5 * segw, y + 0.42, "test", t,
-                     ha="center", fontsize=7.6)
 
-    ax.text(x0 + 3 * segw, 1.30, "$\\vdots$", ha="center", va="center",
+    for i, (name, y) in enumerate(zip(rows, ys)):
+        _rung(i, y, name, label_first=(i == 0))
+    ax.text(x0 + 3 * segw, 1.83, "$\\vdots$", ha="center", va="center",
             color=t["muted"], fontsize=13)
+    _rung(nseg - 5, ylast, "last")
+
+    # where the ladder stops: the end of the training set
+    ax.plot([xend] * 2, [ylast - 0.34, yruler + 0.20], color=t["muted"],
+            linewidth=0.9, linestyle=(0, (4, 3)), zorder=2)
+    _caption(ax, xend + 0.22, ylast,
+             "the frame stops here — end of the training set.\nThe held-out block beyond it is never segmented.",
+             t, fontsize=8.0)
 
     # the rung-to-rung identity: this test is the next validation
     xa = x0 + 4.5 * segw
@@ -130,23 +172,23 @@ def split_vs_ladder(mode):
                 xytext=(xa, ys[0] - BAR_H / 2 - 0.03),
                 arrowprops=dict(arrowstyle="-|>", color=t["accent"],
                                 linewidth=1.3, shrinkA=0, shrinkB=0), zorder=6)
-    _caption(ax, xa + 0.30, (ys[0] + ys[1]) / 2,
+    _caption(ax, xa + 0.28, (ys[0] + ys[1]) / 2,
              "each iteration's test segment becomes\nthe next iteration's validation segment",
              t, colour=t["accent"], fontsize=8.0, weight="600")
 
     # colour key
-    key = [(0.55, train, "train — the model is fitted here"),
-           (4.65, valid, "validation — chooses the features"),
-           (8.35, test, "test — scored once, chooses nothing")]
+    key = [(1.05, train, "train — the model is fitted here"),
+           (5.15, valid, "validation — chooses the features"),
+           (8.85, test, "test — scored once, chooses nothing")]
     for kx, colour, label in key:
-        ax.add_patch(FancyBboxPatch((kx, 0.36), 0.42, 0.20, boxstyle=ROUND,
+        ax.add_patch(FancyBboxPatch((kx, 0.44), 0.42, 0.20, boxstyle=ROUND,
                                     facecolor=colour, edgecolor="none", zorder=3))
-        _caption(ax, kx + 0.56, 0.46, label, t, fontsize=7.8)
+        _caption(ax, kx + 0.56, 0.54, label, t, fontsize=7.8)
 
-    titles(ax, t, "One split fits once; the ladder keeps fitting",
+    titles(ax, t, "The ladder keeps fitting",
            "schematic — the frame slides forward one segment per iteration")
-    fig.tight_layout(rect=(0, 0, 1, 0.90))
-    save(fig, t, f"split-vs-ladder-{mode}.png")
+    fig.tight_layout(rect=(0, 0, 1, 0.89))
+    save(fig, t, f"walk-forward-ladder-{mode}.png")
 
 
 # ------------------------------------------------------ fig: one rung, in full
@@ -409,7 +451,7 @@ def beta_paths(mode):
     save(fig, t, f"beta-paths-{mode}.png")
 
 
-FIGURES = (split_vs_ladder, fold_anatomy, outer_validation, winsorize_band, beta_paths)
+FIGURES = (single_split, walk_forward_ladder, fold_anatomy, outer_validation, winsorize_band, beta_paths)
 
 if __name__ == "__main__":
     for mode in ("light", "dark"):

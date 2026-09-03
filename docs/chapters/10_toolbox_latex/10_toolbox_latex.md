@@ -323,7 +323,7 @@ so `\fig` pulls the matching PNG.
 **Claim.** A dark PDF cannot be made by recolouring a light one after the fact.
 
 **Proof.** The theme changes what is *included*, not only what is painted: `\fig` resolves to a
-different file — `split-vs-ladder-dark.png` rather than `split-vs-ladder-light.png` — and those PNGs
+different file — `walk-forward-ladder-dark.png` rather than `walk-forward-ladder-light.png` — and those PNGs
 are separately rendered, not inversions of each other. A post-hoc colour transform would have to
 replace an embedded raster with a different image, which is not a recolouring. So each theme needs
 its own engine run.
