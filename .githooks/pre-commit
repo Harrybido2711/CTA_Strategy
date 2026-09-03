@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# The sync pass, at the one moment every finished change reliably passes through.
+#
+# Layer 1 (local <-> local) rides on layer 3 (local <-> git) on purpose: since
+# every change has to be committed, the commit is a checkpoint we get for free.
+#
+# Enable once per clone:   git config core.hooksPath .githooks
+# Skip a single commit:    git commit --no-verify
+#
+# This hook REPORTS and does not block. That is deliberate while docs/chapters/
+# still holds Markdown: a gate that fires on every commit gets bypassed daily
+# and then means nothing. Make it blocking (exit 1 on findings) once task T4 is
+# finished and the check comes back clean.
+
+CHECK=".claude/scripts/check_sync.py"
+[ -f "$CHECK" ] || { echo "sync: $CHECK not found (a fresh clone -- .claude/ is gitignored)"; exit 0; }
+
+python3 "$CHECK"
+python3 "$CHECK" --touched $(git diff --cached --name-only --diff-filter=ACMR)
+exit 0

@@ -5,8 +5,8 @@ live in the series:
 
 | Looking for | Chapter |
 | --- | --- |
-| Column meanings, timing offsets, look-ahead bias | [05 · Understanding Backtesting](../docs/05-understanding-backtesting.md) |
-| Momentum signal, overlapping holds, portfolio weights | [04 · From Signal to Position](../docs/04-from-signal-to-position.md) |
+| Column meanings, timing offsets, look-ahead bias | [05 · Understanding Backtesting](../docs/chapters/05_modelling/05_modelling.md) |
+| Momentum signal, overlapping holds, portfolio weights | [04 · From Signal to Position](../docs/chapters/04_volatility_regimes/04_volatility_regimes.md) |
 | Unadjusted prices, splits, data-quality checks | [100 · The Dataset](../docs/chapters/100_dataset/100_dataset.md) |
 
 Code: [`backtest.py`](backtest.py). Multi-asset adds no trading logic — it loops the single-asset
@@ -112,7 +112,7 @@ Assigned work. The pipeline stays as-is — only the signal changes.
 1. **Re-plot performance** with the risk-adjusted signal bucketed by rolling quantile instead of raw
    value — [02 § 4](../docs/chapters/02_testing_a_signal/02_testing_a_signal.md).
 2. **Add a MACD-style fast leg** to the grid search; read the heat map, don't pick the maximum —
-   [03 § 2](../docs/chapters/03_shaping_the_lookback/03_shaping_the_lookback.md), [07 § 4](../docs/07-overfitting-and-robustness.md).
+   [03 § 2](../docs/chapters/03_shaping_the_lookback/03_shaping_the_lookback.md), [07 § 4](../docs/chapters/05_modelling/05_modelling.md).
 3. **Smooth the fast leg** with a window shorter than its own period, or it becomes another slow
    signal — [03 § 4](../docs/chapters/03_shaping_the_lookback/03_shaping_the_lookback.md).
 4. **Run it through the pipeline** and produce the charts.
