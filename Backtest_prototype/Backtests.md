@@ -6,7 +6,7 @@ live in the series:
 | Looking for | Chapter |
 | --- | --- |
 | Column meanings, timing offsets, look-ahead bias | [05 · Understanding Backtesting](../docs/chapters/05_modelling/05_modelling.md) |
-| Momentum signal, overlapping holds, portfolio weights | [04 · From Signal to Position](../docs/chapters/04_volatility_regimes/04_volatility_regimes.md) |
+| Volatility regimes, and conditioning a signal on the state of the tape | [04 · Volatility Regimes](../docs/read_only_chapters/04_volatility_regimes.pdf) |
 | Unadjusted prices, splits, data-quality checks | [100 · The Dataset](../docs/chapters/100_dataset/100_dataset.md) |
 
 Code: [`backtest.py`](backtest.py). Multi-asset adds no trading logic — it loops the single-asset

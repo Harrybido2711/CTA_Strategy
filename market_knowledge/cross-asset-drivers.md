@@ -4,7 +4,7 @@
 > - **What it is:** the market recap that opened the session, one row per CTA sleeve. Told in
 >   class; not audited.
 > - **See also:** [Leverage, Deleveraging, and the Time-Horizon Lesson](leverage-deleveraging-and-horizons.md)
->   for the equity row in full · [04 · Volatility Regimes](../docs/chapters/04_volatility_regimes/04_volatility_regimes.md).
+>   for the equity row in full · [04 · Volatility Regimes](../docs/read_only_chapters/04_volatility_regimes.pdf).
 
 ---
 

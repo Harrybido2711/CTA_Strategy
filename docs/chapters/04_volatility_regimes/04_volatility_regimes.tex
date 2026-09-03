@@ -1,0 +1,458 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 04_volatility_regimes.tex --- 正文层 (BODY LAYER)
+%%
+%% 这里只有内容。字体、边距、颜色、定理环境长什么样，全在
+%% ../../preamble.tex 里；改版式不用碰这个文件。
+%%
+%% 这是正文片段，没有 \documentclass 也没有 document 环境：
+%% ../../build.sh 单独编译它，all_chapters.tex 把它 \input 进合订本。
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapterhead{04}{Volatility Regimes}{04_volatility_regimes}
+
+Three steps, in order. \textbf{MACD stops working when the tape gets loud}
+(\secref{sec:macd-breaks}). \textbf{The option market prices that loudness before any trailing
+estimate can measure it} (\secref{sec:option-market}). \textbf{The resulting label is used by
+conditioning on it, not by adding it to the signal} (\secref{sec:using-label}).
+
+
+\section{Why MACD breaks when the tape gets loud}\label{sec:macd-breaks}
+
+\fig{macd-out-of-phase}{Above, one price path with a 12-day and a 26-day EMA over it. Through the
+calm first stretch the fast average sits clear above the slow one and the two never cross; through
+the shaded stretch, which has no net trend and four times the daily amplitude, they stay tangled and
+their difference changes sign ten times. Below, the position the rule holds: one unbroken long, then
+a shredded alternation of long and short blocks. Each flip is a round trip, paid at the widest
+spreads of the year. Illustrative.}{fig:macd-out-of-phase}
+
+One path, one rule, two regimes. In the calm stretch the fast average pulls clear of the slow one
+and stays there: no crossings, one position, held. In the shaded stretch the trend is gone and the
+swings are four times wider, so the two legs stay tangled and noise carries one across the other
+again and again.
+
+\textbf{Every flip also lands after the turn it is chasing}, since an average only confirms a move
+that has already happened---so the rule goes short at the bottom of the spike and long at the top of
+the snap-back. Whipsaw is not scatter around the right answer; it is the opposite of it, repeated.
+
+Standardizing the signal (\chapref{\S 2.4}{02_testing_a_signal}) rescales it without moving a
+crossing date, and \chapref{\S 3.4}{03_shaping_the_lookback}'s smoother and deadband damp every date
+alike because neither knows the tape is violent. Clearing that ceiling means promoting the state of
+the market to a \textbf{variable}.
+
+
+\section{What the option market already knows}\label{sec:option-market}
+
+\subsection{Volatility cannot be computed from the price}\label{sec:vol-not-from-price}
+
+There is no way to read today's volatility off the price series. Every estimate built from past
+returns---a rolling standard deviation over a month, an EWMA, any weighting you like---is an average
+of what has already happened, so it only climbs as the new regime's returns accumulate inside its
+window. Shortening the window trades the lag for noise and buys nothing.
+
+\fig{regime-lag}{Above, the absolute daily return around a news event: quiet either side, with a
+burst of three and four percent moves in the sessions after it prints. Below, two answers to that
+event in annualized volatility. The implied line jumps on the day the news prints and decays
+smoothly back; the trailing 21-day line barely moves on the day and does not peak until session
+twenty-one, by which time the burst has been over for a fortnight.
+Illustrative.}{fig:regime-lag}
+
+The upper panel is the event and the lower panel is two answers to it. The trailing line does not
+peak until three weeks after the burst it is describing. \textbf{The other line is not an estimate
+at all}---it is a price, quoted by people who have to take a view on the next thirty days, and it
+moves the session the news does. Where it comes from is \secref{sec:option-to-vol}.
+
+\subsection{How an option hands you a volatility}\label{sec:option-to-vol}
+
+An option fixes a price today for a trade that may happen later, and \textbf{the buyer chooses
+whether it happens}. Two of them, defined by which side that choice sits on:
+
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.30\linewidth}|X|X|}
+\hline
+ & \textbf{Call} & \textbf{Put} \\ \hline
+The holder may & \textbf{buy} the underlying at $K$ & \textbf{sell} the underlying at $K$ \\ \hline
+Worth exercising when & $S_T > K$ & $S_T < K$ \\ \hline
+Payoff at expiry & $\max(S_T - K, 0)$ & $\max(K - S_T, 0)$ \\ \hline
+Pays off when the underlying & rises & falls \\ \hline
+The most the buyer can lose & the premium & the premium \\ \hline
+The most the buyer can make & unbounded & $K$, less the premium \\ \hline
+Bought by someone who & wants upside without owning it & wants a floor under something they
+                                                         own \\ \hline
+\end{tabularx}
+
+with $K$ the \textbf{strike}---the price fixed in the contract---and $S_T$ the underlying's price at
+expiry.
+
+\fig{option-payoffs}{Value at expiry against the underlying's price at expiry, with the strike $K$
+marked in both panels. Left, a call: flat at zero below the strike, rising one-for-one above it, and
+a dashed line one premium lower for the same shape net of what was paid. Right, a put: the mirror
+image. Both dashed lines are flat on their far side---the loss is capped at the premium.
+Illustrative.}{fig:option-payoffs}
+
+Both payoffs are \textbf{kinked}: flat on one side of the strike, one-for-one on the other. That
+kink is the whole instrument---it truncates the loss and leaves the gain open---and it is why an
+option is worth more when the underlying might travel further. Under Black--Scholes a call is worth
+\[
+  C = S \Phi(d_1) - K e^{-R \tau} \Phi(d_2), \qquad
+  d_1 = \frac{\ln \left( S/K \right) + \left( R + \sigma^2/2 \right) \tau}{\sigma \tau^{1/2}},
+  \qquad
+  d_2 = d_1 - \sigma \tau^{1/2}
+\]
+where $S$ is the spot price, $K$ the strike, $\tau$ the time to expiry in years, $R$ the risk-free
+rate, $\Phi$ the standard normal cumulative distribution function, and $\sigma$ the volatility.
+Everything but $\sigma$ is observable, which is what makes the equation worth inverting.
+
+\begin{definition}[Implied volatility]\label{def:implied-vol}
+The value of $\sigma$ that makes the model reproduce the option's traded price---a forecast for the
+life of the contract, read out of a price rather than estimated from history.
+\end{definition}
+
+\begin{claim}\label{clm:inversion}
+The inversion is well defined: one price, one implied volatility.
+\end{claim}
+
+\begin{proof}
+The kink makes both payoffs convex in $S_T$. Raising $\sigma$ spreads the distribution of $S_T$
+while leaving its forward mean where it was, and the expectation of a convex function rises under a
+mean-preserving spread. The price is therefore strictly monotone in $\sigma$, and a monotone map is
+invertible.
+\end{proof}
+
+There is no closed form for the inverse, so $\sigma$ is solved numerically---bisection needs about
+twenty steps to reach four decimals, and monotonicity is what guarantees it converges. At the money
+the whole thing collapses to something you can do in your head:
+\[
+  C \approx 0.4\, S \sigma \tau^{1/2}
+  \qquad \Longrightarrow \qquad
+  \sigma \approx \frac{C}{0.4\, S \tau^{1/2}}
+\]
+
+\begin{example}\label{ex:implied-vol}
+A 30-day at-the-money call trades at 2 percent of spot. Quote the price as a fraction of spot and
+$S$ cancels, leaving a denominator of $0.4 \tau^{1/2} \approx 0.115$ at $\tau = 30/365$, so
+$\sigma \approx 0.02/0.115 \approx 0.17$---the market is charging for a \textbf{17 percent
+annualized} move over the next month. Read the same contract a day later at 3 percent of spot and
+the forecast is 26 percent: the number moves with the quote, which is the entire point.
+\end{example}
+
+\begin{note}[One contract is not the market]
+That 17 percent is the volatility charged \textbf{at that strike}. Quotes on other strikes imply
+different numbers---the smile---so a single contract's answer is a property of one contract.
+\secref{sec:vix} reads the whole strip at once to get rid of that dependence.
+\end{note}
+
+\subsection{VIX}\label{sec:vix}
+
+\begin{definition}[VIX]\label{def:vix}
+A constant-30-day implied volatility for the S\&P 500, built from the whole strip of
+out-of-the-money options rather than from any one of them. For a single expiry the strip gives the
+implied \textbf{variance} directly, with no model to invert:
+\[
+  \sigma^2_\tau = \frac{2 e^{R \tau}}{\tau} \sum_i \frac{\Delta K_i}{K_i^2} Q(K_i)
+                  - \frac{1}{\tau} \left( \frac{F}{K_0} - 1 \right)^2
+\]
+where $Q(K_i)$ is the mid price of the out-of-the-money option struck at $K_i$, $\Delta K_i$ the gap
+between neighbouring strikes, $F$ the forward level implied by put-call parity, and $K_0$ the first
+strike below $F$. Every term is a traded price, so the sum is the market's own variance rather than
+one contract's.
+\end{definition}
+
+Two steps turn that into the published number. \textbf{Take the two expiries with $\tau$ between 23
+and 37 days}---listed contracts do not fall on a 30-day schedule, and the band is what guarantees
+one on each side of the target---and \textbf{interpolate their variances linearly in $\tau$} onto
+exactly 30 days. Then annualize, take the root, and quote it in percentage points:
+\[
+  \mathrm{VIX}_t = 100 \left( \sigma^2_{30,t} \right)^{1/2}
+\]
+
+\begin{note}[Decide whether your formula wants the variance or the volatility]
+The published level is already a volatility---a VIX of 20 means an annualized 20 percent---because
+the strip computes a variance and the last step takes its root. Variance is what is additive, across
+time and across independent sources of risk; volatility is not. Anything that rescales a horizon or
+adds contributions needs $\left( \mathrm{VIX}_t / 100 \right)^2$; anything compared against a return
+in the same units needs the level. The error is invisible when made: a missing square root still
+leaves a plausible positive number.
+\end{note}
+
+\begin{note}[What the forecast is worth is a separate question]
+Implied volatility is what the market charges, not what will happen---insurance is sold above its
+expected cost, and that gap is a strategy in its own right. Here the index is only a \textbf{state
+label}, for which a live consensus is enough.
+\end{note}
+
+\subsection{One index for equities, another for rates}\label{sec:two-indices}
+
+\begin{claim}\label{clm:one-index}
+One equity index's implied volatility labels most sleeves, even though it is computed from one
+market.
+\end{claim}
+
+The reason is what a panic does to correlations. In calm markets the sleeves move mostly apart; in a
+large enough shock the same levered participants sell all of them at once to raise cash and the
+cross-asset correlations run toward one. The states in which the label matters most are exactly the
+states in which one market's fear is every market's fear---an empirical regularity rather than a
+theorem, and better at the extremes than in the middle.
+
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.30\linewidth}|>{\raggedright\arraybackslash}p{0.14\linewidth}|X|}
+\hline
+\textbf{Sleeve} & \textbf{Regime index} & \textbf{What its spikes are about} \\ \hline
+Equities, credit, most commodities & \textbf{VIX}
+  & growth and earnings shocks, and forced deleveraging \\ \hline
+Rates, and anything priced off the curve & \textbf{MOVE}
+  & policy surprises, inflation prints, auction stress \\ \hline
+\end{tabularx}
+
+\begin{note}[Rates are the genuine exception]
+Treasury volatility is close to unrelated to equity volatility, because the two are frightened by
+different things. A rate sleeve labelled by VIX is labelled wrongly, and \textbf{MOVE} is the same
+construction run on Treasury options. Neither index is in \texttt{CTA\_data/}
+(\chapref{100 \midot{} The Dataset}{100_dataset}), so both have to be fetched before
+\secref{sec:using-label} can be run.
+\end{note}
+
+\subsection{From a level to a label}\label{sec:level-to-label}
+
+\begin{definition}[Volatility regime]\label{def:vol-regime}
+A stretch of dates over which the amplitude of returns is roughly constant and materially different
+from the stretch on either side; a \textbf{regime shift} is the boundary between two of them.
+\end{definition}
+
+\secref{sec:using-label} needs a small set of such states, named, because a continuous variable
+cannot be a row of a table. Write $v_t$ for the index level on date $t$; its distribution is the
+obstacle.
+
+\fig{vix-bucketing}{The same illustrative sample of volatility index levels, twice. Left, against
+the raw level: the mass piles into a narrow band and trails off into a long near-empty tail, half
+the sample sitting inside six points. Right, against the natural logarithm of the same values: close
+to symmetric, and the two integer cuts at 3 and 4---about 20 and about 55 on the level---divide it
+into calm, stressed and crisis.}{fig:vix-bucketing}
+
+The level spends most of its life in a band a few points wide and occasionally reaches four times
+that, so equal-width bins put nearly everything in the first one---the opposite of what
+\chapref{\S 2.3.2.2}{02_testing_a_signal}'s bucket test needs.
+
+\begin{definition}[Log-ceiling bucket]\label{def:log-ceiling}
+Take the natural log of the level and round up to the next integer,
+$g_t = \left\lceil \ln v_t \right\rceil$, where $g_t$ is the regime label on that date. Because
+$\ln$ compresses the sparse upper tail and stretches the crowded lower band, the integer cuts land
+at multiplicatively spaced levels:
+
+\begin{center}
+\begin{tabular}{|c|l|l|}
+\hline
+\textbf{Label $g_t$} & \textbf{Level range} & \textbf{Reads as} \\ \hline
+3 & $v_t \in (7.4, 20.1]$   & calm---the ordinary tape \\ \hline
+4 & $v_t \in (20.1, 54.6]$  & stressed \\ \hline
+5 & $v_t \in (54.6, 148.4]$ & crisis \\ \hline
+\end{tabular}
+\end{center}
+\end{definition}
+
+The boundaries are $e^3$ and $e^4$, close to where a practitioner would have drawn them by hand.
+That is the construction's virtue: \textbf{the cuts use no data, so a date's label means the same
+thing in 2015 and in 2020.} Writing $g_t = \left\lceil c \ln v_t \right\rceil$ puts the boundaries
+at $e^{k/c}$ and recovers as many buckets as wanted; $c$ is a hyperparameter like any other, and
+choosing it by which value produces the best-looking grid is what
+\chapref{5 \midot{} Modelling}{05_modelling} is about.
+
+The alternative is \chapref{\S 2.3.2.1}{02_testing_a_signal}'s own machinery applied to the index:
+rank the dates by $v_t$ and cut at the quintiles.
+
+\begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}p{0.24\linewidth}|X|X|}
+\hline
+ & \textbf{Log-ceiling} & \textbf{Rolling quantile} \\ \hline
+\textbf{Boundaries}            & fixed, the same in every year
+                               & move with the window \\ \hline
+\textbf{Group sizes}           & very unequal---crisis may be 3 percent of the sample
+                               & equal by construction \\ \hline
+\textbf{A label means}         & an absolute level of market fear
+                               & a rank against the recent past \\ \hline
+\textbf{Comparable across time} & yes
+                               & no---the same $v_t$ can be G5 one year and G3 the next \\ \hline
+\textbf{Look-ahead risk}       & none, the cuts use no data
+                               & real, if the window is not trailing \\ \hline
+\end{tabularx}
+
+\begin{note}[The ranking must be rolling, never full-sample]
+A quintile computed over the whole history uses 2020's levels to label 2015's dates, which is
+look-ahead bias of the plainest kind (\chapref{\S 2.6}{02_testing_a_signal})---and it is easy to
+commit here, because the index feels like context rather than like data.
+\end{note}
+
+
+\section{Using the label}\label{sec:using-label}
+
+Each date now carries three numbers: a signal value, a forward return, and a regime label $g_t$. Two
+different questions can be asked of that---whether the edge \textbf{differs} by regime
+(\secref{sec:conditioning}), and whether the regime is \textbf{new information} the signals do not
+already carry (\secref{sec:residualizing}).
+
+\subsection{Conditioning --- the two-way sort}\label{sec:conditioning}
+
+Put the signal buckets across and the regime labels up, and report the mean forward return in every
+cell. It is \chapref{\S 2.3.2}{02_testing_a_signal}'s bar plot run once per regime---equivalently a
+\textbf{conditional model}: sort on the state first, then on the signal within it.
+
+\fig{regime-signal-grid}{Mean forward return in basis points, signal buckets G1 to G5 across and
+volatility regime up: calm, stressed, crisis. The calm row, holding three-quarters of the sample,
+rises monotonically; the stressed row rises about half as steeply; the crisis row, 3 percent of the
+sample, has no ordering at all and its shading is flat across the row.
+Illustrative.}{fig:regime-signal-grid}
+
+Read it by rows, and the reading is the finding. A staircase in the calm row that flattens through
+the stressed row and disappears in the crisis row is \secref{sec:macd-breaks}'s picture measured on
+your own data: same rule, same parameters, less and less to show for them. The one-dimensional plot
+of \chapref{2}{02_testing_a_signal} is the sample-weighted average of the three rows---it reports
+the calm row lightly diluted and never mentions that the other two exist.
+
+\begin{note}[Keep the regime axis coarse, and print the counts]
+The cells partition the same sample, so a one-way bar's $N/5$ dates become $N/15$ across three rows
+and every error bar (\chapref{\S 2.3.2.3}{02_testing_a_signal}) widens by
+$3^{1/2} \approx 1.7$---at five rows, $5^{1/2} \approx 2.2$. Worse, the row you most want is the
+thinnest: crisis cells hold roughly $N/167$ dates, error bars about 5.8 times wider, so \textbf{a
+flat crisis row is equally consistent with an edge nobody has enough crisis days to measure.} Report
+the count beside every mean, and treat a row you cannot measure as unknown rather than as zero.
+\end{note}
+
+\subsection{Residualizing --- is any of it new?}\label{sec:residualizing}
+
+Regress the candidate on the incumbents and keep what is left:
+\[
+  x_t = \beta_0 + \sum_j \beta_j x_{j,t} + \epsilon_t
+\]
+where $x_t$ is the candidate signal on date $t$, $x_{j,t}$ the signals already in the book
+---momentum and MACD, here---$\beta_j$ their fitted coefficients, and $\epsilon_t$ the residual.
+Then run \chapref{\S 2.3.2}{02_testing_a_signal}'s bar plot on $\epsilon_t$ in place of $x_t$.
+
+\begin{claim}\label{clm:residual}
+If the staircase survives on $\epsilon_t$, the candidate carries an edge the existing signals do not
+already own.
+\end{claim}
+
+\begin{proof}
+Least squares sets the derivative of the summed squared error to zero, giving one normal equation per
+regressor---$\sum_t \epsilon_t x_{j,t} = 0$ for every $j$, and $\sum_t \epsilon_t = 0$ from the
+intercept. Zero sum of products on a centred variable is zero sample covariance, so
+$\rho(\epsilon, x_j) = 0$ for every incumbent. By \chapref{\S 2.1.2}{02_testing_a_signal} a
+portfolio's expected return runs entirely through the correlation between what sets the weights and
+the forward return, so weights built on $\epsilon_t$ earn whatever they earn somewhere the book is
+not standing.
+\end{proof}
+
+\begin{note}[Orthogonal is not independent]
+Zero \emph{linear} correlation is all least squares buys. A residual that is large exactly when MACD
+is large \textbf{in absolute value} is a function of MACD the regression cannot see---and that is
+not a corner case here, since the candidate is a variable about $\sigma$ and
+$\left| \mathrm{MACD} \right|$ widens with $\sigma$ too. Add the transform you suspect as an extra
+regressor and residualize against that too.
+\end{note}
+
+\begin{note}[With fifty signals, regress against the model's output]
+Fitting a candidate against fifty regressors on overlapping daily data fits noise long before it
+exhausts the information, and fifty pairwise regressions give answers that do not compose. The book
+already produces one number per asset per date---its combined prediction $p_t$. Use that single
+series as the regressor: one residual, and the question it answers is the one actually being asked.
+\end{note}
+
+\subsection{Where the answer is spent}\label{sec:answer-spent}
+
+\textbf{Often not in the return model at all.} The natural home for \secref{sec:conditioning}'s grid
+is the \textbf{optimizer}---a penalty that rises with the regime, an exposure cap that binds in the
+crisis row, a volatility target that scales the whole book---which is why the grid earns its place
+even when \secref{sec:residualizing}'s residual comes back flat. Answering \emph{yes} to
+\secref{sec:conditioning} and \emph{no} to \secref{sec:residualizing} is a common and perfectly good
+result, and performance evaluation is where it is spent.
+
+\textbf{Add one dimension per experiment, and record what it bought}---what the step adds alone,
+whether it overlaps what is already there (\secref{sec:residualizing}'s residual), and which
+direction it is useful in, since a variable can predict return poorly and volatility well. The
+record has to pass interpretability in an operational sense: move an input and you should be able to
+say in advance, roughly, what the output does. Measuring 8 bp where you expected 10 is fine;
+\emph{``it moved and I do not know by how much''} is not, and it is what adding several things at
+once guarantees.
+
+\begin{note}[The scorecard is regime-dependent too]
+Every chart above reports mean forward return with an error bar, for the reasons
+\chapref{\S 2.5}{02_testing_a_signal} sets out. A Sharpe ratio has the tape's volatility in its own
+denominator, so the same number means different things in different rows: 0.8 earned in a year when
+the index itself ran at 0.4 is a far harder result than 0.9 earned in a year when buying the index
+and doing nothing paid 0.8. Collapsing the regime axis into one ratio destroys exactly the context
+needed to read the ratio.
+\end{note}
+
+
+\section*{Background}
+\addcontentsline{toc}{section}{Background}
+
+\subsection*{Why is an option the instrument a volatility forecast comes from?}
+
+\begin{itemize}
+  \item \textbf{Its value depends on the range, not the direction.} The flat half of the payoff
+        truncates the losses, so a wider distribution of outcomes is worth strictly more---which
+        makes an option the most volatility-sensitive thing quoted, and
+        \secref{sec:option-to-vol}'s inversion stable enough to be worth doing.
+  \item \textbf{Out-of-the-money contracts are close to pure volatility bets.} One struck far above
+        the price pays only if the underlying travels an unusual distance, so its price is almost
+        entirely a statement about the tails---which is why VIX reads the whole strip, not the
+        at-the-money contract.
+  \item \textbf{The forecast has a fixed horizon attached.} Every contract has an expiry, so an
+        implied volatility is always \emph{volatility over the next $\tau$ days}---which is what
+        allows two of them to be interpolated onto a constant 30-day horizon.
+\end{itemize}
+
+
+\section*{Appendix \midot{} Notation}
+\addcontentsline{toc}{section}{Appendix \midot{} Notation}
+
+Throughout, $t$ is the date. The regime index is a property of the market rather than of one asset,
+so it carries no asset subscript $s$.
+
+\begin{xltabular}{\linewidth}{|>{\raggedright\arraybackslash}p{0.22\linewidth}|X|>{\raggedright\arraybackslash}p{0.16\linewidth}|}
+\hline
+\textbf{Symbol} & \textbf{Means} & \textbf{First used} \\ \hline
+\endhead
+$\sigma$
+  & the volatility of the underlying---the amplitude of its move, without regard to sign
+  & \secref{sec:option-to-vol} \\ \hline
+$C$, $S$, $K$, $\tau$, $R$
+  & a call's price, the spot price, the strike, the time to expiry in years, and the risk-free rate
+  & \secref{sec:option-to-vol} \\ \hline
+$\Phi$, $d_1$, $d_2$
+  & the standard normal cumulative distribution function and the two arguments Black--Scholes feeds
+    it
+  & \secref{sec:option-to-vol} \\ \hline
+$S_T$
+  & the underlying's price at expiry
+  & \secref{sec:option-to-vol} \\ \hline
+$Q(K_i)$, $\Delta K_i$, $F$, $K_0$
+  & one out-of-the-money option's mid price, the gap between neighbouring strikes, the forward
+    level, and the first strike below it
+  & \secref{sec:vix} \\ \hline
+$\sigma^2_\tau$, $\sigma^2_{30,t}$
+  & the implied variance the strip gives for one expiry, and the same interpolated onto 30 days
+  & \secref{sec:vix} \\ \hline
+$v_t$, $g_t$, $c$
+  & the index level on that date, the regime label cut from it, and the multiplier setting how fine
+    the cuts are
+  & \secref{sec:level-to-label} \\ \hline
+$x_t$, $x_{j,t}$, $\beta_j$, $\epsilon_t$
+  & the candidate signal, the signals already in the book, their fitted coefficients, and the
+    residual
+  & \secref{sec:residualizing} \\ \hline
+$p_t$, $N$
+  & the model's combined prediction, and the number of dates in the sample
+  & \secref{sec:using-label} \\ \hline
+\end{xltabular}
+
+\begin{note}[Collisions to watch]
+$\sigma$ is a market-wide volatility here where \chapref{\S 2.4}{02_testing_a_signal}'s
+$\sigma_{s,t}$ is one asset's trailing estimate, and $R$ is the risk-free rate discounting an option
+where \chapref{\S 2.5}{02_testing_a_signal}'s $r_f$ is the same rate subtracted from a portfolio
+return. Uppercase $S$ is a spot price and lowercase $s$ is
+\chapref{2}{02_testing_a_signal}'s asset index; $\Phi$ is a normal CDF and $N$ a sample size, which
+is why the CDF is written $\Phi$ rather than $N$. Lowercase $g_t$ is a regime label on the vertical
+axis while \chapref{\S 2.3.2}{02_testing_a_signal}'s uppercase G1 \ldots G5 are signal buckets on
+the horizontal one, and \secref{sec:conditioning}'s grid has both at once. $\epsilon_t$ here is a
+signal residual after regressing on other \textbf{signals};
+\chapref{\S 2.2}{02_testing_a_signal}'s $\epsilon$ is the part of the forward \textbf{return} no
+signal reaches.
+\end{note}
