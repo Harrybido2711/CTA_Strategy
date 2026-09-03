@@ -110,7 +110,7 @@ spanning December 2025 is trustworthy.
 Assigned work. The pipeline stays as-is — only the signal changes.
 
 1. **Re-plot performance** with the risk-adjusted signal bucketed by rolling quantile instead of raw
-   value — [02 § 4](../docs/chapters/02_testing_a_signal/02_testing_a_signal.md).
+   value — [02 § 2.4](../docs/read_only_chapters/02_testing_a_signal.pdf).
 2. **Add a MACD-style fast leg** to the grid search; read the heat map, don't pick the maximum —
    [03 § 2](../docs/chapters/03_shaping_the_lookback/03_shaping_the_lookback.md), [07 § 4](../docs/chapters/05_modelling/05_modelling.md).
 3. **Smooth the fast leg** with a window shorter than its own period, or it becomes another slow
