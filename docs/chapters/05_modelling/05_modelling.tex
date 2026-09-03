@@ -43,29 +43,26 @@ and scored on last year has learned something no live book could have known.
 
 \subsection{Why the single split fails}\label{sec:split-costs}
 
-Run that pipeline once and it does produce a number. It also has three defects, and they compound.
+It produces a number. It also has three defects, and they compound.
 
 \begin{xltabular}{\linewidth}{|>{\raggedright\arraybackslash}p{0.30\linewidth}|X|}
 \hline
 \textbf{Defect} & \textbf{What goes wrong} \\ \hline
 \endhead
 \textbf{One fit discards time}
-  & A single set of coefficients over several years asserts that those years were one market.
-    Early in the pandemic the world locked down at once and nobody wanted oil; the consensus was
-    that demand had permanently moved online. It had not---the economy reopened, and energy then
-    flew on war. A coefficient estimated across both states describes neither. \\ \hline
+  & One set of coefficients over several years asserts that those years were one market. Set
+    early-pandemic oil---no demand, and a consensus that it would never return---against the
+    war-driven energy rally that followed: a coefficient fitted across both describes neither. \\ \hline
 \textbf{Almost nothing is left to score}
-  & Give validation a year and test a year and validation is roughly 250 dates. A year is also too
-    little market: the regimes it contains are whichever ones happened to fall inside it, so the
-    split never asks what the strategy does when the regime turns. A maximum drawdown measured
+  & A year of validation is roughly 250 dates, holding whichever regimes happened to fall inside
+    it. The split never asks what the strategy does when the regime turns, and a drawdown measured
     over one calm year is not a risk estimate. \\ \hline
 \textbf{The sample is small and the signal is faint}
-  & A school dataset with a thousand points and an $R^2$ of 0.5 is ordinary, and in physics 0.9 is
-    ordinary. In finance \textbf{0.1 to 0.2 is already a good $R^2$}---see
-    \chapref{9}{09_ic_and_r_squared}. Weak true dependence plus few observations is precisely the
-    regime in which a fit lands on noise: a line through ten points drawn from a cloud reaches
-    $R^2$ 0.8 easily. \\ \hline
+  & In finance \textbf{0.1 to 0.2 is already a good $R^2$} (\chapref{9}{09_ic_and_r_squared}),
+    against 0.5 for a school dataset and 0.9 in physics. Weak dependence with few observations is
+    exactly where a fit lands on noise: ten points from a cloud reach $R^2$ 0.8 easily. \\ \hline
 \end{xltabular}
+
 
 \subsection{The fix: stop fitting once}\label{sec:the-fix}
 
