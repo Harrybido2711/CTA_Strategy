@@ -1,0 +1,11 @@
+{
+  "alignment": "signal uses closes through t; scored return close_{t+1} -> close_{t+6} (h=5)",
+  "buckets": "fixed 0.2 cuts of the trailing-252-day percentile, pooled across 37 assets",
+  "se": "Newey-West, lag 4, across per-date means",
+  "what": "IC (C5) and signal win rate (C6) for MOM and B0's stitched score",
+  "ic": "per-date Spearman across 37 assets; t deflated by sqrt(h)",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "f9870c4",
+  "written": "2026-10-23T13:40:06",
+  "rows": 3
+}

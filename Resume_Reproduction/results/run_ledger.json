@@ -1,0 +1,7 @@
+{
+  "what": "every candidate tried, per rung, with whether it was selected",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "f9870c4",
+  "written": "2026-10-23T13:40:06",
+  "rows": 160
+}

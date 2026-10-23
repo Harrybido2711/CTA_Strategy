@@ -163,17 +163,24 @@ def ic_summary(score, fwd, horizon=5):
 
 
 def win_rate(score, fwd, dead=0.1):
-    """Share of (asset, date) whose score sign matches the forward-return sign, beside the base rate.
+    """Signal win rate: share of (asset, date) whose score sign matches the forward-return sign.
 
     Pairs with |score| <= dead are excluded as sign noise; computed per date, then across dates.
+    Two readings:
+      raw       sign(score) vs sign(return), beside the pooled base rate max(P(up), P(down)) over
+                the whole sample (a per-date majority would be an oracle that knows each day's market)
+      relative  sign(score) vs sign(return minus that date's cross-sectional mean), base rate 0.5;
+                this is the reading that matches a dollar-neutral book
     """
     s, f = score.align(fwd, join="inner")
     keep = s.notna() & f.notna() & (s.abs() > dead) & (f != 0)
     hit = (np.sign(s) == np.sign(f)).where(keep)
-    per_date = hit.mean(axis=1)
-    up = (f > 0).where(keep).mean(axis=1)
-    base = np.maximum(up, 1 - up)
-    return pd.Series({"win_rate": float(per_date.mean()), "base_rate": float(base.mean()),
-                      "excess": float(per_date.mean() - base.mean()),
+    up = float((f > 0)[keep].sum().sum() / keep.sum().sum())
+    rel = f.sub(f.where(f.notna() & s.notna()).mean(axis=1), axis=0)
+    hit_rel = (np.sign(s) == np.sign(rel)).where(keep & (rel != 0))
+    win = float(hit.mean(axis=1).mean())
+    win_rel = float(hit_rel.mean(axis=1).mean())
+    return pd.Series({"win_rate": win, "base_rate": max(up, 1 - up), "excess": win - max(up, 1 - up),
+                      "win_rate_relative": win_rel, "excess_relative": win_rel - 0.5,
                       "share_excluded": float(1 - keep.sum().sum() / (s.notna() & f.notna()).sum().sum()),
-                      "dates": int(per_date.notna().sum())})
+                      "dates": int(hit.mean(axis=1).notna().sum())})
