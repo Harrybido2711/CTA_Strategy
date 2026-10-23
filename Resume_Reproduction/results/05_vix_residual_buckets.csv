@@ -1,0 +1,13 @@
+# what: bar plot of the lecture-5 residual (VIX beta on MOM and MACD), centred trailing percentile, WF 2022Q1-2025Q2
+# sample_rows: WF quarters 2022Q1-2025Q2 unless the row says descriptive-from-2020
+# S1: ceil(2 ln v): VIX <= 20.1 / 20.1-33.1 / > 33.1; MOVE <= 90.0 / 90.0-148.4 / > 148.4
+# cuts: S1 data-free, D rolling 252-day tercile, S2 frozen per rung, S3 full-sample (look-ahead)
+# measurable: display flag: a state with fewer than 60 days (about a quarter) is marked not measurable; the flag was added after the first run showed cells of 0-15 days
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+bucket,mean,se_nw,dates,obs,t
+G1,0.00036830605190768046,0.0012176340243626616,875,7605,0.3024768071017567
+G2,0.0015777998818251634,0.0011641105917333736,873,5863,1.355369406506131
+G3,0.0008714833214541256,0.0011121339132841015,866,5754,0.7836136557338305
+G4,0.0010456641556939605,0.0011403837135590161,873,5748,0.9169406255641394
+G5,0.0012711062454467655,0.001130836817482614,875,7364,1.124040379474387
+G5-G1,0.0009028001935390851,0.0010796785159644371,875,875,0.8361750096811428

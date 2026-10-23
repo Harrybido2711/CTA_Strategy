@@ -1,0 +1,13 @@
+# what: lecture 5 residual test: beta to d ln(index) over the trailing window, regressed across assets each date on MOM and MACD 12/26; residual -> bar plot, IC, prop-signal book
+# sample_rows: WF quarters 2022Q1-2025Q2 unless the row says descriptive-from-2020
+# S1: ceil(2 ln v): VIX <= 20.1 / 20.1-33.1 / > 33.1; MOVE <= 90.0 / 90.0-148.4 / > 148.4
+# cuts: S1 data-free, D rolling 252-day tercile, S2 frozen per rung, S3 full-sample (look-ahead)
+# measurable: display flag: a state with fewer than 60 days (about a quarter) is marked not measurable; the flag was added after the first run showed cells of 0-15 days
+# macd: the conventional 12/26 cell, fixed a priori, since B0 retained no MACD band in 2022Q1-2025Q2
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+index,beta_window,regressors,spread_g5_g1,spread_t,monotone_g1_to_g5,residual_mean_ic,residual_ic_t,raw_beta_mean_ic,book_naive_1_ann_return,book_naive_1_sharpe,book_realistic_ann_return,book_realistic_sharpe
+VIX,126,"MOM, MACD",0.0009028001935390851,0.8361750096811428,False,-0.040154397337481905,-1.395032459038496,-0.05784732217768554,0.038124604552205066,0.34211541904922776,-0.015036430481582107,-0.13482195690202717
+VIX,126,"MOM, MACD, |MACD|",0.0003307820732758009,0.2891673722010837,False,-0.03997263241854583,-1.4477094824352008,-0.05784732217768554,0.01925057344893389,0.17536614459592761,-0.038086115648768445,-0.34673459084352476
+VIX,63,"MOM, MACD",-0.0008404590988922574,-0.7280134773109109,False,-0.04375715191128175,-1.553012823071009,-0.06512216167976198,0.004347332652698922,0.03890429926501292,-0.04693504131449912,-0.4198399917730126
+MOVE,126,"MOM, MACD",-0.0005964082836530275,-0.5558511845957713,False,-0.033219458915478735,-1.3774769140191538,-0.042528986506151896,-0.019782792844688292,-0.1840399806331256,-0.06302316358260208,-0.5859660406223761
+MOVE,63,"MOM, MACD",-0.0014210064454018715,-1.3405398202388894,False,-0.04324154155593486,-1.9055344258719338,-0.054330384762533115,-0.03435326697381776,-0.33422372342645895,-0.07832597475974813,-0.7618253733037619

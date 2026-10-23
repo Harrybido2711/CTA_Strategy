@@ -1,0 +1,17 @@
+# what: B0's mean daily return per rolling-252-day quintile of each index (homework B, second cut)
+# sample_rows: WF quarters 2022Q1-2025Q2 unless the row says descriptive-from-2020
+# S1: ceil(2 ln v): VIX <= 20.1 / 20.1-33.1 / > 33.1; MOVE <= 90.0 / 90.0-148.4 / > 148.4
+# cuts: S1 data-free, D rolling 252-day tercile, S2 frozen per rung, S3 full-sample (look-ahead)
+# measurable: display flag: a state with fewer than 60 days (about a quarter) is marked not measurable; the flag was added after the first run showed cells of 0-15 days
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+index,book,quintile,mean_bp_per_day,se_bp,t,ann_return,days,measurable
+VIX,B0 realistic,1.0,7.052658164698013,4.575974101138707,1.5412364687429057,0.17772698575038992,254,True
+VIX,B0 realistic,2.0,-11.966996507494596,7.909313467792406,-1.5130259479821506,-0.3015683119888638,119,True
+VIX,B0 realistic,3.0,-12.65585397825963,7.120085785503005,-1.777486165128493,-0.31892752025214266,118,True
+VIX,B0 realistic,4.0,-8.497070950173935,6.415876203100853,-1.324381998840193,-0.21412618794438318,168,True
+VIX,B0 realistic,5.0,2.130670732191565,7.716631531454267,0.2761140950564503,0.05369290245122744,216,True
+MOVE,B0 realistic,1.0,2.124270933471925,4.237114819401303,0.501348446765028,0.05353162752349252,231,True
+MOVE,B0 realistic,2.0,-8.846601913428644,6.952301586114431,-1.272470965744298,-0.22293436821840185,162,True
+MOVE,B0 realistic,3.0,4.619587615718472,7.019108829202136,0.6581444636531703,0.1164136079161055,97,True
+MOVE,B0 realistic,4.0,-3.8883695877638202,7.118592920880609,-0.546227271453922,-0.09798691361164827,134,True
+MOVE,B0 realistic,5.0,-4.294768012310578,6.825030502169495,-0.6292672261238079,-0.10822815391022657,251,True

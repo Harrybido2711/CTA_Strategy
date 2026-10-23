@@ -1,0 +1,11 @@
+{
+  "what": "B0's mean daily return per rolling-252-day quintile of each index (homework B, second cut)",
+  "sample_rows": "WF quarters 2022Q1-2025Q2 unless the row says descriptive-from-2020",
+  "S1": "ceil(2 ln v): VIX <= 20.1 / 20.1-33.1 / > 33.1; MOVE <= 90.0 / 90.0-148.4 / > 148.4",
+  "cuts": "S1 data-free, D rolling 252-day tercile, S2 frozen per rung, S3 full-sample (look-ahead)",
+  "measurable": "display flag: a state with fewer than 60 days (about a quarter) is marked not measurable; the flag was added after the first run showed cells of 0-15 days",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "01792ac",
+  "written": "2026-10-23T14:37:27",
+  "rows": 10
+}

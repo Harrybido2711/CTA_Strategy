@@ -105,3 +105,58 @@ def corner_difference(per_date, a=("high", "low"), b=("low", "high")):
     se = M.newey_west_se(d, C.NW_LAG)
     return {"corner_a": "/".join(a), "corner_b": "/".join(b), "diff_bp": float(d.mean() * 1e4),
             "se_bp": float(se * 1e4), "t": float(d.mean() / se) if se > 0 else np.nan, "dates": int(len(d))}
+
+
+# ----------------------------------------------------------------------------- market-wide (VIX, MOVE)
+def index_labels(v, cal, rungs, end):
+    """Three-bucket labels of one market-wide index under the four cuts (DATA 6.1).
+
+    S1 data-free:  ceil(2 ln v) merged into three by the index's own cut points
+    D  rolling:    tercile of the rank against the trailing 252 days
+    S2 frozen:     terciles over each rung's training window, applied to its test quarter
+    S3 full:       terciles over the history up to `end` (look-ahead)
+    """
+    name = v.name
+    g = np.ceil(2 * np.log(v))
+    if name == "VIX":       # <= 20.1, 20.1-33.1, > 33.1
+        s1 = pd.Series(np.where(g <= 6, 0, np.where(g == 7, 1, 2)), index=v.index)
+    else:                   # MOVE: <= 90.0, 90.0-148.4, > 148.4
+        s1 = pd.Series(np.where(g <= 9, 0, np.where(g == 10, 1, 2)), index=v.index)
+    pct = v.rolling(252, min_periods=126).rank(pct=True)
+    d = pd.Series(np.where(pct <= 1 / 3, 0, np.where(pct <= 2 / 3, 1, 2)), index=v.index).where(pct.notna())
+    s2 = pd.Series(np.nan, index=v.index)
+    q = cal.to_period("Q")
+    for r in rungs:
+        tq = pd.Period(r["test_q"], "Q")
+        ref = v[q.isin([tq - 4, tq - 3, tq - 2])]
+        lo, hi = ref.quantile(1 / 3), ref.quantile(2 / 3)
+        x = v.iloc[r["test"]]
+        s2.iloc[r["test"]] = np.where(x <= lo, 0, np.where(x <= hi, 1, 2))
+    ref = v.loc[:end]
+    lo, hi = ref.quantile(1 / 3), ref.quantile(2 / 3)
+    s3 = pd.Series(np.where(v <= lo, 0, np.where(v <= hi, 1, 2)), index=v.index)
+    return {"S1 data-free": s1.where(v.notna()), "D rolling": d, "S2 frozen per rung": s2,
+            "S3 full-sample LOOKAHEAD": s3.where(v.notna())}
+
+
+def index_quintile_rolling(v, n=252, minp=126):
+    pct = v.rolling(n, min_periods=minp).rank(pct=True)
+    return np.ceil(pct * 5).clip(1, 5).where(pct.notna())
+
+
+def returns_by_state(r, labels_a, labels_b=None, names=("low", "mid", "high")):
+    """Mean daily return of a book in each state (or each pair of states), NW SE and day counts."""
+    rows = []
+    keys_a = sorted(pd.Series(labels_a).dropna().unique())
+    keys_b = [None] if labels_b is None else sorted(pd.Series(labels_b).dropna().unique())
+    for a in keys_a:
+        for b in keys_b:
+            m = (labels_a == a) if b is None else (labels_a == a) & (labels_b == b)
+            x = r[m.reindex(r.index).fillna(False)].dropna()
+            se = M.newey_west_se(x, C.H)
+            rows.append({"a": a, "b": b, "mean_bp_per_day": float(x.mean() * 1e4) if len(x) else np.nan,
+                         "se_bp": float(se * 1e4) if len(x) > 1 else np.nan,
+                         "t": float(x.mean() / se) if len(x) > 1 and se > 0 else np.nan,
+                         "ann_return": float(x.mean() * 252) if len(x) else np.nan, "days": int(len(x)),
+                         "measurable": int(len(x)) >= 60})
+    return pd.DataFrame(rows)
