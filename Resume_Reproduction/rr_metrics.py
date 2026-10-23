@@ -184,3 +184,51 @@ def win_rate(score, fwd, dead=0.1):
                       "win_rate_relative": win_rel, "excess_relative": win_rel - 0.5,
                       "share_excluded": float(1 - keep.sum().sum() / (s.notna() & f.notna()).sum().sum()),
                       "dates": int(hit.mean(axis=1).notna().sum())})
+
+
+# ----------------------------------------------------------------------------- robustness
+def stationary_bootstrap_indices(n, mean_block, n_draws=2000, seed=0):
+    """Politis-Romano stationary bootstrap: blocks of geometric length with mean `mean_block`."""
+    rng = np.random.default_rng(seed)
+    p = 1.0 / mean_block
+    idx = np.empty((n_draws, n), dtype=np.int64)
+    idx[:, 0] = rng.integers(0, n, size=n_draws)
+    jump = rng.random((n_draws, n)) < p
+    fresh = rng.integers(0, n, size=(n_draws, n))
+    for t in range(1, n):
+        idx[:, t] = np.where(jump[:, t], fresh[:, t], (idx[:, t - 1] + 1) % n)
+    return idx
+
+
+def sharpe_rows(x):
+    """Annualised Sharpe of every row of a 2-D array."""
+    sd = x.std(axis=1, ddof=1)
+    return np.where(sd > 0, x.mean(axis=1) / sd * np.sqrt(ANN), np.nan)
+
+
+def deflated_sharpe(r, trial_sharpes_daily, n_trials):
+    """Bailey & Lopez de Prado's deflated Sharpe ratio for a daily return series r.
+
+    SR0 is the expected maximum Sharpe of n_trials unskilled strategies whose Sharpes vary as the
+    trials did; DSR is the probability that the true Sharpe exceeds it, given skew and kurtosis.
+    """
+    from scipy.stats import kurtosis, norm, skew
+    x = pd.Series(r).dropna().to_numpy()
+    T = len(x)
+    sr = x.mean() / x.std(ddof=1)
+    v = float(np.var(trial_sharpes_daily, ddof=1))
+    e = 0.5772156649
+    n = max(int(n_trials), 2)
+    sr0 = np.sqrt(v) * ((1 - e) * norm.ppf(1 - 1 / n) + e * norm.ppf(1 - 1 / (n * np.e)))
+    g3, g4 = skew(x), kurtosis(x, fisher=False)
+    z = (sr - sr0) * np.sqrt(T - 1) / np.sqrt(1 - g3 * sr + (g4 - 1) / 4 * sr ** 2)
+    return {"sharpe_daily": float(sr), "sr0_daily": float(sr0), "dsr": float(norm.cdf(z)), "n_trials": n, "days": T}
+
+
+def effective_trials(series, cutoff):
+    """Greedy clustering: a trial joins the first cluster whose representative it correlates with above cutoff."""
+    reps = []
+    for s in series:
+        if not any(np.corrcoef(s, r)[0, 1] > cutoff for r in reps):
+            reps.append(s)
+    return len(reps)
