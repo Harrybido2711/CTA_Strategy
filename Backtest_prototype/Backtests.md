@@ -136,16 +136,17 @@ The prototype's mechanics, extended and re-run as a walk-forward study, live in
 then adds next-close fills, 5 bp + 2 bp friction, a deadband, and books built from momentum, MACD,
 models and an optimizer.
 
-Headline, 18 walk-forward quarters 2022Q1 → 2026Q2, realistic execution:
+Two rounds. **Round 1** ranked the ETFs against each other daily on a 21-day signal, held five
+days, and lost after costs: B0 returns −6.3% a year (Sharpe −0.41) on 39 turns a year. **Round 2**
+follows the paper in `References/`: each ETF's own 12-month excess return, sized at 40% / σ and
+held a month. After costs and in excess of bills, 2021-02 → 2026-06:
 
-| Book | Annual return | Sharpe | Turnover per unit gross |
-| --- | --- | --- | --- |
-| B0, momentum + MACD band | −6.3% | −0.41 | 38.9 |
-| B0 before costs | −1.2% | −0.08 | 38.9 |
-| B1, the rebuild | −4.7% | −0.45 | 37.2 |
-| Optimizer with a turnover penalty | +2.2% | +0.20 | 15.1 |
+| Book | Excess return | Sharpe | Max drawdown | Turnover a year |
+| --- | --- | --- | --- | --- |
+| T0, the paper | +4.8% | 0.32 | −0.42 | 11.1 |
+| T1, T0 scaled to 10% book volatility | +4.5% | 0.46 | −0.22 | 11.0 |
 
-Friction, not the signal, decides these numbers. The full table, the claims ledger and every
+The horizon, not the code, separates the two rounds. The full table, the claims ledger and every
 regenerating command are in [`RESULTS.md`](../Resume_Reproduction/RESULTS.md):
 
 ```bash

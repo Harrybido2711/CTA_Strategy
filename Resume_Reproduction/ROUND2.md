@@ -101,3 +101,18 @@ Continuous inverse-volatility scaling, in T1 and T3, is the adjustment that help
 
 T3 was frozen with m = 1 before Test was read. It is reported beside T0–T2 and labelled as an
 amendment.
+
+## Status after the Test read (2026-10-23)
+
+The read ran at commit `deeeb61`; the numbers are in `RESULTS.md` § Round 2. In short, over
+2021-02 → 2026-06, after costs and in excess of bills:
+
+| Book | Excess return | Sharpe | Max drawdown | Sharpe on Test |
+| --- | --- | --- | --- | --- |
+| T0, the paper | +4.8% | 0.32 | −0.42 | 1.06 |
+| T1, 10% volatility target | +4.5% | 0.46 | −0.22 | 1.23 |
+| T2 / T3, the VIX overlays (m = 1) | +4.3% to +4.5% | 0.43 to 0.45 | −0.23 | 1.25 |
+
+T1 − T0 in Sharpe has a 90% bootstrap CI of −0.04 to +0.34 over the record, and +0.003 to +0.35 on
+Test. Monthly rebalancing holds turnover near 11 turns a year, so a deadband has little left to
+trim.

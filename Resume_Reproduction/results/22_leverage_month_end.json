@@ -1,0 +1,8 @@
+{
+  "round": "2",
+  "what": "month-end leverage of T1 relative to T0, and gross exposure",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "fac7226",
+  "written": "2026-10-23T16:11:59",
+  "rows": 65
+}

@@ -1,5 +1,115 @@
 # Resume Reproduction — Results
 
+Two rounds were run on 2026-10-23. **Round 2 is the current answer.**
+
+- **Round 1** tested short-horizon cross-sectional momentum: a 21-day signal, a five-day hold,
+  ranked across assets every day. It is kept below as a record.
+- **Round 2** tests time-series momentum as the paper in `References/` defines it: Moskowitz, Ooi
+  and Pedersen (2012), a 12-month look-back and a 1-month hold. It adds the volatility targeting
+  and regime analysis Harry asked for. Its plan is `ROUND2.md`, committed before any Round 2 number
+  existed.
+
+**Sample:** 37 liquid US-listed ETFs as futures proxies, daily, total-return prices, returns in
+excess of the 3-month bill (DTB3 × net exposure). **Execution:** next-close fill, 5 bp per side
+plus 2 bp slippage, $1 of capital. **Record:** 2021-02 → 2026-06, 65 monthly rebalances.
+**Test:** 2025-07 → 2026-06, read at commit `deeeb61`. That is the second look at those quarters:
+Round 1 read them first, for different books.
+
+## Round 2 — time-series momentum
+
+### Bottom line
+
+- **The paper's strategy works on this data.** T0, the sign of each ETF's 12-month excess return
+  sized at 40% / σ and held a month, earns +4.8% a year in excess of bills after costs. Its Sharpe
+  is 0.32 over 2021-02 → 2026-06 and 1.06 on Test. Look-backs of 6–12 months earn; 1–3 months lose,
+  as in the paper.
+- **Execution now costs a defined share of the return.** It costs 12% of the next-close naive
+  return over the record, and 23% before Test. Against the same-close naive return the figures are
+  17% and 35%.
+- **Volatility targeting is the leverage adjustment that works.** T1 scales the whole book to 10%
+  ex-ante volatility. That lifts the Sharpe from 0.32 to 0.46 and halves the drawdown, from −0.42
+  to −0.22.
+- **Cutting leverage on a high-VIX state does not work.** That holds whether the cut is set at
+  month-ends (T2) or every day (T3). T0 does lose heavily while VIX is high, but by the time the
+  state reads high the drawdown has happened.
+
+### Books, after costs, in excess of bills
+
+| Book | Record: excess return | Record: Sharpe | Record: max drawdown | Test: Sharpe | Turnover a year | Mean gross |
+| --- | --- | --- | --- | --- | --- | --- |
+| T0, the paper, before costs | +5.6% | 0.37 | −0.41 | 1.13 | 11.1 | 2.84 |
+| **T0, the paper** | **+4.8%** | **0.32** | **−0.42** | **1.06** | 11.1 | 2.84 |
+| **T1, 10% volatility target** | **+4.5%** | **0.46** | **−0.22** | **1.23** | 11.0 | 2.00 |
+| T2, T1 + month-end VIX cut (m = 1) + deadband | +4.5% | 0.45 | −0.23 | 1.25 | 10.7 | 2.00 |
+| T3, daily leverage, VIX cut (m = 1) | +4.3% | 0.43 | −0.23 | 1.25 | 12.0 | 1.99 |
+
+On the pre-Test window alone, 2021-02 → 2025-06, T0's Sharpe is 0.17 and T1's 0.28. The record's
+standard error on a Sharpe is about 0.43, so these are point estimates, not proofs. T0's 90%
+bootstrap CI runs from −0.35 to +1.01, and T1's from −0.22 to +1.17.
+
+### The four bullets, measured again
+
+| Resume claim | Round 2 measurement | Verdict |
+| --- | --- | --- |
+| Momentum and MACD signals, engine with Sharpe, drawdown, turnover, IC, win rate | TSMOM per the paper, with every metric computed. MACD is not part of Round 2 | the momentum half holds |
+| Over 25% of naive returns lost to execution | 23% of the next-close naive return (35% against same-close) before Test; 12% (17%) over the record; 5% (2%) on Test | **holds before Test against the same-close base; about 12–17% over the whole record** |
+| Trend works best in high-volume, low-volatility regimes | Market level: T0 earns +17% a year when VIX is low, +16% mid, −21% high (426 days). Per asset: high-volume / low-σ beats low-volume / high-σ by +0.82% a month, t 1.35, positive in 4 of 6 periods | **the volatility half is strongly supported; the volume half leans the right way but is not "consistent"** |
+| +8% out-of-sample Sharpe from regime-aware features, volatility scaling and turnover controls | T1 − T0: +0.14 of Sharpe over the record (+44% relative), 90% CI −0.04 to +0.34. On Test: +0.17, CI +0.003 to +0.35 | **volatility scaling more than covers +8%, but the record's CI touches zero; the regime overlay added nothing** |
+| −14% annual turnover | T1 leaves turnover unchanged (CI −9.6% to +7.2%); T2's deadband trims it 2–3% | **not reproduced: monthly rebalancing already keeps turnover at about 11 turns a year** |
+
+### Regime analysis (Harry's request)
+
+| VIX state | Days | T0 excess a year | T0 Sharpe | T1 excess a year | T1 Sharpe |
+| --- | --- | --- | --- | --- | --- |
+| low tercile of the trailing year | 596 | +17% | 1.45 | +13% | 1.76 |
+| mid | 336 | +16% | 1.10 | +15% | 1.60 |
+| high | 426 | −21% | −1.12 | −15% | −1.13 |
+
+- **The pattern holds on Test alone.** Low: +46.5%, mid: +41.9%, high: −58.6% a year, on 83, 96 and 71 days.
+- **T1 already de-levers in loud markets.** Its gross fell to about 1× in late 2022 while T0 stayed
+  between 2× and 3×; see `figures/rr2-leverage-path`.
+- **A further cut on high-VIX days lowered the Sharpe every time it was tried.** With m = 0.5, T3's
+  pre-Test Sharpe falls from +0.25 to −0.18 and turnover rises from 11 to 28 turns a year. The
+  loss happens while VIX is rising; cutting after the state flips sells the bottom and misses the
+  recovery.
+
+### Robustness
+
+| Check | T0 Sharpe, record | T1 Sharpe, record |
+| --- | --- | --- |
+| Headline | 0.32 | 0.46 |
+| Cost grid: 2–10 bp, slip 0–5 bp, borrow 0–50 bp/yr | 0.22 to 0.35 | 0.32 to 0.51 |
+| Price return, no distributions | 0.47 | 0.64 |
+| Without the 7 bond ETFs | 0.33 | 0.44 |
+| Data truncated at 2025-12-04 | 0.25 | 0.38 |
+
+Every row stays positive. The full paper grid (k × h) on every sample is
+`results/21_tsmom_grid.csv`: Sharpe 0.32–0.39 for k = 6–12 months, negative for k = 1.
+
+### Figures
+
+| Figure | Shows |
+| --- | --- |
+| `figures/rr2-equity-curves-{light,dark}.png` | T0 before and after costs, T1, T3 |
+| `figures/rr2-regime-bars-{light,dark}.png` | excess return by VIX state |
+| `figures/rr2-leverage-path-{light,dark}.png` | T0 and T1 gross exposure, high-VIX days shaded |
+| `figures/rr2-tsmom-grid-{light,dark}.png` | the paper's look-back × holding grid, Sharpe after costs |
+| `figures/rr2-haircut-{light,dark}.png` | T0's return after each execution assumption |
+
+### Regenerate Round 2
+
+```bash
+.venv/bin/python Resume_Reproduction/run_20_round2.py          # pre-Test: grid, T0, T1, regimes, m for T2
+.venv/bin/python Resume_Reproduction/run_20b_round2_t3.py      # pre-Test: amendment 1, m for T3
+.venv/bin/python Resume_Reproduction/run_21_round2_test.py     # the Test read and robustness
+.venv/bin/python Resume_Reproduction/run_22_round2_reconcile.py
+.venv/bin/python Resume_Reproduction/make_rr_figures.py
+```
+
+---
+
+# Round 1 — short-horizon cross-sectional momentum (superseded)
+
 Measured on 2026-10-23. **Sample:** 37 liquid US-listed ETFs as futures proxies, daily bars,
 2020-01-02 → 2026-06-29, split-adjusted copy, price returns. **Out of sample:** 18 walk-forward
 quarters, 2022Q1 → 2026Q2. Each quarter is traded by choices made from the quarters before it
@@ -10,7 +120,7 @@ gross 2.
 This file is the authoritative home of every measured number. `OUTLINE.md` § 2 carries each
 claim's one-line status, and `results/` carries the tables behind it.
 
-## Bottom line
+## Round 1 bottom line
 
 None of the four resume bullets reproduces on this data. The reasons are measurable:
 

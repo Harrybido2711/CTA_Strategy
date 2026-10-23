@@ -1,0 +1,8 @@
+{
+  "round": "2",
+  "what": "daily excess returns (DTB3 x net) of the frozen books, gross and net exposure, VIX state; re-evaluated for plotting",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "fac7226",
+  "written": "2026-10-23T16:11:59",
+  "rows": 1358
+}
