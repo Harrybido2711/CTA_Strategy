@@ -1,0 +1,13 @@
+# round: 2 (time-series momentum, ROUND2.md)
+# prices: total return; excess of DTB3
+# last_month_end: 2025-05-30
+# sharpe: excess of DTB3 x net exposure
+# execution: realistic = next close, 5 bp + 2 bp; naive_1 = next close, no cost; naive_0 = same close
+# what: T2's high-VIX leverage multiplier: chosen on the choice window by Sharpe, one-SE rule toward 1.0; OV column is the confirmation
+# chosen: 1.0
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+m,sharpe_choice_window,shortfall_vs_best,se_shortfall,within_one_se,sharpe_OV,turnover_choice_window,chosen
+1.0,0.3718117386653927,0.0,0.0,True,-0.0218440676751665,9.206725148724718,True
+0.75,0.27053810059506217,0.10127363807033052,0.0671997060735459,False,-0.10860056592095484,8.593150163682735,False
+0.5,0.11813527634110257,0.2536764623242901,0.1555375507598903,False,-0.24974114196126582,9.361304397570139,False
+0.25,-0.0854970843728733,0.457308823038266,0.2665401217296469,False,-0.48685498036722186,10.19621850644229,False

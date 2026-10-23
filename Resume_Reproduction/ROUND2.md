@@ -79,3 +79,25 @@ evidence than a first, and the results say so.
   from zero at 90%.
 - **Regime splits.** A regime tercile holds about 20 months. Treat every regime comparison as
   descriptive unless its CI says otherwise.
+
+## Amendment 1 — T3, added after the pre-Test regime analysis (2026-10-23)
+
+**What the pre-Test analysis showed.** T0 earns +12.4% a year when VIX is in the low tercile of
+its trailing year and −14.0% in the high tercile (`results/20_regime_returns.csv`). Yet the
+pre-registered rule chose m = 1 for T2: cutting leverage at month-ends in the high-VIX state
+lowered the Sharpe. A month-end state does not predict the next month, because the losses happen
+while VIX is high.
+
+**What was added.** T3 keeps T0's monthly directions and per-asset sizing, but re-sets two things
+every day from that close's information: the book leverage, to 10% ex-ante volatility, and the
+high-VIX multiplier m. A 0.5% deadband limits the trading. m comes from the same grid by the same
+one-SE rule on the same pre-Test window.
+
+**Result, pre-Test** (`results/20b_t3_multiplier.csv`). The rule again chooses m = 1, so T3 is
+daily volatility targeting with no VIX overlay. Any m below 1 lowers the Sharpe and raises
+turnover: m = 0.5 gives a Sharpe of −0.18 against +0.25, on 28 turns a year against 11. In this
+sample, de-leveraging on a VIX state cuts exposure after the drawdown and misses the recovery.
+Continuous inverse-volatility scaling, in T1 and T3, is the adjustment that helps.
+
+T3 was frozen with m = 1 before Test was read. It is reported beside T0–T2 and labelled as an
+amendment.

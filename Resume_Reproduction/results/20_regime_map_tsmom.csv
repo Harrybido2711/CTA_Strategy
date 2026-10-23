@@ -1,0 +1,19 @@
+# round: 2 (time-series momentum, ROUND2.md)
+# prices: total return; excess of DTB3
+# last_month_end: 2025-05-30
+# sharpe: excess of DTB3 x net exposure
+# execution: realistic = next close, 5 bp + 2 bp; naive_1 = next close, no cost; naive_0 = same close
+# what: sign(12-month excess return) x next-month excess return, per volume x sigma cell, rolling cut
+# corner: HV/LV - LV/HV = +0.645% per month, t +0.84, 20 months
+# corner_by_year: 2021:+1.74% 2022:+0.33% 2023:+2.95% 2024:-2.14% 2025:-1.07%
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+volume,sigma,signal_weighted_pct_per_month,se_pct,t,months,asset_months,episodes
+low,low,0.6119803023728344,0.7708081130303631,0.7939463687880615,47,368,238
+low,mid,-0.2635489075119822,0.4340758015691266,-0.6071495037486258,45,238,187
+low,high,0.18071040320081544,0.531883299757693,0.33975573830413675,32,147,101
+mid,low,0.6788877133684683,0.6285889160339895,1.080018587747034,44,218,174
+mid,mid,1.0510900022174308,0.8969397138811012,1.1718624852380701,48,166,152
+mid,high,0.4633501559560558,0.5866543579736339,0.7898179731529075,38,152,125
+high,low,0.5970779553319553,0.40802076489395467,1.463351884767769,39,171,119
+high,mid,-1.5248713105543508,0.8991284695648355,-1.6959437523898728,46,178,146
+high,high,-0.3895987037791541,0.9513966785353954,-0.4095018540309731,43,316,190

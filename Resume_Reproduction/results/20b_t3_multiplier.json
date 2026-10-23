@@ -1,0 +1,11 @@
+{
+  "round": "2, amendment 1 (ROUND2.md)",
+  "what": "T3: daily book leverage to 10% vol and a daily high-VIX multiplier m; m chosen on 2021-02..2024-06 by Sharpe, one-SE rule toward 1.0",
+  "chosen": 1.0,
+  "execution": "next close, 5 bp + 2 bp, deadband 0.5% of capital every day",
+  "sharpe": "excess of DTB3 x net",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "4cc0535",
+  "written": "2026-10-23T16:09:00",
+  "rows": 5
+}

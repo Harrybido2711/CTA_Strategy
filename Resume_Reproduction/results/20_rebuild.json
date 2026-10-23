@@ -1,0 +1,12 @@
+{
+  "round": "2 (time-series momentum, ROUND2.md)",
+  "prices": "total return; excess of DTB3",
+  "last_month_end": "2025-05-30",
+  "sharpe": "excess of DTB3 x net exposure",
+  "execution": "realistic = next close, 5 bp + 2 bp; naive_1 = next close, no cost; naive_0 = same close",
+  "what": "T1 and T2 against T0, realistic; T2's m was chosen on the choice window, so OV is its out-of-sample row",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "4cc0535",
+  "written": "2026-10-23T16:07:52",
+  "rows": 6
+}

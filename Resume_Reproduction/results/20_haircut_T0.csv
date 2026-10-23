@@ -1,0 +1,11 @@
+# round: 2 (time-series momentum, ROUND2.md)
+# prices: total return; excess of DTB3
+# last_month_end: 2025-05-30
+# sharpe: excess of DTB3 x net exposure
+# execution: realistic = next close, 5 bp + 2 bp; naive_1 = next close, no cost; naive_0 = same close
+# what: T0 haircut, raw PnL per $1 (not excess), stated order naive_0 -> delay -> cost -> slippage
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+window,naive_0_ann_bp,delay_bp,cost_bp,slip_bp,realistic_ann_bp,H_1,H_0,note
+record 2021-02..2025-06,377.40675626055065,-58.35233191973179,-52.59658366050057,-21.03863346419821,245.41920721612007,0.2307920263974791,0.3497222740583642,
+choice window 2021-02..2024-06,256.8277362777331,-40.579072532053814,-46.78656847031953,-18.71462738812801,150.74746788723172,0.30289757505961135,0.41304054588475736,
+OV 2024-07..2025-06,791.2339528415807,-119.35015813824262,-72.53655579320191,-29.01462231727114,570.3326165928651,0.15114396107039862,0.27918586589388195,
