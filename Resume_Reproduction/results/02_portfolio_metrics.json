@@ -1,0 +1,10 @@
+{
+  "what": "every book under naive_0 (same close, no cost), naive_1 (next close, no cost) and realistic (next close, 5 bp + 2 bp)",
+  "samples": "WF = 2022Q1-2025Q2; train-ladder = 2022Q1-2024Q2; OV = 2024Q3-2025Q2",
+  "capital": "$1 constant notional; returns additive; drawdown in units of initial capital",
+  "rf": "sharpe_rf0 and sharpe_dtb3 (DTB3 x net exposure) side by side",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "1d681c8",
+  "written": "2026-10-23T14:30:52",
+  "rows": 63
+}

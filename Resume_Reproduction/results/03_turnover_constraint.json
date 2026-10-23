@@ -1,0 +1,13 @@
+{
+  "what": "B0 with a deadband of k x the per-rung median daily |dw_held| (C11)",
+  "realistic": "lag 1 trading row, next close, 5 bp per side + 2 bp slippage, no borrow",
+  "H_1": "1 - realistic / naive_1 (feasible frictionless); undefined when naive_1 <= 0",
+  "H_0": "1 - realistic / naive_0 (same-close, non-executable benchmark)",
+  "samples": "WF = 2022Q1-2025Q2; train-ladder = 2022Q1-2024Q2; OV = 2024Q3-2025Q2",
+  "per_rung_scale": "2022Q1:0.00557 2022Q2:0.00558 2022Q3:0.00531 2022Q4:0.00541 2023Q1:0.00532 2023Q2:0.00554 2023Q3:0.00514 2023Q4:0.00517 2024Q1:0.00578 2024Q2:0.00591 2024Q3:0.00569 2024Q4:0.00529 2025Q1:0.00579 2025Q2:0.00552",
+  "sample_rows": "WF 2022Q1-2025Q2",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "1d681c8",
+  "written": "2026-10-23T14:32:15",
+  "rows": 5
+}

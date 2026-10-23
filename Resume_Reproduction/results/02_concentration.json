@@ -1,0 +1,7 @@
+{
+  "what": "largest weight, Herfindahl and PnL share by category, realistic, WF 2022Q1-2025Q2",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "1d681c8",
+  "written": "2026-10-23T14:30:52",
+  "rows": 7
+}

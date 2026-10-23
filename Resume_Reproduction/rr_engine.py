@@ -11,7 +11,8 @@ each piece a parameter:
     cost_bp      bp of traded dollars, per side
     slip_bp      bp of traded dollars: the fill moved against the trade
     borrow_bp    bp per year on the short gross, charged daily
-    deadband     no trade in an asset whose current weight is within this of its target
+    deadband     no trade in an asset whose current weight is within this of its target; a scalar,
+                 or a Series on the calendar when the threshold is re-set each quarter
 
 The prototype corresponds to lag=2, exec_price='twap', size_price='prev_close' and no frictions
 (tests/test_parity.py). Missing bars (the 2022 vendor gap) are carried: no trade, no cost, the
@@ -58,6 +59,10 @@ def simulate(open_, close, w_target, lag=1, exec_price="close", size_price="exec
     out_trade_dollars = np.zeros((T, N))
 
     c_rate, s_rate, b_rate = cost_bp / 1e4, slip_bp / 1e4, borrow_bp / 1e4 / 252.0
+    if np.ndim(deadband) == 0:
+        DB = np.full(T, float(deadband))
+    else:
+        DB = pd.Series(deadband).reindex(idx).fillna(0.0).to_numpy(float)
     for t in range(T):
         w_fill = W[t - lag] if t - lag >= 0 else np.zeros(N)
         a = avail[t]
@@ -73,8 +78,8 @@ def simulate(open_, close, w_target, lag=1, exec_price="close", size_price="exec
             target_sh = w_fill * capital / ps
             w_cur = shares * pf / capital
         tradable = a & np.isfinite(target_sh) & np.isfinite(pf)
-        if deadband > 0:
-            tradable &= np.abs(w_fill - np.nan_to_num(w_cur)) >= deadband
+        if DB[t] > 0:
+            tradable &= np.abs(w_fill - np.nan_to_num(w_cur)) >= DB[t]
         trade = np.where(tradable, target_sh - shares, 0.0)
         traded_dollars = np.where(tradable, np.abs(trade) * pf, 0.0)
         exec_cash = np.where(tradable, trade * pf, 0.0)
@@ -115,5 +120,6 @@ def simulate(open_, close, w_target, lag=1, exec_price="close", size_price="exec
         "shares": F(out_shares), "w_held": F(out_wheld), "pnl_asset": F(out_pnl_asset),
         "trade_dollars": F(out_trade_dollars),
         "params": dict(lag=lag, exec_price=exec_price, size_price=size_price, cost_bp=cost_bp,
-                       slip_bp=slip_bp, borrow_bp=borrow_bp, deadband=deadband, capital=capital),
+                       slip_bp=slip_bp, borrow_bp=borrow_bp,
+                       deadband=deadband if np.ndim(deadband) == 0 else "per-quarter series", capital=capital),
     }

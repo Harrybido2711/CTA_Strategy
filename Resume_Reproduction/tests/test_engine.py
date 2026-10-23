@@ -63,3 +63,11 @@ def test_constant_dollar_rebalances_with_price():
     r = simulate(o, c, w, lag=0)
     assert r["w_held"]["A"].to_numpy() == pytest.approx([1.0, 1.0, 1.0])
     assert r["pnl_net"].to_numpy() == pytest.approx([0.0, 0.1, 0.1])
+
+
+def test_deadband_can_change_over_time():
+    c, o, w = one_asset([100.0] * 20, [0.50, 0.51] * 10)
+    db = pd.Series([0.05] * 10 + [0.0] * 10, index=c.index)
+    r = simulate(o, c, w, lag=0, deadband=db)
+    assert r["turnover_exec"].iloc[:10].sum() == pytest.approx(0.50)
+    assert r["turnover_exec"].iloc[10:].sum() == pytest.approx(9 * 0.01)   # row 10 already sits at 0.50

@@ -90,8 +90,31 @@ free**, and a real short book only behaves this way if it is actually rebalanced
 
 ## Results & Caveats
 
-Over 2020-01 → 2026-06 both portfolios post near-zero Sharpe. Expected — a fast weekly
-cross-sectional momentum on 37 ETFs is not supposed to be profitable; the exercise is the mechanics.
+**Corrected 2026-10-23: the Sharpe ratios are not near zero.** As coded (frictionless, filled at
+TWAP two rows after the signal, r_f = 0), over 2020-01 → 2026-06 on the data as it stands:
+
+| Book | Cumulative PnL per $1 | Sharpe, r_f = 0 | Sharpe, DTB3 on the net |
+| --- | --- | --- | --- |
+| Portfolio 1 (150/50) | +0.490 | 0.42 | 0.27 |
+| Portfolio 2 (relative MOM) | +0.210 | 0.27 | 0.26 |
+
+Portfolio 1 runs +100% net through a rising market, so most of its Sharpe is market beta, and a
+third of it goes once the bill rate is charged. Reproduce the first column and the r_f = 0 Sharpe
+with `cd Backtest_prototype && python backtest.py`; the DTB3 column is
+`Resume_Reproduction/DATA.md` § 5.
+
+Two artefacts move these numbers a little: on the 2022 vendor-gap days the summed cumulative PnL
+dips by up to 6.6% of capital and recovers next day, which inflates the daily volatility, and the
+unadjusted 2025-12-05 split costs Portfolio 1 about 0.04 per $1. Neither is a trading result.
+
+**Under realistic execution both books lose.** With the next close as the fill, 5 bp per side and
+2 bp slippage, on 2022Q1 → 2025Q2, both have negative returns; each turns its gross book over
+about 31 to 40 times a year, so friction alone costs several percent a year:
+
+```bash
+.venv/bin/python Resume_Reproduction/run_02_portfolios.py   # -> results/02_portfolio_metrics.csv
+.venv/bin/python Resume_Reproduction/run_03_haircut.py      # -> results/03_haircut_*.csv
+```
 
 **Vertical steps in the equity curve come from the data, not a code bug.** Status as of 2026-07-31:
 

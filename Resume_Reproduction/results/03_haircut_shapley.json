@@ -1,0 +1,11 @@
+{
+  "what": "Shapley attribution of naive_0 -> realistic over delay (0->1), cost (0->5), slip (0->2)",
+  "realistic": "lag 1 trading row, next close, 5 bp per side + 2 bp slippage, no borrow",
+  "H_1": "1 - realistic / naive_1 (feasible frictionless); undefined when naive_1 <= 0",
+  "H_0": "1 - realistic / naive_0 (same-close, non-executable benchmark)",
+  "samples": "WF = 2022Q1-2025Q2; train-ladder = 2022Q1-2024Q2; OV = 2024Q3-2025Q2",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "1d681c8",
+  "written": "2026-10-23T14:32:11",
+  "rows": 36
+}
