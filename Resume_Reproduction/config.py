@@ -104,3 +104,29 @@ OPTIMIZER = {
     "rule": "per (cap, tau) the gamma whose OV vol is closest to target_vol; then the one-SE rule on OV "
             "mean daily net return, simplest = lowest cap, then highest tau",
 }
+
+# ----------------------------------------------------------------------------- ROUND 2: time-series momentum (ROUND2.md)
+# Frozen 2026-10-23 before any Round 2 number was computed. Parameters are the paper's unless noted.
+ROUND2 = {
+    "source": "Moskowitz, Ooi and Pedersen (2012), Time Series Momentum, SSRN 2089463",
+    "month_days": 21,
+    "lookback_months": 12,                    # paper: k = 12 (TSMOM)
+    "holding_months": 1,                      # paper: h = 1
+    "lookback_grid_months": (1, 3, 6, 9, 12), # paper's Table 2 grid, truncated: 24+ months does not fit 2020-2026
+    "holding_grid_months": (1, 3),
+    "signal": "sign of the past k-month excess return, total-return prices minus DTB3",
+    "ewma_com_days": 60,                      # paper eq. 1: centre of mass 60 days
+    "annualise": 261,                         # paper eq. 1
+    "asset_vol_target": 0.40,                 # paper: 40% / sigma per instrument, averaged over 1/S
+    "asset_weight_cap": 0.50,                 # ours: no ETF above 0.5 of capital (SHY would be ~0.5 uncapped)
+    "gross_cap": 3.0,                         # ours: a margin account, not futures
+    "book_vol_target": 0.10,                  # ours: T1 scales the whole book to 10% ex-ante volatility
+    "book_cov_com_days": 60,
+    "regime_index": "VIX", "regime_cut": "D rolling 252-day tercile",
+    "regime_multiplier_grid": (1.0, 0.75, 0.5, 0.25),   # applied to T1's leverage in the high-VIX tercile
+    "regime_rule": "choose on 2021-02..2024-06 by excess-return Sharpe, one-SE rule toward 1.0; OV confirms",
+    "deadband": 0.005,                        # ours: T2 skips rebalance trades under 0.5% of capital
+    "prices": "total return (distributions reinvested); price return as a robustness row",
+    "rebalance": "signal at the last close of each month; trade at the next close (lag 1)",
+    "first_signal": "2021-01-29",             # first month-end with a full 12-month lookback
+}
