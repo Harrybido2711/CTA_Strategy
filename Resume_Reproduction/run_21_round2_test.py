@@ -191,7 +191,8 @@ def main():
     print(crd.round(3).to_string(index=False))
     b = pd.DataFrame(boot).query("mean_block == 21")
     print(b.round(3).to_string(index=False))
-    print(pd.DataFrame(chk).query("check in @list(@alts)").round(3).to_string(index=False))
+    ck = pd.DataFrame(chk)
+    print(ck[ck["check"].isin(list(alts))].round(3).to_string(index=False))
     print(pd.DataFrame(reg).query("cut == 'D rolling' and book == 'T0'").round(3).to_string(index=False))
 
 

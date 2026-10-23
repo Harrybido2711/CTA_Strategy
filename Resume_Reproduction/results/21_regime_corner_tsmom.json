@@ -1,0 +1,12 @@
+{
+  "round": "2 (ROUND2.md)",
+  "test_read": "Round 2 Test read at 2026-10-23T16:10:40, frozen at deeeb61; Round 1 had already read these quarters for other books",
+  "sharpe": "excess of DTB3 x net",
+  "execution": "realistic = next close, 5 bp + 2 bp",
+  "m": "T2 m=1.0, T3 m=1.0 (chosen pre-Test)",
+  "what": "HV/LV minus LV/HV, sign(12-month excess return) x next-month excess return, rolling cut",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "deeeb61",
+  "written": "2026-10-23T16:10:43",
+  "rows": 7
+}

@@ -1,0 +1,11 @@
+# round: 2 (ROUND2.md)
+# test_read: Round 2 Test read at 2026-10-23T16:10:40, frozen at deeeb61; Round 1 had already read these quarters for other books
+# sharpe: excess of DTB3 x net
+# execution: realistic = next close, 5 bp + 2 bp
+# m: T2 m=1.0, T3 m=1.0 (chosen pre-Test)
+# what: T0 haircut, raw PnL per $1, stated order
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+sample,naive_0_ann_bp,delay_bp,cost_bp,slip_bp,realistic_ann_bp,H_1,H_0,note
+full 2021-02..2026-06,680.2923094210553,-37.08018124525952,-55.592383925234095,-22.23695357009133,565.3827906804703,0.12100104162534375,0.16891197673302472,
+pre-Test 2021-02..2025-06,377.4067562605497,-58.35233191973077,-52.59658366050057,-21.03863346419821,245.41920721612007,0.2307920263974791,0.34972227405836254,
+Test 2025-07..2026-06,2022.6810810284162,57.197990543997115,-68.86977069853309,-27.547908279409654,1983.461392594471,0.04635734850923323,0.01938995168432811,

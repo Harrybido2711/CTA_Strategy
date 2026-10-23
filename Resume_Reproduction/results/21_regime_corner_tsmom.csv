@@ -1,0 +1,15 @@
+# round: 2 (ROUND2.md)
+# test_read: Round 2 Test read at 2026-10-23T16:10:40, frozen at deeeb61; Round 1 had already read these quarters for other books
+# sharpe: excess of DTB3 x net
+# execution: realistic = next close, 5 bp + 2 bp
+# m: T2 m=1.0, T3 m=1.0 (chosen pre-Test)
+# what: HV/LV minus LV/HV, sign(12-month excess return) x next-month excess return, rolling cut
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+period,corner_pct_per_month,t,months,periods_positive
+2021,1.7449381001721018,1.2404509079750223,6,
+2022,0.3280424137762015,0.31072664167404207,4,
+2023,2.953229444714595,7.35852863840229,4,
+2024,-2.1390379928586176,-5.438380750501009,4,
+2025H1,-0.015158928877094293,-0.010439392624727924,3,
+Test 2025H2-2026H1,1.253543198464079,2.865009594046973,5,
+full,0.8177232026634784,1.34565212145428,26,4 of 6
