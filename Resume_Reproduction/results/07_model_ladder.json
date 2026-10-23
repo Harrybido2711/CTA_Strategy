@@ -1,0 +1,10 @@
+{
+  "what": "every model on every rung: test-quarter MSE, MAE and IC",
+  "target": "forward return close_{t+1} -> close_{t+6}, raw (winsorised 1/99 only inside fitting windows)",
+  "units": "mse x 1e4, mae x 1e2 (percent)",
+  "sample_rows": "rungs 2022Q1-2025Q2; Test is W10",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "f66d769",
+  "written": "2026-10-23T14:40:59",
+  "rows": 168
+}

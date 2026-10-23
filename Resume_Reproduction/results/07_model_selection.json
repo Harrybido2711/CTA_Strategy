@@ -1,0 +1,11 @@
+{
+  "what": "outer layer: OV MSE per model, paired NW SE of the difference to the best, one-SE rule",
+  "order": "EW < Lasso f=0.7 < Lasso f=0.5 < Lasso f=0.1 < Lasso f=0.05 < Ridge l=10 < Ridge l=1 < Ridge l=0.1 < Ridge l=0.01 < OLS < HGB < CatBoost",
+  "best_by_mse": "Ridge l=0.1",
+  "chosen": "EW",
+  "sample_rows": "OV quarters 2024Q3-2025Q2",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "f66d769",
+  "written": "2026-10-23T14:40:59",
+  "rows": 12
+}

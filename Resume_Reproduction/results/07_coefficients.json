@@ -1,0 +1,7 @@
+{
+  "what": "standardised coefficients per rung for the linear models (coefficient path, WF 5.3)",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "f66d769",
+  "written": "2026-10-23T14:40:59",
+  "rows": 140
+}
