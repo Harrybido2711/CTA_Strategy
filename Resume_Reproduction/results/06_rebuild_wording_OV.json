@@ -1,0 +1,19 @@
+{
+  "written": "before any Test quarter is read (W7)",
+  "deadband": {
+    "d_sharpe": 0.029002898875692962,
+    "d_turnover_pct": -0.06678256276729533
+  },
+  "vol scaling (after deadband)": {
+    "d_sharpe": 0.10296519441741658,
+    "d_turnover_pct": -0.03316749932761254
+  },
+  "regime (after both)": {
+    "d_sharpe": -0.05663472464788466,
+    "d_turnover_pct": 0.028143387973317946
+  },
+  "B1 vs B0 on OV": {
+    "d_sharpe": 0.07533336864522489,
+    "d_turnover_pct": -0.07234225898856295
+  }
+}
