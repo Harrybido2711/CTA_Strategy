@@ -107,6 +107,10 @@ spanning December 2025 is trustworthy.
 
 ## Next Steps
 
+The full plan — every resume claim, the measurement that would support it, and the order of
+work — is [`Resume_Reproduction/OUTLINE.md`](../Resume_Reproduction/OUTLINE.md). The four items
+below are the subset it absorbed as its first workstreams.
+
 Assigned work. The pipeline stays as-is — only the signal changes.
 
 1. **Re-plot performance** with the risk-adjusted signal bucketed by rolling quantile instead of raw
