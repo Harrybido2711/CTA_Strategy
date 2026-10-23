@@ -62,8 +62,8 @@ back-adjusted) data. The two tickers' split factors differ — verify rather tha
 | `USO` | 1-for-8 reverse split | 2020-04-29 | pre-split OHLC × 8, volume ÷ 8 |
 
 Unadjusted, UNG showed a phantom +300% and USO +700%. After adjustment the close series is
-continuous, and the largest remaining one-day moves are +25.7% (UNG) and +27.4% (USO on 2020-04-21 —
-the real WTI-negative-price crash, which should be kept). Originals are preserved in
+continuous, and the largest remaining one-day moves are both falls: −25.7% (UNG, 2026-02-02) and
+−27.4% (USO on 2020-04-21 — the real WTI-negative-price crash, which should be kept). Originals are preserved in
 `CTA_data/_unadjusted_raw/`, deliberately outside the `*_ohlcv_1d.csv` glob so the loaders cannot
 pick them up.
 
@@ -111,6 +111,10 @@ pre-split history does **not** repair this bar; XLK keeps a fabricated −16.1% 
 signal reading `high`/`low` — ATR, Donchian channels, intraday-range volatility — stays contaminated.
 Either clamp `open`/`high` into the range implied by `low`/`close`, or mark the bar `NaN` for those
 five and let the backtest skip it (more conservative, costs one day per ticker).
+
+**Where the fix is applied.** `CTA_data/` stays exactly as this section describes it. The
+resume-reproduction work applies the ÷ 2 restatement and the clamp to a copy of the five files in
+`Resume_Reproduction/data/adjusted/` → [DATA.md § 4](../../../Resume_Reproduction/DATA.md).
 
 The other 30 tickers show no split-sized jumps in this window.
 

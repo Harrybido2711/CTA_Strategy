@@ -25,3 +25,6 @@ docs/chapters/*/_build/
 
 # Agent entry points — local only, like .claude/
 AGENTS.md
+
+# pytest
+.pytest_cache/

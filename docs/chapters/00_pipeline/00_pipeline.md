@@ -25,10 +25,13 @@ rose 8 percent and annual turnover fell 14 percent against the same baseline. Bo
 numbers, and they are the right kind of small — the strategy trades *less* and earns *slightly more*,
 which is the signature of removing cost rather than adding fit.
 
-**Note.** The percentages are this project's, measured on this sample; the chapters teach the method,
-not the number. The prototype in this repository is deliberately behind the story — it runs a plain
-five-day cross-sectional momentum and posts a near-zero Sharpe, because its job is the mechanics.
-→ [Implementation Notes](../../Backtest_prototype/Backtests.md)
+**Note.** The percentages in this story are targets, not measurements: none has been reproduced in
+this repository yet, and the three figures below are schematic. The chapters teach the method, not
+the number. The prototype in this repository is deliberately behind the story — it runs a plain
+five-day cross-sectional momentum, because its job is the mechanics. The measured reproduction
+lives with its code.
+→ [Implementation Notes](../../Backtest_prototype/Backtests.md) ·
+[Reproduction plan](../../../Resume_Reproduction/OUTLINE.md)
 
 ## 2. The Build Order, Step by Step
 

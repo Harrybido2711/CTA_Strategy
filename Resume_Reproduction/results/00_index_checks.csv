@@ -1,0 +1,6 @@
+# what: VIX/MOVE handout and DTB3 alignment checks
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+index,file_rows,file_first,file_last,rows_in_sample,dropped_not_etf_days,filled_one_day,still_missing,corrections_applied,days_differing_from_cboe_after_correction,mean_annual_pct
+VIX,1654.0,2020-01-02,2026-07-31,1631.0,2026-05-25,0.0,0,3.0,0.0,
+MOVE,1632.0,2020-01-02,2026-07-17,1619.0,,11.0,0,,,
+DTB3,,,,,,,0,,,2.815

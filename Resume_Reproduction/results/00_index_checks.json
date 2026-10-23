@@ -1,0 +1,7 @@
+{
+  "what": "VIX/MOVE handout and DTB3 alignment checks",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "f91c49b",
+  "written": "2026-10-23T12:25:49",
+  "rows": 3
+}
