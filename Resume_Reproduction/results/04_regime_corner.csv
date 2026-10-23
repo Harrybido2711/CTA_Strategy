@@ -1,0 +1,25 @@
+# what: corner difference: high-volume/low-sigma minus low-volume/high-sigma, per-date signal-weighted return, NW SE
+# signal: MOM quoted; MACD 12/26 companion
+# sample_rows: WF quarters 2022Q1-2025Q2
+# floors: a cell is measurable only if it has >= 250 dates, >= 1000 asset-days and >= 10 episodes
+# volume_sigma_rank_corr: 0.342 (mean per-asset Spearman)
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+cut,signal,universe,target,corner_a,corner_b,diff_bp,se_bp,t,dates,units
+rolling,MOM,all 37,return,high/low,low/high,-6.7515174049807065,14.504328274267548,-0.46548294256127143,328,bp of return per 5-day window
+rolling,MOM,all 37,sigma-normalised,high/low,low/high,0.5161211691448835,6.210458200289954,0.08310516752544711,328,z-score units x 100 per 5-day window
+rolling,MOM,ex-bonds,return,high/low,low/high,-18.42816550189749,18.595340186249096,-0.9910098614665178,248,bp of return per 5-day window
+rolling,MACD 12/26,all 37,return,high/low,low/high,5.453116889256334,15.33467983680909,0.3556068302232675,328,bp of return per 5-day window
+rolling,MACD 12/26,all 37,sigma-normalised,high/low,low/high,5.976433918374056,6.335875621872446,0.9432688195049884,328,z-score units x 100 per 5-day window
+rolling,MACD 12/26,ex-bonds,return,high/low,low/high,0.2943453998498124,18.28576536406439,0.016096969089861933,248,bp of return per 5-day window
+frozen,MOM,all 37,return,high/low,low/high,-18.174417744795598,12.742251537201092,-1.4263113305945387,329,bp of return per 5-day window
+frozen,MOM,all 37,sigma-normalised,high/low,low/high,-10.037799990533673,5.081309340548621,-1.97543572292135,329,z-score units x 100 per 5-day window
+frozen,MOM,ex-bonds,return,high/low,low/high,-40.85590131966307,16.89112691130474,-2.418778897002982,261,bp of return per 5-day window
+frozen,MACD 12/26,all 37,return,high/low,low/high,-3.560344195429026,12.079060532380131,-0.2947534028730854,329,bp of return per 5-day window
+frozen,MACD 12/26,all 37,sigma-normalised,high/low,low/high,-4.583392770702327,5.2002826275432055,-0.8813737827298976,329,z-score units x 100 per 5-day window
+frozen,MACD 12/26,ex-bonds,return,high/low,low/high,-16.46818916118129,14.83390582392805,-1.110172152678564,261,bp of return per 5-day window
+fullsample_LOOKAHEAD,MOM,all 37,return,high/low,low/high,7.137205256826295,16.07870543278568,0.4438917851105725,284,bp of return per 5-day window
+fullsample_LOOKAHEAD,MOM,all 37,sigma-normalised,high/low,low/high,-0.5634329423709583,5.553126376921075,-0.10146229423349683,284,z-score units x 100 per 5-day window
+fullsample_LOOKAHEAD,MOM,ex-bonds,return,high/low,low/high,15.701556214084219,23.086839200243446,0.6801085275423345,227,bp of return per 5-day window
+fullsample_LOOKAHEAD,MACD 12/26,all 37,return,high/low,low/high,4.996096560899156,13.629960786395397,0.36655252639361646,284,bp of return per 5-day window
+fullsample_LOOKAHEAD,MACD 12/26,all 37,sigma-normalised,high/low,low/high,-0.7314854742128267,5.2169772574574225,-0.14021250968023732,284,z-score units x 100 per 5-day window
+fullsample_LOOKAHEAD,MACD 12/26,ex-bonds,return,high/low,low/high,5.365481412002264,19.485141487758394,0.2753627124223422,227,bp of return per 5-day window

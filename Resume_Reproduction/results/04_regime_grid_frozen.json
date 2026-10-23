@@ -1,0 +1,12 @@
+{
+  "what": "3x3 grid of the signal-weighted forward return (bp per 5-day window) inside each volume x sigma cell; pooled G5-G1 beside it, descriptive",
+  "signal": "MOM quoted; MACD 12/26 companion",
+  "sample_rows": "WF quarters 2022Q1-2025Q2",
+  "floors": "a cell is measurable only if it has >= 250 dates, >= 1000 asset-days and >= 10 episodes",
+  "volume_sigma_rank_corr": "0.342 (mean per-asset Spearman)",
+  "cut": "frozen",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "f711ec9",
+  "written": "2026-10-23T14:35:41",
+  "rows": 54
+}

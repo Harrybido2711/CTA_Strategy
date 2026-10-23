@@ -1,0 +1,8 @@
+{
+  "what": "S1 demonstration: a fixed absolute cut on per-asset sigma sorts assets, not regimes",
+  "sample_rows": "WF quarters 2022Q1-2025Q2",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "f711ec9",
+  "written": "2026-10-23T14:35:42",
+  "rows": 2
+}

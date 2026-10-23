@@ -1,0 +1,31 @@
+# what: corner difference by period; 'consistently' needs 5 of 5 periods once Test is added (W10)
+# signal: MOM quoted; MACD 12/26 companion
+# sample_rows: WF quarters 2022Q1-2025Q2
+# floors: a cell is measurable only if it has >= 250 dates, >= 1000 asset-days and >= 10 episodes
+# volume_sigma_rank_corr: 0.342 (mean per-asset Spearman)
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+cut,signal,period,corner_a,corner_b,diff_bp,se_bp,t,dates,block
+rolling,MOM,2022,high/low,low/high,-25.035411278799973,52.975703771699685,-0.4725828917099581,68,train-ladder
+rolling,MOM,2023,high/low,low/high,20.132745893193682,16.631811862850288,1.210496250150789,110,train-ladder
+rolling,MOM,2024H1,high/low,low/high,-25.88062313527193,18.49078258397797,-1.3996499616894076,53,train-ladder
+rolling,MOM,2024H2-2025H1 (OV),high/low,low/high,-13.96926560780584,22.494680066952807,-0.6210030801161849,97,OV
+rolling,MACD 12/26,2022,high/low,low/high,-12.081335574883813,59.966988807832706,-0.20146643703586772,68,train-ladder
+rolling,MACD 12/26,2023,high/low,low/high,32.889966044181094,20.083924365098884,1.6376264641454277,110,train-ladder
+rolling,MACD 12/26,2024H1,high/low,low/high,-21.838451813918752,13.618710933811125,-1.6035623283331837,53,train-ladder
+rolling,MACD 12/26,2024H2-2025H1 (OV),high/low,low/high,1.5432457736696001,16.680140826763193,0.09251994870411832,97,OV
+frozen,MOM,2022,high/low,low/high,-11.678209293025933,29.19386260101487,-0.4000227531597673,57,train-ladder
+frozen,MOM,2023,high/low,low/high,-54.72551929282856,26.040410993841117,-2.101561273582503,87,train-ladder
+frozen,MOM,2024H1,high/low,low/high,-19.99935742116727,12.076579323551286,-1.6560448853397818,60,train-ladder
+frozen,MOM,2024H2-2025H1 (OV),high/low,low/high,5.178848923286766,22.74055421666895,0.22773626684483536,125,OV
+frozen,MACD 12/26,2022,high/low,low/high,-0.5254709080346083,29.627542513713454,-0.01773589246530953,57,train-ladder
+frozen,MACD 12/26,2023,high/low,low/high,-41.23571574262643,25.70218886525978,-1.6043659144674038,87,train-ladder
+frozen,MACD 12/26,2024H1,high/low,low/high,-13.65923246615851,11.817908217270187,-1.1558079666076175,60,train-ladder
+frozen,MACD 12/26,2024H2-2025H1 (OV),high/low,low/high,26.12527855231866,19.912178193132053,1.3120251485761403,125,OV
+fullsample_LOOKAHEAD,MOM,2022,high/low,low/high,-76.96354804389071,37.187421569638616,-2.069612379545212,45,train-ladder
+fullsample_LOOKAHEAD,MOM,2023,high/low,low/high,-13.956877808469004,24.047819596567788,-0.5803801776049996,69,train-ladder
+fullsample_LOOKAHEAD,MOM,2024H1,high/low,low/high,66.11460604625358,48.04017328997275,1.3762357943045442,17,train-ladder
+fullsample_LOOKAHEAD,MOM,2024H2-2025H1 (OV),high/low,low/high,34.83269425432548,22.469348126038188,1.550231633732189,153,OV
+fullsample_LOOKAHEAD,MACD 12/26,2022,high/low,low/high,-79.71457804473921,39.6581676120624,-2.010041886566975,45,train-ladder
+fullsample_LOOKAHEAD,MACD 12/26,2023,high/low,low/high,-20.210335296161198,16.078483937985787,-1.2569801589572644,69,train-ladder
+fullsample_LOOKAHEAD,MACD 12/26,2024H1,high/low,low/high,47.096662054034326,39.517443959260675,1.1917942390855851,17,train-ladder
+fullsample_LOOKAHEAD,MACD 12/26,2024H2-2025H1 (OV),high/low,low/high,36.600766770099106,17.502520279230335,2.0911712248396612,153,OV

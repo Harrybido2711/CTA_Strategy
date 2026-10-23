@@ -1,0 +1,11 @@
+{
+  "what": "corner difference: high-volume/low-sigma minus low-volume/high-sigma, per-date signal-weighted return, NW SE",
+  "signal": "MOM quoted; MACD 12/26 companion",
+  "sample_rows": "WF quarters 2022Q1-2025Q2",
+  "floors": "a cell is measurable only if it has >= 250 dates, >= 1000 asset-days and >= 10 episodes",
+  "volume_sigma_rank_corr": "0.342 (mean per-asset Spearman)",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "f711ec9",
+  "written": "2026-10-23T14:35:42",
+  "rows": 18
+}

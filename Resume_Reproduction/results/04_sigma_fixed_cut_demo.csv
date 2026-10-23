@@ -1,0 +1,6 @@
+# what: S1 demonstration: a fixed absolute cut on per-asset sigma sorts assets, not regimes
+# sample_rows: WF quarters 2022Q1-2025Q2
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+cut,share_of_asset_days_on_the_assets_usual_label,assets_always_one_label
+S1 data-free,0.7349498069498069,AGG IEF LQD SHY TIP UNG
+D rolling,0.39233976833976836,
