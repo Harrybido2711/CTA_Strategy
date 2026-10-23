@@ -93,3 +93,14 @@ REBUILD = {
     "ov_sensitivity": {"deadband_multiple": (0.25, 0.5, 1, 2), "kappa": (1, 0.75, 0.5, 0.25),
                        "kappa_scope": ("LV/HV corner", "high-sigma row")},
 }
+
+# ----------------------------------------------------------------------------- optimizer (W9, homework D and E)
+OPTIMIZER = {
+    "target_vol": 0.10,                       # the risk preference: 10% annualised book volatility
+    "gamma_grid": (0.3, 0.5, 1, 2, 5),
+    "cap_grid": (0.20, 0.25, 0.30),
+    "tau_multiple_grid": (0.0, 1.0, 2.0),     # tau_i = multiple x (cost + slippage) per dollar traded
+    "covariance": "sample covariance of the chosen model's refit-window residuals",
+    "rule": "per (cap, tau) the gamma whose OV vol is closest to target_vol; then the one-SE rule on OV "
+            "mean daily net return, simplest = lowest cap, then highest tau",
+}

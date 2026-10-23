@@ -71,3 +71,19 @@ def test_deadband_can_change_over_time():
     r = simulate(o, c, w, lag=0, deadband=db)
     assert r["turnover_exec"].iloc[:10].sum() == pytest.approx(0.50)
     assert r["turnover_exec"].iloc[10:].sum() == pytest.approx(9 * 0.01)   # row 10 already sits at 0.50
+
+
+def test_optimizer_respects_vector_inputs():
+    from rr_optimizer import MeanVariance, chol_t
+    rng = np.random.default_rng(3)
+    n = 6
+    A = rng.normal(size=(50, n))
+    sigma = np.cov(A.T)
+    mu = np.array([0.02, 0.01, 0.0, -0.01, -0.02, 0.03])
+    cap = np.array([0.5, 0.5, 0.5, 0.5, 0.5, 0.1])        # the last asset is held to 0.1
+    opt = MeanVariance(n, gross=2.0, net=0.0)
+    w = opt.solve(mu, chol_t(sigma), np.zeros(n), 0.5, cap, np.zeros(n))
+    assert abs(w.sum()) < 1e-6
+    assert np.abs(w).sum() <= 2.0 + 1e-6
+    assert (np.abs(w) <= cap + 1e-6).all()
+    assert w[0] > 0 and w[4] < 0
