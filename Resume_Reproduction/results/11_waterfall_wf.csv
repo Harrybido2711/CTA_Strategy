@@ -1,0 +1,8 @@
+# what: B0 annual return after each execution assumption, stated order, all 18 quarters
+# units: bp per year
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+step,ann_return_bp,change_bp
+naive_0,-190.50932692145346,
++ one-day delay,-116.40209709299144,74.10722982846202
++ 5 bp cost,-479.8028275246566,-363.4007304316652
++ 2 bp slippage,-625.1631196973232,-145.36029217266656

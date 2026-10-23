@@ -90,7 +90,8 @@ class Fitted:
         elif name == "CatBoost":
             from catboost import CatBoostRegressor
             self.m = CatBoostRegressor(depth=4, iterations=300, learning_rate=0.05, loss_function="RMSE",
-                                       random_seed=0, verbose=0, thread_count=4).fit(X, yw)
+                                       random_seed=0, verbose=0, thread_count=4,
+                                       allow_writing_files=False).fit(X, yw)
         else:
             raise ValueError(name)
 

@@ -29,9 +29,10 @@ which is the signature of removing cost rather than adding fit.
 this repository yet, and the three figures below are schematic. The chapters teach the method, not
 the number. The prototype in this repository is deliberately behind the story — it runs a plain
 five-day cross-sectional momentum, because its job is the mechanics. The measured reproduction
-lives with its code.
+lives with its code, and on this sample it does not bear the story out.
 → [Implementation Notes](../../Backtest_prototype/Backtests.md) ·
-[Reproduction plan](../../../Resume_Reproduction/OUTLINE.md)
+[Reproduction plan](../../../Resume_Reproduction/OUTLINE.md) ·
+[Reproduction results](../../../Resume_Reproduction/RESULTS.md)
 
 ## 2. The Build Order, Step by Step
 

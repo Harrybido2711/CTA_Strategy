@@ -28,3 +28,6 @@ AGENTS.md
 
 # pytest
 .pytest_cache/
+
+# CatBoost training logs
+catboost_info/

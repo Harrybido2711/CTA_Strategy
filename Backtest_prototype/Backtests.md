@@ -128,6 +128,30 @@ about 31 to 40 times a year, so friction alone costs several percent a year:
 Detail: [100](../docs/chapters/100_dataset/100_dataset.md). Until those five are fixed, no conclusion
 spanning December 2025 is trustworthy.
 
+## Resume reproduction
+
+The prototype's mechanics, extended and re-run as a walk-forward study, live in
+[`Resume_Reproduction/`](../Resume_Reproduction/RESULTS.md). The engine there reproduces
+`backtester()` to 1e-9 at this file's settings (two rows of lag, TWAP fill, previous-close sizing),
+then adds next-close fills, 5 bp + 2 bp friction, a deadband, and books built from momentum, MACD,
+models and an optimizer.
+
+Headline, 18 walk-forward quarters 2022Q1 → 2026Q2, realistic execution:
+
+| Book | Annual return | Sharpe | Turnover per unit gross |
+| --- | --- | --- | --- |
+| B0, momentum + MACD band | −6.3% | −0.41 | 38.9 |
+| B0 before costs | −1.2% | −0.08 | 38.9 |
+| B1, the rebuild | −4.7% | −0.45 | 37.2 |
+| Optimizer with a turnover penalty | +2.2% | +0.20 | 15.1 |
+
+Friction, not the signal, decides these numbers. The full table, the claims ledger and every
+regenerating command are in [`RESULTS.md`](../Resume_Reproduction/RESULTS.md):
+
+```bash
+.venv/bin/python Resume_Reproduction/run_09_test.py   # -> results/06_scorecard.csv
+```
+
 ## Next Steps
 
 The full plan — every resume claim, the measurement that would support it, and the order of

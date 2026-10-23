@@ -1,0 +1,8 @@
+{
+  "what": "B0 annual return after each execution assumption, stated order, all 18 quarters",
+  "units": "bp per year",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "b004100",
+  "written": "2026-10-23T14:54:07",
+  "rows": 4
+}
