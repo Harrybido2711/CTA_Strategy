@@ -4,7 +4,7 @@
   "deadband_scale_per_rung": "2022Q1:0.00557 2022Q2:0.00558 2022Q3:0.00531 2022Q4:0.00541 2023Q1:0.00532 2023Q2:0.00554 2023Q3:0.00514 2023Q4:0.00517 2024Q1:0.00578 2024Q2:0.00591 2024Q3:0.00569 2024Q4:0.00529 2025Q1:0.00579 2025Q2:0.00552",
   "samples": "WF = 2022Q1-2025Q2; train-ladder = 2022Q1-2024Q2; OV = 2024Q3-2025Q2",
   "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
-  "git": "acf4a32",
-  "written": "2026-10-23T14:38:33",
+  "git": "3146e73",
+  "written": "2026-10-23T14:45:55",
   "rows": 21
 }

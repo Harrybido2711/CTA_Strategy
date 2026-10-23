@@ -27,6 +27,8 @@ def rungs(cal, first=C.WF_FIRST_TEST_Q, last=C.WF_LAST_TEST_Q):
         train = np.flatnonzero(q.isin([tq - 4, tq - 3, tq - 2]))
         val = np.flatnonzero(q == tq - 1)
         test = np.flatnonzero(q == tq)
+        if len(test) == 0 or len(val) <= C.PURGE:
+            continue                                  # a truncated sample ends before this quarter
         refit = np.concatenate([train, val])
         out.append({
             "test_q": str(tq), "block": block_of(tq),

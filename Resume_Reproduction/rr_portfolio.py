@@ -28,11 +28,17 @@ VARIANTS = {
 class World:
     """Prices, signals and the ladder, built once."""
 
-    def __init__(self, include_test=False):
-        self.etfs = D.load_etfs()
+    def __init__(self, include_test=False, end=C.SAMPLE_END, universe=None, total_return=False):
+        self.etfs = D.load_etfs(end)
+        if universe is not None:
+            self.etfs = {t: d for t, d in self.etfs.items() if t in set(universe)}
         self.cal = D.calendar(self.etfs)
         self.close = D.panel(self.etfs, "close", self.cal)
         self.open = D.panel(self.etfs, "open", self.cal)
+        self.total_return = total_return
+        if total_return:
+            dist = D.load_distributions(self.cal, self.close.columns)
+            self.open, self.close = D.total_return_prices(self.open, self.close, dist)
         self.rf = D.load_dtb3(self.cal)
         self.fwd = S.forward_return(self.close)
         self.mom = S.mom_score(self.close)

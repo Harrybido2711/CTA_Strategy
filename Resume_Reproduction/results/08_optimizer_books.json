@@ -8,7 +8,7 @@
   "target_vol": "0.1",
   "chosen_on": "OV quarters 2024Q3-2025Q2",
   "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
-  "git": "851354d",
-  "written": "2026-10-23T14:44:08",
+  "git": "3146e73",
+  "written": "2026-10-23T14:46:54",
   "rows": 15
 }

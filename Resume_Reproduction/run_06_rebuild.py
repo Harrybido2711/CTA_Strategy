@@ -29,14 +29,11 @@ RB_CFG = C.REBUILD
 
 def main():
     wd = PF.World()
-    score = wd.b0_score()
-    sig = S.sigma(S.returns(wd.close))
-    vol = D.panel(wd.etfs, "volume", wd.cal)
-    vlab, slab = R.cut_rolling(R.volume_measure(vol)), R.cut_rolling(R.sigma_measure(wd.close))
-    scale, per_rung = PF.b0_deadband_scale(wd)
+    inp = RB.b1_inputs(wd)
+    score, sig, vlab, slab, scale, per_rung = (inp[k] for k in ("score", "sig", "vlab", "slab", "scale", "per_rung"))
 
     def book(vol_scaling, kappa, scope, eta):
-        w = wd.from_start(RB.overlap(RB.targets(score, sig, vlab, slab, vol_scaling, kappa, scope)))
+        w = RB.b1_weights(wd, inp, vol_scaling, kappa, scope)
         return simulate(wd.open, wd.close, w, deadband=scale * eta, **PF.VARIANTS["realistic"])
 
     k, sc, e = RB_CFG["kappa"], RB_CFG["kappa_scope"], RB_CFG["deadband_multiple"]

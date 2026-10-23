@@ -53,3 +53,20 @@ def targets(score, sig, vlab, slab, vol_scaling=True, kappa=C.REBUILD["kappa"], 
 
 def overlap(w, hold=C.HOLD):
     return w.fillna(0.0).rolling(hold, min_periods=1).mean()
+
+
+def b1_inputs(wd):
+    """Everything B1 needs from a World: B0's score, sigma, the rolling-cut labels, the deadband scale."""
+    import rr_data as D
+    import rr_portfolio as PF
+    import rr_regimes as R
+    import rr_signals as S
+    vol = D.panel(wd.etfs, "volume", wd.cal)
+    scale, per_rung = PF.b0_deadband_scale(wd)
+    return {"score": wd.b0_score(), "sig": S.sigma(S.returns(wd.close)),
+            "vlab": R.cut_rolling(R.volume_measure(vol)), "slab": R.cut_rolling(R.sigma_measure(wd.close)),
+            "scale": scale, "per_rung": per_rung}
+
+
+def b1_weights(wd, inp, vol_scaling=True, kappa=C.REBUILD["kappa"], scope=C.REBUILD["kappa_scope"]):
+    return wd.from_start(overlap(targets(inp["score"], inp["sig"], inp["vlab"], inp["slab"], vol_scaling, kappa, scope)))

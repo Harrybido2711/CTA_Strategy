@@ -61,3 +61,35 @@ def residual_covariance(resid, assets, method="sample"):
         X = R.fillna(0.0).to_numpy()
         return LedoitWolf().fit(X).covariance_
     raise ValueError(method)
+
+
+def model_inputs(wd, panel, model):
+    """mu (date x asset) from the model's test-quarter predictions, and chol(Sigma) per rung and method."""
+    import rr_models as MD
+    assets = list(wd.close.columns)
+    mu = pd.DataFrame(np.nan, index=wd.cal, columns=assets)
+    chol = {}
+    for r in wd.rungs:
+        _, p, resid = MD.fit_rung(model, panel, wd.cal, r)
+        mu.update(p.unstack("asset").reindex(columns=assets))
+        for method in ("sample", "ledoit_wolf"):
+            chol[(r["test_q"], method)] = chol_t(residual_covariance(resid, assets, method))
+    return mu, chol
+
+
+def optimized_weights(wd, mu, chol, gamma, cap, tau_per_dollar, net, method, dates, gross=2.0):
+    """Solve the optimizer date by date over `dates`, carrying the previous target as w_prev."""
+    assets = list(wd.close.columns)
+    quarter = pd.Series([str(q) for q in wd.cal.to_period("Q")], index=wd.cal)
+    opt = MeanVariance(len(assets), gross=gross, net=net)
+    out = pd.DataFrame(0.0, index=wd.cal, columns=assets)
+    w_prev = np.zeros(len(assets))
+    for d in dates:
+        m = mu.loc[d].to_numpy()
+        ok = np.isfinite(m)
+        w = opt.solve(np.where(ok, m, 0.0), chol[(quarter[d], method)], w_prev, gamma,
+                      np.where(ok, cap, 0.0), np.full(len(assets), tau_per_dollar))
+        w = np.where(np.abs(w) < 1e-9, 0.0, w)
+        out.loc[d] = w
+        w_prev = w
+    return out

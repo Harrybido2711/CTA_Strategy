@@ -6,7 +6,7 @@
   "plateau": "32 of 32 cells within one SE of the best OV mean",
   "cap_binding_share": "0.029 of asset-days where |w| would exceed 0.2 before the cap",
   "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
-  "git": "acf4a32",
-  "written": "2026-10-23T14:38:37",
+  "git": "3146e73",
+  "written": "2026-10-23T14:45:59",
   "rows": 32
 }

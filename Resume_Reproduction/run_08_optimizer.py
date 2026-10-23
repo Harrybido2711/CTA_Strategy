@@ -32,30 +32,11 @@ def main():
     panel = MD.build_panel(wd)
     chosen = json.load(open(os.path.join(C.RESULTS, "07_model_selection.json")))["chosen"]
 
-    mu = pd.DataFrame(np.nan, index=wd.cal, columns=assets)
-    chol = {}
-    for r in wd.rungs:
-        _, p, resid = MD.fit_rung(chosen, panel, wd.cal, r)
-        mu.update(p.unstack("asset").reindex(columns=assets))
-        for method in ("sample", "ledoit_wolf"):
-            chol[(r["test_q"], method)] = OP.chol_t(OP.residual_covariance(resid, assets, method))
-    quarter = pd.Series([str(q) for q in wd.cal.to_period("Q")], index=wd.cal)
+    mu, chol = OP.model_inputs(wd, panel, chosen)
     tau_unit = (C.COST_BP + C.SLIP_BP) / 1e4
 
     def weights(gamma, cap, tau_mult, net, method, dates):
-        opt = OP.MeanVariance(len(assets), gross=C.GROSS, net=net)
-        out = pd.DataFrame(0.0, index=wd.cal, columns=assets)
-        w_prev = np.zeros(len(assets))
-        for d in dates:
-            m = mu.loc[d].to_numpy()
-            ok = np.isfinite(m)
-            capv = np.where(ok, cap, 0.0)
-            w = opt.solve(np.where(ok, m, 0.0), chol[(quarter[d], method)], w_prev, gamma, capv,
-                          np.full(len(assets), tau_mult * tau_unit))
-            w = np.where(np.abs(w) < 1e-9, 0.0, w)
-            out.loc[d] = w
-            w_prev = w
-        return out
+        return OP.optimized_weights(wd, mu, chol, gamma, cap, tau_mult * tau_unit, net, method, dates)
 
     def score(w, mask, rf=None):
         res = simulate(wd.open, wd.close, w, **PF.VARIANTS["realistic"])

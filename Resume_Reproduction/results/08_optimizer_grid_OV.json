@@ -4,7 +4,7 @@
   "rule": "per (cap, tau) the gamma whose OV vol is closest to target_vol; then the one-SE rule on OV mean daily net return, simplest = lowest cap, then highest tau",
   "target_vol": 0.1,
   "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
-  "git": "851354d",
-  "written": "2026-10-23T14:43:56",
+  "git": "3146e73",
+  "written": "2026-10-23T14:46:42",
   "rows": 45
 }
