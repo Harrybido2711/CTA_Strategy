@@ -1,0 +1,11 @@
+# frozen_commit: 36e86c4
+# draws: 2000
+# blocks: 5 10 21 42 63
+# samples: WF = 2022Q1-2026Q2 (18 quarters); Test = 2025Q3-2026Q2
+# what: deflated Sharpe of B1's OV Sharpe against the trials read on OV
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+trials_label,sharpe_daily,sr0_daily,dsr,n_trials,days
+B1 family on OV (32),-0.06426841931113247,0.014560049940661894,0.10570822813309055,32,250
+every OV read (W7 + W8 + W9),-0.06426841931113247,0.017260474888157663,0.09809370405591794,89,250
+"B1 family, effective at corr 0.9",-0.06426841931113247,0.003603875596279277,0.1409658453588818,2,250
+"B1 family, effective at corr 0.8",-0.06426841931113247,0.003603875596279277,0.1409658453588818,2,250

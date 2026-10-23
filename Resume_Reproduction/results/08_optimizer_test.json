@@ -1,0 +1,15 @@
+{
+  "test_read": "single read at 2026-10-23T14:49:45, frozen at commit 36e86c4",
+  "samples": "WF = 2022Q1-2026Q2 (18 quarters); train-ladder 2022Q1-2024Q2; OV 2024Q3-2025Q2; Test 2025Q3-2026Q2",
+  "what": "the OV-chosen optimizer over all 18 quarters",
+  "model": "EW",
+  "gamma": "5.0",
+  "cap": "0.2",
+  "tau_multiple": "2.0",
+  "target_vol": "0.1",
+  "chosen_on": "OV quarters 2024Q3-2025Q2",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "36e86c4",
+  "written": "2026-10-23T14:50:03",
+  "rows": 8
+}

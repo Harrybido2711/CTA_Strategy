@@ -1,0 +1,9 @@
+# test_read: single read at 2026-10-23T14:49:45, frozen at commit 36e86c4
+# samples: WF = 2022Q1-2026Q2 (18 quarters); train-ladder 2022Q1-2024Q2; OV 2024Q3-2025Q2; Test 2025Q3-2026Q2
+# what: B0 by S1 VIX x MOVE state on Test: day counts show it is not measurable
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+a,b,mean_bp_per_day,se_bp,t,ann_return,days,measurable
+0,0,-0.4354854570702246,4.43623368831464,-0.09816558091097066,-0.01097423351816966,199,True
+0,1,-14.539990704434496,5.249028772722836,-2.7700344833301696,-0.36640776575174927,3,False
+1,0,-16.525713768241992,18.56501122799625,-0.8901537179423314,-0.4164479869596982,37,False
+1,1,4.017947691020278,46.92640104277538,0.08562232776721466,0.101252281813711,11,False

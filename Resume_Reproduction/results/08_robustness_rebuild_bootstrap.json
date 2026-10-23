@@ -1,0 +1,11 @@
+{
+  "frozen_commit": "36e86c4",
+  "draws": 2000,
+  "blocks": "5 10 21 42 63",
+  "samples": "WF = 2022Q1-2026Q2 (18 quarters); Test = 2025Q3-2026Q2",
+  "what": "paired stationary bootstrap of B1 vs B0 (C20, C21)",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "36e86c4",
+  "written": "2026-10-23T14:50:58",
+  "rows": 10
+}

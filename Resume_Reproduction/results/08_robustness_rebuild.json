@@ -1,0 +1,12 @@
+{
+  "frozen_commit": "36e86c4",
+  "draws": 2000,
+  "blocks": "5 10 21 42 63",
+  "samples": "WF = 2022Q1-2026Q2 (18 quarters); Test = 2025Q3-2026Q2",
+  "what": "B1 vs B0 under drop-best-days, cost grid and alternative samples",
+  "share_of_d_pnl_in_top5_days": "2.639",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "36e86c4",
+  "written": "2026-10-23T14:50:58",
+  "rows": 37
+}

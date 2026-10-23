@@ -1,0 +1,9 @@
+{
+  "test_read": "single read at 2026-10-23T14:49:45, frozen at commit 36e86c4",
+  "samples": "WF = 2022Q1-2026Q2 (18 quarters); train-ladder 2022Q1-2024Q2; OV 2024Q3-2025Q2; Test 2025Q3-2026Q2",
+  "what": "execution haircut over all 18 quarters and on Test alone (C13)",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "36e86c4",
+  "written": "2026-10-23T14:49:51",
+  "rows": 16
+}

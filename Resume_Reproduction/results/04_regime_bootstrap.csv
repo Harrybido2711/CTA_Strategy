@@ -1,0 +1,12 @@
+# frozen_commit: 36e86c4
+# draws: 2000
+# blocks: 5 10 21 42 63
+# samples: WF = 2022Q1-2026Q2 (18 quarters); Test = 2025Q3-2026Q2
+# what: HV/LV minus LV/HV, rolling cut, MOM: date-block bootstrap of the per-date difference (C16)
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+mean_block,point_bp,ci90_lo_bp,ci90_hi_bp,dates
+5,-3.8155825531060925,-25.50416886686806,16.331277295952592,410
+10,-3.8155825531060925,-24.584919045758742,16.83486021688206,410
+21,-3.8155825531060925,-23.046584562883762,15.109808781874198,410
+42,-3.8155825531060925,-18.74060835435474,12.05135285654318,410
+63,-3.8155825531060925,-17.551381905540165,10.762735821635667,410
