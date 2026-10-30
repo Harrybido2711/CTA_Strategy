@@ -1,0 +1,80 @@
+# round: 3, Part A (ROUND3.md section 4)
+# cut: D: percentile among the trailing 252 trading days incl. today (min 126), split at 1/3, 2/3
+# sample_window: 2021-02-01..2025-06-30, pre-Test; month-ends 2021-01-29..2025-05-30
+# execution: realistic = next close, 5 bp + 2 bp; excess of DTB3
+# what: A3 / A5: T0 and T1 excess returns by market state, both alignments; n = days or months
+# se: Newey-West, lag 5 days or 1 month
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+book,state_of,alignment,state,n,ann_excess,se_ann,t
+T0,VIX,"contemporaneous, daily (state t, return t)",low,513,0.12400182149384328,0.08354471447275638,1.48425693087119
+T0,VIX,"contemporaneous, daily (state t, return t)",mid,240,0.05962422030377237,0.16795469054128048,0.35500181692822513
+T0,VIX,"contemporaneous, daily (state t, return t)",high,355,-0.14004420700099315,0.17925042774087746,-0.7812768357989058
+T0,VIX,"predictive, daily (state t-1, return t)",low,513,0.012678571000140517,0.08535823719229393,0.1485336555343616
+T0,VIX,"predictive, daily (state t-1, return t)",mid,239,-0.22642409505039343,0.1781712096991267,-1.270823133730473
+T0,VIX,"predictive, daily (state t-1, return t)",high,356,0.2129727685614223,0.14798805774931897,1.4391213169523633
+T0,VIX,"predictive, monthly (state at month-end F, next month)",low,24,-0.06255620630810502,0.08054381251103569,-0.7766730225184447
+T0,VIX,"predictive, monthly (state at month-end F, next month)",mid,8,-0.1009735142080606,0.17611477260150285,-0.5733392645972673
+T0,VIX,"predictive, monthly (state at month-end F, next month)",high,21,0.17510958057393838,0.08626525641008859,2.0298969464775114
+T0,MOVE,"contemporaneous, daily (state t, return t)",low,336,-0.001717945821919132,0.10180415734496276,-0.016875006549073267
+T0,MOVE,"contemporaneous, daily (state t, return t)",mid,262,-0.011977400274772818,0.1411601669744174,-0.08484971739190061
+T0,MOVE,"contemporaneous, daily (state t, return t)",high,510,0.06259286761186215,0.11678422650278421,0.5359702203479499
+T0,MOVE,"predictive, daily (state t-1, return t)",low,335,-0.06099254020813863,0.09553991227794363,-0.6383985368408108
+T0,MOVE,"predictive, daily (state t-1, return t)",mid,263,-0.012904274359213737,0.1313451323296992,-0.09824706961215554
+T0,MOVE,"predictive, daily (state t-1, return t)",high,510,0.1020262332158707,0.11491603778663657,0.8878328489301186
+T0,MOVE,"predictive, monthly (state at month-end F, next month)",low,16,-0.052775555808408,0.12141568003842133,-0.4346683706067245
+T0,MOVE,"predictive, monthly (state at month-end F, next month)",mid,13,-0.12128690174001874,0.13120129118981386,-0.9244337509190241
+T0,MOVE,"predictive, monthly (state at month-end F, next month)",high,24,0.15788761427285303,0.10341151855734654,1.5267894377288052
+T0,correlation,"contemporaneous, daily (state t, return t)",low,410,-0.04446160680718685,0.11638425702110906,-0.3820242354524176
+T0,correlation,"contemporaneous, daily (state t, return t)",mid,396,0.079976457546594,0.11101247056115744,0.7204276883697898
+T0,correlation,"contemporaneous, daily (state t, return t)",high,302,0.04889283250460201,0.16330438009926915,0.29939694498629577
+T0,correlation,"predictive, daily (state t-1, return t)",low,411,-0.10468169221036233,0.11917980000513281,-0.8783509638869499
+T0,correlation,"predictive, daily (state t-1, return t)",mid,396,0.09458913436563769,0.10366427314315194,0.9124564471215438
+T0,correlation,"predictive, daily (state t-1, return t)",high,301,0.11220575449687974,0.1626190612509486,0.68999140465906
+T0,correlation,"predictive, monthly (state at month-end F, next month)",low,21,0.02703299399724317,0.06297257025533957,0.42928204911488405
+T0,correlation,"predictive, monthly (state at month-end F, next month)",mid,20,0.0067262378721338195,0.08963059470062867,0.07504399468284062
+T0,correlation,"predictive, monthly (state at month-end F, next month)",high,12,0.05549554130074315,0.18344729655859715,0.30251490396325703
+T0,market volume,"contemporaneous, daily (state t, return t)",low,312,-0.09381814495983283,0.17352839128395237,-0.5406501164775621
+T0,market volume,"contemporaneous, daily (state t, return t)",mid,349,0.04738988575040984,0.11672198008334171,0.4060065269332525
+T0,market volume,"contemporaneous, daily (state t, return t)",high,447,0.09158667766100499,0.1039137784110673,0.8813718359725295
+T0,market volume,"predictive, daily (state t-1, return t)",low,312,-0.13457395365937874,0.18169386698438741,-0.7406631599235125
+T0,market volume,"predictive, daily (state t-1, return t)",mid,349,0.04479940198509178,0.11846298565075565,0.37817215005171545
+T0,market volume,"predictive, daily (state t-1, return t)",high,447,0.12205623280273725,0.09805117221899831,1.2448217603163723
+T0,market volume,"predictive, monthly (state at month-end F, next month)",low,17,0.0053557884392854745,0.1313800199746524,0.040765623572890194
+T0,market volume,"predictive, monthly (state at month-end F, next month)",mid,14,-0.14120296927315162,0.10833362938279817,-1.3034084621517597
+T0,market volume,"predictive, monthly (state at month-end F, next month)",high,22,0.1479071496977259,0.07113087139759483,2.079366480286464
+T1,VIX,"contemporaneous, daily (state t, return t)",low,513,0.09118868847358295,0.05062719427685299,1.8011799740455867
+T1,VIX,"contemporaneous, daily (state t, return t)",mid,240,0.08022901013233635,0.09928914950465087,0.808034015122451
+T1,VIX,"contemporaneous, daily (state t, return t)",high,355,-0.0979903181627651,0.12083105783357752,-0.8109696291637923
+T1,VIX,"predictive, daily (state t-1, return t)",low,513,0.010769821100043302,0.05158375067028567,0.20878321099375108
+T1,VIX,"predictive, daily (state t-1, return t)",mid,239,-0.1386782518452006,0.10738251598888376,-1.291441633380583
+T1,VIX,"predictive, daily (state t-1, return t)",high,356,0.16535781077979747,0.1035527077239401,1.5968468079137326
+T1,VIX,"predictive, monthly (state at month-end F, next month)",low,24,-0.033155593111952764,0.04532865413792833,-0.7314488758273131
+T1,VIX,"predictive, monthly (state at month-end F, next month)",mid,8,-0.04552212821173539,0.09653079626244332,-0.4715814017318577
+T1,VIX,"predictive, monthly (state at month-end F, next month)",high,21,0.12688135582436644,0.06125948837083142,2.071211484109958
+T1,MOVE,"contemporaneous, daily (state t, return t)",low,336,0.013171966225344516,0.07005818259891892,0.18801467204414427
+T1,MOVE,"contemporaneous, daily (state t, return t)",mid,262,0.016782391531657108,0.0866147225167804,0.1937591098142207
+T1,MOVE,"contemporaneous, daily (state t, return t)",high,510,0.04397143027042594,0.07498816714648063,0.5863782506449703
+T1,MOVE,"predictive, daily (state t-1, return t)",low,335,-0.029821586387667114,0.06522771024608137,-0.457191985969777
+T1,MOVE,"predictive, daily (state t-1, return t)",mid,263,0.014860621499676803,0.08370796638715916,0.17752935761149286
+T1,MOVE,"predictive, daily (state t-1, return t)",high,510,0.07319624442427577,0.07273162861536472,1.0063880847680193
+T1,MOVE,"predictive, monthly (state at month-end F, next month)",low,16,-0.023384081997168876,0.08484851519399353,-0.2755980106865117
+T1,MOVE,"predictive, monthly (state at month-end F, next month)",mid,13,-0.04509355240701245,0.06588823623895912,-0.6843945897029344
+T1,MOVE,"predictive, monthly (state at month-end F, next month)",high,24,0.10270661271570039,0.06178041719516949,1.6624460853225
+T1,correlation,"contemporaneous, daily (state t, return t)",low,410,2.320372565260585e-05,0.08079995899316686,0.00028717496817749815
+T1,correlation,"contemporaneous, daily (state t, return t)",mid,396,0.03380811102868731,0.07394090964696665,0.45723147294380434
+T1,correlation,"contemporaneous, daily (state t, return t)",high,302,0.059108182702150396,0.09475026429038319,0.6238313227391141
+T1,correlation,"predictive, daily (state t-1, return t)",low,411,-0.04575311244995281,0.08324315279495087,-0.5496321428701098
+T1,correlation,"predictive, daily (state t-1, return t)",mid,396,0.03377888955016543,0.070025921349684,0.48237693841236207
+T1,correlation,"predictive, daily (state t-1, return t)",high,301,0.12184812500329655,0.0939027862688519,1.2975986106997368
+T1,correlation,"predictive, monthly (state at month-end F, next month)",low,21,0.02193921884467242,0.039663706155644726,0.5531308334773488
+T1,correlation,"predictive, monthly (state at month-end F, next month)",mid,20,0.0018246411149639118,0.0644122937623486,0.028327528929430593
+T1,correlation,"predictive, monthly (state at month-end F, next month)",high,12,0.0839483994911289,0.09648939429066927,0.8700272201755015
+T1,market volume,"contemporaneous, daily (state t, return t)",low,312,-0.06042694126296401,0.10010574211930792,-0.603631120290243
+T1,market volume,"contemporaneous, daily (state t, return t)",mid,349,0.04810429036999319,0.07421199752042044,0.6482009914469239
+T1,market volume,"contemporaneous, daily (state t, return t)",high,447,0.07452573826810811,0.07412713630171228,1.0053772745890714
+T1,market volume,"predictive, daily (state t-1, return t)",low,312,-0.09100225046056562,0.10249313073515806,-0.8878863374338243
+T1,market volume,"predictive, daily (state t-1, return t)",mid,349,0.0459826674270753,0.07708469192548419,0.5965213880795628
+T1,market volume,"predictive, daily (state t-1, return t)",high,447,0.09752337333909251,0.07063975870433982,1.3805734210853282
+T1,market volume,"predictive, monthly (state at month-end F, next month)",low,17,0.017284784931171054,0.06414757648129682,0.2694534365801129
+T1,market volume,"predictive, monthly (state at month-end F, next month)",mid,14,-0.06695857313798753,0.08062012952794016,-0.8305441026956176
+T1,market volume,"predictive, monthly (state at month-end F, next month)",high,22,0.0976443587287665,0.055110686236421985,1.7717862976678838

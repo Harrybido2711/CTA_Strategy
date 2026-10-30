@@ -1,0 +1,51 @@
+# round: 3, Part A (ROUND3.md section 4)
+# cut: D: percentile among the trailing 252 trading days incl. today (min 126), split at 1/3, 2/3
+# sample_window: 2021-02-01..2025-06-30, pre-Test; month-ends 2021-01-29..2025-05-30
+# execution: realistic = next close, 5 bp + 2 bp; excess of DTB3
+# what: A8: sum |dw| at month-end targets split into its sources; per year = parts summed / years
+# check_max: T0 1.1e-16, T1 1.1e-16 (parts sum exactly to the change)
+# by_state: per_year there = mean per rebalance x 12, the rate the book would run at in that state
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+book,source,per_year,share_of_parts,rebalances
+T0,sign_flip,9.45406648437317,0.6365698151964868,52
+T0,entry_exit,0.0,0.0,52
+T0,sizing,2.835987519668308,0.1909552946638173,52
+T0,count_1_over_S,0.0,0.0,52
+T0,caps,2.561524343975273,0.1724748901396957,52
+T0,actual,9.811703674730223,,52
+T0,"engine turnover_ann (executed, record)",10.519316732099831,,52
+T0,sign_flip | VIX low at formation,8.618331077228623,,24
+T0,entry_exit | VIX low at formation,0.0,,24
+T0,sizing | VIX low at formation,2.705101072322904,,24
+T0,count_1_over_S | VIX low at formation,0.0,,24
+T0,caps | VIX low at formation,2.6076918190096867,,24
+T0,actual | VIX low at formation,8.939887924832869,,24
+T0,sign_flip | VIX mid at formation,8.546408875190755,,8
+T0,entry_exit | VIX mid at formation,0.0,,8
+T0,sizing | VIX mid at formation,2.062411282417387,,8
+T0,count_1_over_S | VIX mid at formation,0.0,,8
+T0,caps | VIX mid at formation,1.7276901847507908,,8
+T0,actual | VIX mid at formation,9.153796926070394,,8
+T0,sign_flip | VIX high at formation,10.820012016619597,,20
+T0,entry_exit | VIX high at formation,0.0,,20
+T0,sizing | VIX high at formation,3.3024817513831612,,20
+T0,count_1_over_S | VIX high at formation,0.0,,20
+T0,caps | VIX high at formation,2.839657037623768,,20
+T0,actual | VIX high at formation,11.121045274070983,,20
+T1,T0_change_at_old_leverage,7.5953772863450375,0.4981664895295504,52
+T1,leverage,6.048533383335079,0.39671191157224234,52
+T1,caps,1.6027537406816172,0.10512159889820721,52
+T1,actual,10.285961488812578,,52
+T1,"engine turnover_ann (executed, record)",10.551522205047515,,52
+T1,T0_change_at_old_leverage | VIX low at formation,6.701171911813585,,24
+T1,leverage | VIX low at formation,5.764440223910727,,24
+T1,caps | VIX low at formation,1.3602422396071379,,24
+T1,actual | VIX low at formation,9.347630286899246,,24
+T1,T0_change_at_old_leverage | VIX mid at formation,6.463587694870223,,8
+T1,leverage | VIX mid at formation,6.412911757730447,,8
+T1,caps | VIX mid at formation,1.8995227951588771,,8
+T1,actual | VIX mid at formation,9.98418860879827,,8
+T1,T0_change_at_old_leverage | VIX high at formation,9.121139572372702,,20
+T1,leverage | VIX high at formation,6.243693824886156,,20
+T1,caps | VIX high at formation,1.7750599201800883,,20
+T1,actual | VIX high at formation,11.532668083114302,,20

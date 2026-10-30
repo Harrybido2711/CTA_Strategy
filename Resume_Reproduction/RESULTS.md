@@ -8,14 +8,104 @@ Two rounds were run on 2026-10-23. **Round 2 is the current answer.**
   and Pedersen (2012), a 12-month look-back and a 1-month hold. It adds the volatility targeting
   and regime analysis Harry asked for. Its plan is `ROUND2.md`, committed before any Round 2 number
   existed.
-- **Round 3** is planned in `ROUND3.md`, which covers the full regime analysis and the revisions
-  built from it. Nothing has run yet.
+- **Round 3** follows Harry's learning path. Its plan is `ROUND3.md`, pre-registered at `5d94bc8`.
+  Part A, the regime analysis under the dynamic cut, has run (below). Part B, the model and the
+  optimizer, has not.
 
 **Sample:** 37 liquid US-listed ETFs as futures proxies, daily, total-return prices, returns in
 excess of the 3-month bill (DTB3 × net exposure). **Execution:** next-close fill, 5 bp per side
 plus 2 bp slippage, $1 of capital. **Record:** 2021-02 → 2026-06, 65 monthly rebalances.
 **Test:** 2025-07 → 2026-06, read at commit `deeeb61`. That is the second look at those quarters:
 Round 1 read them first, for different books.
+
+## Round 3, Part A — the regime analysis (2026-10-30)
+
+**Sample:** pre-Test only, 2021-02 → 2025-06. That gives 53 month-ends (2021-01-29 → 2025-05-30)
+and 1,954 asset-months; returns after 2025-06-30 are masked. **Cut:** dynamic D only: the
+percentile among the trailing 252 trading days, split into terciles. **Books:** T0 and T1 of Round 2,
+realistic execution, in excess of bills. Script `run_30_round3_regimes.py`, tables
+`results/30_*`. What each finding implies for Part B is in `ROUND3.md` A9.
+
+### Bullet 3, as worded: not supported per asset
+
+High-volume / low-σ minus low-volume / high-σ, as sign × next-month excess return
+(`30_regime_corner`):
+
+| Statistic | Value |
+| --- | --- |
+| Corner | **+0.62% a month**, t 0.75 |
+| Months with both cells present | 20 |
+| Periods positive | 2 of 5 (2021 +1.74%, 2022 −0.25%, 2023 +3.47%, 2024 −1.72%, 2025H1 −2.04%) |
+| 90% CI (stationary bootstrap over months, widest of mean block 1, 3, 6) | −0.71% to +1.89% |
+
+**C16 fails on both counts.** Neither of an asset's own terciles predicts its next-month trend
+return: by own volume, low +0.26%, mid +0.44%, high −0.20% a month; by own σ, +0.25%, −0.51%,
++0.37%. All |t| < 1.4 (`30_regime_marginals`).
+
+### What does predict: the market's implied-volatility state, with the opposite sign
+
+| T0, by VIX state | Low | Mid | High |
+| --- | --- | --- | --- |
+| Same day (state t, return t), a year | +12.4% (513 days) | +6.0% (240) | −14.0% (355) |
+| **Next month (state at the month-end, return over the following month), a year** | **−6.3%** (24 months) | −10.1% (8) | **+17.5%** (21, t 2.0) |
+
+The same-day row reproduces Round 2's table to the decimal. The next-month row reverses it: a
+high-VIX month-end is followed by a **better** month for trend. T1 shows the same pattern, at
+−3.3% after low and +12.7% after high (t 2.1).
+
+Per asset, the risk-scaled trend return (sign × 40%/σ × return) is **+3.49% a month higher** after
+the asset's index (VIX, or MOVE for the 7 bond ETFs) closes a month in its high tercile than after
+it closes in its low one. That is t 2.83 with SEs clustered by month. Adding the sizing σ and
+trend strength as controls leaves it at t 2.87, so it is not information the 1/σ sizing already
+uses (`30_regime_regressions`).
+
+**How fragile** (`30_book_predictive_checks`). T0's high-minus-low gap is +1.98% a month:
+
+- by year, +4.92% in 2021, +5.76% in 2022 and +0.92% in 2024; each other year has only one of the
+  two states;
+- with any one year left out, +1.66% to +2.41%;
+- without the two best high-VIX months, 2021-11 and 2022-02, +1.15%.
+
+21 high months is a thin base. The finding is descriptive.
+
+**Market volume** leans the resume's way but rests on 2022. T0 earns +14.8% a year after a
+high-volume month-end (t 2.1, 22 months) against +0.5% after a low one (17). Year by year the gap is
++1.11%, +3.07%, −1.36% and −1.56% a month in 2021–2024, and with 2022 left out it is +0.03%.
+
+### The regime lag (`30_regime_lag`, `30_regime_lag_windows`)
+
+17 events between 2021-05 and 2025-03 in which VIX entered its high tercile, at least 21 trading
+days apart:
+
+| Window | T0, mean of events | T1 |
+| --- | --- | --- |
+| Days −20 to −1 | +2.64% (SE 0.73) | +1.76% |
+| **Entry day 0** | **−1.02%** (SE 0.30; 15 of 17 negative) | −0.70% |
+| Days 1 to 20 | +0.25% (SE 1.23) | +0.12% |
+| Days 21 to 60 | −0.56% (SE 1.39) | −0.23% |
+
+The loss is booked on the day the label flips, and the book is flat afterwards. A label known at
+that close cannot avoid it, which is why Round 2's month-end and daily cuts both chose m = 1.
+Across assets the trailing σ_fast / σ_slow moves only from 0.95 to 1.00. The average VIX rises
+from 18.4 to 21.0: under the dynamic cut, "entering high" is usually a modest rise after a calm
+stretch.
+
+### Where the turnover comes from (`30_turnover_sources`)
+
+| Book | Weight changes a year | Parts of the change |
+| --- | --- | --- |
+| T0 | 9.8 (engine-executed on the record: 10.5) | sign flips 64%, sizing 19%, caps 17%, entries and 1/S 0% |
+| T1 | 10.3 (10.6) | T0's own change 50%, leverage changes 40%, caps 11% |
+
+Turnover runs faster after high-VIX month-ends: T0 trades at 11.1 a year then, against 8.9 after
+low ones. Sign flips are the signal itself. A turnover penalty can only cut cheaply into the
+sizing, cap and leverage trades: 36% of T0's parts and 51% of T1's.
+
+### Regenerate Part A
+
+```bash
+.venv/bin/python Resume_Reproduction/run_30_round3_regimes.py
+```
 
 ## Round 2 — time-series momentum
 

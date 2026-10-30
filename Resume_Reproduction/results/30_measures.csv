@@ -1,0 +1,14 @@
+# round: 3, Part A (ROUND3.md section 4)
+# cut: D: percentile among the trailing 252 trading days incl. today (min 126), split at 1/3, 2/3
+# sample_window: 2021-02-01..2025-06-30, pre-Test; month-ends 2021-01-29..2025-05-30
+# execution: realistic = next close, 5 bp + 2 bp; excess of DTB3
+# what: A1: first labelled date and days / month-ends per D tercile on the pre-Test record
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+measure,level,first_labelled,low_asset_days,mid_asset_days,high_asset_days,low_asset_months,mid_asset_months,high_asset_months,low_days,mid_days,high_days,low_months,mid_months,high_months
+V_lab,per asset,2020-07-31,15413.0,11058.0,14408.0,753.0,536.0,665.0,,,,,,
+sigma_lab,per asset,2020-08-03,15932.0,11629.0,13435.0,758.0,585.0,618.0,,,,,,
+index_lab,per asset,2020-07-01,17742.0,9034.0,14220.0,832.0,331.0,798.0,,,,,,
+VIX_lab,market,2020-07-01,,,,,,,513.0,240.0,355.0,24.0,8.0,21.0
+MOVE_lab,market,2020-07-01,,,,,,,336.0,262.0,510.0,16.0,13.0,24.0
+corr_lab,market,2020-09-29,,,,,,,410.0,396.0,302.0,21.0,20.0,12.0
+mkt_volume_lab,market,2021-01-29,,,,,,,312.0,349.0,447.0,17.0,14.0,22.0

@@ -1,0 +1,43 @@
+# round: 3, Part A (ROUND3.md section 4)
+# cut: D: percentile among the trailing 252 trading days incl. today (min 126), split at 1/3, 2/3
+# sample_window: 2021-02-01..2025-06-30, pre-Test; month-ends 2021-01-29..2025-05-30
+# execution: realistic = next close, 5 bp + 2 bp; excess of DTB3
+# what: A5: homework B's 2-D table, VIX state x market-volume state
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+book,alignment,VIX,market_volume,n,ann_excess
+T0,"contemporaneous, daily",low,low,135,-0.06837921968740475
+T0,"contemporaneous, daily",low,mid,175,0.24617557988783034
+T0,"contemporaneous, daily",low,high,203,0.1466177468166056
+T0,"contemporaneous, daily",mid,low,72,-0.4512663350060051
+T0,"contemporaneous, daily",mid,mid,85,0.09747620992796352
+T0,"contemporaneous, daily",mid,high,83,0.46404230300555205
+T0,"contemporaneous, daily",high,low,105,0.11858199572156351
+T0,"contemporaneous, daily",high,mid,89,-0.3913161145770133
+T0,"contemporaneous, daily",high,high,161,-0.16981160769417727
+T0,"predictive, monthly",low,low,8,-0.051276103815627735
+T0,"predictive, monthly",low,mid,7,-0.17860180671028691
+T0,"predictive, monthly",low,high,9,0.017674725122501133
+T0,"predictive, monthly",mid,low,2,-0.13563644383811235
+T0,"predictive, monthly",mid,mid,3,-0.24016921707844915
+T0,"predictive, monthly",mid,high,3,0.061330808415695784
+T0,"predictive, monthly",high,low,7,0.11036144595272857
+T0,"predictive, monthly",high,mid,4,-0.0015303179041916588
+T0,"predictive, monthly",high,high,10,0.2910892342000373
+T1,"contemporaneous, daily",low,low,135,0.0079195011698184
+T1,"contemporaneous, daily",low,mid,175,0.14988278771494642
+T1,"contemporaneous, daily",low,high,203,0.09596638758082242
+T1,"contemporaneous, daily",mid,low,72,-0.2729545468149435
+T1,"contemporaneous, daily",mid,mid,85,0.12171808371133988
+T1,"contemporaneous, daily",mid,high,83,0.3441162974334068
+T1,"contemporaneous, daily",high,low,105,-0.0025677234408982676
+T1,"contemporaneous, daily",high,mid,89,-0.22232727670170666
+T1,"contemporaneous, daily",high,high,161,-0.09148959229835651
+T1,"predictive, monthly",low,low,8,-0.0099456327618059
+T1,"predictive, monthly",low,mid,7,-0.08904876356900532
+T1,"predictive, monthly",low,high,9,-0.010314203067709147
+T1,"predictive, monthly",mid,low,2,-0.030292456456990538
+T1,"predictive, monthly",mid,mid,3,-0.11024232596139188
+T1,"predictive, monthly",mid,high,3,0.00904495503475787
+T1,"predictive, monthly",high,low,7,0.061998759834048046
+T1,"predictive, monthly",high,mid,4,0.004162074733846853
+T1,"predictive, monthly",high,high,10,0.22138688545379717

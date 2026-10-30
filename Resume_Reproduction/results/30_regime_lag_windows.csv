@@ -1,0 +1,15 @@
+# round: 3, Part A (ROUND3.md section 4)
+# cut: D: percentile among the trailing 252 trading days incl. today (min 126), split at 1/3, 2/3
+# sample_window: 2021-02-01..2025-06-30, pre-Test; month-ends 2021-01-29..2025-05-30
+# execution: realistic = next close, 5 bp + 2 bp; excess of DTB3
+# what: A6: excess return per window around each event, mean and SE across events
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+book,window,events,mean_pct,se_pct,share_negative
+T0,before: days -20..-1,17,2.6353863494822165,0.7319597208689768,0.17647058823529413
+T0,entry day 0,17,-1.0207268559716791,0.29646813745883316,0.8823529411764706
+T0,after: days 1..20,17,0.2483134140849679,1.2305484924178043,0.5294117647058824
+T0,after: days 21..60,17,-0.5648228117233711,1.3882375111340088,0.5294117647058824
+T1,before: days -20..-1,17,1.7640818261401767,0.5287325941905195,0.17647058823529413
+T1,entry day 0,17,-0.6953760839924485,0.1844694861435736,0.8823529411764706
+T1,after: days 1..20,17,0.12248212150705605,0.6606073725977889,0.5294117647058824
+T1,after: days 21..60,17,-0.22673930788681093,0.9621136797217621,0.5294117647058824

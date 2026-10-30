@@ -1,0 +1,13 @@
+{
+  "round": "3, Part A (ROUND3.md section 4)",
+  "cut": "D: percentile among the trailing 252 trading days incl. today (min 126), split at 1/3, 2/3",
+  "sample_window": "2021-02-01..2025-06-30, pre-Test; month-ends 2021-01-29..2025-05-30",
+  "execution": "realistic = next close, 5 bp + 2 bp; excess of DTB3",
+  "what": "A8: sum |dw| at month-end targets split into its sources; per year = parts summed / years",
+  "check_max": "T0 1.1e-16, T1 1.1e-16 (parts sum exactly to the change)",
+  "by_state": "per_year there = mean per rebalance x 12, the rate the book would run at in that state",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "d82ebbc",
+  "written": "2026-10-30T18:47:50",
+  "rows": 42
+}

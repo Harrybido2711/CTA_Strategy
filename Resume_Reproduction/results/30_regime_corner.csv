@@ -1,0 +1,20 @@
+# round: 3, Part A (ROUND3.md section 4)
+# cut: D: percentile among the trailing 252 trading days incl. today (min 126), split at 1/3, 2/3
+# sample_window: 2021-02-01..2025-06-30, pre-Test; month-ends 2021-01-29..2025-05-30
+# execution: realistic = next close, 5 bp + 2 bp; excess of DTB3
+# what: A4: HV/LV minus LV/HV per month; C16 = positive in every period and bootstrap CI excludes 0
+# bootstrap: stationary over months, mean block 1, 3, 6 months, 4000 draws, widest 90% interval
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+y,period,corner_pct_per_month,se_pct,t,months,ci90_lo_pct,ci90_hi_pct,ci90_by_block,periods_positive,c16_consistently
+sign x return,full,0.6175330869148199,0.8263208544910994,0.7473284542662739,20,-0.7113514005930465,1.8852486292124966,"b1:[-0.71,+1.89] b3:[-0.58,+1.87] b6:[-0.39,+1.61]",2 of 5,False
+sign x return,2021,1.7404938031630166,,,6,,,,,
+sign x return,2022,-0.2507343655281916,,,4,,,,,
+sign x return,2023,3.4677777110581456,,,4,,,,,
+sign x return,2024,-1.7208132157506204,,,4,,,,,
+sign x return,2025H1,-2.038610799899518,,,2,,,,,
+sign x 40%/sigma x return,full,0.5934519178141651,2.5247411670723743,0.23505455749442894,20,-3.4624960450421542,4.469347283907683,"b1:[-3.46,+4.47] b3:[-3.14,+4.36] b6:[-2.47,+3.54]",2 of 5,False
+sign x 40%/sigma x return,2021,3.453394212480001,,,6,,,,,
+sign x 40%/sigma x return,2022,-2.4104071806493605,,,4,,,,,
+sign x 40%/sigma x return,2023,9.038935732323996,,,4,,,,,
+sign x 40%/sigma x return,2024,-4.351581513838735,,,4,,,,,
+sign x 40%/sigma x return,2025H1,-8.979557534970157,,,2,,,,,

@@ -134,10 +134,18 @@ T0's and T1's Σ|Δw| at each rebalance is split into four sources:
 Each source is also shown by VIX state. This shows what the optimizer's γ term has to work on: a
 penalty can delay a resize cheaply, but a sign flip is the signal itself.
 
-### A9. Output
+### A9. Output: findings, written 2026-10-30 after `run_30_round3_regimes.py`
 
-A findings table: which features and which optimizer terms Part B should be expected to use, and
-why. It is written up in this file before Part B runs. It changes nothing in § 5.
+Which features and which optimizer terms Part B should be expected to use, and why. This changes
+nothing in § 5. The numbers are in `RESULTS.md` § Round 3, Part A.
+
+| # | Finding | Part B should be expected to |
+| --- | --- | --- |
+| F1 | **The per-asset corner fails C16.** High-volume / low-σ beats low-volume / high-σ in only 2 of 5 periods, with a CI that spans 0. Neither the asset's own volume tercile nor its own σ tercile predicts its next-month trend return | give the V-rank and σ-rank features little weight; Lasso should zero them |
+| F2 | **The market's implied-volatility state predicts the next month, with the sign opposite to the same-day table.** After a month-end in the high tercile of VIX (MOVE for bonds), trend returns are higher. The effect survives the sizing σ and trend strength as controls, so it is new information. It holds in each year where both states occur, but two months carry half of it | let index-rank and z12 × index-rank carry weight. Nothing here supports de-levering after a high-VIX month-end |
+| F3 | **High market volume precedes better months, but only through 2022.** Without 2022 the gap is about zero | weak or no weight on corr-rank and market volume |
+| F4 | **The regime lag is total.** Around VIX entering its high tercile, the book gains in the 20 days before, loses on the entry day itself, and is flat afterwards. σ_fast / σ_slow barely moves | no gain from regime timing. A label known at the close arrives after the loss, and Σ̂ lags as well |
+| F5 | **Turnover is mostly sign flips.** In T0 they are 64% of the parts of the weight change. In T1, leverage changes are 40% | the γ term can only cut cheaply into sizing, cap and leverage trades. A −14% cut has to come from those, not from the flips, which are the signal itself |
 
 ## 5. Part B — the learning path at the paper's horizon
 

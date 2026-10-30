@@ -1,0 +1,55 @@
+# round: 3, Part A (ROUND3.md section 4)
+# cut: D: percentile among the trailing 252 trading days incl. today (min 126), split at 1/3, 2/3
+# sample_window: 2021-02-01..2025-06-30, pre-Test; month-ends 2021-01-29..2025-05-30
+# execution: realistic = next close, 5 bp + 2 bp; excess of DTB3
+# what: A5: predictive monthly high-minus-low state gap by year, leaving a year out, and without the 2 best months
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+book,state_of,check,high_minus_low_pct_per_month,high_months,low_months
+T0,VIX,year 2021,4.915642151768733,3.0,8.0
+T0,VIX,year 2022,5.756264220989662,8.0,2.0
+T0,VIX,year 2023,,0.0,10.0
+T0,VIX,year 2024,0.9241559012161704,6.0,4.0
+T0,VIX,year 2025,,4.0,0.0
+T0,VIX,all,1.9805482240170282,21.0,24.0
+T0,VIX,drop year 2021,1.6623865185358213,,
+T0,VIX,drop year 2022,1.695730299210641,,
+T0,VIX,drop year 2023,2.040039621248252,,
+T0,VIX,drop year 2024,2.261261810857083,,
+T0,VIX,drop year 2025,2.41408804094252,,
+T0,VIX,drop the 2 best high months: 2021-11-30 2022-02-28,1.1495548912482763,,
+T0,market volume,year 2021,1.11062225652934,9.0,2.0
+T0,market volume,year 2022,3.069913297883513,4.0,7.0
+T0,market volume,year 2023,-1.3643997148964377,5.0,2.0
+T0,market volume,year 2024,-1.563601565932246,1.0,6.0
+T0,market volume,year 2025,,3.0,0.0
+T0,market volume,all,1.1879280104870036,22.0,17.0
+T0,market volume,drop year 2021,0.9359513054456452,,
+T0,market volume,drop year 2022,0.03287158800280676,,
+T0,market volume,drop year 2023,1.7080582175449395,,
+T0,market volume,drop year 2024,1.886037174825498,,
+T0,market volume,drop year 2025,1.1025435632169385,,
+T0,market volume,drop the 2 best high months: 2021-11-30 2022-02-28,0.3758156519598455,,
+T1,VIX,year 2021,3.277440502132592,3.0,8.0
+T1,VIX,year 2022,2.959857289610703,8.0,2.0
+T1,VIX,year 2023,,0.0,10.0
+T1,VIX,year 2024,0.6755066628427164,6.0,4.0
+T1,VIX,year 2025,,4.0,0.0
+T1,VIX,all,1.3336412411359935,21.0,24.0
+T1,VIX,drop year 2021,1.025994845472371,,
+T1,VIX,drop year 2022,1.107264300897401,,
+T1,VIX,drop year 2023,1.4218368089799533,,
+T1,VIX,drop year 2024,1.5305693342648417,,
+T1,VIX,drop year 2025,1.6405369547023096,,
+T1,VIX,drop the 2 best high months: 2022-02-28 2021-11-30,0.6779649936921733,,
+T1,market volume,year 2021,0.7915058886182224,9.0,2.0
+T1,market volume,year 2022,2.3168530892127954,4.0,7.0
+T1,market volume,year 2023,-1.0432264431981937,5.0,2.0
+T1,market volume,year 2024,-1.171082784572824,1.0,6.0
+T1,market volume,year 2025,,3.0,0.0
+T1,market volume,all,0.669663114979962,22.0,17.0
+T1,market volume,drop year 2021,0.6103124241729403,,
+T1,market volume,drop year 2022,-0.04066856874662095,,
+T1,market volume,drop year 2023,1.0516909589218184,,
+T1,market volume,drop year 2024,1.0576022861497254,,
+T1,market volume,drop year 2025,0.5846574098953652,,
+T1,market volume,drop the 2 best high months: 2022-02-28 2021-11-30,0.022406515661999554,,
