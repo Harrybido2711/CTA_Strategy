@@ -130,3 +130,35 @@ ROUND2 = {
     "rebalance": "signal at the last close of each month; trade at the next close (lag 1)",
     "first_signal": "2021-01-29",             # first month-end with a full 12-month lookback
 }
+
+
+# ----------------------------------------------------------------------------- Round 3 (ROUND3.md)
+ROUND3 = {
+    "plan": "ROUND3.md, pre-registered 2026-10-30 before any Round 3 number existed",
+    "regime_cut": "D: percentile among the trailing 252 trading days incl. today (min 126), split at 1/3, 2/3",
+    "rank_window": 252, "rank_min_periods": 126,
+    "measure_window": 21,                     # V and sigma: 21-day mean volume / realised vol, through t-1
+    "corr_window": 63,                        # average pairwise correlation of the 37 ETFs
+    "sigma_fast_com": 10, "sigma_slow_com": 60,
+    "bond_index": "MOVE", "other_index": "VIX",
+    "periods": ("2021", "2022", "2023", "2024", "2025H1"),   # C16's per-period sign rule, pre-Test
+    "event_window": (-20, 60),                # A6: trading days around VIX entering its high tercile
+    "event_min_gap": 21,                      # a new event needs 21 days since the last one
+    # ---- Part B: the learning path (Leetcode cta-strategy ch01, 07, 08, 09)
+    "mom_months": (1, 3, 6, 12),
+    "macd_pair": (21, 63),                    # chapter 03's slowest pairing on its ladder
+    "clip_sd": 3.0,
+    "models": ("EW", "Ridge", "Lasso", "CatBoost", "HGB"),
+    "ridge_alpha": (0.1, 1.0, 10.0, 100.0),
+    "lasso_alpha_frac": (0.01, 0.03, 0.1, 0.3),
+    "catboost": {"depth": (2, 3), "iterations": 300, "learning_rate": 0.03},
+    "hgb": {"max_depth": (2, 3), "max_iter": 200, "learning_rate": 0.05, "min_samples_leaf": 20},
+    "risk_budget_grid": (0.05, 0.10, 0.15, 0.20),   # sigma_0, annual: chapter 09's lambda as Form B
+    "gamma_grid": (1e-4, 1e-2, 1e-1, 1.0),          # chapter 09's grid, monthly-return units per unit traded
+    "asset_cap": 0.5, "gross_cap": 3.0, "net_max": 1.0,
+    "cov_com_days": 60, "cov_horizon_days": 21,
+    "procedures": "5 model classes x regime features off/on = 10, compared on OV",
+    "pair_rule": "drop pairs with validation max drawdown deeper than the grid median; highest cumulative "
+                 "excess return; if top two within one SE of the mean daily return, higher Sharpe",
+    "first_apply_q": "2022Q1", "last_apply_q": "2026Q2",
+}

@@ -1,9 +1,21 @@
-# Round 3 — Regime analysis, and the revisions it motivates
+# Round 3 — Regime analysis, then the learning path's model and optimizer
 
-**Status: outline, 2026-10-29. Nothing in Round 3 has been computed.** This file becomes the
-pre-registration once Harry settles § 9 and `config.ROUND3` is committed beside it. Every number
-below is a Round 2 result, cited from `RESULTS.md` or `results/20_*` / `results/21_*`, or a target
-the resume claims.
+**Status: pre-registration, 2026-10-30.** Committed with `config.ROUND3` before any Round 3 number
+exists. Every number below is a Round 2 result, cited from `RESULTS.md` or `results/20_*` /
+`results/21_*`, or a target the resume claims.
+
+Harry decided two things on 2026-10-30:
+
+- **Regimes use the dynamic cut D only.** That is the rolling 252-day tercile.
+- **Part B follows his learning path.** The course notes are at
+  `Career_Preparation/Leetcode/database/finance/strategies/paths/cta-strategy/`, chapters 01, 07, 08
+  and 09. They fix what happens after the model is trained: μ̂ → Σ̂ → the optimizer with λ and γ →
+  λ and γ chosen on validation → apply → evaluate.
+
+This replaces the outline of 2026-10-29 (commits `94c4aca` to `efe3a3e`). Its hand-written
+revision menu (VS / RF / TC) is retired. In the course pipeline each piece has a home: regime
+features enter **the model**, volatility scaling is **the optimizer's risk term**, and turnover
+control is **its γ term**.
 
 ## 1. The starting line: what Round 2 left open
 
@@ -13,49 +25,52 @@ analysis came next, and the revisions were built from it. Round 3 is that second
 
 | Bullet | Round 2 measured | Left for Round 3 |
 | --- | --- | --- |
-| 2: over 25% lost to execution | T0's haircut: 23% of the next-close naive return before Test (35% against same-close); 12% (17%) over the record | Recompute for every revision. Turnover controls should win part of it back |
-| 3: trend works best in high-volume, low-volatility regimes | **Volatility half, market level:** T0 earns +17% a year in the low-VIX tercile, +16% mid and −21% high (596 / 336 / 426 days). **Volume half, per asset:** HV/LV − LV/HV is +0.82% a month, t 1.35, positive in 4 of 6 periods. Before Test the 3 × 3 map is not monotone: high-volume / mid-σ is the worst cell (−1.52% a month, t −1.70) | A full regime analysis: more measures, the regime lag, by asset class, by year, and turnover by regime |
-| 4: +8% OOS Sharpe and −14% turnover from regime features, vol scaling and turnover controls | Volatility scaling (T1) moves the Sharpe from 0.32 to 0.46, 90% CI of the change −0.04 to +0.34. Cutting leverage on a high-VIX state lowered the Sharpe every time it was tried. Turnover stays near 11 turns a year; a 0.5% deadband trims 2–3% | Revisions aimed at what Part A finds: per-asset regime features, vol estimates that react faster, and controls on where the turnover actually comes from |
+| 2: over 25% lost to execution | T0's haircut: 23% of the next-close naive return before Test (35% against same-close); 12% (17%) over the record | Recompute for the final book. The turnover term should win part of it back |
+| 3: trend works best in high-volume, low-volatility regimes | **Volatility half, market level:** T0 earns +17% a year in the low-VIX tercile, +16% mid and −21% high (596 / 336 / 426 days), but these are same-day states (A3). **Volume half, per asset:** HV/LV − LV/HV is +0.82% a month, t 1.35, positive in 4 of 6 periods. Before Test the 3 × 3 map is not monotone: high-volume / mid-σ is the worst cell (−1.52% a month, t −1.70) | Part A |
+| 4: +8% OOS Sharpe and −14% turnover from regime features, vol scaling and turnover controls | Volatility scaling (T1) moves the Sharpe from 0.32 to 0.46, 90% CI of the change −0.04 to +0.34. Cutting leverage on a high-VIX state lowered the Sharpe every time it was tried. Turnover stays near 11 turns a year | Part B |
 
 ## 2. The question
 
 Start from the execution-aware baseline, the strategy whose haircut is bullet 2. Does a regime
-analysis point to revisions that raise the walk-forward out-of-sample Sharpe and cut annual
-turnover? Each answer is reported as ΔSR (absolute, and as a percentage only under C20's rule),
-ΔTO%, a CI, the sample and the observation count.
+analysis, and then the learning path's model and optimizer built on it, raise the out-of-sample
+Sharpe and cut annual turnover? Each answer is reported as:
+
+- ΔSR, absolute, and as a percentage only under C20's rule;
+- ΔTO%;
+- a CI;
+- the sample and the observation count.
 
 ## 3. What is fixed
 
 | Item | Value |
 | --- | --- |
-| Baseline R0 | **T0**: sign of the 12-month excess return, × 40%/σ, / S, monthly, caps 0.5 per asset and 3× gross (§ 9 Q1) |
+| Baseline R0 | **T0**: sign of the 12-month excess return, × 40%/σ, / S, monthly, caps 0.5 per asset and 3× gross. Decided 2026-10-30. T1 is printed beside it |
 | Data, prices, returns | as Round 2: 37 ETFs, daily, total-return prices, excess of DTB3, the split-adjusted copy (DATA § 4) |
 | Execution | signal at the month's last close, trade at the next close; 5 bp per side + 2 bp slippage; $1 of capital |
 | Turnover | executed turnover per unit gross, per year, as in Round 2 |
-| Asset classes | the four of `config.UNIVERSE_CATEGORY`, used by every earlier script: equity 21, bonds 7, commodities 6, alternatives 3. Chapter 100's six-way table splits equity into U.S. broad 5, U.S. sectors 11 and international 5 |
+| Asset classes | the four of `config.UNIVERSE_CATEGORY`: equity 21, bonds 7, commodities 6, alternatives 3. Chapter 100's six-way table splits equity into U.S. broad 5, U.S. sectors 11 and international 5 |
+| Regime cut | **D only**: the value's percentile among the trailing 252 trading days, including today (126 to start), split at 1/3 and 2/3 |
 
 ## 4. Part A — the regime analysis
 
-Descriptive only. It runs on **2021-02 → 2025-06**, which excludes Test. It explains the revisions;
-it does not choose them (§ 5).
+Descriptive only. It runs on **2021-02 → 2025-06**, which excludes Test. It explains what Part B
+should find; it chooses nothing in Part B, whose grids are fixed in § 5.
 
-### A1. Measures, all computed from data through t − 1
+### A1. Measures, all computed from data through t − 1 (indices through t)
 
 | Measure | Definition | Level |
 | --- | --- | --- |
-| V, volume | 21-day mean volume, ranked against the asset's own trailing 252 days. DATA § 3: one venue feed, so never compared across assets | per asset |
-| σ, volatility | 21-day realised volatility, ranked against the asset's own trailing 252 days; σ_fast / σ_slow (EWMA com 10 / 60) beside | per asset |
-| VIX, MOVE | terciles. The 7 bond ETFs are labelled by MOVE, the other 30 by VIX: a rate sleeve labelled by VIX is labelled wrongly (course, *Volatility Signals*) | market |
-| Market volume | cross-sectional mean of the per-asset V ranks | market |
-| Correlation | average pairwise 63-day correlation of the 37 ETFs, terciles | market |
+| V, volume | 21-day mean volume, D-ranked against the asset's own past. DATA § 3: one venue feed, so never compared across assets | per asset |
+| σ, volatility | 21-day realised volatility, D-ranked against the asset's own past; σ_fast / σ_slow (EWMA com 10 / 60) beside | per asset |
+| VIX, MOVE | D terciles. The 7 bond ETFs are labelled by MOVE, the other 30 by VIX: a rate sleeve labelled by VIX is labelled wrongly (course, *Volatility Signals*) | market |
+| Market volume | cross-sectional mean of the per-asset V percentiles, D-ranked | market |
+| Correlation | average pairwise 63-day correlation of the 37 ETFs, D-ranked | market |
 | Trend strength | 12-month excess return / (σ × √1 year), in z units | per asset |
 
-### A2. Cuts
+### A2. The cut
 
-The dynamic cut D (rolling 252-day tercile) is quoted. The static cuts S1 (data-free ln-ceiling,
-VIX only), S2 (frozen at each rung) and S3 (full sample, labelled look-ahead) are printed beside
-it, with the share of days on which they agree with D. This is Round 1's comparison, run at the
-monthly horizon.
+**D only** (Harry, 2026-10-30). The static cuts were compared in Round 1 and Round 2 (DATA § 6.1,
+`results/20_regime_returns.csv`), and that comparison is not repeated.
 
 ### A3. Timing: every table in two alignments
 
@@ -64,14 +79,15 @@ monthly horizon.
 | Contemporaneous | the state on day t | the book's return on day t | when the book loses: descriptive only |
 | Predictive | the state known at the decision close (month-end t, or t − 1 for a daily rule) | the return after the trade | whether the state can be acted on |
 
-**Only a predictive table can motivate a revision.** Round 2's VIX-state table
+**Only a predictive table can motivate a change.** Round 2's VIX-state table
 (`results/20_regime_returns.csv`, the +17% / +16% / −21% row of `RESULTS.md`) joins the VIX close
 of day t to the return of day t, so it is contemporaneous. That is why it looks strong while the
-overlay it suggested chose m = 1. Part A prints both alignments for every state, side by side.
+overlay it suggested chose m = 1.
 
 ### A4. The per-asset regime map (bullet 3)
 
-- **Cells.** V tercile × σ tercile. The outcome is sign × next-month excess return.
+- **Cells.** V tercile × σ tercile at each month-end. The outcome is sign × next-month excess
+  return, with the book's version, sign × 40%/σ × return, beside it.
 - **Counts.** Asset-months, months and episodes are printed in every cell.
 - **The corner.** HV/LV − LV/HV, plus a pooled regression with a V × σ interaction and SEs
   clustered by month. The 37 assets in one month share one market shock, so they are not 37
@@ -79,7 +95,8 @@ overlay it suggested chose m = 1. Part A prints both alignments for every state,
 - **"Consistently".** C16's rule: the corner is positive in every period (2021, 2022, 2023, 2024,
   2025H1), and its episode-bootstrap CI excludes 0. Otherwise the fallback wording in `OUTLINE.md`
   applies.
-- **By asset class.** Each of the four classes is a descriptive column; equity is also shown in chapter 100's three parts. Alternatives holds 3 assets, so its cells will often be too thin to read.
+- **By asset class.** Each of the four classes is a descriptive column. Alternatives holds 3
+  assets, so its cells will often be too thin to read.
 
 ### A5. The book by market state
 
@@ -91,128 +108,178 @@ own volatility in its denominator.
 ### A6. The regime lag
 
 An event study: the cumulative excess return of T0 and T1 from 20 days before to 60 days after VIX
-enters its high tercile, with per-asset σ_fast and σ_slow over the same window. It measures why
-the month-end and daily state cuts of Round 2 arrived too late, and which estimate reacts in time.
+enters its high tercile, with the cross-asset mean σ_fast / σ_slow over the same window. It
+measures why the month-end and daily state cuts of Round 2 arrived too late, and which estimate
+reacts in time.
 
 ### A7. Is it new information?
 
-T0 already sizes each asset by 1/σ, and T1 scales the whole book by its ex-ante volatility, so
-part of any volatility regime is already spent. Chapter 04 § 3.2 residualizes the label on what
-the book already uses. Here that means regressing the signed next-month return on the regime
-labels with the sizing σ (and, for T1, the leverage) as controls.
+T0 already sizes each asset by 1/σ, so part of any volatility regime is already spent. Chapter 04
+§ 3.2 residualizes the label on what the book already uses. Here that means regressing the book's
+signed next-month return (sign × 40%/σ × return) on the regime labels, with and without the sizing
+σ and trend strength as controls, SEs clustered by month.
 
-- A label whose effect disappears gets no revision. It is recorded as "already in the book".
+- A label whose effect disappears is recorded as "already in the book".
 - Volume enters no sizing rule, so a volume effect that survives is new.
 
 ### A8. Where the turnover comes from
 
-T0's and T1's Σ|Δw| is split into four sources:
+T0's and T1's Σ|Δw| at each rebalance is split into four sources:
 
 - sign flips;
 - per-asset σ resizing;
 - book-leverage changes (T1 only);
-- changes from 1/S and the caps.
+- assets entering or leaving, and the caps.
 
-Each source is also shown by regime. This decides which control could plausibly reach −14%: a
-deadband cannot remove a sign flip.
+Each source is also shown by VIX state. This shows what the optimizer's γ term has to work on: a
+penalty can delay a resize cheaply, but a sign flip is the signal itself.
 
 ### A9. Output
 
-A table of findings → revisions. It fills the "motivated by" column of § 5 and is written up
-before Part B runs.
+A findings table: which features and which optimizer terms Part B should be expected to use, and
+why. It is written up in this file before Part B runs. It changes nothing in § 5.
 
-## 5. Part B — the revisions
+## 5. Part B — the learning path at the paper's horizon
 
-**The menu is fixed now, from Round 2's evidence, before Part A runs.** Part A explains each item;
-it cannot add a winner. An item added later is a numbered amendment, labelled as such wherever its
-number appears, as Round 2 did with T3. Every item is reported, including those that lose.
+### B0. The eight steps, mapped
 
-| Family | Item | Rule | Grid (chosen walk-forward, § 6) | Motivated by |
-| --- | --- | --- | --- | --- |
-| **VS**, volatility scaling | VS1 | book vol target 10% (= T1) | on / off | Round 2: the adjustment that worked |
-| | VS2 | asset σ = max(σ_fast, σ_slow), so sizing reacts inside a volatility spike | com_fast ∈ {10, 20} | Round 2: state cuts lag; A6 |
-| **RF**, regime-aware features | RF1 | per-asset multiplier by (V, σ) cell, fitted on the training window and shrunk toward 1 | multipliers ∈ {0.5, 1, 1.5}, shrinkage ∈ {0.5, 1} | bullet 3; A4, A7 |
-| | RF2 | trend strength in place of the sign: clip(z / z₀, −1, 1) | z₀ ∈ {0.5, 1} | sign flips near zero; A8 |
-| | RF3 | mean of the sign over 6, 9 and 12-month look-backs | on / off | paper Table 2 and Round 2's grid: 6–12 months all earn |
-| | RF4 | slow MACD agreement: × 1 when chapter 03's slowest pairing agrees with the TSMOM sign, × a when it does not | a ∈ {0.5, 1} | bullet 1's "momentum + MACD" at the monthly horizon (§ 9 Q4) |
-| | RF5 | optional: the course's model step, Ridge and CatBoost on the RF inputs plus V, σ and VIX ranks; target next-month return / σ | λ grid, depth grid | the course pipeline, chapter 08 (§ 9 Q3) |
-| **TC**, turnover controls | TC1 | proportional no-trade band: trade asset s only when \|w* − w\| > b\|w*\| | b ∈ {0.1, 0.25, 0.5} | Round 2: the absolute 0.5% band had little to trim |
-| | TC2 | partial adjustment w ← w + κ(w* − w) | κ ∈ {1, 0.5} | A8 resizing share |
-| | TC3 | sign hysteresis: flip only when trend strength crosses ±h | h ∈ {0, 0.25, 0.5} | A8 sign-flip share |
-
-### The ladder, and the ablation
-
-| Book | Contents |
+| Course step | Round 3 |
 | --- | --- |
-| R0 | T0, the baseline |
-| R1 | R0 + VS |
-| R2 | R1 + RF |
-| **R3** | R2 + TC, **the refined strategy that bullet 4 describes** |
+| 1 Clean | as Round 2 |
+| 2 Build the signals | the features in B1, per asset, at each month-end F |
+| 3 Test each signal | IC and bucket test of every feature, reported on pre-Test. **No feature is dropped on that sample**, because a pre-Test screen would leak into the walk-forward record. Selection is left to the model inside each rung (Lasso's zeros, a tree's splits), as chapter 01 step 5 allows |
+| 4 Standardize | clip at ±3 sd, then z-score with the rung's training mean and sd (chapter 07) |
+| 5 Combine: the model | B2 |
+| 6 Walk-forward | B4 |
+| 7 Score and scale | **the optimizer** of chapter 09, which replaces proportional scaling: B3 |
+| 8 Trade and evaluate | next close, 5 + 2 bp; read the stitched apply quarters, then OV, then Test once (B5) |
 
-Each family is also run alone on R0, and R3 is run with each family left out. A family's
-contribution therefore does not depend on the order of the ladder.
+### B1. Features
 
-## 6. Out-of-sample protocol
+| Family | Feature | Definition |
+| --- | --- | --- |
+| Momentum | z1, z3, z6, z12 | k-month excess return / (σ_F × √(k/12)), with σ_F the paper's EWMA (com 60, × 261). The paper's look-backs; Round 2 found 6–12 earn and 1–3 lose |
+| MACD | macd | chapter 03's slowest pairing on its ladder, (21, 63): (EMA₂₁ − EMA₆₃) / P, divided by σ_F |
+| Regime, D percentiles minus 0.5 | σ-rank, V-rank, index-rank, corr-rank | the A1 measures as continuous ranks; the index is VIX, or MOVE for the 7 bond ETFs |
+| Interactions | z12 × each regime rank | lets the linear models condition the trend on the regime. Trees find this by themselves (chapter 08, *Why tree models*) |
 
-The course's rule applies: the small validation window chooses hyperparameters, and the
-procedure itself is fixed in advance. Here the procedure is the § 5 menu and the ladder.
+"Regime features off" means Momentum + MACD only.
 
-| Step | Rule |
+### B2. The model ladder (chapter 08)
+
+- **Target.** y = next-month excess return / σ_F, pooled across assets, so that 37 assets with
+  different volatility share one scale. The expected return is μ̂ = ŷ × σ_F, monthly.
+- **Models.** Each has its inner grid; hyperparameters are chosen by validation MSE (homework C):
+
+  | Model | Inner grid |
+  | --- | --- |
+  | **EW** | the mean of the standardized Momentum + MACD features, mapped to ŷ by a one-slope regression on train |
+  | **Ridge** | α ∈ {0.1, 1, 10, 100} |
+  | **Lasso** | α ∈ {0.01, 0.03, 0.1, 0.3} × α_max |
+  | **CatBoost** | depth ∈ {2, 3}, 300 iterations, learning rate 0.03 |
+  | **HistGradientBoosting** | max depth ∈ {2, 3}, 200 iterations, learning rate 0.05, min leaf 20 |
+
+### B3. The optimizer (chapter 09)
+
+$$ \max_w \ \hat\mu^\top w - \gamma \sum_i |w_i - w_{\text{prev},i}| \quad \text{s.t.} \quad w^\top \hat\Sigma w \le \sigma_0^2,\ \ |w_i| \le 0.5,\ \ \sum_i |w_i| \le 3,\ \ \mathbf{1}^\top w \le 1 $$
+
+- **λ, as a risk budget σ₀.** Chapter 09 shows Form B (risk capped at σ₀) and the λ form reach the
+  same book, one λ per σ₀. Two-fund separation makes λ a choice of how much risk to hold. The
+  course's λ grid, {1e-4, 0.01, 0.1, 1}, is unit-dependent: here w* ≈ Σ⁻¹μ/(2λ) would put every
+  value below 1 against the caps. So λ is written in the units it means: σ₀ ∈ {5%, 10%, 15%, 20%}
+  a year, four values, as the course has four.
+- **γ, the turnover penalty.** The course's grid, {1e-4, 0.01, 0.1, 1}, in monthly-return units per
+  unit of capital traded. The trading cost itself is 0.0007.
+- **Σ̂.** The EWMA covariance of daily excess returns (com 60) × 21, the estimate T1 already uses.
+  Homework D's residual covariance is not used: a quarter of monthly residuals gives 3 to 12
+  observations for a 37 × 37 matrix.
+- **The constraints.** The per-asset and gross caps are T0's, so R0 and the optimizer differ only
+  in how weights are formed (`OUTLINE.md` § 6.1). The net ≤ 100% bound is the course's.
+- **w_prev.** The live book's weights. At the start of a validation quarter that is the book as
+  the previous rung left it; before the first rung it is zero.
+
+### B4. Walk-forward (chapters 01 and 07)
+
+| Item | Rule |
 | --- | --- |
-| Rungs | quarterly. **Expanding** window from 2021-02, not Round 1's rolling three quarters: a monthly book has three rebalances a quarter, too few to fit or validate on |
-| Inside a rung q | inner validation = the last 4 quarters before q; inner train = everything earlier, with a 1-month purge. Each family picks its item and grid point by validation Sharpe, using the one-SE rule toward "off". Then refit on the whole window and trade quarter q |
-| Record | first rung 2023Q1, which gives at least 11 training months. **Headline: 2023Q1 → 2025Q2**, 10 quarters, 30 monthly rebalances |
-| Test | 2025Q3 → 2026Q2, read once by a script committed before it runs (the `frozen_commit` guard of `run_09` / `run_21`). **This is the third look at those quarters**, and it is labelled so everywhere |
-| Fresh data | 2026-07 onward, if extended (§ 9 Q2). It is the only sample the Round 3 design has never seen |
+| Segment | one calendar quarter (chapter 07: two to three months), by **holding month**. A position held in month m was formed at the end of m − 1 |
+| Rung | train on 3 segments, validate on 1, apply to the next. Slide one segment. Apply quarters 2022Q1 → 2026Q2, 18 rungs. This is Round 1's ladder (`rr_split.rungs`) on monthly rows |
+| Labels | at a fit date F, a training row is used only if its holding month ended by F. That is the monthly purge |
+| Inner layer, per rung | (1) fit every model's grid on train; (2) choose its hyperparameter by validation MSE; (3) backtest the 16 (σ₀, γ) pairs over the validation quarter with that model's predictions; (4) refit on train + validation (chapter 07's second house style); (5) apply to the next quarter with the chosen pair |
+| Choosing (σ₀, γ) | chapter 09: by the equity curve and the drawdown, the Sharpe only as a tie-break. Operationally: drop pairs whose validation max drawdown is deeper than the grid's median; of the rest, take the highest cumulative excess return; if the top two are within one SE of the mean daily return, the higher Sharpe |
+| Outer layer, OV 2024Q3 → 2025Q2 | candidate procedures = 5 model classes × regime features off / on = **10**. Each is run unchanged through every rung; OV chooses one by the same rule |
+| Test 2025Q3 → 2026Q2 | the chosen procedure, read once by a script committed before it runs (frozen-commit guard). **The third look at those quarters**, labelled so everywhere |
 
-**The design caveat, stated now.** The menu was built knowing Round 2's results on all of
-2021–2026. The parameters are out of sample on the walk-forward record; the design is not. Only
-fresh data is clean on both.
+### B5. What is reported
+
+| Book | What it isolates |
+| --- | --- |
+| R0 = T0 | the baseline |
+| T1 | Round 2's rule-based volatility scaling |
+| P, the chosen procedure | the learning path's book: **bullet 4's refined strategy** |
+| P with regime features off | the regime-aware features' contribution |
+| P with γ fixed at 1e-4 | the turnover term's contribution |
+| All 10 procedures | the stitched train-ladder record, every one, so the OV choice can be seen against what it chose from |
+
+## 6. Samples, and the caveat
+
+| Sample | Quarters | Status in the course's terms |
+| --- | --- | --- |
+| Stitched apply quarters | 2022Q1 → 2024Q2, 10 quarters, 30 monthly rebalances | in-sample: the procedure was designed while looking at it |
+| OV | 2024Q3 → 2025Q2, 4 quarters | out-of-sample selection: chooses the procedure, so its winner is flattered |
+| Test | 2025Q3 → 2026Q2, 4 quarters | out of sample, but the third look at those quarters |
+| Fresh data | 2026-07 onward, if extended (§ 9) | the only sample the Round 3 design has never seen |
+
+**The design caveat, stated now.** The feature list and grids were written knowing Round 2's
+results on all of 2021–2026. The parameters are out of sample on the walk-forward record; the
+design is not. Only fresh data is clean on both.
 
 ## 7. Metrics and acceptance
 
 These follow `OUTLINE.md` § 6.1 and § 6.3, re-based on R0 and the monthly record.
 
-- **Sharpe.** ΔSR = SR(R3) − SR(R0), with a paired stationary-bootstrap CI (mean block 21 days,
-  plus the sensitivity column). The percentage is quoted only if SR(R0)'s CI excludes 0 (C20).
-  Each family's contribution and each ablation row is reported.
-- **Turnover.** ΔTO%, with a CI, split by A8's four sources (C21).
-- **Execution haircut.** H₁ and H₀ for R3 beside R0: how much of bullet 2's loss the turnover
-  controls win back.
+- **Sharpe.** ΔSR = SR(P) − SR(R0) on each sample of § 6, with a paired stationary-bootstrap CI
+  (mean block 21 days, plus the sensitivity column). The percentage is quoted only if SR(R0)'s CI
+  excludes 0 (C20).
+- **Turnover.** ΔTO%, with a CI, split by A8's sources (C21).
+- **Execution haircut.** H₁ and H₀ for P beside R0: how much of bullet 2's loss the turnover term
+  wins back.
 - **Robustness.** Each with its pass condition:
   - per-year sign count;
-  - drop the best 5 and 10 days of |r_R3 − r_R0|;
+  - drop the best 5 and 10 days of |r_P − r_R0|;
   - the cost grid;
-  - the S2 cut in place of D;
   - without the fixed-income ETFs;
   - data truncated at 2025-12-04.
-- **Deflated Sharpe.** N = every candidate in `config.ROUND3`'s grids, counted by the script, not
-  by hand.
+- **Deflated Sharpe** on OV's winner. N = 10 procedures × each one's inner grid, counted by the
+  script, not by hand.
+- **The course's sanity line.** A weekly-or-slower book above a Sharpe of about 1 is suspected of
+  look-ahead before it is credited (chapter 09).
 
-**Power, stated now.** 30 months is about 630 trading days, so SE(SR) ≈ √(252/630) ≈ 0.63. For
-paired books with ρ = 0.9–0.95, SE(ΔSR) ≈ 0.20–0.28, so the minimum detectable ΔSR at 80% power
-is about 0.5–0.7. **+8% of a 0.3 Sharpe is about 0.025, twenty to thirty times smaller.** No result
-on this sample can confirm "+8%" as such. The quotable form is an absolute ΔSR with its CI.
-Turnover is different: it is mechanical and measured almost without noise, so −14% is a fair test.
+**Power, stated now.** Test's 12 months give SE(SR) ≈ 1.0; the 54-month walk-forward record gives
+≈ 0.47. For paired books with ρ = 0.9–0.95, SE(ΔSR) over the record is ≈ 0.15–0.21, so the
+minimum detectable ΔSR at 80% power is about 0.4–0.5. **+8% of a 0.3 Sharpe is about 0.025.** No
+result on this sample can confirm "+8%" as such; the quotable form is an absolute ΔSR with its CI.
+Turnover is mechanical and measured almost without noise, so −14% is a fair test.
 
 ## 8. Deliverables and order
 
 | Step | Produces | Gate |
 | --- | --- | --- |
-| 0 | `ROUND3.md` final, plus `config.ROUND3` | Harry settles § 9; committed before any Round 3 number exists |
-| 1 | `rr_round3.py` (measures, revision rules, nested selection) and tests in `tests/` | tests pass; no-look-ahead test on every new measure |
-| 2 | `run_30_round3_regimes.py` → Part A tables, `results/30_*` | pre-Test only |
-| 3 | A9's findings table, written up in this file | before step 4 |
-| 4 | `run_31_round3_revisions.py` → the ladder and ablation on the headline record, `results/31_*` | pre-Test only |
-| 5 | `run_32_round3_test.py`: the Test and fresh-data read, `results/32_*` | script committed first; frozen-commit guard |
+| 0 | this file and `config.ROUND3` | committed before any Round 3 number exists |
+| 1 | `rr_round3.py` (measures, features, monthly rungs, models, optimizer) and tests in `tests/` | tests pass; a no-look-ahead test on every new measure |
+| 2 | `run_30_round3_regimes.py` → Part A, `results/30_*` | pre-Test only |
+| 3 | A9's findings, written up in this file | before step 4 |
+| 4 | `run_31_round3_pipeline.py` → all 10 procedures through OV, the OV choice, `results/31_*` | pre-Test only |
+| 5 | `run_32_round3_test.py`: the Test read, `results/32_*` | script committed first; frozen-commit guard |
 | 6 | `run_33_round3_reconcile.py` → `RESULTS.md` § Round 3; the C13, C16, C20 and C21 ledger rows in `OUTLINE.md` | the T13 "Done when" |
-| 7 | Figures `rr3-*`: regime map with counts, regime lag, turnover sources, revision ladder (ΔSR against ΔTO with CIs), equity curves | `nature-figure` pass, then the `figures` and `colors` skills; both axes labelled |
+| 7 | Figures `rr3-*`: regime map with counts, regime lag, turnover sources, the procedure comparison, equity curves | `nature-figure` pass, then the `figures` and `colors` skills; both axes labelled |
 
-## 9. Open questions for Harry
+## 9. Decisions and open items
 
-| # | Question | Recommendation |
+| # | Question | Status |
 | --- | --- | --- |
-| Q1 | Baseline: T0, or T1 (already vol-scaled)? | **T0.** Bullet 4 lists volatility scaling as one of the revisions, and T0 is the strategy whose haircut bullet 2 measures. Increments over T1 are printed either way |
-| Q2 | Extend the data past 2026-06-29 to the latest close? | **Yes, if the Databento pull is cheap.** About four months is too short to judge a Sharpe, but it is the only clean check of the sign and the turnover. Yahoo would change the volume feed, so it is not a substitute |
-| Q3 | Include RF5, the course's model step (Ridge, CatBoost)? | **Rules first.** RF5 stays as one candidate if you want the course's model ladder represented. An inner train of roughly 400–1,500 asset-months is thin for trees |
-| Q4 | Bring MACD back as RF4? | **Yes.** Bullet 1 says "momentum + MACD", and Round 2 has no MACD |
+| Q1 | Baseline T0 or T1? | **T0**, with T1 printed beside it. Recommended 2026-10-29, accepted 2026-10-30 |
+| Q2 | Extend the data past 2026-06-29? | **Open.** It needs Harry's Databento pull; Yahoo would change the volume feed |
+| Q3 | The course's model step? | **In**, as Part B: Harry asked on 2026-10-30 that Round 3 follow the learning path |
+| Q4 | MACD back? | **In**, as the B1 feature `macd` |
+| — | Regime cut | **D only**, Harry 2026-10-30 |
