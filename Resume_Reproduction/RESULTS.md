@@ -8,6 +8,8 @@ Two rounds were run on 2026-10-23. **Round 2 is the current answer.**
   and Pedersen (2012), a 12-month look-back and a 1-month hold. It adds the volatility targeting
   and regime analysis Harry asked for. Its plan is `ROUND2.md`, committed before any Round 2 number
   existed.
+- **Round 3** is planned in `ROUND3.md`, which covers the full regime analysis and the revisions
+  built from it. Nothing has run yet.
 
 **Sample:** 37 liquid US-listed ETFs as futures proxies, daily, total-return prices, returns in
 excess of the 3-month bill (DTB3 × net exposure). **Execution:** next-close fill, 5 bp per side
