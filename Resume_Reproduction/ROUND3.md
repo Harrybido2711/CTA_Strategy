@@ -32,7 +32,7 @@ turnover? Each answer is reported as ΔSR (absolute, and as a percentage only un
 | Data, prices, returns | as Round 2: 37 ETFs, daily, total-return prices, excess of DTB3, the split-adjusted copy (DATA § 4) |
 | Execution | signal at the month's last close, trade at the next close; 5 bp per side + 2 bp slippage; $1 of capital |
 | Turnover | executed turnover per unit gross, per year, as in Round 2 |
-| Asset classes | the six of `config.UNIVERSE_CATEGORY`: U.S. broad equity, U.S. sectors, international equity, fixed income, commodities, alternatives |
+| Asset classes | the four of `config.UNIVERSE_CATEGORY`, used by every earlier script: equity 21, bonds 7, commodities 6, alternatives 3. Chapter 100's six-way table splits equity into U.S. broad 5, U.S. sectors 11 and international 5 |
 
 ## 4. Part A — the regime analysis
 
@@ -45,7 +45,7 @@ it does not choose them (§ 5).
 | --- | --- | --- |
 | V, volume | 21-day mean volume, ranked against the asset's own trailing 252 days. DATA § 3: one venue feed, so never compared across assets | per asset |
 | σ, volatility | 21-day realised volatility, ranked against the asset's own trailing 252 days; σ_fast / σ_slow (EWMA com 10 / 60) beside | per asset |
-| VIX, MOVE | terciles. Equity and commodity ETFs are labelled by VIX, the fixed-income ETFs by MOVE: a rate sleeve labelled by VIX is labelled wrongly (course, *Volatility Signals*) | market |
+| VIX, MOVE | terciles. The 7 bond ETFs are labelled by MOVE, the other 30 by VIX: a rate sleeve labelled by VIX is labelled wrongly (course, *Volatility Signals*) | market |
 | Market volume | cross-sectional mean of the per-asset V ranks | market |
 | Correlation | average pairwise 63-day correlation of the 37 ETFs, terciles | market |
 | Trend strength | 12-month excess return / (σ × √1 year), in z units | per asset |
@@ -79,7 +79,7 @@ overlay it suggested chose m = 1. Part A prints both alignments for every state,
 - **"Consistently".** C16's rule: the corner is positive in every period (2021, 2022, 2023, 2024,
   2025H1), and its episode-bootstrap CI excludes 0. Otherwise the fallback wording in `OUTLINE.md`
   applies.
-- **By asset class.** Each of the six classes is reported as a descriptive column.
+- **By asset class.** Each of the four classes is a descriptive column; equity is also shown in chapter 100's three parts. Alternatives holds 3 assets, so its cells will often be too thin to read.
 
 ### A5. The book by market state
 
