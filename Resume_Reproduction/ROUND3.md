@@ -45,7 +45,7 @@ it does not choose them (§ 5).
 | --- | --- | --- |
 | V, volume | 21-day mean volume, ranked against the asset's own trailing 252 days. DATA § 3: one venue feed, so never compared across assets | per asset |
 | σ, volatility | 21-day realised volatility, ranked against the asset's own trailing 252 days; σ_fast / σ_slow (EWMA com 10 / 60) beside | per asset |
-| VIX, MOVE | terciles | market |
+| VIX, MOVE | terciles. Equity and commodity ETFs are labelled by VIX, the fixed-income ETFs by MOVE: a rate sleeve labelled by VIX is labelled wrongly (course, *Volatility Signals*) | market |
 | Market volume | cross-sectional mean of the per-asset V ranks | market |
 | Correlation | average pairwise 63-day correlation of the 37 ETFs, terciles | market |
 | Trend strength | 12-month excess return / (σ × √1 year), in z units | per asset |
@@ -57,29 +57,54 @@ VIX only), S2 (frozen at each rung) and S3 (full sample, labelled look-ahead) ar
 it, with the share of days on which they agree with D. This is Round 1's comparison, run at the
 monthly horizon.
 
-### A3. The per-asset regime map (bullet 3)
+### A3. Timing: every table in two alignments
+
+| Alignment | State | Return | Answers |
+| --- | --- | --- | --- |
+| Contemporaneous | the state on day t | the book's return on day t | when the book loses: descriptive only |
+| Predictive | the state known at the decision close (month-end t, or t − 1 for a daily rule) | the return after the trade | whether the state can be acted on |
+
+**Only a predictive table can motivate a revision.** Round 2's VIX-state table
+(`results/20_regime_returns.csv`, the +17% / +16% / −21% row of `RESULTS.md`) joins the VIX close
+of day t to the return of day t, so it is contemporaneous. That is why it looks strong while the
+overlay it suggested chose m = 1. Part A prints both alignments for every state, side by side.
+
+### A4. The per-asset regime map (bullet 3)
 
 - **Cells.** V tercile × σ tercile. The outcome is sign × next-month excess return.
 - **Counts.** Asset-months, months and episodes are printed in every cell.
 - **The corner.** HV/LV − LV/HV, plus a pooled regression with a V × σ interaction and SEs
-  clustered by month.
+  clustered by month. The 37 assets in one month share one market shock, so they are not 37
+  independent observations.
 - **"Consistently".** C16's rule: the corner is positive in every period (2021, 2022, 2023, 2024,
   2025H1), and its episode-bootstrap CI excludes 0. Otherwise the fallback wording in `OUTLINE.md`
   applies.
 - **By asset class.** Each of the six classes is reported as a descriptive column.
 
-### A4. The book by market state
+### A5. The book by market state
 
-T0 and T1 are reported by VIX, MOVE, correlation and market-volume state, with day counts. A 2-D
-VIX × market-volume table covers homework B's two-dimensional view.
+T0 and T1 are reported by VIX, MOVE, correlation and market-volume state, in both alignments, with
+day and month counts. A 2-D VIX × market-volume table covers homework B's two-dimensional view.
+Rows are compared by mean return with its error bar, not by Sharpe: a Sharpe carries the state's
+own volatility in its denominator.
 
-### A5. The regime lag
+### A6. The regime lag
 
 An event study: the cumulative excess return of T0 and T1 from 20 days before to 60 days after VIX
 enters its high tercile, with per-asset σ_fast and σ_slow over the same window. It measures why
 the month-end and daily state cuts of Round 2 arrived too late, and which estimate reacts in time.
 
-### A6. Where the turnover comes from
+### A7. Is it new information?
+
+T0 already sizes each asset by 1/σ, and T1 scales the whole book by its ex-ante volatility, so
+part of any volatility regime is already spent. Chapter 04 § 3.2 residualizes the label on what
+the book already uses. Here that means regressing the signed next-month return on the regime
+labels with the sizing σ (and, for T1, the leverage) as controls.
+
+- A label whose effect disappears gets no revision. It is recorded as "already in the book".
+- Volume enters no sizing rule, so a volume effect that survives is new.
+
+### A8. Where the turnover comes from
 
 T0's and T1's Σ|Δw| is split into four sources:
 
@@ -91,7 +116,7 @@ T0's and T1's Σ|Δw| is split into four sources:
 Each source is also shown by regime. This decides which control could plausibly reach −14%: a
 deadband cannot remove a sign flip.
 
-### A7. Output
+### A9. Output
 
 A table of findings → revisions. It fills the "motivated by" column of § 5 and is written up
 before Part B runs.
@@ -105,15 +130,15 @@ number appears, as Round 2 did with T3. Every item is reported, including those 
 | Family | Item | Rule | Grid (chosen walk-forward, § 6) | Motivated by |
 | --- | --- | --- | --- | --- |
 | **VS**, volatility scaling | VS1 | book vol target 10% (= T1) | on / off | Round 2: the adjustment that worked |
-| | VS2 | asset σ = max(σ_fast, σ_slow), so sizing reacts inside a volatility spike | com_fast ∈ {10, 20} | Round 2: state cuts lag; A5 |
-| **RF**, regime-aware features | RF1 | per-asset multiplier by (V, σ) cell, fitted on the training window and shrunk toward 1 | multipliers ∈ {0.5, 1, 1.5}, shrinkage ∈ {0.5, 1} | bullet 3; A3 |
-| | RF2 | trend strength in place of the sign: clip(z / z₀, −1, 1) | z₀ ∈ {0.5, 1} | sign flips near zero; A6 |
+| | VS2 | asset σ = max(σ_fast, σ_slow), so sizing reacts inside a volatility spike | com_fast ∈ {10, 20} | Round 2: state cuts lag; A6 |
+| **RF**, regime-aware features | RF1 | per-asset multiplier by (V, σ) cell, fitted on the training window and shrunk toward 1 | multipliers ∈ {0.5, 1, 1.5}, shrinkage ∈ {0.5, 1} | bullet 3; A4, A7 |
+| | RF2 | trend strength in place of the sign: clip(z / z₀, −1, 1) | z₀ ∈ {0.5, 1} | sign flips near zero; A8 |
 | | RF3 | mean of the sign over 6, 9 and 12-month look-backs | on / off | paper Table 2 and Round 2's grid: 6–12 months all earn |
 | | RF4 | slow MACD agreement: × 1 when chapter 03's slowest pairing agrees with the TSMOM sign, × a when it does not | a ∈ {0.5, 1} | bullet 1's "momentum + MACD" at the monthly horizon (§ 9 Q4) |
 | | RF5 | optional: the course's model step, Ridge and CatBoost on the RF inputs plus V, σ and VIX ranks; target next-month return / σ | λ grid, depth grid | the course pipeline, chapter 08 (§ 9 Q3) |
 | **TC**, turnover controls | TC1 | proportional no-trade band: trade asset s only when \|w* − w\| > b\|w*\| | b ∈ {0.1, 0.25, 0.5} | Round 2: the absolute 0.5% band had little to trim |
-| | TC2 | partial adjustment w ← w + κ(w* − w) | κ ∈ {1, 0.5} | A6 resizing share |
-| | TC3 | sign hysteresis: flip only when trend strength crosses ±h | h ∈ {0, 0.25, 0.5} | A6 sign-flip share |
+| | TC2 | partial adjustment w ← w + κ(w* − w) | κ ∈ {1, 0.5} | A8 resizing share |
+| | TC3 | sign hysteresis: flip only when trend strength crosses ±h | h ∈ {0, 0.25, 0.5} | A8 sign-flip share |
 
 ### The ladder, and the ablation
 
@@ -151,7 +176,7 @@ These follow `OUTLINE.md` § 6.1 and § 6.3, re-based on R0 and the monthly reco
 - **Sharpe.** ΔSR = SR(R3) − SR(R0), with a paired stationary-bootstrap CI (mean block 21 days,
   plus the sensitivity column). The percentage is quoted only if SR(R0)'s CI excludes 0 (C20).
   Each family's contribution and each ablation row is reported.
-- **Turnover.** ΔTO%, with a CI, split by A6's four sources (C21).
+- **Turnover.** ΔTO%, with a CI, split by A8's four sources (C21).
 - **Execution haircut.** H₁ and H₀ for R3 beside R0: how much of bullet 2's loss the turnover
   controls win back.
 - **Robustness.** Each with its pass condition:
@@ -177,7 +202,7 @@ Turnover is different: it is mechanical and measured almost without noise, so �
 | 0 | `ROUND3.md` final, plus `config.ROUND3` | Harry settles § 9; committed before any Round 3 number exists |
 | 1 | `rr_round3.py` (measures, revision rules, nested selection) and tests in `tests/` | tests pass; no-look-ahead test on every new measure |
 | 2 | `run_30_round3_regimes.py` → Part A tables, `results/30_*` | pre-Test only |
-| 3 | A7's findings table, written up in this file | before step 4 |
+| 3 | A9's findings table, written up in this file | before step 4 |
 | 4 | `run_31_round3_revisions.py` → the ladder and ablation on the headline record, `results/31_*` | pre-Test only |
 | 5 | `run_32_round3_test.py`: the Test and fresh-data read, `results/32_*` | script committed first; frozen-commit guard |
 | 6 | `run_33_round3_reconcile.py` → `RESULTS.md` § Round 3; the C13, C16, C20 and C21 ledger rows in `OUTLINE.md` | the T13 "Done when" |
