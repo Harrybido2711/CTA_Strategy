@@ -269,6 +269,36 @@ $$ \max_w \ \hat\mu^\top w - \sum_i (\varphi \kappa_i + \gamma)\,|w_i - w_{\text
 
 This is reported with H₁ and H₀, and with how much of R0's haircut the cost-aware optimizer wins back.
 
+## Amendment 2 — γ in the units it means (Harry, 2026-10-30, after the pre-Test run, before Test)
+
+**Written after the pre-Test results of Part B were seen** (`RESULTS.md` § Round 3, Part B before
+Test; `results/31_*` at `a8c48d7`). It is labelled so wherever its numbers appear. Test had not
+been read.
+
+**What was wrong.** B3 kept the course's γ grid, {1e-4, 0.01, 0.1, 1}, in monthly-return units per
+dollar traded. Against a cost of 0.0007, that makes three of the four values forbid trading. In
+the first run P's book therefore alternated between frozen quarters and full rebuilds, and its
+turnover rose 55% against R0. This is the same unit problem B3 had already fixed for λ, left
+unfixed for γ.
+
+**The change, and nothing else.** γ is written as multiples of the trading cost:
+
+$$ \gamma \in \{0,\ 0.5,\ 1,\ 2\} \times \kappa, \qquad \kappa = 7\ \text{bp per dollar traded} $$
+
+That is 0 to 14 bp of expected gain demanded per dollar traded, on top of the fixed cost term φκ.
+
+Everything else stays as pre-registered:
+
+- the 3 / 1 / 1 quarterly ladder;
+- the σ₀ grid;
+- the models;
+- the features;
+- the OV rule.
+
+**Where it lands.** The amended run writes `results/31b_*`. The first run's `results/31_*` stay as
+the record of the pre-registered grid. Amendment 1's "γ = 1e-4" ablation becomes "γ = 0", the cost
+term alone.
+
 ## 6. Samples, and the caveat
 
 | Sample | Quarters | Status in the course's terms |

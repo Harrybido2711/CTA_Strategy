@@ -437,14 +437,14 @@ class Context:
 class Procedure:
     """One candidate procedure (model class x regime features), run unchanged through every rung."""
 
-    def __init__(self, ctx, model, regime_on, phi=P3["cost_phi"], gamma_fixed=None):
+    def __init__(self, ctx, model, regime_on, phi=P3["cost_phi"], gamma_fixed=None, kappa_bp=P3["kappa_bp"]):
         self.ctx, self.model, self.regime_on, self.phi, self.gamma_fixed = ctx, model, regime_on, phi, gamma_fixed
         self.cols = FEATURES_ON if regime_on else FEATURES_OFF
         self.name = f"{model} | regime {'on' if regime_on else 'off'}"
         self.book = CostAwareBook(len(ctx.assets))
         self.live = {}                                         # F -> target vector
         self.log = []
-        self.kappa = np.full(len(ctx.assets), P3["kappa_bp"] / 1e4)
+        self.kappa = np.full(len(ctx.assets), kappa_bp / 1e4)   # the cost grid re-prices the optimizer
 
     def _rows(self, segs, need_y=True):
         p = self.ctx.panel

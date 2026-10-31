@@ -1,5 +1,8 @@
 """Round 3, Part B before Test: the learning path's pipeline, the procedures, the OV choice (ROUND3.md section 5).
 
+Amendment 2 is in force: gamma is a multiple of the 7 bp cost, and the outputs are results/31b_*.
+results/31_* are the first run, on the pre-registered gamma grid, at commit d9decdc.
+
     .venv/bin/python Resume_Reproduction/run_31_round3_pipeline.py
 
 Apply quarters 2022Q1 -> 2025Q2 only; the last month-end used is 2025-05-30 and every statistic
@@ -24,6 +27,7 @@ from run_20_round2 import R2             # noqa: E402
 P3 = C.ROUND3
 LAST_ME = "2025-05-30"
 LAST_Q = pd.Period("2025Q2", "Q")
+OUT = "31b"
 WINDOWS = {"train-ladder 2022Q1-2024Q2": ("2022-01-01", "2024-06-30"),
            "OV 2024Q3-2025Q2": ("2024-07-01", "2025-06-30"),
            "WF pre-Test 2022Q1-2025Q2": ("2022-01-01", "2025-06-30")}
@@ -72,7 +76,7 @@ def main():
     runs = {k: ctx.run_engine(v) for k, v in {**base, **books}.items()}
 
     rows = [dict(stats(ctx, res, a, b), book=k, window=wn) for k, res in runs.items() for wn, (a, b) in WINDOWS.items()]
-    write_result(pd.DataFrame(rows).set_index(["book", "window"]), "31_procedures",
+    write_result(pd.DataFrame(rows).set_index(["book", "window"]), OUT + "_procedures",
                  dict(meta, what="every procedure and the two baselines, realistic execution",
                       turnover="executed, per $1 a year, the record's first day (the build from zero) excluded"))
 
@@ -80,20 +84,20 @@ def main():
     a, b = WINDOWS["OV 2024Q3-2025Q2"]
     ov = {k: runs[k]["excess"][(cal >= pd.Timestamp(a)) & (cal <= pd.Timestamp(b))] for k in books}
     pick, tab = R3.choose(ov)
-    write_result(tab, "31_choice", dict(meta, what="OV comparison of the procedures by chapter 09's rule", chosen=pick,
+    write_result(tab, OUT + "_choice", dict(meta, what="OV comparison of the procedures by chapter 09's rule", chosen=pick,
                                         rule=P3["pair_rule"]))
     lg = pd.DataFrame(logs)
     coefs = pd.DataFrame([dict(procedure=l["procedure"], apply_q=l["apply_q"], **l["coefs"]) for l in logs])
-    write_result(lg.drop(columns=["coefs"]).set_index(["procedure", "apply_q"]), "31_rung_log",
+    write_result(lg.drop(columns=["coefs"]).set_index(["procedure", "apply_q"]), OUT + "_rung_log",
                  dict(meta, what="per rung: model grid point (validation MSE), the (sigma_0, gamma) pair, rows"))
-    write_result(coefs.set_index(["procedure", "apply_q"]), "31_coefficients",
+    write_result(coefs.set_index(["procedure", "apply_q"]), OUT + "_coefficients",
                  dict(meta, what="refit coefficients (Ridge, Lasso; standardized features) or feature importances (trees) per rung"))
 
     # ---- the chosen procedure's ablations (amendment 1): costs, turnover, delay
     model, on = next((m_, o_) for m_, o_ in R3.PROCEDURES if f"{m_} | regime {'on' if o_ else 'off'}" == pick)
     abl = {"P": runs[pick]}
-    for nm, kw in {"P, phi = 0 (blind to costs)": dict(phi=0.0), "P, gamma = 1e-4": dict(gamma_fixed=1e-4),
-                   "P, phi = 0 and gamma = 1e-4": dict(phi=0.0, gamma_fixed=1e-4),
+    for nm, kw in {"P, phi = 0 (blind to costs)": dict(phi=0.0), "P, gamma = 0 (the cost term alone)": dict(gamma_fixed=0.0),
+                   "P, phi = 0 and gamma = 0 (blind to trading)": dict(phi=0.0, gamma_fixed=0.0),
                    f"P, regime features {'off' if on else 'on'}": dict(regime_on=not on)}.items():
         kw2 = dict(kw); ro = kw2.pop("regime_on", on)
         pr = R3.Procedure(ctx, model, ro, **kw2)
@@ -106,7 +110,7 @@ def main():
         abl[f"R0 at d = {d}"] = cd.run_engine(base["R0 = T0 (paper)"])
         print(f"d = {d}: done", flush=True)
     ab = [dict(stats(ctx, res, a_, b_), book=k, window=wn) for k, res in abl.items() for wn, (a_, b_) in WINDOWS.items()]
-    write_result(pd.DataFrame(ab).set_index(["book", "window"]), "31_ablations",
+    write_result(pd.DataFrame(ab).set_index(["book", "window"]), OUT + "_ablations",
                  dict(meta, what=f"the chosen procedure P = {pick}: the cost term off, gamma off, both, the other feature set, delay 2 and 3"))
 
     # ---- the execution waterfall (bullet 2), P beside R0
@@ -123,7 +127,7 @@ def main():
             n0, n1, rl = pnl["naive_0 (same close, free)"], pnl["naive_1 (next close, free)"], pnl["realistic (+ slippage 2 bp)"]
             wf.append({"book": k, "window": wn, "variant": "H_1 = 1 - realistic / naive_1", "cum_pnl": 1 - rl / n1 if n1 > 0 else np.nan})
             wf.append({"book": k, "window": wn, "variant": "H_0 = 1 - realistic / naive_0", "cum_pnl": 1 - rl / n0 if n0 > 0 else np.nan})
-    write_result(pd.DataFrame(wf).set_index(["book", "window", "variant"]), "31_waterfall",
+    write_result(pd.DataFrame(wf).set_index(["book", "window", "variant"]), OUT + "_waterfall",
                  dict(meta, what="raw PnL per $1 (not excess) under each execution assumption; H undefined when the naive PnL <= 0"))
 
     # ---- paired bootstrap, P against R0 and T1
@@ -143,12 +147,12 @@ def main():
                            "d_sharpe_90_lo": np.quantile(d, 0.05), "d_sharpe_90_hi": np.quantile(d, 0.95),
                            "d_turnover": float(t1_.mean() / t0_.mean() - 1),
                            "d_turnover_90_lo": np.quantile(dto, 0.05), "d_turnover_90_hi": np.quantile(dto, 0.95)})
-    write_result(pd.DataFrame(bs).set_index(["against", "window", "mean_block"]), "31_bootstrap",
+    write_result(pd.DataFrame(bs).set_index(["against", "window", "mean_block"]), OUT + "_bootstrap",
                  dict(meta, what=f"P = {pick} minus the baseline, paired stationary bootstrap, 2000 draws, 90% intervals"))
 
     ovx = {k: v.dropna().to_numpy() for k, v in ov.items()}
     dsr = M.deflated_sharpe(ov[pick], [x.mean() / x.std(ddof=1) for x in ovx.values()], len(ovx))
-    write_result(pd.DataFrame([dict(dsr, procedure=pick)]).set_index("procedure"), "31_deflated_sharpe",
+    write_result(pd.DataFrame([dict(dsr, procedure=pick)]).set_index("procedure"), OUT + "_deflated_sharpe",
                  dict(meta, what="deflated Sharpe of OV's winner against the procedures it was chosen from (daily units)"))
     print(f"chosen: {pick}; {time.time() - t_start:.0f} s")
 

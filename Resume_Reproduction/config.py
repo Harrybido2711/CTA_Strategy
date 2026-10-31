@@ -168,3 +168,8 @@ ROUND3 = {
     "delay_grid": (2, 3),                     # P re-run end to end at these delays
     "label": "excess return from the fill F + d to the next month-end close F', known at F'",
 }
+# Amendment 2 (Harry, 2026-10-30, after the pre-Test run, before Test): gamma as multiples of the cost.
+# The pre-registered grid, kept for the record of results/31_*: (1e-4, 1e-2, 1e-1, 1.0) in monthly-return units.
+ROUND3["gamma_grid_preregistered"] = ROUND3["gamma_grid"]
+ROUND3["gamma_kappa_multiples"] = (0.0, 0.5, 1.0, 2.0)
+ROUND3["gamma_grid"] = tuple(m * ROUND3["kappa_bp"] / 1e4 for m in ROUND3["gamma_kappa_multiples"])
