@@ -1,0 +1,26 @@
+# round: 3, Part B, the Test read
+# test_read: single read at 2026-10-30T19:40:25, frozen at commit 7e00439
+# procedure: CatBoost | regime on
+# third_look: Round 1 and Round 2 read these Test quarters first
+# execution: next close (d = 1), 5 bp + 2 bp; excess of DTB3
+# what: P's per-rung choices, all 18 rungs
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+apply_q,procedure,model_point,val_mse,sigma0,gamma,train_rows,val_rows
+2022Q1,CatBoost | regime on,CatBoost depth=2,1.160396064680815,0.05,0.0014,296,111
+2022Q2,CatBoost | regime on,CatBoost depth=2,1.6167939779473766,0.1,0.0014,333,111
+2022Q3,CatBoost | regime on,CatBoost depth=2,0.9672452278641345,0.1,0.0014,333,111
+2022Q4,CatBoost | regime on,CatBoost depth=2,1.1463443726379565,0.1,0.0007,333,111
+2023Q1,CatBoost | regime on,CatBoost depth=2,1.2005073546106102,0.05,0.0,333,108
+2023Q2,CatBoost | regime on,CatBoost depth=3,0.8457823920540382,0.1,0.0014,330,107
+2023Q3,CatBoost | regime on,CatBoost depth=3,0.5654322585808457,0.1,0.0014,326,111
+2023Q4,CatBoost | regime on,CatBoost depth=3,0.6502197894994202,0.05,0.0014,326,111
+2024Q1,CatBoost | regime on,CatBoost depth=2,1.2395391920320413,0.1,0.0,329,111
+2024Q2,CatBoost | regime on,CatBoost depth=2,0.8066835296493874,0.05,0.0007,333,111
+2024Q3,CatBoost | regime on,CatBoost depth=2,0.5738726996559047,0.1,0.0014,333,111
+2024Q4,CatBoost | regime on,CatBoost depth=3,1.3628812461114557,0.1,0.0014,333,111
+2025Q1,CatBoost | regime on,CatBoost depth=2,1.9511746639840386,0.1,0.0014,333,111
+2025Q2,CatBoost | regime on,CatBoost depth=3,0.7873033847315098,0.05,0.0014,333,111
+2025Q3,CatBoost | regime on,CatBoost depth=2,0.5657921145196656,0.05,0.0,333,111
+2025Q4,CatBoost | regime on,CatBoost depth=2,0.766618127458948,0.05,0.0014,333,111
+2026Q1,CatBoost | regime on,CatBoost depth=3,0.39215175485833004,0.05,0.0,333,111
+2026Q2,CatBoost | regime on,CatBoost depth=3,1.68560661924066,0.05,0.0,333,111

@@ -361,3 +361,24 @@ Turnover is mechanical and measured almost without noise, so −14% is a fair te
 | Q3 | The course's model step? | **In**, as Part B: Harry asked on 2026-10-30 that Round 3 follow the learning path |
 | Q4 | MACD back? | **In**, as the B1 feature `macd` |
 | — | Regime cut | **D only**, Harry 2026-10-30 |
+
+## Status after the Test read (2026-10-30)
+
+Test was read once, at `7e00439`, by `run_32_round3_test.py`. The numbers are in `RESULTS.md`
+§ Round 3, Part B — the Test read. In short, after costs and in excess of bills:
+
+| Book | Test Sharpe | WF 2022Q1–2026Q2 Sharpe | WF turnover |
+| --- | --- | --- | --- |
+| R0 = T0 | 1.06 | 0.12 | 11.6 |
+| T1 | 1.23 | 0.34 | 12.0 |
+| P = CatBoost with regime features | −0.27 | 0.36 | 37.8 |
+
+- **The learning-path book does not beat the paper's rule out of sample.** On Test, P − R0 is
+  −1.33 of Sharpe, 90% CI −2.98 to +0.20.
+- **Over the whole record P leads R0, but not significantly.** The gap is +0.24, CI −0.65 to +1.07,
+  and it disappears without the 5 days on which the two books differ most.
+- **Turnover is about three times R0's.** Within the pipeline, the γ and cost terms cut it by 24%
+  against an optimizer blind to trading.
+
+Round 2's T1 remains the best book. Any further change is post-Test: Test has now been read three
+times.

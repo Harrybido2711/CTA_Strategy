@@ -1,0 +1,36 @@
+# round: 3, Part B, the Test read
+# test_read: single read at 2026-10-30T19:40:25, frozen at commit 7e00439
+# procedure: CatBoost | regime on
+# third_look: Round 1 and Round 2 read these Test quarters first
+# execution: next close (d = 1), 5 bp + 2 bp; excess of DTB3
+# what: the 'two good days' check and the per-year sign count
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+against,window,check,d_sharpe
+R0 = T0 (paper),Test 2025Q3-2026Q2,drop the 0 largest |r_P - r_ref| days,-1.3257846570795537
+R0 = T0 (paper),Test 2025Q3-2026Q2,drop the 5 largest |r_P - r_ref| days,-1.2766222923184547
+R0 = T0 (paper),Test 2025Q3-2026Q2,drop the 10 largest |r_P - r_ref| days,-0.7466713424768301
+R0 = T0 (paper),WF 2022Q1-2026Q2,drop the 0 largest |r_P - r_ref| days,0.24266687594282205
+R0 = T0 (paper),WF 2022Q1-2026Q2,drop the 5 largest |r_P - r_ref| days,0.009079514849653136
+R0 = T0 (paper),WF 2022Q1-2026Q2,drop the 10 largest |r_P - r_ref| days,-0.15846009099046832
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,drop the 0 largest |r_P - r_ref| days,0.6536852960363181
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,drop the 5 largest |r_P - r_ref| days,0.25635524771213436
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,drop the 10 largest |r_P - r_ref| days,0.1698380795384588
+R0 = T0 (paper),year 2022,per-year Sharpe difference,0.5511891416248806
+R0 = T0 (paper),year 2023,per-year Sharpe difference,1.7457493594835805
+R0 = T0 (paper),year 2024,per-year Sharpe difference,0.6704222923597752
+R0 = T0 (paper),year 2025,per-year Sharpe difference,-1.5379335099701903
+R0 = T0 (paper),year 2026,per-year Sharpe difference,-0.3767043704381086
+T1 (10% vol target),Test 2025Q3-2026Q2,drop the 0 largest |r_P - r_ref| days,-1.496171988033532
+T1 (10% vol target),Test 2025Q3-2026Q2,drop the 5 largest |r_P - r_ref| days,-0.9083406473857527
+T1 (10% vol target),Test 2025Q3-2026Q2,drop the 10 largest |r_P - r_ref| days,-0.6741123738098465
+T1 (10% vol target),WF 2022Q1-2026Q2,drop the 0 largest |r_P - r_ref| days,0.021301199775975443
+T1 (10% vol target),WF 2022Q1-2026Q2,drop the 5 largest |r_P - r_ref| days,-0.06671184540380543
+T1 (10% vol target),WF 2022Q1-2026Q2,drop the 10 largest |r_P - r_ref| days,-0.12701157389377932
+T1 (10% vol target),WF pre-Test 2022Q1-2025Q2,drop the 0 largest |r_P - r_ref| days,0.4307753714533184
+T1 (10% vol target),WF pre-Test 2022Q1-2025Q2,drop the 5 largest |r_P - r_ref| days,0.33699403908995684
+T1 (10% vol target),WF pre-Test 2022Q1-2025Q2,drop the 10 largest |r_P - r_ref| days,0.27119588929809535
+T1 (10% vol target),year 2022,per-year Sharpe difference,0.19306352034906593
+T1 (10% vol target),year 2023,per-year Sharpe difference,1.2878041567760194
+T1 (10% vol target),year 2024,per-year Sharpe difference,0.6319233700111752
+T1 (10% vol target),year 2025,per-year Sharpe difference,-1.5634256331202834
+T1 (10% vol target),year 2026,per-year Sharpe difference,-0.5127491006081935

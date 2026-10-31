@@ -1,0 +1,12 @@
+{
+  "round": "3, Part B, the Test read",
+  "test_read": "single read at 2026-10-30T19:40:25, frozen at commit 7e00439",
+  "procedure": "CatBoost | regime on",
+  "third_look": "Round 1 and Round 2 read these Test quarters first",
+  "execution": "next close (d = 1), 5 bp + 2 bp; excess of DTB3",
+  "what": "the 'two good days' check and the per-year sign count",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "7e00439",
+  "written": "2026-10-30T19:42:08",
+  "rows": 28
+}

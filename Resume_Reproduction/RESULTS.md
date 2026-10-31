@@ -1,6 +1,8 @@
 # Resume Reproduction — Results
 
-Two rounds were run on 2026-10-23. **Round 2 is the current answer.**
+Rounds 1 and 2 were run on 2026-10-23, Round 3 on 2026-10-30. **Round 2's T1 is still the best
+book.** Round 3 measured the regime analysis and Harry's learning-path pipeline; that pipeline's
+book did not survive Test.
 
 - **Round 1** tested short-horizon cross-sectional momentum: a 21-day signal, a five-day hold,
   ranked across assets every day. It is kept below as a record.
@@ -9,8 +11,8 @@ Two rounds were run on 2026-10-23. **Round 2 is the current answer.**
   and regime analysis Harry asked for. Its plan is `ROUND2.md`, committed before any Round 2 number
   existed.
 - **Round 3** follows Harry's learning path. Its plan is `ROUND3.md`, pre-registered at `5d94bc8`.
-  Part A, the regime analysis under the dynamic cut, has run. Part B, the model and the optimizer,
-  has run through OV; its Test read is pending (below).
+  Part A, the regime analysis under the dynamic cut, and Part B, the model and the cost-aware
+  optimizer, have both run. Test was read once, at `7e00439` (below).
 
 **Sample:** 37 liquid US-listed ETFs as futures proxies, daily, total-return prices, returns in
 excess of the 3-month bill (DTB3 × net exposure). **Execution:** next-close fill, 5 bp per side
@@ -207,6 +209,92 @@ features**.
 - **The cost term cuts turnover by 12%** against φ = 0.
 - **The waterfall.** P falls from +6.3% a year at next close and free, to +4.4% after the 5 bp cost,
   to +3.6% after slippage: **H₁ = 43%**, and H₀ = 18% against its same-close +4.4%.
+
+## Round 3, Part B — the Test read (2026-10-30, at `7e00439`)
+
+The procedure OV chose, **P = CatBoost with regime features**, was re-run unchanged through all 18
+rungs and read once on Test 2025Q3 → 2026Q2. Its pre-Test part reproduces `31b_*` exactly. **This is
+the third look at those quarters.** Tables are `results/32_*`; the series are in
+`33_daily_excess`. Only P and the baselines were read on Test.
+
+### Bottom line
+
+- **P fails on Test.** Its Sharpe is −0.27 against R0's 1.06 and T1's 1.23. The OV winner's 1.04
+  became −0.27, which is the course's own warning in action: a validation winner is partly luck.
+- **Over the whole walk-forward record P beats R0, but not significantly, and not robustly.** On
+  2022Q1 → 2026Q2, 54 months, P's Sharpe is 0.36 against R0's 0.12 and T1's 0.34. The difference
+  is +0.24, 90% CI −0.65 to +1.07. Without the 5 days on which P and R0 differ most, it is +0.01.
+- **P trades about three times as much as R0.** Turnover is +225% over the record, the opposite of
+  bullet 4's −14%.
+- **Inside the pipeline, the two cost-aware terms do cut turnover.** On the full record, γ cuts it
+  by 17% against the same pipeline at γ = 0, and γ with the cost term together cut it by 24%
+  against an optimizer blind to trading. Both cost Sharpe on this record.
+
+| Book | Test Sharpe | Test excess | Test turnover | WF 2022Q1–2026Q2 Sharpe | WF excess | WF max DD | WF turnover |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| R0 = T0, the paper | **1.06** | +14.9% | 13.4 | 0.12 | +1.7% | −0.40 | 11.6 |
+| T1, 10% vol target | **1.23** | +12.2% | 12.4 | 0.34 | +3.4% | −0.22 | 12.0 |
+| **P** | **−0.27** | −2.3% | 33.5 | **0.36** | +3.4% | −0.17 | 37.8 |
+
+| P − R0 (mean block 21) | ΔSR | 90% CI | ΔTO | 90% CI |
+| --- | --- | --- | --- | --- |
+| Test | −1.33 | −2.98 to +0.20 | +150% | +76% to +269% |
+| WF 2022Q1–2026Q2 | +0.24 | −0.65 to +1.07 | +225% | +162% to +302% |
+| WF, without the 5 / 10 days of largest \|r_P − r_R0\| | +0.01 / −0.16 | | | |
+
+By calendar year, ΔSR against R0 is +0.55 in 2022, +1.75 in 2023, +0.67 in 2024, −1.54 in 2025
+and −0.38 in 2026H1: 3 of 5 positive, and both negative years are the recent ones.
+
+### The three execution factors (amendment 1), over the record and on Test
+
+| P variant | WF Sharpe | WF turnover | Test Sharpe |
+| --- | --- | --- | --- |
+| P | 0.36 | 37.8 | −0.27 |
+| γ = 0, the cost term alone | 0.56 | 45.6 | −0.66 |
+| φ = 0, blind to costs | 0.49 | 43.0 | −0.23 |
+| φ = 0 and γ = 0, blind to trading | 0.41 | 49.7 | −0.48 |
+| regime features off | −0.32 | 46.7 | −0.13 |
+| d = 2, re-trained | 0.12 | 42.6 | −0.38 |
+| d = 3, re-trained | 0.18 | 42.7 | −1.54 |
+
+For comparison, R0 at d = 1, 2 and 3 has Sharpe 0.12, 0.22 and 0.29 over the record.
+
+### The execution waterfall (bullet 2), raw PnL a year
+
+| Book, window | Same close, free | Next close, free | + 5 bp cost | + 2 bp slippage | H₁ | H₀ |
+| --- | --- | --- | --- | --- | --- | --- |
+| R0, WF 2022Q1–2026Q2 | +3.6% | +3.5% | +2.9% | +2.7% | 23% | 24% |
+| **P, WF 2022Q1–2026Q2** | +3.6% | +5.4% | +3.5% | +2.7% | **50%** | 26% |
+| R0, Test | +20.2% | +20.8% | +20.1% | +19.8% | 5% | 2% |
+| P, Test | +1.1% | +2.1% | +0.2% | −0.5% | costs exceed it | |
+
+### Robustness (`32_robustness`)
+
+| Check | P, WF Sharpe | R0, WF Sharpe | P, Test | R0, Test |
+| --- | --- | --- | --- | --- |
+| Cost grid, 2–10 bp × 0–5 bp, optimizer re-priced each time | 0.20 to 0.68 | 0.05 to 0.15 | −0.32 to +0.03 | 0.98 to 1.11 |
+| Without the 7 bond ETFs | −0.28 | 0.08 | 0.08 | 1.21 |
+| Data truncated at 2025-12-04 | 0.46 | −0.00 | −0.35 | 1.44 |
+
+### Step 3, each feature on its own (`33_feature_ic`, computed after the Test read, chose nothing)
+
+Spearman IC per month, across the ETFs, against the next-month return over σ, on 2021-01 →
+2025-05 (53 months). **No feature reaches |t| = 2.**
+
+- The strongest is the trend × implied-vol interaction z12 × index-rank: IC 0.083, t 1.85,
+  positive in 58% of months. That is Part A's F2 again.
+- z12 alone: 0.036, t 0.89.
+- Own volume rank: −0.040, t −1.37.
+- corr-rank is one value across assets, so it has no cross-sectional IC.
+
+### The four bullets after Round 3
+
+| Resume claim | Round 3 measurement | Verdict |
+| --- | --- | --- |
+| 1. Momentum + MACD, engine with Sharpe, drawdown, turnover, IC, win rate | MACD returns as a feature beside momentum at 1, 3, 6 and 12 months. Every metric is computed; feature ICs are in `33_feature_ic`. Neither MACD nor any momentum horizon has a significant IC on its own | the engine and metrics hold; MACD adds nothing measurable |
+| 2. Over 25% of naive return lost to costs, delay, turnover and slippage | **P: 50% of its next-close naive return (H₀ 26%) over 2022Q1–2026Q2**, and more than all of it on Test. R0 on the same window: 23% (24%). Round 2's T0: 23% before Test | **holds for the learning-path book on both bases**; holds for the paper's book against same-close before Test |
+| 3. Trend best in high-volume, low-volatility regimes | Per asset the HV/LV corner fails (2 of 5 periods). The same-day table says low VIX is good, but the month-end state predicts the reverse: trend earns more after high-VIX month-ends. High market volume leans the right way only through 2022 | **not supported as worded**; the defensible statement is about the implied-vol state, and it runs the other way at decision time |
+| 4. +8% OOS Sharpe and −14% turnover from regime features, vol scaling and turnover controls | Test: ΔSR −1.33, turnover +150% against R0. The full walk-forward record: ΔSR +0.24 (CI −0.65 to +1.07, gone without 5 days). Within the pipeline, regime features add +0.68 of Sharpe over the record, and the γ and cost terms cut turnover 24% against the trading-blind optimizer | **not supported against the baseline**. What survives is mechanism-level: regime features help the model over the record, and the cost-aware terms cut the model book's own turnover |
 
 ## Round 2 — time-series momentum
 

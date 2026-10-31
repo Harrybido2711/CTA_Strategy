@@ -146,7 +146,19 @@ held a month. After costs and in excess of bills, 2021-02 → 2026-06:
 | T0, the paper | +4.8% | 0.32 | −0.42 | 11.1 |
 | T1, T0 scaled to 10% book volatility | +4.5% | 0.46 | −0.22 | 11.0 |
 
-The horizon, not the code, separates the two rounds. The full table, the claims ledger and every
+**Round 3** first ran a regime analysis under the dynamic cut. It then ran Harry's learning-path
+pipeline: momentum, MACD and regime features into an EW / Ridge / Lasso / CatBoost / HGB ladder,
+then a mean–variance optimizer that prices costs, turnover and delay, all chosen per quarter
+walk-forward. OV chose CatBoost with regime features. On Test 2025Q3 → 2026Q2, after costs:
+
+| Book | Test Sharpe | Walk-forward 2022Q1–2026Q2 Sharpe | Turnover a year |
+| --- | --- | --- | --- |
+| T0 | 1.06 | 0.12 | 11.6 |
+| T1 | 1.23 | 0.34 | 12.0 |
+| The learning-path book | −0.27 | 0.36 | 37.8 |
+
+The horizon, not the code, separates the first two rounds. The third shows that a model and an
+optimizer on 37 ETFs and five years do not beat the paper's rule out of sample. The full table, the claims ledger and every
 regenerating command are in [`RESULTS.md`](../Resume_Reproduction/RESULTS.md):
 
 ```bash

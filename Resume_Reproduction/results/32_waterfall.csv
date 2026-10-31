@@ -1,0 +1,44 @@
+# round: 3, Part B, the Test read
+# test_read: single read at 2026-10-30T19:40:25, frozen at commit 7e00439
+# procedure: CatBoost | regime on
+# third_look: Round 1 and Round 2 read these Test quarters first
+# execution: next close (d = 1), 5 bp + 2 bp; excess of DTB3
+# what: raw PnL per $1 under each execution assumption; H undefined when the naive PnL <= 0
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+book,window,variant,cum_pnl,ann_pnl
+R0 = T0 (paper),Test 2025Q3-2026Q2,"naive_0 (same close, free)",0.200662805657581,0.20226810810284163
+R0 = T0 (paper),Test 2025Q3-2026Q2,"naive_1 (next close, free)",0.20633720948139023,0.20798790715724133
+R0 = T0 (paper),Test 2025Q3-2026Q2,+ cost 5 bp,0.19950489095971036,0.20110093008738802
+R0 = T0 (paper),Test 2025Q3-2026Q2,realistic (+ slippage 2 bp),0.19677196355103876,0.19834613925944708
+R0 = T0 (paper),Test 2025Q3-2026Q2,H_1 = 1 - realistic / naive_1,0.04635734850923323,
+R0 = T0 (paper),Test 2025Q3-2026Q2,H_0 = 1 - realistic / naive_0,0.01938995168432811,
+R0 = T0 (paper),WF 2022Q1-2026Q2,"naive_0 (same close, free)",0.15910558304648875,0.03563965060241348
+R0 = T0 (paper),WF 2022Q1-2026Q2,"naive_1 (next close, free)",0.15766657966105624,0.035317313844076596
+R0 = T0 (paper),WF 2022Q1-2026Q2,+ cost 5 bp,0.13154034910450174,0.029465038199408388
+R0 = T0 (paper),WF 2022Q1-2026Q2,realistic (+ slippage 2 bp),0.12108985688188112,0.02712412794154137
+R0 = T0 (paper),WF 2022Q1-2026Q2,H_1 = 1 - realistic / naive_1,0.23198779892229504,
+R0 = T0 (paper),WF 2022Q1-2026Q2,H_0 = 1 - realistic / naive_0,0.23893395465261513,
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,"naive_0 (same close, free)",-0.04155722261109224,-0.011968480111994565
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,"naive_1 (next close, free)",-0.04867062982033399,-0.014017141388256188
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,+ cost 5 bp,-0.06796454185520862,-0.01957378805430008
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,realistic (+ slippage 2 bp),-0.07568210666915764,-0.0217964467207174
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,H_1 = 1 - realistic / naive_1,,
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,H_0 = 1 - realistic / naive_0,,
+P,Test 2025Q3-2026Q2,"naive_0 (same close, free)",0.010518740373873264,0.01060289029686425
+P,Test 2025Q3-2026Q2,"naive_1 (next close, free)",0.02065595552789984,0.020821203172123038
+P,Test 2025Q3-2026Q2,+ cost 5 bp,0.0024353345888610822,0.002454817265571971
+P,Test 2025Q3-2026Q2,realistic (+ slippage 2 bp),-0.004852913786754232,-0.004891737097048265
+P,Test 2025Q3-2026Q2,H_1 = 1 - realistic / naive_1,1.2349401740432409,
+P,Test 2025Q3-2026Q2,H_0 = 1 - realistic / naive_0,1.4613588333074587,
+P,WF 2022Q1-2026Q2,"naive_0 (same close, free)",0.16247665034235304,0.03639476967668708
+P,WF 2022Q1-2026Q2,"naive_1 (next close, free)",0.24029713488301035,0.05382655821379432
+P,WF 2022Q1-2026Q2,+ cost 5 bp,0.15455874255962254,0.034621158333355447
+P,WF 2022Q1-2026Q2,realistic (+ slippage 2 bp),0.12026338563026795,0.02693899838118002
+P,WF 2022Q1-2026Q2,H_1 = 1 - realistic / naive_1,0.49952218244791524,
+P,WF 2022Q1-2026Q2,H_0 = 1 - realistic / naive_0,0.2598112690231975,
+P,WF pre-Test 2022Q1-2025Q2,"naive_0 (same close, free)",0.15195790996847977,0.04376387807092217
+P,WF pre-Test 2022Q1-2025Q2,"naive_1 (next close, free)",0.21964117935511052,0.06325665965427182
+P,WF pre-Test 2022Q1-2025Q2,+ cost 5 bp,0.15212340797076146,0.0438115414955793
+P,WF pre-Test 2022Q1-2025Q2,realistic (+ slippage 2 bp),0.12511629941702218,0.036033494232102385
+P,WF pre-Test 2022Q1-2025Q2,H_1 = 1 - realistic / naive_1,0.43036046435200936,
+P,WF pre-Test 2022Q1-2025Q2,H_0 = 1 - realistic / naive_0,0.1766384557212275,
