@@ -65,3 +65,56 @@ def test_turnover_sources_sum_to_the_actual_change():
     w1, lev = T.t1_targets(w0, xr)
     src1 = R3.turnover_sources_t1(w0, lev, w1)
     assert src1["check"].max() < 1e-12
+
+
+# ----------------------------------------------------------------------------- Part B
+def _book(n=500, k=6, seed=5):
+    cal, xr = _toy(n, k, seed)
+    close = (1 + xr).cumprod() * 100
+    me = T.month_ends(cal)
+    rng = np.random.default_rng(seed)
+    w = pd.DataFrame(rng.uniform(-0.3, 0.3, (len(me), k)), index=me, columns=xr.columns)
+    return cal, xr, close, me, w
+
+
+def test_label_is_known_at_the_next_month_end():
+    cal, xr = _toy()
+    me = T.month_ends(cal)
+    lab = R3.label_return(xr, cal, me, d=1)
+    pos = cal.get_indexer(me)
+    expect = np.prod(1 + xr.iloc[pos[2] + 2: pos[3] + 1].to_numpy(), axis=0) - 1
+    assert np.allclose(lab.iloc[2].to_numpy(), expect)
+    xr2 = xr.copy(); xr2.iloc[pos[3] + 1:] *= 9
+    assert np.allclose(R3.label_return(xr2, cal, me, 1).iloc[2].to_numpy(), expect)
+
+
+def test_sliced_engine_matches_the_full_run_after_the_start_fill():
+    from rr_engine import simulate
+    cal, xr, close, me, w = _book()
+    run = lambda c, o, ww, cc: simulate(o, c, T.daily_weights(ww, cc), lag=1, deadband=T.rebalance_deadband(ww, cc, lag=1),
+                                        cost_bp=5, slip_bp=2)
+    full = run(close, close, w, cal)
+    s = cal.get_loc(me[8]); e = cal.get_loc(me[12])
+    sl = run(close.iloc[s:e + 1], close.iloc[s:e + 1], w.loc[me[8]:me[11]], cal[s:e + 1])
+    after = cal[s + 2:e + 1]
+    assert np.allclose(full["pnl_net"].loc[after].to_numpy(), sl["pnl_net"].loc[after].to_numpy(), atol=1e-12)
+
+
+def test_drifted_weights_match_the_engine():
+    from rr_engine import simulate
+    cal, xr, close, me, w = _book()
+    res = simulate(close, close, T.daily_weights(w, cal), lag=1, deadband=T.rebalance_deadband(w, cal, lag=1))
+    i_fill, i_now = cal.get_loc(me[5]) + 1, cal.get_loc(me[6])
+    got = R3.drifted(w.loc[me[5]].to_numpy(), close, i_fill, i_now)
+    assert np.allclose(got, res["w_held"].iloc[i_now].to_numpy())
+
+
+def test_choose_drops_deep_drawdowns_then_takes_the_highest_cumulative():
+    idx = pd.bdate_range("2024-01-01", periods=60)
+    rng = np.random.default_rng(0)
+    base = rng.normal(0, 0.001, 60)
+    s = {"deep": pd.Series(np.r_[np.full(30, 0.004), np.full(10, -0.01), np.full(20, 0.004)], index=idx),
+         "steady": pd.Series(base + 0.001, index=idx), "flat": pd.Series(np.zeros(60), index=idx),
+         "weak": pd.Series(base, index=idx)}
+    pick, tab = R3.choose(s)
+    assert not tab.loc["deep", "kept"] and pick == "steady"
