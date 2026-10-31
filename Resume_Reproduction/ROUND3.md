@@ -229,6 +229,46 @@ $$ \max_w \ \hat\mu^\top w - \gamma \sum_i |w_i - w_{\text{prev},i}| \quad \text
 | P with γ fixed at 1e-4 | the turnover term's contribution |
 | All 10 procedures | the stitched train-ladder record, every one, so the OV choice can be seen against what it chose from |
 
+## Amendment 1 — the three execution factors inside the optimizer (Harry, 2026-10-30)
+
+Added after Part A and **before any Part B number existed**. Harry asked that the book anticipate
+the three factors of bullet 2 when it chooses its weights. Before this amendment it only paid
+them afterwards. The engine already charges all three on every fill. What changes is that the
+optimizer now prices them in advance.
+
+| Factor | In the engine (unchanged) | In the optimizer and the model (new) |
+| --- | --- | --- |
+| **Transaction cost** | c = 5 bp per side + s = 2 bp slippage on traded dollars | a cost term −φ Σᵢ κᵢ \|wᵢ − w_heldᵢ\|, with κᵢ = (c + s) / 10⁴ per dollar traded. **φ = 1, fixed**: a cost is an expense, not a preference, so it is not tuned |
+| **Turnover** | — | the γ term, as before: a penalty on top of the cost, chosen on validation from the course's grid |
+| **Execution delay** | the fill is d trading days after the decision close; d = 1 | the model is trained on the return from the fill F + d to the next month-end F′; the optimizer trades from **w_held**, the live book drifted at prices to the decision close |
+
+So B3 becomes:
+
+$$ \max_w \ \hat\mu^\top w - \sum_i (\varphi \kappa_i + \gamma)\,|w_i - w_{\text{held},i}| \quad \text{s.t.} \quad w^\top \hat\Sigma w \le \sigma_0^2,\ \ |w_i| \le 0.5,\ \ \sum_i |w_i| \le 3,\ \ \mathbf{1}^\top w \le 1 $$
+
+- **With one cost rate for every ETF, φκ and γ add.** The cost is then a floor under γ: even at
+  γ = 1e-4 a trade is made only if its expected gain beats 7 bp. The cost grid (§ 7) re-solves
+  the optimizer at each cost rate, so the book always prices the cost it is charged.
+- **The label is known at F′.** A training label ends at the next month-end close, not at the next
+  fill, so at a fit date F every label ending by F is usable. No row is purged, and the label omits
+  the first d days of its holding month and none after it.
+
+**What is added to B5.** The chosen procedure P is also reported:
+
+- with φ = 0, blind to costs, which the engine still charges;
+- with γ = 1e-4;
+- with both;
+- at d = 2 and d = 3, re-run end to end and re-trained at that delay.
+
+**What is added to § 7.** An execution waterfall for P beside R0, bullet 2's decomposition:
+
+1. same-close and free (d = 0, non-executable);
+2. next close (d = 1);
+3. + 5 bp cost;
+4. + 2 bp slippage.
+
+This is reported with H₁ and H₀, and with how much of R0's haircut the cost-aware optimizer wins back.
+
 ## 6. Samples, and the caveat
 
 | Sample | Quarters | Status in the course's terms |

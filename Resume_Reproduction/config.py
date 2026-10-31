@@ -161,4 +161,10 @@ ROUND3 = {
     "pair_rule": "drop pairs with validation max drawdown deeper than the grid median; highest cumulative "
                  "excess return; if top two within one SE of the mean daily return, higher Sharpe",
     "first_apply_q": "2022Q1", "last_apply_q": "2026Q2",
+    # ---- Amendment 1 (Harry, 2026-10-30, before Part B ran): the three execution factors in the optimizer
+    "cost_phi": 1.0,                          # transaction-cost term: phi x kappa_i x |w - w_held|; fixed, not tuned
+    "kappa_bp": COST_BP + SLIP_BP,            # per dollar traded, the engine's own c + s
+    "delay_days": 1,                          # d: fill d trading days after the decision close
+    "delay_grid": (2, 3),                     # P re-run end to end at these delays
+    "label": "excess return from the fill F + d to the next month-end close F', known at F'",
 }
