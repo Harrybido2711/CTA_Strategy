@@ -1,0 +1,43 @@
+# round: 3, Part B before Test (ROUND3.md section 5, amendment 1)
+# apply_quarters: 2022Q1..2025Q2, 14 rungs
+# last_month_end: 2025-05-30
+# execution: next close (d = 1), 5 bp + 2 bp; excess of DTB3; optimizer prices phi x kappa = 7 bp + gamma
+# what: raw PnL per $1 (not excess) under each execution assumption; H undefined when the naive PnL <= 0
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+book,window,variant,cum_pnl,ann_pnl,sharpe_excess
+R0 = T0 (paper),train-ladder 2022Q1-2024Q2,"naive_0 (same close, free)",-0.1200526544406137,-0.048405230270455436,-0.1340989581631289
+R0 = T0 (paper),train-ladder 2022Q1-2024Q2,"naive_1 (next close, free)",-0.11532576818376039,-0.04649934973169219,-0.12090602151716649
+R0 = T0 (paper),train-ladder 2022Q1-2024Q2,+ cost 5 bp,-0.1274235933343888,-0.05137719283242556,-0.15368120568905982
+R0 = T0 (paper),train-ladder 2022Q1-2024Q2,realistic (+ slippage 2 bp),-0.1322627233946403,-0.05332833007271896,-0.16677808110252565
+R0 = T0 (paper),train-ladder 2022Q1-2024Q2,H_1 = 1 - realistic / naive_1,,,
+R0 = T0 (paper),train-ladder 2022Q1-2024Q2,H_0 = 1 - realistic / naive_0,,,
+R0 = T0 (paper),OV 2024Q3-2025Q2,"naive_0 (same close, free)",0.0784954318295219,0.07912339528415807,0.0805565225232588
+R0 = T0 (paper),OV 2024Q3-2025Q2,"naive_1 (next close, free)",0.0666551383634264,0.0671883794703338,0.002211852225370434
+R0 = T0 (paper),OV 2024Q3-2025Q2,+ cost 5 bp,0.05945905147918018,0.05993472389101362,-0.043831309191386426
+R0 = T0 (paper),OV 2024Q3-2025Q2,realistic (+ slippage 2 bp),0.056580616725482646,0.05703326165928651,-0.06218196126651169
+R0 = T0 (paper),OV 2024Q3-2025Q2,H_1 = 1 - realistic / naive_1,0.15114396107039862,,
+R0 = T0 (paper),OV 2024Q3-2025Q2,H_0 = 1 - realistic / naive_0,0.27918586589388195,,
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,"naive_0 (same close, free)",-0.04155722261109179,-0.011968480111994436,-0.071305378162462
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,"naive_1 (next close, free)",-0.04867062982033399,-0.014017141388256188,-0.08431202334083973
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,+ cost 5 bp,-0.06796454185520862,-0.01957378805430008,-0.12099435026278543
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,realistic (+ slippage 2 bp),-0.07568210666915764,-0.0217964467207174,-0.13563991738481188
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,H_1 = 1 - realistic / naive_1,,,
+R0 = T0 (paper),WF pre-Test 2022Q1-2025Q2,H_0 = 1 - realistic / naive_0,,,
+P,train-ladder 2022Q1-2024Q2,"naive_0 (same close, free)",0.0482442113970829,0.019452066035303826,0.5392809996655308
+P,train-ladder 2022Q1-2024Q2,"naive_1 (next close, free)",0.06348069469241369,0.025595416099981196,0.6137756893284656
+P,train-ladder 2022Q1-2024Q2,+ cost 5 bp,0.010011181185508478,0.004036508253997018,0.37163005890988177
+P,train-ladder 2022Q1-2024Q2,realistic (+ slippage 2 bp),-0.011376624217253217,-0.004587054884396497,0.27550659256887383
+P,train-ladder 2022Q1-2024Q2,H_1 = 1 - realistic / naive_1,1.179213921214583,,
+P,train-ladder 2022Q1-2024Q2,H_0 = 1 - realistic / naive_0,1.2358132486323758,,
+P,OV 2024Q3-2025Q2,"naive_0 (same close, free)",0.10371369857139695,0.10454340815996813,0.7176616655667223
+P,OV 2024Q3-2025Q2,"naive_1 (next close, free)",0.15616048466269683,0.1574097685399984,1.2231427941651551
+P,OV 2024Q3-2025Q2,+ cost 5 bp,0.14211222678525298,0.143249124599535,1.0946295300729982
+P,OV 2024Q3-2025Q2,realistic (+ slippage 2 bp),0.1364929236342754,0.1375848670233496,1.0424147071844618
+P,OV 2024Q3-2025Q2,H_1 = 1 - realistic / naive_1,0.12594454397924626,,
+P,OV 2024Q3-2025Q2,H_0 = 1 - realistic / naive_0,-0.31605492345172803,,
+P,WF pre-Test 2022Q1-2025Q2,"naive_0 (same close, free)",0.15195790996847985,0.0437638780709222,0.5950421412799255
+P,WF pre-Test 2022Q1-2025Q2,"naive_1 (next close, free)",0.21964117935511052,0.06325665965427182,0.8074848048677898
+P,WF pre-Test 2022Q1-2025Q2,+ cost 5 bp,0.15212340797076146,0.0438115414955793,0.6007987658017386
+P,WF pre-Test 2022Q1-2025Q2,realistic (+ slippage 2 bp),0.12511629941702218,0.036033494232102385,0.5180453786515062
+P,WF pre-Test 2022Q1-2025Q2,H_1 = 1 - realistic / naive_1,0.43036046435200936,,
+P,WF pre-Test 2022Q1-2025Q2,H_0 = 1 - realistic / naive_0,0.17663845572122794,,

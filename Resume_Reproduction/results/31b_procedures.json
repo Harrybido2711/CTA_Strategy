@@ -1,0 +1,12 @@
+{
+  "round": "3, Part B before Test (ROUND3.md section 5, amendment 1)",
+  "apply_quarters": "2022Q1..2025Q2, 14 rungs",
+  "last_month_end": "2025-05-30",
+  "execution": "next close (d = 1), 5 bp + 2 bp; excess of DTB3; optimizer prices phi x kappa = 7 bp + gamma",
+  "what": "every procedure and the two baselines, realistic execution",
+  "turnover": "executed, per $1 a year, the record's first day (the build from zero) excluded",
+  "sample": "37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return",
+  "git": "e7002b9",
+  "written": "2026-10-30T19:38:31",
+  "rows": 33
+}

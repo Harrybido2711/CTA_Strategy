@@ -183,6 +183,31 @@ come from the inner choice of (σ₀, γ), for two reasons:
 `ROUND3.md` B3 re-expressed λ in the units it means; γ needed the same treatment and did not get
 it. That is an error in the pre-registration, not a finding about turnover control.
 
+### The amended run (amendment 2: γ ∈ {0, 0.5, 1, 2} × 7 bp), before Test
+
+This was written after the first run's numbers above had been seen, and it is labelled so. Tables
+are `results/31b_*`, run at `e7002b9`. The chosen procedure is unchanged: **CatBoost with regime
+features**.
+
+| WF pre-Test 2022Q1–2025Q2 | Sharpe | Excess a year | Max DD | Turnover | OV Sharpe |
+| --- | --- | --- | --- | --- | --- |
+| R0 = T0 | −0.14 | −2.1% | −0.40 | 11.0 | −0.06 |
+| T1 | 0.09 | +0.9% | −0.22 | 11.8 | −0.01 |
+| **P** | **0.52** | **+5.0%** | **−0.09** | 38.1 | 1.04 |
+| P, γ = 0 (the cost term alone) | 0.86 | — | — | 46.5 | 1.03 |
+| P, φ = 0 (blind to costs) | 0.67 | — | — | 43.2 | 1.10 |
+| P, regime features off | −0.41 | — | — | 45.9 | −0.57 |
+| P at d = 2 / d = 3, re-trained | 0.44 / 0.56 | — | — | 44.4 / 44.2 | 0.48 / 1.29 |
+
+- **P against R0.** ΔSR = +0.65, 90% CI −0.31 to +1.57. Turnover is **+245%** (CI +170% to +343%).
+- **P against T1.** ΔSR = +0.43, CI −0.53 to +1.38.
+- **The deflated Sharpe of OV's winner is 0.62.**
+- **The γ term now works as a turnover control.** It sits at 2κ in 10 of 14 rungs, and cuts
+  turnover by 18% against the same pipeline at γ = 0. On this record that costs 0.34 of Sharpe.
+- **The cost term cuts turnover by 12%** against φ = 0.
+- **The waterfall.** P falls from +6.3% a year at next close and free, to +4.4% after the 5 bp cost,
+  to +3.6% after slippage: **H₁ = 43%**, and H₀ = 18% against its same-close +4.4%.
+
 ## Round 2 — time-series momentum
 
 ### Bottom line
