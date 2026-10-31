@@ -1,0 +1,8 @@
+# round: 3, Part B before Test (ROUND3.md section 5, amendment 1)
+# apply_quarters: 2022Q1..2025Q2, 14 rungs
+# last_month_end: 2025-05-30
+# execution: next close (d = 1), 5 bp + 2 bp; excess of DTB3; optimizer prices phi x kappa = 7 bp + gamma
+# what: deflated Sharpe of OV's winner against the procedures it was chosen from (daily units)
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+procedure,sharpe_daily,sr0_daily,dsr,n_trials,days
+CatBoost | regime on,0.05550678338834639,0.04495306523083648,0.565941114522476,9,250

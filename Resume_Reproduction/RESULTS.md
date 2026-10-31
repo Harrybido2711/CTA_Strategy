@@ -9,8 +9,8 @@ Two rounds were run on 2026-10-23. **Round 2 is the current answer.**
   and regime analysis Harry asked for. Its plan is `ROUND2.md`, committed before any Round 2 number
   existed.
 - **Round 3** follows Harry's learning path. Its plan is `ROUND3.md`, pre-registered at `5d94bc8`.
-  Part A, the regime analysis under the dynamic cut, has run (below). Part B, the model and the
-  optimizer, has not.
+  Part A, the regime analysis under the dynamic cut, has run. Part B, the model and the optimizer,
+  has run through OV; its Test read is pending (below).
 
 **Sample:** 37 liquid US-listed ETFs as futures proxies, daily, total-return prices, returns in
 excess of the 3-month bill (DTB3 × net exposure). **Execution:** next-close fill, 5 bp per side
@@ -106,6 +106,82 @@ sizing, cap and leverage trades: 36% of T0's parts and 51% of T1's.
 ```bash
 .venv/bin/python Resume_Reproduction/run_30_round3_regimes.py
 ```
+
+## Round 3, Part B before Test — the learning path's pipeline (2026-10-30)
+
+**Sample:** 14 quarterly rungs, apply quarters 2022Q1 → 2025Q2. Month-ends run through 2025-05-30
+and statistics are masked at 2025-06-30. **Pipeline:** `ROUND3.md` § 5 with amendment 1:
+
+- the B1 features;
+- an EW / Ridge / Lasso / CatBoost / HGB grid, chosen by validation MSE;
+- the cost-aware optimizer (risk budget σ₀, fixed cost term φκ = 7 bp, turnover penalty γ), with
+  (σ₀, γ) chosen per rung on the validation quarter by chapter 09's rule;
+- next-close fill, 5 + 2 bp.
+
+Script `run_31_round3_pipeline.py` (run at `d9decdc`, 173 s); tables `results/31_*`. Test has not
+been read for Round 3.
+
+### Nine procedures and the baselines
+
+Sharpe and excess return in excess of bills. Turnover is executed $ per $1 a year, without the
+first day's build from zero.
+
+| Book | WF pre-Test Sharpe | WF excess a year | WF max DD | WF turnover | OV Sharpe | OV excess |
+| --- | --- | --- | --- | --- | --- | --- |
+| R0 = T0, the paper | −0.14 | −2.1% | −0.40 | 11.0 | −0.06 | −1.0% |
+| T1, 10% vol target | 0.09 | +0.9% | −0.22 | 11.8 | −0.01 | −0.1% |
+| EW | 0.08 | +0.7% | −0.14 | 5.9 | 0.48 | +7.1% |
+| Ridge, regime off / on | −0.01 / 0.17 | −0.1% / +1.7% | −0.18 / −0.16 | 12.4 / 11.3 | −0.12 / 0.83 | −2.1% / +11.2% |
+| Lasso, regime off / on | −0.01 / 0.40 | −0.1% / +4.4% | −0.16 / −0.18 | 9.4 / 8.9 | −0.43 / 0.39 | −6.0% / +7.3% |
+| CatBoost, regime off / **on** | −0.29 / **0.29** | −3.2% / **+2.8%** | −0.24 / **−0.10** | 20.1 / **17.1** | −0.04 / **0.88** | −0.6% / **+9.5%** |
+| HGB, regime off / on | −0.16 / 0.14 | −1.6% / +1.7% | −0.15 / −0.19 | 20.6 / 12.3 | −0.24 / 0.42 | −2.9% / +5.7% |
+
+- **The regime features help every model class**, on the walk-forward record and on OV alike.
+  That is what Part A's F2 led one to expect.
+- **OV chose CatBoost with regime features (P)** (`31_choice`). Ridge with regime features had the
+  higher OV cumulative return, but within one SE, so the higher Sharpe broke the tie.
+- **The OV winner is not significant once selection is counted.** Its deflated Sharpe against the
+  nine procedures is 0.57.
+
+### P against the baseline
+
+| Statistic | Value |
+| --- | --- |
+| ΔSR, P − R0, WF pre-Test | **+0.43**, 90% CI −0.65 to +1.42 (mean block 21) |
+| ΔSR, P − T1 | +0.21, 90% CI −0.84 to +1.21 |
+| ΔTO, P against R0 | **+55%**, 90% CI −2% to +136%: turnover **rose** |
+
+R0's Sharpe on this window is −0.14, so a percentage change is undefined (C20).
+
+**Execution waterfall** (`31_waterfall`, raw PnL a year, WF pre-Test). P falls from +2.5% at next
+close and free, to +1.7% after the 5 bp cost, to +1.3% after slippage, so **H₁ = 47%**. Its
+same-close version earns less, +1.0%, so H₀ is negative. R0's naive return is negative on this
+window, so its H is undefined.
+
+### Ablations, and why they swing (`31_ablations`, `31_rung_log`)
+
+| P variant, WF pre-Test | Sharpe | Turnover |
+| --- | --- | --- |
+| P as chosen | 0.29 | 17.1 |
+| γ fixed at 1e-4 | 0.87 | 46.0 |
+| φ = 0, blind to costs | −0.28 | 15.9 |
+| φ = 0 and γ = 1e-4 | 0.65 | 48.9 |
+| regime features off | −0.29 | 20.1 |
+| d = 2, re-trained | 0.48 | 6.9 |
+| d = 3, re-trained | 0.82 | 6.4 |
+
+The swings are too large to belong to the factors themselves; a longer delay should not help. They
+come from the inner choice of (σ₀, γ), for two reasons:
+
+- **The choice is close to random.** Across P's 14 rungs, γ took each of its four values 2 to 5
+  times. Three monthly rebalances in a validation quarter cannot separate 16 pairs.
+- **Three of the four γ values freeze the book.** The course's grid {1e-4, 0.01, 0.1, 1} is in
+  monthly-return units per dollar traded. γ = 0.01 asks for 1% of expected gain on every dollar
+  traded, against a cost of 0.07%, and 0.1 and 1 forbid trading outright. So the book alternates
+  between frozen quarters and full rebuilds, which is why turnover rises instead of falling.
+
+`ROUND3.md` B3 re-expressed λ in the units it means; γ needed the same treatment and did not get
+it. That is an error in the pre-registration, not a finding about turnover control.
 
 ## Round 2 — time-series momentum
 

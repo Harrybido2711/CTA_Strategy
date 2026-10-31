@@ -1,0 +1,18 @@
+# round: 3, Part B before Test (ROUND3.md section 5, amendment 1)
+# apply_quarters: 2022Q1..2025Q2, 14 rungs
+# last_month_end: 2025-05-30
+# execution: next close (d = 1), 5 bp + 2 bp; excess of DTB3; optimizer prices phi x kappa = 7 bp + gamma
+# what: OV comparison of the procedures by chapter 09's rule
+# chosen: CatBoost | regime on
+# rule: drop pairs with validation max drawdown deeper than the grid median; highest cumulative excess return; if top two within one SE of the mean daily return, higher Sharpe
+# sample: 37 liquid US-listed ETFs as futures proxies; daily UTC-dated bars; 2020-01-02 to 2026-06-29; split-adjusted copy (DATA.md 4); dividends unadjusted unless the file says total return
+cand,cum,max_dd,mean,se,sharpe,kept,chosen
+EW | regime off,0.07067331241174193,-0.11735093366007734,0.00028269324964696774,0.0005877332078497709,0.48290919469929006,True,False
+Ridge | regime off,-0.020910147727466362,-0.18369383830725394,-8.364059090986545e-05,0.000690703705945269,-0.12157816164753955,False,False
+Ridge | regime on,0.11095658812141596,-0.10816757196661239,0.00044382635248566384,0.0005381821025581988,0.827969044861402,True,False
+Lasso | regime off,-0.059305774751684824,-0.16136141490522704,-0.0002372230990067393,0.0005564125424910793,-0.4280458885866819,False,False
+Lasso | regime on,0.07274600347867372,-0.17509085440169989,0.00029098401391469485,0.0007556585213291002,0.38661064901324504,False,False
+CatBoost | regime off,-0.005779002898356811,-0.12452603102722368,-2.3116011593427245e-05,0.0005433544735604841,-0.042712984942709135,False,False
+CatBoost | regime on,0.09454893712713872,-0.10083476020691573,0.00037819574850855484,0.0004309238956658233,0.8811428695361742,True,True
+HGB | regime off,-0.0290506377799764,-0.1108209653048137,-0.0001162025511199056,0.0004776244213219927,-0.24426396598619018,True,False
+HGB | regime on,0.056853508194995024,-0.09143823135006848,0.0002274140327799801,0.0005423854073520205,0.4209587384634724,True,False
